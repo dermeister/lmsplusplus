@@ -1,6 +1,7 @@
 import React from "react";
 
 import autorender from "../autorender";
+import { Button } from "../Button";
 import { SignIn } from "../SignIn";
 import { AppModel } from "./AppModel";
 
@@ -28,7 +29,7 @@ export function App({ model }: AppProps): JSX.Element {
 
   return autorender(() => (
     <div>
-      <button onClick={onClick}>Click</button>
+      <Button onClick={onClick}>Click</Button>
       {content(model)}
     </div>
   ));
