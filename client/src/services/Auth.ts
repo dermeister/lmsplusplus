@@ -23,6 +23,7 @@ export class Auth extends ObservableObject {
 
     try {
       this._user = await Promise.resolve(new User());
+      localStorage.setItem(this.localStorageKey, JSON.stringify(this._user));
     } catch (e) {
       if (e.message === "Bad Request") return false;
       throw e;
