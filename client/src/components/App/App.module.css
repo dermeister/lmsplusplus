@@ -1,0 +1,15 @@
+:root {
+  --app-background-color: #212121;
+  --app-text-color: #ffffff;
+  --input-text-color: #ffffff;
+  --input-background-color: #757575;
+  --input-background-color-focus: #9e9e9e;
+  --primary-button-color: #ffc107;
+  --primary-button-color-hover: #ffa000;
+  --shadow-color: #000000;
+  --border-radius: 2px;
+}
+
+.app {
+  height: 100vh;
+}

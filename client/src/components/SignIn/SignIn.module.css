@@ -1,0 +1,49 @@
+.screen {
+  height: 100%;
+  background-color: var(--app-background-color);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.screen-title {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: var(--app-text-color);
+  user-select: none;
+  @apply text-4xl font-mono;
+}
+
+.form {
+  margin: auto;
+  padding: 20px;
+  width: 400px;
+  background-color: var(--app-background-color);
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 15px var(--shadow-color);
+}
+
+.form-heading {
+  margin-bottom: 24px;
+  color: var(--app-text-color);
+  text-align: center;
+  user-select: none;
+  @apply text-2xl;
+}
+
+.label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--app-text-color);
+  user-select: none;
+  @apply text-xl;
+}
+
+.input {
+  margin-bottom: 12px;
+}
+
+.submit {
+  margin-top: 10px;
+}

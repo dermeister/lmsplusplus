@@ -1,9 +1,9 @@
 import React from "react";
 
 import autorender from "../autorender";
-import { Button } from "../Button";
 import { SignIn } from "../SignIn";
 import { AppModel } from "./AppModel";
+import styles from "./App.module.css";
 
 interface AppProps {
   model: AppModel;
@@ -19,18 +19,5 @@ function signedIn(): JSX.Element {
 }
 
 export function App({ model }: AppProps): JSX.Element {
-  async function onClick(): Promise<void> {
-    if (model.auth.user === null) {
-      await model.auth.signIn("Denis", "12345678");
-    } else {
-      model.auth.signOut();
-    }
-  }
-
-  return autorender(() => (
-    <div>
-      <Button onClick={onClick}>Click</Button>
-      {content(model)}
-    </div>
-  ));
+  return autorender(() => <div className={styles.app}>{content(model)}</div>);
 }

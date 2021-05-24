@@ -1,3 +1,24 @@
 .button {
-  @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded;
+  padding: 8px 16px;
+  background-color: var(--primary-button-color);
+  font-weight: bold;
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 15px var(--shadow-color);
+}
+
+.button:hover {
+  background-color: var(--primary-button-color-hover);
+}
+
+.button:focus {
+  background-color: var(--primary-button-color-hover);
+  outline: none;
+}
+
+.button:active {
+  transform: scale(0.99);
+}
+
+.fluid {
+  width: 100%;
 }
