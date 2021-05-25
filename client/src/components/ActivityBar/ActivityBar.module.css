@@ -16,11 +16,13 @@
   background-color: var(--primary-button-background-color);
   color: var(--primary-button-text-color);
   border-radius: var(--border-radius);
+  border: none;
   box-shadow: 0 0 6px var(--shadow-color);
 }
 
 .activity-button:hover {
   background-color: var(--primary-button-background-color-hover);
+  cursor: pointer;
 }
 
 .activity-button:focus-visible {

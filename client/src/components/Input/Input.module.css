@@ -2,6 +2,8 @@
   padding: 8px;
   color: var(--input-text-color);
   background-color: var(--input-background-color);
+  font-size: var(--app-font-size-regular);
+  border: none;
   outline: none;
   box-shadow: inset 1px 1px 1px var(--shadow-color),
     inset -1px -1px 1px var(--shadow-color);
