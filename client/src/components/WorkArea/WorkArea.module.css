@@ -1,0 +1,11 @@
+.work-area {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  overflow: hidden;
+}
+
+.main-panel {
+  flex-grow: 1;
+  color: var(--app-text-color);
+}

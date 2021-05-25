@@ -2,8 +2,9 @@ import React from "react";
 
 import autorender from "../autorender";
 import { AppModel } from "./AppModel";
-import { ActivityBar } from "../ActivityBar";
+import { Activities } from "../Activities";
 import styles from "./App.module.css";
+import { WorkArea } from "../WorkArea";
 
 interface AppProps {
   model: AppModel;
@@ -12,7 +13,8 @@ interface AppProps {
 function content(model: AppModel): JSX.Element {
   return (
     <>
-      <ActivityBar model={model.activityBar} />
+      <Activities model={model.activities} />
+      <WorkArea />
     </>
   );
 }

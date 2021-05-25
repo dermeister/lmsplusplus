@@ -1,0 +1,7 @@
+.side-panel {
+  padding: 16px;
+  width: 280px;
+  height: 100%;
+  box-shadow: 1px 0 3px var(--shadow-color), -1px 0 3px var(--shadow-color);
+  color: var(--app-text-color);
+}

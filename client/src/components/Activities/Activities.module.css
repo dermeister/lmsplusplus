@@ -3,9 +3,9 @@
   align-items: center;
   flex-direction: column;
   width: 74px;
-  padding: 16px 0px;
+  padding: 16px;
   height: 100%;
-  box-shadow: 0 1px 10px var(--shadow-color);
+  box-shadow: 1px 0 3px var(--shadow-color);
 }
 
 .activity-button {
@@ -37,7 +37,7 @@
   transform: scale(0.98);
   background-color: var(--primary-button-background-color-hover);
   transform-origin: center center;
-  animation: spin 0.3s ease-in-out;
+  animation: rotate 0.3s ease-in-out;
 }
 
 .activity-button:last-child {
@@ -48,7 +48,7 @@
   margin-top: auto;
 }
 
-@keyframes spin {
+@keyframes rotate {
   0% {
     transform: rotate(0deg);
   }

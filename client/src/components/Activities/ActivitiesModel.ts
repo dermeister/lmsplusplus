@@ -7,16 +7,16 @@ export enum Activity {
   Settings,
 }
 
-export class ActivityBarModel extends ObservableObject {
-  private _activity: Activity = Activity.Tasks;
+export class ActivitiesModel extends ObservableObject {
+  private _current: Activity = Activity.Tasks;
 
   @cached
-  public get activity(): Activity {
-    return this._activity;
+  public get current(): Activity {
+    return this._current;
   }
 
   @transaction
   public setActivity(activity: Activity): void {
-    this._activity = activity;
+    this._current = activity;
   }
 }

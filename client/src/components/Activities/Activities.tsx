@@ -1,20 +1,20 @@
 import React from "react";
 
 import autorender from "../autorender";
-import { Activity, ActivityBarModel } from "./ActivityBarModel";
-import styles from "./ActivityBar.module.css";
+import { Activity, ActivitiesModel } from "./ActivitiesModel";
+import styles from "./Activities.module.css";
 
 interface ActivityBarProps {
-  model: ActivityBarModel;
+  model: ActivitiesModel;
 }
 
 function button(
-  model: ActivityBarModel,
+  model: ActivitiesModel,
   activity: Activity,
   title: string
 ): JSX.Element {
   let className = styles.activityButton;
-  if (model.activity === activity) className += ` ${styles.selected}`;
+  if (model.current === activity) className += ` ${styles.selected}`;
 
   return (
     <button onClick={() => model.setActivity(activity)} className={className}>
@@ -23,7 +23,7 @@ function button(
   );
 }
 
-export function ActivityBar({ model }: ActivityBarProps): JSX.Element {
+export function Activities({ model }: ActivityBarProps): JSX.Element {
   return autorender(() => (
     <div className={styles.activityBar}>
       <div className={styles.topButtons}>
