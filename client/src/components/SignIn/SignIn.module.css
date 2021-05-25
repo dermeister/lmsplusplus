@@ -1,6 +1,5 @@
 .screen {
   height: 100%;
-  background-color: var(--app-background-color);
   display: flex;
   flex-direction: column;
   position: relative;

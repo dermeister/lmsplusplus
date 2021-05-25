@@ -7,9 +7,4 @@ import "./index.css";
 
 const model = Transaction.run(() => new AppModel());
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App model={model} />
-  </React.StrictMode>,
-  document.getElementById("root")
-);
+ReactDOM.render(<App model={model} />, document.getElementById("root"));

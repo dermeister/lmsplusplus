@@ -12,15 +12,15 @@ export class Auth extends ObservableObject {
   private _user: User | null = null;
   private localStorageKey: string;
 
+  @cached
+  public get user(): User | null {
+    return this._user;
+  }
+
   public constructor(localStorageKey: string) {
     super();
     this.localStorageKey = localStorageKey;
     this._user = this.loadUserFromLocalStorage();
-  }
-
-  @cached
-  public get user(): User | null {
-    return this._user;
   }
 
   @transaction
@@ -49,7 +49,7 @@ export class Auth extends ObservableObject {
     return User.deserialize(serializedUser);
   }
 
-  @reaction
+  // @reaction
   private updateLocalStorage(): void {
     if (this._user === null) {
       localStorage.removeItem(this.localStorageKey);

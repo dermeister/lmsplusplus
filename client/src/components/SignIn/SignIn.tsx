@@ -19,44 +19,51 @@ export function SignIn({ model }: SignInProps): JSX.Element {
     model.setPassword(e.target.value);
   }
 
-  return autorender(() => (
-    <div className={styles.screen}>
-      <h1 className={styles.screenTitle}>LMS++</h1>
+  function onSubmit(e: React.FormEvent<HTMLFormElement>): void {
+    e.preventDefault();
+    model.signIn();
+  }
 
-      <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
-        <p className={styles.formHeading}>Welcome back!</p>
+  return autorender(() => {
+    return (
+      <div className={styles.screen}>
+        <h1 className={styles.screenTitle}>LMS++</h1>
 
-        <div>
-          <label className={styles.label} htmlFor="sign-in-login">
-            Login
-          </label>
-          <Input
-            className={styles.input}
-            value={model.login}
-            onChange={onLogin}
-            id="sign-in-login"
-            fluid
-          />
-        </div>
+        <form className={styles.form} onSubmit={onSubmit}>
+          <p className={styles.formHeading}>Welcome back!</p>
 
-        <div>
-          <label className={styles.label} htmlFor="sign-in-password">
-            Password
-          </label>
-          <Input
-            value={model.password}
-            onChange={onPassword}
-            className={styles.input}
-            id="sign-in-password"
-            type="password"
-            fluid
-          />
-        </div>
+          <div>
+            <label className={styles.label} htmlFor="sign-in-login">
+              Login
+            </label>
+            <Input
+              className={styles.input}
+              value={model.login}
+              onChange={onLogin}
+              id="sign-in-login"
+              fluid
+            />
+          </div>
 
-        <Button className={styles.submit} fluid>
-          Sign in
-        </Button>
-      </form>
-    </div>
-  ));
+          <div>
+            <label className={styles.label} htmlFor="sign-in-password">
+              Password
+            </label>
+            <Input
+              value={model.password}
+              onChange={onPassword}
+              className={styles.input}
+              id="sign-in-password"
+              type="password"
+              fluid
+            />
+          </div>
+
+          <Button className={styles.submit} fluid>
+            Sign in
+          </Button>
+        </form>
+      </div>
+    );
+  });
 }
