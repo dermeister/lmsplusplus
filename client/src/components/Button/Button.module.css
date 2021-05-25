@@ -1,17 +1,18 @@
 .button {
   padding: 8px 16px;
-  background-color: var(--primary-button-color);
+  background-color: var(--primary-button-background-color);
+  color: var(--primary-button-text-color);
   font-weight: bold;
   border-radius: var(--border-radius);
   box-shadow: 0 0 15px var(--shadow-color);
 }
 
 .button:hover {
-  background-color: var(--primary-button-color-hover);
+  background-color: var(--primary-button-background-color-hover);
 }
 
 .button:focus {
-  background-color: var(--primary-button-color-hover);
+  background-color: var(--primary-button-background-color-hover);
   outline: none;
 }
 

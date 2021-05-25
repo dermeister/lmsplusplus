@@ -1,0 +1,59 @@
+.activity-bar {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  width: 74px;
+  padding: 16px 0px;
+  height: 100%;
+  box-shadow: 0 1px 10px var(--shadow-color);
+}
+
+.activity-button {
+  display: block;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 16px;
+  background-color: var(--primary-button-background-color);
+  color: var(--primary-button-text-color);
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 6px var(--shadow-color);
+}
+
+.activity-button:hover {
+  background-color: var(--primary-button-background-color-hover);
+}
+
+.activity-button:focus-visible {
+  background-color: var(--primary-button-background-color-hover);
+}
+
+.activity-button:focus {
+  outline: none;
+}
+
+.selected {
+  transform: scale(0.98);
+  background-color: var(--primary-button-background-color-hover);
+  transform-origin: center center;
+  animation: spin 0.3s ease-in-out;
+}
+
+.activity-button:last-child {
+  margin-bottom: 0;
+}
+
+.bottom-buttons {
+  margin-top: auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}

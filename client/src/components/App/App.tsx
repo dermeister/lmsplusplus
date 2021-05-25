@@ -1,8 +1,8 @@
 import React from "react";
 
 import autorender from "../autorender";
-import { SignIn } from "../SignIn";
 import { AppModel } from "./AppModel";
+import { ActivityBar } from "../ActivityBar";
 import styles from "./App.module.css";
 
 interface AppProps {
@@ -10,12 +10,11 @@ interface AppProps {
 }
 
 function content(model: AppModel): JSX.Element {
-  if (model.auth.user === null) return <SignIn model={model.signIn} />;
-  return signedIn();
-}
-
-function signedIn(): JSX.Element {
-  return <div>Sign out</div>;
+  return (
+    <>
+      <ActivityBar model={model.activityBar} />
+    </>
+  );
 }
 
 export function App({ model }: AppProps): JSX.Element {
