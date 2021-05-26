@@ -3,7 +3,7 @@ import React from "react";
 import autorender from "./autorender";
 import { AppModel } from "../models/AppModel";
 import { Activities } from "./Activities";
-import { WorkArea } from "./WorkArea";
+import { Workspace } from "./Workspace";
 import styles from "./App.module.css";
 
 interface AppProps {
@@ -14,7 +14,7 @@ function content(model: AppModel): JSX.Element {
   return (
     <>
       <Activities model={model.activities} />
-      <WorkArea model={model} />
+      <Workspace model={model} />
     </>
   );
 }

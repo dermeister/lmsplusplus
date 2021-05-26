@@ -3,15 +3,15 @@ import React from "react";
 import autorender from "./autorender";
 import { Side, SidePanel } from "./SidePanel";
 import { AppModel } from "../models/AppModel";
-import styles from "./WorkArea.module.css";
+import styles from "./Workspace.module.css";
 
-interface WorkAreaProps {
+interface WorkspaceProps {
   model: AppModel;
 }
 
-export function WorkArea({ model }: WorkAreaProps): JSX.Element {
+export function Workspace({ model }: WorkspaceProps): JSX.Element {
   return autorender(() => (
-    <div className={styles.workArea}>
+    <div className={styles.workspace}>
       <SidePanel model={model.leftSidePanel} title="Tasks" side={Side.Left}>
         Hello, world!
       </SidePanel>
