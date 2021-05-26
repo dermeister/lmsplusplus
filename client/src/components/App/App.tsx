@@ -14,7 +14,7 @@ function content(model: AppModel): JSX.Element {
   return (
     <>
       <Activities model={model.activities} />
-      <WorkArea />
+      <WorkArea model={model.workArea} />
     </>
   );
 }

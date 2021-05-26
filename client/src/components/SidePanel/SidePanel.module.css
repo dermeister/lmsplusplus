@@ -5,3 +5,71 @@
   box-shadow: 1px 0 3px var(--shadow-color), -1px 0 3px var(--shadow-color);
   color: var(--app-text-color);
 }
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid white;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--app-font-size-small);
+  font-weight: normal;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.close {
+  padding: 0;
+  width: 20px;
+  background-color: transparent;
+  border: none;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #e0e0e0;
+}
+
+.close:active {
+  transform: scale(0.9);
+}
+
+.side-panel-toggle {
+  position: absolute;
+  top: 16px;
+  padding: 4px 8px;
+  background-color: #616161;
+  color: white;
+  border: none;
+  font-size: 12px;
+  text-transform: uppercase;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+  box-shadow: 0 0 4px var(--shadow-color);
+}
+
+.side-panel-toggle-left {
+  left: 0;
+  transform-origin: left bottom;
+  transform: translateY(-100%) rotate(90deg);
+}
+
+.side-panel-toggle-right {
+  right: 0;
+  transform-origin: right bottom;
+  transform: translateY(-100%) rotate(-90deg);
+}
+
+.side-panel-toggle:hover {
+  background-color: #757575;
+  cursor: pointer;
+}
+
+.side-panel-toggle-left.side-panel-toggle:active {
+  transform: scale(0.9) translateY(-100%) rotate(90deg);
+}

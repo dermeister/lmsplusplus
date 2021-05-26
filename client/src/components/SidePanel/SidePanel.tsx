@@ -1,17 +1,60 @@
 import React from "react";
+import { FaTimes } from "react-icons/fa";
 
+import { SidePanelModel } from "./SidePanelModel";
+import autorender from "../autorender";
 import styles from "./SidePanel.module.css";
 
-export enum Position {
+export enum Side {
   Left,
   Right,
 }
 
-interface SideBarProps {
-  position: Position;
+interface SidePanelProps {
+  model: SidePanelModel;
+  title: string;
+  side: Side;
   children?: React.ReactNode;
 }
 
-export function SidePanel({ children }: SideBarProps): JSX.Element {
-  return <div className={styles.sidePanel}>{children}</div>;
+function buildClassName(position: Side): string {
+  let className = styles.sidePanelToggle;
+  switch (position) {
+    case Side.Left:
+      className += ` ${styles.sidePanelToggleLeft}`;
+      break;
+
+    case Side.Right:
+      className += ` ${styles.sidePanelToggleRight}`;
+      break;
+  }
+
+  return className;
+}
+
+export function SidePanel(props: SidePanelProps): JSX.Element {
+  const { model, title, side, children } = props;
+
+  return autorender(() => {
+    if (model.opened) {
+      return (
+        <div className={styles.sidePanel}>
+          <header className={styles.header}>
+            <h2 className={styles.title}>{title}</h2>
+            <button onClick={() => model.close()} className={styles.close}>
+              <FaTimes />
+            </button>
+          </header>
+
+          {children}
+        </div>
+      );
+    }
+
+    return (
+      <button onClick={() => model.open()} className={buildClassName(side)}>
+        {title}
+      </button>
+    );
+  });
 }

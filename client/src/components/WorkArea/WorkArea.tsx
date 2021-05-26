@@ -1,17 +1,22 @@
 import React from "react";
 
 import autorender from "../autorender";
-import { Position, SidePanel } from "../SidePanel";
+import { Side, SidePanel } from "../SidePanel";
+import { WorkAreaModel } from "./WorkAreaModel";
 import styles from "./WorkArea.module.css";
 
-export function WorkArea(): JSX.Element {
+interface WorkAreaProps {
+  model: WorkAreaModel;
+}
+
+export function WorkArea({ model }: WorkAreaProps): JSX.Element {
   return autorender(() => (
     <div className={styles.workArea}>
-      <SidePanel position={Position.Left}>Hello</SidePanel>
+      <SidePanel model={model.leftSidePanel} title="Tasks" side={Side.Left}>
+        Hello, world!
+      </SidePanel>
 
       <div className={styles.mainPanel}>Main panel</div>
-
-      <SidePanel position={Position.Right}>World</SidePanel>
     </div>
   ));
 }

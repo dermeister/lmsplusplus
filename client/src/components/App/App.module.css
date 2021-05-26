@@ -1,5 +1,6 @@
 :root {
   --app-font-size-regular: 1rem;
+  --app-font-size-small: 0.85rem;
   --app-background-color: #212121;
   --app-text-color: #ffffff;
   --input-text-color: #ffffff;
