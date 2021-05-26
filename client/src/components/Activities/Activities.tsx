@@ -1,4 +1,6 @@
 import React from "react";
+import { FaTasks, FaCode, FaDesktop, FaCog } from "react-icons/fa";
+import { IconType } from "react-icons";
 
 import autorender from "../autorender";
 import { Activity, ActivitiesModel } from "./ActivitiesModel";
@@ -11,14 +13,14 @@ interface ActivityBarProps {
 function button(
   model: ActivitiesModel,
   activity: Activity,
-  title: string
+  Icon: IconType
 ): JSX.Element {
   let className = styles.activityButton;
   if (model.current === activity) className += ` ${styles.selected}`;
 
   return (
     <button onClick={() => model.setActivity(activity)} className={className}>
-      {title}
+      <Icon size={20} />
     </button>
   );
 }
@@ -27,13 +29,13 @@ export function Activities({ model }: ActivityBarProps): JSX.Element {
   return autorender(() => (
     <div className={styles.activityBar}>
       <div className={styles.topButtons}>
-        {button(model, Activity.Tasks, "T")}
-        {button(model, Activity.Solution, "S")}
-        {button(model, Activity.Demo, "D")}
+        {button(model, Activity.Tasks, FaTasks)}
+        {button(model, Activity.Solution, FaCode)}
+        {button(model, Activity.Demo, FaDesktop)}
       </div>
 
       <div className={styles.bottomButtons}>
-        {button(model, Activity.Settings, "S")}
+        {button(model, Activity.Settings, FaCog)}
       </div>
     </div>
   ));
