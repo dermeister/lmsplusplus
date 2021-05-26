@@ -42,9 +42,9 @@
 }
 
 .activity-button.selected {
-  background-color: var(--button-success-background-color);
+  background-color: var(--button-neutral-background-color);
 
-  color: var(--button-success-text-color);
+  color: var(--button-neutral-text-color);
 
   transform-origin: center center;
   transform: scale(0.98);
@@ -52,8 +52,8 @@
 }
 
 .activity-button.selected:hover {
-  background-color: var(--button-success-background-color);
-  color: var(--button-success-text-color);
+  background-color: var(--button-neutral-background-color);
+  color: var(--button-neutral-text-color);
 }
 
 .activity-button:last-child {

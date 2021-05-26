@@ -14,10 +14,10 @@
   --button-primary-background-color-hover: #ffa000;
   --button-secondary-background-color: #616161;
   --button-secondary-background-color-hover: #757575;
-  --button-success-background-color: #4caf50;
+  --button-neutral-background-color: #757575;
   --button-primary-text-color: #000000;
   --button-secondary-text-color: #000000;
-  --button-success-text-color: #ffffff;
+  --button-neutral-text-color: #ffffff;
 
   --shadow-color: #000000;
   --border-radius: 2px;
