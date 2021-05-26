@@ -2,8 +2,8 @@ import React from "react";
 
 import autorender from "./autorender";
 import { Side, SidePanel } from "./SidePanel";
-import styles from "./WorkArea.module.css";
 import { AppModel } from "../models/AppModel";
+import styles from "./WorkArea.module.css";
 
 interface WorkAreaProps {
   model: AppModel;

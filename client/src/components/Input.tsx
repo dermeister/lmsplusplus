@@ -26,11 +26,5 @@ function reactInputProps(props: InputProps): ReactInputProps {
 }
 
 export function Input(props: InputProps): JSX.Element {
-  return (
-    <input
-      autoComplete="off"
-      {...reactInputProps(props)}
-      className={buildClassName(props)}
-    />
-  );
+  return <input autoComplete="off" {...reactInputProps(props)} className={buildClassName(props)} />;
 }

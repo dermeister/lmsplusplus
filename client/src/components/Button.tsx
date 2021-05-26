@@ -26,7 +26,5 @@ function reactButtonProps(props: ButtonProps): ReactButtonProps {
 }
 
 export function Button(props: ButtonProps): JSX.Element {
-  return (
-    <button {...reactButtonProps(props)} className={buildClassName(props)} />
-  );
+  return <button {...reactButtonProps(props)} className={buildClassName(props)} />;
 }

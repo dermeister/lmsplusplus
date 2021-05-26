@@ -10,11 +10,7 @@ interface ActivityBarProps {
   model: ActivitiesModel;
 }
 
-function button(
-  model: ActivitiesModel,
-  activity: Activity,
-  Icon: IconType
-): JSX.Element {
+function button(model: ActivitiesModel, activity: Activity, Icon: IconType): JSX.Element {
   let className = styles.activityButton;
   if (model.current === activity) className += ` ${styles.selected}`;
 
@@ -34,9 +30,7 @@ export function Activities({ model }: ActivityBarProps): JSX.Element {
         {button(model, Activity.Demo, FaDesktop)}
       </div>
 
-      <div className={styles.bottomButtons}>
-        {button(model, Activity.Settings, FaCog)}
-      </div>
+      <div className={styles.bottomButtons}>{button(model, Activity.Settings, FaCog)}</div>
     </div>
   ));
 }
