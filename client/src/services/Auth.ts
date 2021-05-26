@@ -6,7 +6,7 @@ import {
   transaction,
 } from "reactronic";
 
-import { User } from "../models/User";
+import { User } from "../domain/User";
 
 export class Auth extends ObservableObject {
   private _user: User | null = null;

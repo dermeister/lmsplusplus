@@ -1,44 +1,59 @@
 .activity-bar {
   z-index: 1;
+
   display: flex;
   align-items: center;
   flex-direction: column;
+
   width: 74px;
   padding: 16px;
   height: 100%;
+
   box-shadow: 1px 0 3px var(--shadow-color);
 }
 
 .activity-button {
   display: block;
+
+  margin-bottom: 16px;
   width: 46px;
   height: 46px;
-  margin-bottom: 16px;
-  background-color: var(--primary-button-background-color);
-  color: var(--primary-button-text-color);
+
+  background-color: var(--button-primary-background-color);
   border-radius: var(--border-radius);
   border: none;
   box-shadow: 0 0 6px var(--shadow-color);
+
+  color: var(--button-primary-text-color);
 }
 
 .activity-button:hover {
-  background-color: var(--primary-button-background-color-hover);
-  cursor: pointer;
-}
+  background-color: var(--button-primary-background-color-hover);
 
-.activity-button:focus-visible {
-  background-color: var(--primary-button-background-color-hover);
+  cursor: pointer;
 }
 
 .activity-button:focus {
   outline: none;
 }
 
-.selected {
-  transform: scale(0.98);
-  background-color: var(--primary-button-background-color-hover);
+.activity-button:focus-visible {
+  background-color: var(--button-primary-background-color-hover);
+}
+
+.activity-button.selected {
+  background-color: var(--button-success-background-color);
+
+  color: var(--button-success-text-color);
+
   transform-origin: center center;
+  transform: scale(0.98);
   animation: rotate 0.3s ease-in-out;
+}
+
+.activity-button.selected:hover {
+  background-color: var(--button-success-background-color);
+  color: var(--button-success-text-color);
 }
 
 .activity-button:last-child {

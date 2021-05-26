@@ -2,20 +2,26 @@
   padding: 16px;
   width: 280px;
   height: 100%;
+
+  background-color: var(--app-secondary-background-color);
   box-shadow: 1px 0 3px var(--shadow-color), -1px 0 3px var(--shadow-color);
-  color: var(--app-text-color);
+
+  color: var(--app-secondary-text-color);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
+
   margin-bottom: 10px;
   padding-bottom: 2px;
-  border-bottom: 1px solid white;
+
+  border-bottom: 1px solid var(--app-secondary-text-color);
 }
 
 .title {
   margin: 0;
+
   font-size: var(--app-font-size-small);
   font-weight: normal;
   text-transform: uppercase;
@@ -25,9 +31,11 @@
 .close {
   padding: 0;
   width: 20px;
+
   background-color: transparent;
   border: none;
-  color: white;
+
+  color: var(--app-secondary-text-color);
   text-align: center;
   cursor: pointer;
 }
@@ -44,29 +52,35 @@
   position: absolute;
   top: 16px;
   padding: 4px 8px;
-  background-color: #616161;
-  color: white;
+
+  background-color: var(--button-secondary-background-color);
   border: none;
-  font-size: 12px;
-  text-transform: uppercase;
   border-radius: var(--border-radius) var(--border-radius) 0 0;
   box-shadow: 0 0 4px var(--shadow-color);
+
+  color: var(--app-secondary-text-color);
+  font-size: 12px;
+  text-transform: uppercase;
+  user-select: none;
 }
 
 .side-panel-toggle-left {
   left: 0;
+
   transform-origin: left bottom;
   transform: translateY(-100%) rotate(90deg);
 }
 
 .side-panel-toggle-right {
   right: 0;
+
   transform-origin: right bottom;
   transform: translateY(-100%) rotate(-90deg);
 }
 
 .side-panel-toggle:hover {
   background-color: #757575;
+
   cursor: pointer;
 }
 

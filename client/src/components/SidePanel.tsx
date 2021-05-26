@@ -1,8 +1,8 @@
 import React from "react";
 import { FaTimes } from "react-icons/fa";
 
-import { SidePanelModel } from "./SidePanelModel";
-import autorender from "../autorender";
+import autorender from "./autorender";
+import { SidePanelModel } from "../models/SidePanelModel";
 import styles from "./SidePanel.module.css";
 
 export enum Side {

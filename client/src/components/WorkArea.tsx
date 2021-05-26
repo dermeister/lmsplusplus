@@ -1,12 +1,12 @@
 import React from "react";
 
-import autorender from "../autorender";
-import { Side, SidePanel } from "../SidePanel";
-import { WorkAreaModel } from "./WorkAreaModel";
+import autorender from "./autorender";
+import { Side, SidePanel } from "./SidePanel";
 import styles from "./WorkArea.module.css";
+import { AppModel } from "../models/AppModel";
 
 interface WorkAreaProps {
-  model: WorkAreaModel;
+  model: AppModel;
 }
 
 export function WorkArea({ model }: WorkAreaProps): JSX.Element {

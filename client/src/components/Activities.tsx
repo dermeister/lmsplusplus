@@ -2,8 +2,8 @@ import React from "react";
 import { FaTasks, FaCode, FaDesktop, FaCog } from "react-icons/fa";
 import { IconType } from "react-icons";
 
-import autorender from "../autorender";
-import { Activity, ActivitiesModel } from "./ActivitiesModel";
+import autorender from "./autorender";
+import { Activity, ActivitiesModel } from "../models/ActivitiesModel";
 import styles from "./Activities.module.css";
 
 interface ActivityBarProps {

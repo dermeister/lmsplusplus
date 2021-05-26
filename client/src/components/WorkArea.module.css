@@ -1,13 +1,17 @@
 .work-area {
   position: relative;
+
   display: flex;
   justify-content: space-between;
+
   width: 100%;
   overflow: hidden;
 }
 
 .main-panel {
-  padding: 16px 16px;
   flex-grow: 1;
-  color: var(--app-text-color);
+
+  padding: 16px 16px;
+
+  color: var(--app-primary-text-color);
 }

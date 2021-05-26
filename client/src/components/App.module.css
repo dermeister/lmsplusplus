@@ -1,0 +1,33 @@
+:root {
+  --app-font-size-regular: 1rem;
+  --app-font-size-small: 0.85rem;
+  --app-primary-background-color: #212121;
+  --app-secondary-background-color: #424242;
+  --app-primary-text-color: #ffffff;
+  --app-secondary-text-color: #ffffff;
+
+  --input-text-color: #ffffff;
+  --input-background-color: #424242;
+  --input-background-color-focus: #616161;
+
+  --button-primary-background-color: #ffc107;
+  --button-primary-background-color-hover: #ffa000;
+  --button-secondary-background-color: #616161;
+  --button-secondary-background-color-hover: #757575;
+  --button-success-background-color: #4caf50;
+  --button-primary-text-color: #000000;
+  --button-secondary-text-color: #000000;
+  --button-success-text-color: #ffffff;
+
+  --shadow-color: #000000;
+  --border-radius: 2px;
+}
+
+.app {
+  display: flex;
+
+  width: 100vw;
+  height: 100vh;
+
+  background-color: var(--app-primary-background-color);
+}

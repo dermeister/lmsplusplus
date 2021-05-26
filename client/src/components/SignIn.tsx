@@ -1,10 +1,10 @@
 import React from "react";
 
-import autorender from "../autorender";
-import { SignInModel } from "./SignInModel";
+import autorender from "./autorender";
+import { SignInModel } from "../models/SignInModel";
 import styles from "./SignIn.module.css";
-import { Button } from "../Button";
-import { Input } from "../Input";
+import { Button } from "./Button";
+import { Input } from "./Input";
 
 interface SignInProps {
   model: SignInModel;
