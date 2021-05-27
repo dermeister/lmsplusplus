@@ -4,13 +4,13 @@ import autorender from "./autorender";
 import { SignInModel } from "../models/SignInModel";
 import { Button } from "./Button";
 import { Input } from "./Input";
-import styles from "./SignIn.module.css";
+import styles from "./SignInScreen.module.css";
 
-interface SignInProps {
+interface SignInScreenProps {
   model: SignInModel;
 }
 
-export function SignIn({ model }: SignInProps): JSX.Element {
+export function SignInScreen({ model }: SignInScreenProps): JSX.Element {
   function onLogin(e: React.ChangeEvent<HTMLInputElement>): void {
     model.setLogin(e.target.value);
   }

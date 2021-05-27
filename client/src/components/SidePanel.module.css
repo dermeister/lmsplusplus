@@ -51,6 +51,7 @@
 .side-panel-toggle {
   position: absolute;
   top: 16px;
+
   padding: 4px 8px;
 
   background-color: var(--button-secondary-background-color);
@@ -79,7 +80,7 @@
 }
 
 .side-panel-toggle:hover {
-  background-color: #757575;
+  background-color: var(--button-secondary-background-color-hover);
 
   cursor: pointer;
 }

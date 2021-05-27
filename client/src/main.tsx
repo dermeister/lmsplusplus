@@ -2,10 +2,10 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Transaction } from "reactronic";
 
-import { App } from "./components/App";
-import { AppModel } from "./models/AppModel";
+import { Root } from "./components/Root";
+import { RootModel } from "./models/RootModel";
 import "./index.css";
 
-const model = Transaction.run(() => new AppModel());
+const model = Transaction.run(() => new RootModel());
 
-ReactDOM.render(<App model={model} />, document.getElementById("root"));
+ReactDOM.render(<Root model={model} />, document.getElementById("root"));

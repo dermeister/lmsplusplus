@@ -23,7 +23,7 @@
   --border-radius: 2px;
 }
 
-.app {
+.root {
   display: flex;
 
   width: 100vw;
