@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { Models } from "../models";
 import autorender from "./autorender";
 import styles from "./ContextMenu.module.css";
+import { Overlay } from "./Overlay";
 
 interface ContextMenuProps {
   model: Models.ContextMenu;
@@ -10,21 +11,16 @@ interface ContextMenuProps {
 }
 
 export function ContextMenu({ model, children }: ContextMenuProps): JSX.Element {
-  function onMenuMouseDown(e: React.MouseEvent): void {
-    e.stopPropagation();
-  }
-
   return autorender(() => {
     if (!model.isOpened) return <></>;
 
-    const menuStyle = { left: model.x, top: model.y };
     return ReactDOM.createPortal(
-      <div onMouseDown={() => model.close()} className={styles.overlay}>
-        <menu onMouseDown={onMenuMouseDown} className={styles.contextMenu} style={menuStyle}>
+      <Overlay onClose={() => model.close()}>
+        <menu className={styles.contextMenu} style={{ left: model.x, top: model.y }}>
           {children}
         </menu>
-      </div>,
-      document.getElementById("context-menu") as HTMLElement
+      </Overlay>,
+      document.getElementById("context-menu") as Element
     );
   });
 }
