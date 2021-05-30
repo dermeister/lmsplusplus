@@ -10,13 +10,22 @@ interface ContextMenuProps {
   children: React.ReactNode;
 }
 
+function onContextMenu(e: React.MouseEvent): void {
+  e.preventDefault();
+  e.stopPropagation();
+}
+
 export function ContextMenu({ model, children }: ContextMenuProps): JSX.Element {
   return autorender(() => {
     if (!model.isOpened) return <></>;
 
     return ReactDOM.createPortal(
       <Overlay onClose={() => model.close()}>
-        <menu className={styles.contextMenu} style={{ left: model.x, top: model.y }}>
+        <menu
+          onContextMenu={onContextMenu}
+          className={styles.contextMenu}
+          style={{ left: model.x, top: model.y }}
+        >
           {children}
         </menu>
       </Overlay>,
