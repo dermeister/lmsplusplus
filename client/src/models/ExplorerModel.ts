@@ -1,4 +1,5 @@
 import { cached, ObservableObject, transaction, unobservable } from "reactronic";
+import { ContextMenuModel } from "./ContextMenuModel";
 
 export abstract class ExplorerModel extends ObservableObject {
   @unobservable public abstract readonly roots: ExplorerNode[];
@@ -7,6 +8,7 @@ export abstract class ExplorerModel extends ObservableObject {
 export abstract class ExplorerNode extends ObservableObject {
   @unobservable public readonly title: string;
   @unobservable public readonly key: string;
+  @unobservable public contextMenu = new ContextMenuModel();
 
   public constructor(title: string, key: string) {
     super();
@@ -14,10 +16,7 @@ export abstract class ExplorerNode extends ObservableObject {
     this.key = key;
   }
 
-  public abstract get isGroup(): boolean;
-
-  @transaction
-  public click(): void {}
+  public abstract click(): void;
 }
 
 export class ExplorerGroupNode extends ExplorerNode {
@@ -34,10 +33,6 @@ export class ExplorerGroupNode extends ExplorerNode {
     return this._isOpened;
   }
 
-  public get isGroup(): boolean {
-    return true;
-  }
-
   @transaction
   public click(): void {
     this._isOpened = !this._isOpened;
@@ -45,11 +40,5 @@ export class ExplorerGroupNode extends ExplorerNode {
 }
 
 export class ExplorerItemNode extends ExplorerNode {
-  public constructor(title: string, key: string) {
-    super(title, key);
-  }
-
-  public get isGroup(): boolean {
-    return false;
-  }
+  public click(): void {}
 }

@@ -3,6 +3,9 @@ import { FaChevronRight } from "react-icons/fa";
 
 import autorender from "./autorender";
 import { ExplorerGroupNode, ExplorerModel, ExplorerNode } from "../models/ExplorerModel";
+import { useContextMenu } from "./WindowManager";
+import { ContextMenu } from "./ContextMenu";
+import { ContextMenuModel } from "../models/ContextMenuModel";
 import styles from "./Explorer.module.css";
 
 interface ExplorerProps {
@@ -12,43 +15,65 @@ interface ExplorerProps {
 const OFFSET_BASE = 16;
 const OFFSET_DELTA = 7;
 
-function renderNode(node: ExplorerNode, offset: number): JSX.Element {
+function contextMenu(model: ContextMenuModel): JSX.Element {
   return (
-    <li key={node.key}>
-      <p onClick={() => node.click()} style={{ paddingLeft: offset }} className={styles.node}>
-        {tryRenderArrow(node)}
-        {node.title}
-      </p>
-
-      {tryRenderChildren(node, offset + OFFSET_DELTA)}
-    </li>
+    <ContextMenu model={model}>
+      <p>Item 1</p>
+      <p>Item 2</p>
+      <p>Item 3</p>
+      <p>Item 4</p>
+    </ContextMenu>
   );
 }
 
-function tryRenderArrow(node: ExplorerNode): JSX.Element | undefined {
-  if (node.isGroup) {
-    const groupNode = node as ExplorerGroupNode;
+function Node({ node, offset }: { node: ExplorerNode; offset: number }): JSX.Element {
+  const onContextMenu = useContextMenu(node.contextMenu);
 
+  return autorender(() => (
+    <li>
+      <p
+        onContextMenu={onContextMenu}
+        onClick={() => node.click()}
+        style={{ paddingLeft: offset }}
+        className={styles.node}
+      >
+        {renderArrowIfGroupNode(node)}
+        {node.title}
+        {contextMenu(node.contextMenu)}
+      </p>
+
+      {renderChildrenIfGroupNode(node, offset + OFFSET_DELTA)}
+    </li>
+  ));
+}
+
+function renderArrowIfGroupNode(node: ExplorerNode): JSX.Element | undefined {
+  if (node instanceof ExplorerGroupNode) {
     let className = styles.arrow;
-    if (groupNode.isOpened) className += ` ${styles.arrowOpened}`;
+    if (node.isOpened) className += ` ${styles.arrowOpened}`;
 
     return <FaChevronRight size={10} className={className} />;
   }
 }
 
-function tryRenderChildren(node: ExplorerNode, padding: number): JSX.Element | undefined {
-  if (node.isGroup) {
-    const groupNode = node as ExplorerGroupNode;
-
-    if (groupNode.isOpened) {
-      const nodes = groupNode.children.map((c) => renderNode(c, padding + OFFSET_DELTA));
-      return <ul className={styles.list}>{nodes}</ul>;
-    }
+function renderChildrenIfGroupNode(node: ExplorerNode, offset: number): JSX.Element | undefined {
+  if (node instanceof ExplorerGroupNode && node.isOpened) {
+    return (
+      <ul className={styles.list}>
+        {node.children.map((c) => (
+          <Node key={c.key} node={c} offset={offset + OFFSET_DELTA} />
+        ))}
+      </ul>
+    );
   }
 }
 
 export function Explorer({ model }: ExplorerProps): JSX.Element {
   return autorender(() => (
-    <ul className={styles.list}>{model.roots.map((r) => renderNode(r, OFFSET_BASE))}</ul>
+    <ul className={styles.list}>
+      {model.roots.map((r) => (
+        <Node key={r.key} node={r} offset={OFFSET_BASE} />
+      ))}
+    </ul>
   ));
 }

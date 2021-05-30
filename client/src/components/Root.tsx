@@ -1,10 +1,10 @@
 import React from "react";
-
-import autorender from "./autorender";
 import { RootModel } from "../models/RootModel";
 import { AppScreen } from "./AppScreen";
+import autorender from "./autorender";
 import styles from "./Root.module.css";
 import { SignInScreen } from "./SignInScreen";
+import { WindowManager } from "./WindowManager";
 
 interface RootProps {
   model: RootModel;
@@ -12,9 +12,14 @@ interface RootProps {
 
 function content(model: RootModel): JSX.Element {
   if (model.auth.user === null) return <AppScreen model={model.app} />;
+
   return <SignInScreen model={model.signIn} />;
 }
 
 export function Root({ model }: RootProps): JSX.Element {
-  return autorender(() => <div className={styles.root}>{content(model)}</div>);
+  return autorender(() => (
+    <WindowManager model={model.windowManager}>
+      <div className={styles.root}>{content(model)}</div>
+    </WindowManager>
+  ));
 }
