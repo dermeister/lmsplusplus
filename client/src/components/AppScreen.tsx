@@ -1,14 +1,13 @@
 import React from "react";
-
-import autorender from "./autorender";
-import { AppModel } from "../models/AppModel";
+import { Models } from "../models";
 import { Activities } from "./Activities";
-import { SidePanel, Side } from "./SidePanel";
-import { Explorer } from "./Explorer";
 import styles from "./AppScreen.module.css";
+import autorender from "./autorender";
+import { Explorer } from "./Explorer";
+import { Side, SidePanel } from "./SidePanel";
 
 interface AppScreenProps {
-  model: AppModel;
+  model: Models.App;
 }
 
 export function AppScreen({ model }: AppScreenProps): JSX.Element {

@@ -1,13 +1,12 @@
 import React from "react";
-
+import { SignIn } from "../models/SignIn";
 import autorender from "./autorender";
-import { SignInModel } from "../models/SignInModel";
 import { Button } from "./Button";
 import { Input } from "./Input";
 import styles from "./SignInScreen.module.css";
 
 interface SignInScreenProps {
-  model: SignInModel;
+  model: SignIn;
 }
 
 export function SignInScreen({ model }: SignInScreenProps): JSX.Element {

@@ -1,11 +1,4 @@
-import {
-  cached,
-  ObservableObject,
-  reaction,
-  standalone,
-  transaction,
-} from "reactronic";
-
+import { cached, ObservableObject, reaction, standalone, transaction } from "reactronic";
 import { User } from "../domain/User";
 
 export class Auth extends ObservableObject {
@@ -49,7 +42,7 @@ export class Auth extends ObservableObject {
     return User.deserialize(serializedUser);
   }
 
-  // @reaction
+  @reaction
   private updateLocalStorage(): void {
     if (this._user === null) {
       localStorage.removeItem(this.localStorageKey);

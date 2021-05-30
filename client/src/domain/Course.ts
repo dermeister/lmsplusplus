@@ -1,5 +1,4 @@
 import { cached, ObservableObject } from "reactronic";
-
 import { Task } from "./Task";
 
 export class Course extends ObservableObject {

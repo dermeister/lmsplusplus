@@ -1,8 +1,7 @@
 import React from "react";
 import { FaTimes } from "react-icons/fa";
-
+import { Models } from "../models";
 import autorender from "./autorender";
-import { SidePanelModel } from "../models/SidePanelModel";
 import styles from "./SidePanel.module.css";
 
 export enum Side {
@@ -11,7 +10,7 @@ export enum Side {
 }
 
 interface SidePanelProps {
-  model: SidePanelModel;
+  model: Models.SidePanel;
   title: string;
   side: Side;
   children?: React.ReactNode;

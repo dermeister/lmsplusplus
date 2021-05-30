@@ -1,16 +1,15 @@
 import React from "react";
-import { FaTasks, FaCode, FaDesktop, FaCog } from "react-icons/fa";
 import { IconType } from "react-icons";
-
-import autorender from "./autorender";
-import { Activity, ActivitiesModel } from "../models/ActivitiesModel";
+import { FaCode, FaCog, FaDesktop, FaTasks } from "react-icons/fa";
+import { Models } from "../models";
 import styles from "./Activities.module.css";
+import autorender from "./autorender";
 
 interface ActivityBarProps {
-  model: ActivitiesModel;
+  model: Models.Activities;
 }
 
-function button(model: ActivitiesModel, activity: Activity, Icon: IconType): JSX.Element {
+function button(model: Models.Activities, activity: Models.Activity, Icon: IconType): JSX.Element {
   let className = styles.activityButton;
   if (model.current === activity) className += ` ${styles.selected}`;
 
@@ -25,12 +24,12 @@ export function Activities({ model }: ActivityBarProps): JSX.Element {
   return autorender(() => (
     <div className={styles.activityBar}>
       <div className={styles.topButtons}>
-        {button(model, Activity.Tasks, FaTasks)}
-        {button(model, Activity.Solution, FaCode)}
-        {button(model, Activity.Demo, FaDesktop)}
+        {button(model, Models.Activity.Tasks, FaTasks)}
+        {button(model, Models.Activity.Solution, FaCode)}
+        {button(model, Models.Activity.Demo, FaDesktop)}
       </div>
 
-      <div className={styles.bottomButtons}>{button(model, Activity.Settings, FaCog)}</div>
+      <div className={styles.bottomButtons}>{button(model, Models.Activity.Settings, FaCog)}</div>
     </div>
   ));
 }

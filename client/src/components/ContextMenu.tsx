@@ -1,12 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
-
+import { Models } from "../models";
 import autorender from "./autorender";
-import { ContextMenuModel } from "../models/ContextMenuModel";
 import styles from "./ContextMenu.module.css";
 
 interface ContextMenuProps {
-  model: ContextMenuModel;
+  model: Models.ContextMenu;
   children: React.ReactNode;
 }
 

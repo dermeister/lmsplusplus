@@ -1,19 +1,18 @@
 import { ObservableObject, reaction, transaction, unobservable } from "reactronic";
-
-import { Auth } from "../services/Auth";
-import { SignInModel } from "./SignInModel";
-import { ActivitiesModel } from "./ActivitiesModel";
-import { SidePanelModel } from "./SidePanelModel";
-import { CourseExplorerModel } from "./CourseExplorerModel";
 import { Course } from "../domain/Course";
 import { Task } from "../domain/Task";
+import { Auth } from "../services/Auth";
+import { Activities } from "./Activities";
+import { CourseExplorer } from "./CourseExplorer";
+import { SidePanel } from "./SidePanel";
+import { SignIn } from "./SignIn";
 
-export class AppModel extends ObservableObject {
+export class App extends ObservableObject {
   @unobservable public readonly auth = new Auth("user");
-  @unobservable public readonly signIn = new SignInModel(this.auth);
-  @unobservable public readonly activities = new ActivitiesModel();
-  @unobservable public readonly leftSidePanel = new SidePanelModel();
-  @unobservable public readonly explorer = new CourseExplorerModel([
+  @unobservable public readonly signIn = new SignIn(this.auth);
+  @unobservable public readonly activities = new Activities();
+  @unobservable public readonly leftSidePanel = new SidePanel();
+  @unobservable public readonly explorer = new CourseExplorer([
     new Course("SPP", [new Task("Task 1"), new Task("Task 2")]),
     new Course("OSiSP", [new Task("Task 1"), new Task("Task 2"), new Task("Task 3")]),
   ]);

@@ -1,21 +1,19 @@
 import React from "react";
 import { FaChevronRight } from "react-icons/fa";
-
+import { Models } from "../models";
 import autorender from "./autorender";
-import { ExplorerGroupNode, ExplorerModel, ExplorerNode } from "../models/ExplorerModel";
-import { useContextMenu } from "./WindowManager";
 import { ContextMenu } from "./ContextMenu";
-import { ContextMenuModel } from "../models/ContextMenuModel";
 import styles from "./Explorer.module.css";
+import { useContextMenu } from "./WindowManager";
 
 interface ExplorerProps {
-  model: ExplorerModel;
+  model: Models.Explorer;
 }
 
 const OFFSET_BASE = 16;
 const OFFSET_DELTA = 7;
 
-function contextMenu(model: ContextMenuModel): JSX.Element {
+function contextMenu(model: Models.ContextMenu): JSX.Element {
   return (
     <ContextMenu model={model}>
       <p>Item 1</p>
@@ -26,7 +24,7 @@ function contextMenu(model: ContextMenuModel): JSX.Element {
   );
 }
 
-function Node({ node, offset }: { node: ExplorerNode; offset: number }): JSX.Element {
+function Node({ node, offset }: { node: Models.ExplorerNode; offset: number }): JSX.Element {
   const onContextMenu = useContextMenu(node.contextMenu);
 
   return autorender(() => (
@@ -47,8 +45,8 @@ function Node({ node, offset }: { node: ExplorerNode; offset: number }): JSX.Ele
   ));
 }
 
-function renderArrowIfGroupNode(node: ExplorerNode): JSX.Element | undefined {
-  if (node instanceof ExplorerGroupNode) {
+function renderArrowIfGroupNode(node: Models.ExplorerNode): JSX.Element | undefined {
+  if (node instanceof Models.ExplorerGroupNode) {
     let className = styles.arrow;
     if (node.isOpened) className += ` ${styles.arrowOpened}`;
 
@@ -56,8 +54,11 @@ function renderArrowIfGroupNode(node: ExplorerNode): JSX.Element | undefined {
   }
 }
 
-function renderChildrenIfGroupNode(node: ExplorerNode, offset: number): JSX.Element | undefined {
-  if (node instanceof ExplorerGroupNode && node.isOpened) {
+function renderChildrenIfGroupNode(
+  node: Models.ExplorerNode,
+  offset: number
+): JSX.Element | undefined {
+  if (node instanceof Models.ExplorerGroupNode && node.isOpened) {
     return (
       <ul className={styles.list}>
         {node.children.map((c) => (

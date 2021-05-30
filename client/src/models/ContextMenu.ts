@@ -1,6 +1,6 @@
 import { cached, ObservableObject, transaction } from "reactronic";
 
-export class ContextMenuModel extends ObservableObject {
+export class ContextMenu extends ObservableObject {
   private _x: number = 0;
   private _y: number = 0;
   private _isOpened = false;

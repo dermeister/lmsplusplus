@@ -1,5 +1,5 @@
 import React from "react";
-import { RootModel } from "../models/RootModel";
+import { Models } from "../models";
 import { AppScreen } from "./AppScreen";
 import autorender from "./autorender";
 import styles from "./Root.module.css";
@@ -7,10 +7,10 @@ import { SignInScreen } from "./SignInScreen";
 import { WindowManager } from "./WindowManager";
 
 interface RootProps {
-  model: RootModel;
+  model: Models.Root;
 }
 
-function content(model: RootModel): JSX.Element {
+function content(model: Models.Root): JSX.Element {
   if (model.auth.user === null) return <AppScreen model={model.app} />;
 
   return <SignInScreen model={model.signIn} />;

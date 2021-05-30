@@ -1,14 +1,14 @@
 import { cached, ObservableObject, transaction, unobservable } from "reactronic";
-import { ContextMenuModel } from "./ContextMenuModel";
+import { ContextMenu } from "./ContextMenu";
 
-export abstract class ExplorerModel extends ObservableObject {
+export abstract class Explorer extends ObservableObject {
   @unobservable public abstract readonly roots: ExplorerNode[];
 }
 
 export abstract class ExplorerNode extends ObservableObject {
   @unobservable public readonly title: string;
   @unobservable public readonly key: string;
-  @unobservable public contextMenu = new ContextMenuModel();
+  @unobservable public contextMenu = new ContextMenu();
 
   public constructor(title: string, key: string) {
     super();

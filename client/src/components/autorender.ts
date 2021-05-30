@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   cached,
-  standalone,
   ObservableObject,
   reaction,
   Reactronic,
+  standalone,
   Transaction,
   unobservable,
 } from "reactronic";
@@ -25,8 +25,7 @@ class Rx extends ObservableObject {
   @unobservable
   public refresh: ((rx: ReactState) => void) | null = null;
   @unobservable
-  public unmount = () =>
-    standalone(() => Transaction.run(Reactronic.dispose, this));
+  public unmount = () => standalone(() => Transaction.run(Reactronic.dispose, this));
 
   @cached
   public render(jsx: () => JSX.Element): JSX.Element {

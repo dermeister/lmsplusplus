@@ -7,7 +7,7 @@ export enum Activity {
   Settings,
 }
 
-export class ActivitiesModel extends ObservableObject {
+export class Activities extends ObservableObject {
   private _current: Activity = Activity.Tasks;
 
   @cached

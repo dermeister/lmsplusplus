@@ -1,8 +1,7 @@
 import { ObservableObject, transaction, unobservable } from "reactronic";
-
 import { Auth } from "../services/Auth";
 
-export class SignInModel extends ObservableObject {
+export class SignIn extends ObservableObject {
   @unobservable public readonly auth: Auth;
   public login = "";
   public password = "";

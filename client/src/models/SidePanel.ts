@@ -1,6 +1,6 @@
 import { cached, ObservableObject, transaction } from "reactronic";
 
-export class SidePanelModel extends ObservableObject {
+export class SidePanel extends ObservableObject {
   private _opened = false;
 
   @cached

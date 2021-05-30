@@ -1,10 +1,14 @@
 import { unobservable } from "reactronic";
-
 import { Course } from "../domain/Course";
 import { Task } from "../domain/Task";
-import { ExplorerGroupNode, ExplorerItemNode, ExplorerModel, ExplorerNode } from "./ExplorerModel";
+import {
+  Explorer as Explorer,
+  ExplorerGroupNode,
+  ExplorerItemNode,
+  ExplorerNode,
+} from "./Explorer";
 
-export class CourseExplorerModel extends ExplorerModel {
+export class CourseExplorer extends Explorer {
   @unobservable public readonly roots: ExplorerNode[];
 
   public constructor(data: Course[]) {
