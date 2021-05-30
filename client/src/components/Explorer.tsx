@@ -6,12 +6,21 @@ import { ContextMenu } from "./ContextMenu";
 import styles from "./Explorer.module.css";
 import { useContextMenu } from "./WindowManager";
 
+interface NodeProps {
+  node: Models.ExplorerNode;
+  offset: number;
+}
+
 interface ExplorerProps {
   model: Models.Explorer;
 }
 
-const OFFSET_BASE = 16;
-const OFFSET_DELTA = 7;
+function buildNodeClassName(node: Models.ExplorerNode): string {
+  let className = styles.node;
+  if (node.contextMenu.isOpened) className += ` ${styles.contextMenuOpened}`;
+
+  return className;
+}
 
 function contextMenu(model: Models.ContextMenu): JSX.Element {
   return (
@@ -24,7 +33,7 @@ function contextMenu(model: Models.ContextMenu): JSX.Element {
   );
 }
 
-function Node({ node, offset }: { node: Models.ExplorerNode; offset: number }): JSX.Element {
+function Node({ node, offset }: NodeProps): JSX.Element {
   const onContextMenu = useContextMenu(node.contextMenu);
 
   return autorender(() => (
@@ -33,14 +42,14 @@ function Node({ node, offset }: { node: Models.ExplorerNode; offset: number }): 
         onContextMenu={onContextMenu}
         onClick={() => node.click()}
         style={{ paddingLeft: offset }}
-        className={styles.node}
+        className={buildNodeClassName(node)}
       >
         {renderArrowIfGroupNode(node)}
         {node.title}
         {contextMenu(node.contextMenu)}
       </p>
 
-      {renderChildrenIfGroupNode(node, offset + OFFSET_DELTA)}
+      {renderChildrenIfGroupNode(node, offset + Number(styles.offsetDelta))}
     </li>
   ));
 }
@@ -62,7 +71,7 @@ function renderChildrenIfGroupNode(
     return (
       <ul className={styles.list}>
         {node.children.map((c) => (
-          <Node key={c.key} node={c} offset={offset + OFFSET_DELTA} />
+          <Node key={c.key} node={c} offset={offset + Number(styles.offsetDelta)} />
         ))}
       </ul>
     );
@@ -73,7 +82,7 @@ export function Explorer({ model }: ExplorerProps): JSX.Element {
   return autorender(() => (
     <ul className={styles.list}>
       {model.roots.map((r) => (
-        <Node key={r.key} node={r} offset={OFFSET_BASE} />
+        <Node key={r.key} node={r} offset={Number(styles.offsetBase)} />
       ))}
     </ul>
   ));

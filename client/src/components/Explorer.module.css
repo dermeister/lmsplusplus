@@ -19,6 +19,7 @@
   cursor: pointer;
 }
 
+.context-menu-opened,
 .node:hover {
   background-color: var(--explorer-background-color-hover);
 }
@@ -31,4 +32,9 @@
 
 .arrow-opened {
   transform: rotate(90deg);
+}
+
+:export {
+  offset-base: 16;
+  offset-delta: 7;
 }
