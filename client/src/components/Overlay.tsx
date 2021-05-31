@@ -37,15 +37,26 @@ export function Overlay(props: OverlayProps): JSX.Element {
     if (target instanceof Node && !ref.current?.contains(target)) focusContent(ref.current);
   }
 
-  function onMouseDown({ target }: React.MouseEvent): void {
-    if (target === ref.current) props.onClose?.();
+  function onMouseDown(e: React.MouseEvent): void {
+    e.stopPropagation();
+    if (e.target === ref.current) props.onClose?.();
+  }
+
+  function stopPropagation(e: React.SyntheticEvent) {
+    e.stopPropagation();
   }
 
   return (
     <div
       ref={ref}
       onMouseDown={onMouseDown}
-      onClick={(e) => e.stopPropagation()}
+      onMouseUp={stopPropagation}
+      onClick={stopPropagation}
+      onMouseEnter={stopPropagation}
+      onMouseOver={stopPropagation}
+      onMouseMove={stopPropagation}
+      onMouseOut={stopPropagation}
+      onMouseLeave={stopPropagation}
       className={buildClassName(props)}
       tabIndex={-1}
     >
