@@ -69,7 +69,7 @@ function renderChildrenIfGroupNode(
 ): JSX.Element | undefined {
   if (node instanceof Models.ExplorerGroupNode && node.isOpened) {
     return (
-      <ul className={styles.children}>
+      <ul className={styles.list}>
         {node.children.map((c) => (
           <Node key={c.key} node={c} offset={offset + Number(styles.offsetDelta)} />
         ))}
@@ -80,7 +80,7 @@ function renderChildrenIfGroupNode(
 
 export function Explorer({ model }: ExplorerProps): JSX.Element {
   return autorender(() => (
-    <ul className={styles.roots}>
+    <ul className={styles.list}>
       {model.roots.map((r) => (
         <Node key={r.key} node={r} offset={Number(styles.offsetBase)} />
       ))}

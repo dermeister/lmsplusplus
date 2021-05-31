@@ -1,31 +1,10 @@
-.container {
-  overflow: hidden;
-}
-
-.roots,
-.children {
+.list {
   margin: 0;
   padding: 0;
 
   overflow: hidden;
 
   list-style: none;
-}
-
-.children :first-child {
-  animation: appear 0.15s ease-out;
-}
-
-@keyframes appear {
-  0% {
-    margin-top: -40px;
-  }
-  50% {
-    margin-top: -20px;
-  }
-  100% {
-    margin-top: 0;
-  }
 }
 
 .node {
