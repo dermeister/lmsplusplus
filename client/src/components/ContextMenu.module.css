@@ -12,4 +12,21 @@
   box-shadow: 0 0 6px var(--shadow-color);
 
   color: var(--app-primary-text-color);
+
+  transform-origin: top;
+  animation: appear 0.1s ease-out;
+}
+
+@keyframes appear {
+  0% {
+    transform: scaleY(0.5);
+  }
+
+  50% {
+    transform: scaleY(0.75);
+  }
+
+  100% {
+    transform: scaleY(1);
+  }
 }
