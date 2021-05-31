@@ -9,7 +9,7 @@ interface OverlayProps {
 }
 
 function focusContent(overlay: HTMLDivElement | null): void {
-  const focusableChild = overlay?.querySelector(":enabled");
+  const focusableChild = overlay?.querySelector(`:enabled:not([tabindex="-1"])`);
   if (focusableChild instanceof HTMLElement) {
     focusableChild.focus();
   } else {

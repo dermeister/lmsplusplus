@@ -25,10 +25,10 @@ function buildNodeClassName(node: Models.ExplorerNode): string {
 function contextMenu(model: Models.ContextMenu): JSX.Element {
   return (
     <ContextMenu model={model}>
-      <p>Item 1</p>
-      <p>Item 2</p>
-      <p>Item 3</p>
-      <p>Item 4</p>
+      <ContextMenu.Button>Item 1</ContextMenu.Button>
+      <ContextMenu.Button>Item 2</ContextMenu.Button>
+      <ContextMenu.Button>Item 3</ContextMenu.Button>
+      <ContextMenu.Button>Item 4</ContextMenu.Button>
     </ContextMenu>
   );
 }

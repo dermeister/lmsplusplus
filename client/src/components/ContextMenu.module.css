@@ -5,8 +5,8 @@
   z-index: 1001;
 
   margin: 0;
-  padding: 0 16px;
-  min-width: 160px;
+  padding: 6px;
+  width: 200px;
 
   background-color: var(--app-primary-background-color);
   box-shadow: 0 0 6px var(--shadow-color);
@@ -29,4 +29,38 @@
   100% {
     transform: scaleY(1);
   }
+}
+
+.context-menu-button {
+  display: block;
+
+  padding: 8px;
+  width: 100%;
+
+  background-color: transparent;
+  border: none;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+
+  color: var(--app-primary-text-color);
+  font-size: var(--app-font-size-small);
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  cursor: pointer;
+}
+
+.context-menu-button:focus {
+  outline: none;
+}
+
+.context-menu-button:hover {
+  background-color: var(--button-secondary-background-color);
+  box-shadow: 0 0 10px var(--shadow-color);
+}
+
+.context-menu-button:hover:active {
+  transform: scale(0.99);
 }

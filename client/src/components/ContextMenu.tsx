@@ -33,3 +33,16 @@ export function ContextMenu({ model, children }: ContextMenuProps): JSX.Element 
     );
   });
 }
+
+interface ContextMenuButtonProps {
+  children?: React.ReactNode;
+  onClick?(): void;
+}
+
+ContextMenu.Button = function ContextMenuButton(props: ContextMenuButtonProps): JSX.Element {
+  return (
+    <button onClick={props.onClick} className={styles.contextMenuButton} tabIndex={-1}>
+      {props.children}
+    </button>
+  );
+};
