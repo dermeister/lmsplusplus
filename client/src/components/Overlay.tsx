@@ -4,7 +4,8 @@ import styles from "./Overlay.module.css";
 interface OverlayProps {
   children: React.ReactNode;
   className?: string;
-  onClose(): void;
+  beforeClick?(): void;
+  afterClick?(): void;
 }
 
 function focusContent(overlay: HTMLDivElement | null): void {
@@ -38,25 +39,30 @@ export function Overlay(props: OverlayProps): JSX.Element {
   }
 
   function onMouseDown(e: React.MouseEvent): void {
-    e.stopPropagation();
-    if (e.target === ref.current) props.onClose?.();
+    if (e.target === ref.current) {
+      props.beforeClick?.();
+      setTimeout(() => props.afterClick?.(), 0);
+    }
   }
 
-  function stopPropagation(e: React.SyntheticEvent) {
+  function stopEvent(e: React.SyntheticEvent) {
     e.stopPropagation();
+    e.preventDefault();
   }
 
   return (
     <div
       ref={ref}
       onMouseDown={onMouseDown}
-      onMouseUp={stopPropagation}
-      onClick={stopPropagation}
-      onMouseEnter={stopPropagation}
-      onMouseOver={stopPropagation}
-      onMouseMove={stopPropagation}
-      onMouseOut={stopPropagation}
-      onMouseLeave={stopPropagation}
+      onMouseUp={stopEvent}
+      onClick={stopEvent}
+      onMouseEnter={stopEvent}
+      onMouseOver={stopEvent}
+      onMouseMove={stopEvent}
+      onMouseOut={stopEvent}
+      onMouseLeave={stopEvent}
+      onScroll={stopEvent}
+      onContextMenu={stopEvent}
       className={buildClassName(props)}
       tabIndex={-1}
     >

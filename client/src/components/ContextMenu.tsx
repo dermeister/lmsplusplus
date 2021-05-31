@@ -20,7 +20,7 @@ export function ContextMenu({ model, children }: ContextMenuProps): JSX.Element 
     if (!model.isOpened) return <></>;
 
     return ReactDOM.createPortal(
-      <Overlay onClose={() => model.close()}>
+      <Overlay beforeClick={() => model.close()}>
         <menu
           onContextMenu={onContextMenu}
           className={styles.contextMenu}
