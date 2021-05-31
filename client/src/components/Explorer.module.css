@@ -1,8 +1,31 @@
-.list {
+.container {
+  overflow: hidden;
+}
+
+.roots,
+.children {
   margin: 0;
   padding: 0;
 
+  overflow: hidden;
+
   list-style: none;
+}
+
+.children :first-child {
+  animation: appear 0.15s ease-out;
+}
+
+@keyframes appear {
+  0% {
+    margin-top: -40px;
+  }
+  50% {
+    margin-top: -20px;
+  }
+  100% {
+    margin-top: 0;
+  }
 }
 
 .node {
@@ -27,7 +50,7 @@
 .arrow {
   margin-right: 6px;
 
-  transition: transform 0.1s;
+  transition: transform 0.15s;
 }
 
 .arrow-opened {
