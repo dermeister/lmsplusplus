@@ -16,16 +16,30 @@ function onContextMenu(e: React.MouseEvent): void {
 }
 
 export function ContextMenu({ model, children }: ContextMenuProps): JSX.Element {
+  function positionMenu(menu: HTMLElement | null): void {
+    if (menu !== null) {
+      const OFFSET = 10;
+
+      if (model.x + menu.clientWidth + OFFSET > window.innerWidth) {
+        menu.style.right = `${OFFSET}px`;
+      } else {
+        menu.style.left = `${model.x}px`;
+      }
+
+      if (model.y + menu.clientHeight + OFFSET > window.innerHeight) {
+        menu.style.bottom = `${OFFSET}px`;
+      } else {
+        menu.style.top = `${model.y}px`;
+      }
+    }
+  }
+
   return autorender(() => {
     if (!model.isOpened) return <></>;
 
     return ReactDOM.createPortal(
       <Overlay beforeClick={() => model.close()}>
-        <menu
-          onContextMenu={onContextMenu}
-          className={styles.contextMenu}
-          style={{ left: model.x, top: model.y }}
-        >
+        <menu ref={positionMenu} onContextMenu={onContextMenu} className={styles.contextMenu}>
           {children}
         </menu>
       </Overlay>,
