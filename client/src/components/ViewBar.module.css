@@ -1,4 +1,4 @@
-.activity-bar {
+.view-bar {
   z-index: 1;
 
   display: flex;
@@ -12,7 +12,7 @@
   box-shadow: 1px 0 3px var(--shadow-color);
 }
 
-.activity-button {
+.view-button {
   display: block;
 
   margin-bottom: 16px;
@@ -27,21 +27,21 @@
   color: var(--button-primary-text-color);
 }
 
-.activity-button:hover {
+.view-button:hover {
   background-color: var(--button-primary-background-color-hover);
 
   cursor: pointer;
 }
 
-.activity-button:focus {
+.view-button:focus {
   outline: none;
 }
 
-.activity-button:focus-visible {
+.view-button:focus-visible {
   background-color: var(--button-primary-background-color-hover);
 }
 
-.activity-button.selected {
+.view-button.selected {
   background-color: var(--button-neutral-background-color);
 
   color: var(--button-neutral-text-color);
@@ -51,12 +51,12 @@
   animation: rotate 0.3s ease-in-out;
 }
 
-.activity-button.selected:hover {
+.view-button.selected:hover {
   background-color: var(--button-neutral-background-color);
   color: var(--button-neutral-text-color);
 }
 
-.activity-button:last-child {
+.view-button:last-child {
   margin-bottom: 0;
 }
 

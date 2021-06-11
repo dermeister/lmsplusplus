@@ -11,7 +11,6 @@ export enum Side {
 
 interface SidePanelProps {
   model: Models.SidePanel;
-  title: string;
   side: Side;
   children?: React.ReactNode;
 }
@@ -32,14 +31,14 @@ function buildClassName(position: Side): string {
 }
 
 export function SidePanel(props: SidePanelProps): JSX.Element {
-  const { model, title, side, children } = props;
+  const { model, side, children } = props;
 
   return autorender(() => {
     if (model.opened) {
       return (
         <div className={styles.sidePanel}>
           <header className={styles.header}>
-            <h2 className={styles.title}>{title}</h2>
+            <h2 className={styles.title}>{model.title}</h2>
             <button onClick={() => model.close()} className={styles.close}>
               <FaTimes />
             </button>
@@ -52,7 +51,7 @@ export function SidePanel(props: SidePanelProps): JSX.Element {
 
     return (
       <button onClick={() => model.open()} className={buildClassName(side)}>
-        {title}
+        {model.title}
       </button>
     );
   });

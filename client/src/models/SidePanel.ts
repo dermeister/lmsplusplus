@@ -1,7 +1,13 @@
-import { cached, ObservableObject, transaction } from "reactronic";
+import { cached, ObservableObject, transaction, unobservable } from "reactronic";
 
 export class SidePanel extends ObservableObject {
-  private _opened = false;
+  @unobservable public readonly title: string;
+  private _opened = true;
+
+  public constructor(title: string) {
+    super();
+    this.title = title;
+  }
 
   @cached
   public get opened(): boolean {
