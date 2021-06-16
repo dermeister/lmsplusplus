@@ -6,13 +6,6 @@ import { useContextMenu } from "../WindowManager";
 import { buildNodeClassName, useOffset } from "./common";
 import styles from "./Explorer.module.css";
 
-function arrow(group: Models.GroupNode): JSX.Element {
-  let className = styles.arrow;
-  if (group.isOpened) className += ` ${styles.arrowOpened}`;
-
-  return <FaChevronRight size={10} className={className} />;
-}
-
 interface GroupProps {
   group: Models.GroupNode;
   children?: React.ReactNode;
@@ -33,4 +26,11 @@ export function Group({ group, children }: GroupProps): JSX.Element {
       {children}
     </p>
   ));
+}
+
+function arrow(group: Models.GroupNode): JSX.Element {
+  let className = styles.arrow;
+  if (group.isOpened) className += ` ${styles.arrowOpened}`;
+
+  return <FaChevronRight size={10} className={className} />;
 }

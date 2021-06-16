@@ -10,16 +10,16 @@ interface RootProps {
   model: Models.Root;
 }
 
-function content(model: Models.Root): JSX.Element {
-  if (model.auth.user === null) return <AppScreen model={model.app} />;
-
-  return <SignInScreen model={model.signIn} />;
-}
-
 export function Root({ model }: RootProps): JSX.Element {
   return autorender(() => (
     <WindowManager model={model.windowManager}>
       <div className={styles.root}>{content(model)}</div>
     </WindowManager>
   ));
+}
+
+function content(model: Models.Root): JSX.Element {
+  if (model.auth.user === null) return <AppScreen model={model.app} />;
+
+  return <SignInScreen model={model.signIn} />;
 }

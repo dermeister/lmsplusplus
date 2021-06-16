@@ -5,22 +5,12 @@ import autorender from "../autorender";
 import { ContextMenu } from "../ContextMenu";
 import { Explorer } from "../explorer";
 
-function courseContextMenu(model: Models.ContextMenu): JSX.Element {
-  return (
-    <ContextMenu model={model}>
-      <ContextMenu.Button>Edit Course</ContextMenu.Button>
-      <ContextMenu.Button>Delete Course</ContextMenu.Button>
-    </ContextMenu>
-  );
+interface TasksExplorerProps {
+  model: Models.TasksExplorer;
 }
 
-function taskContextMenu(model: Models.ContextMenu): JSX.Element {
-  return (
-    <ContextMenu model={model}>
-      <ContextMenu.Button>Edit Task</ContextMenu.Button>
-      <ContextMenu.Button>Delete Task</ContextMenu.Button>
-    </ContextMenu>
-  );
+export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
+  return autorender(() => <Explorer model={model}>{courses(model.courses)}</Explorer>);
 }
 
 function courses(courses: Models.CourseNode[]): JSX.Element[] {
@@ -36,6 +26,15 @@ function courses(courses: Models.CourseNode[]): JSX.Element[] {
   ));
 }
 
+function courseContextMenu(model: Models.ContextMenu): JSX.Element {
+  return (
+    <ContextMenu model={model}>
+      <ContextMenu.Button>Edit Course</ContextMenu.Button>
+      <ContextMenu.Button>Delete Course</ContextMenu.Button>
+    </ContextMenu>
+  );
+}
+
 function tasks(items: Models.ItemNode<Task>[]): JSX.Element[] {
   return items.map((item) => (
     <Explorer.Item key={item.id} item={item}>
@@ -45,10 +44,11 @@ function tasks(items: Models.ItemNode<Task>[]): JSX.Element[] {
   ));
 }
 
-interface TasksExplorerProps {
-  model: Models.TasksExplorer;
-}
-
-export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
-  return autorender(() => <Explorer model={model}>{courses(model.courses)}</Explorer>);
+function taskContextMenu(model: Models.ContextMenu): JSX.Element {
+  return (
+    <ContextMenu model={model}>
+      <ContextMenu.Button>Edit Task</ContextMenu.Button>
+      <ContextMenu.Button>Delete Task</ContextMenu.Button>
+    </ContextMenu>
+  );
 }

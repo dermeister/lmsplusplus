@@ -10,11 +10,6 @@ interface ContextMenuProps {
   children: React.ReactNode;
 }
 
-function onContextMenu(e: React.MouseEvent): void {
-  e.preventDefault();
-  e.stopPropagation();
-}
-
 export function ContextMenu({ model, children }: ContextMenuProps): JSX.Element {
   function positionMenu(menu: HTMLElement | null): void {
     if (menu !== null) {
@@ -46,6 +41,11 @@ export function ContextMenu({ model, children }: ContextMenuProps): JSX.Element 
       document.getElementById("context-menu") as Element
     );
   });
+}
+
+function onContextMenu(e: React.MouseEvent): void {
+  e.preventDefault();
+  e.stopPropagation();
 }
 
 interface ContextMenuButtonProps {

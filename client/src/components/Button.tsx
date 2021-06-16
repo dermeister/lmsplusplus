@@ -10,12 +10,8 @@ interface ButtonProps extends ReactButtonProps {
   fluid?: boolean;
 }
 
-function buildClassName(props: ButtonProps): string {
-  let className = styles.button;
-  if (props.className !== undefined) className += ` ${props.className}`;
-  if (props.fluid) className += ` ${styles.fluid}`;
-
-  return className;
+export function Button(props: ButtonProps): JSX.Element {
+  return <button {...reactButtonProps(props)} className={buildClassName(props)} />;
 }
 
 function reactButtonProps(props: ButtonProps): ReactButtonProps {
@@ -24,6 +20,10 @@ function reactButtonProps(props: ButtonProps): ReactButtonProps {
   return buttonProps;
 }
 
-export function Button(props: ButtonProps): JSX.Element {
-  return <button {...reactButtonProps(props)} className={buildClassName(props)} />;
+function buildClassName(props: ButtonProps): string {
+  let className = styles.button;
+  if (props.className !== undefined) className += ` ${props.className}`;
+  if (props.fluid) className += ` ${styles.fluid}`;
+
+  return className;
 }

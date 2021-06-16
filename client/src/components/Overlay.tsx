@@ -8,22 +8,6 @@ interface OverlayProps {
   afterClick?(): void;
 }
 
-function focusContent(overlay: HTMLDivElement | null): void {
-  const focusableChild = overlay?.querySelector(`:enabled:not([tabindex="-1"])`);
-  if (focusableChild instanceof HTMLElement) {
-    focusableChild.focus();
-  } else {
-    overlay?.focus();
-  }
-}
-
-function buildClassName(props: OverlayProps): string {
-  let className = styles.overlay;
-  if (props.className !== undefined) className += ` ${props.className}`;
-
-  return className;
-}
-
 export function Overlay(props: OverlayProps): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -69,4 +53,20 @@ export function Overlay(props: OverlayProps): JSX.Element {
       {props.children}
     </div>
   );
+}
+
+function focusContent(overlay: HTMLDivElement | null): void {
+  const focusableChild = overlay?.querySelector(`:enabled:not([tabindex="-1"])`);
+  if (focusableChild instanceof HTMLElement) {
+    focusableChild.focus();
+  } else {
+    overlay?.focus();
+  }
+}
+
+function buildClassName(props: OverlayProps): string {
+  let className = styles.overlay;
+  if (props.className !== undefined) className += ` ${props.className}`;
+
+  return className;
 }

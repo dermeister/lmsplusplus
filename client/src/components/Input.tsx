@@ -10,12 +10,8 @@ interface InputProps extends ReactInputProps {
   fluid?: boolean;
 }
 
-function buildClassName(props: InputProps): string {
-  let className = styles.input;
-  if (props.className !== undefined) className += ` ${props.className}`;
-  if (props.fluid) className += ` ${styles.fluid}`;
-
-  return className;
+export function Input(props: InputProps): JSX.Element {
+  return <input autoComplete="off" {...reactInputProps(props)} className={buildClassName(props)} />;
 }
 
 function reactInputProps(props: InputProps): ReactInputProps {
@@ -24,6 +20,10 @@ function reactInputProps(props: InputProps): ReactInputProps {
   return inputProps;
 }
 
-export function Input(props: InputProps): JSX.Element {
-  return <input autoComplete="off" {...reactInputProps(props)} className={buildClassName(props)} />;
+function buildClassName(props: InputProps): string {
+  let className = styles.input;
+  if (props.className !== undefined) className += ` ${props.className}`;
+  if (props.fluid) className += ` ${styles.fluid}`;
+
+  return className;
 }

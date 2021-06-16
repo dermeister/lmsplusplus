@@ -15,21 +15,6 @@ interface SidePanelProps {
   children?: React.ReactNode;
 }
 
-function buildClassName(position: Side): string {
-  let className = styles.sidePanelToggle;
-  switch (position) {
-    case Side.Left:
-      className += ` ${styles.sidePanelToggleLeft}`;
-      break;
-
-    case Side.Right:
-      className += ` ${styles.sidePanelToggleRight}`;
-      break;
-  }
-
-  return className;
-}
-
 export function SidePanel(props: SidePanelProps): JSX.Element {
   const { model, side, children } = props;
 
@@ -55,4 +40,19 @@ export function SidePanel(props: SidePanelProps): JSX.Element {
       </button>
     );
   });
+}
+
+function buildClassName(position: Side): string {
+  let className = styles.sidePanelToggle;
+  switch (position) {
+    case Side.Left:
+      className += ` ${styles.sidePanelToggleLeft}`;
+      break;
+
+    case Side.Right:
+      className += ` ${styles.sidePanelToggleRight}`;
+      break;
+  }
+
+  return className;
 }
