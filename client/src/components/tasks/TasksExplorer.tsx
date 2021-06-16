@@ -35,11 +35,11 @@ function courseContextMenu(model: Models.ContextMenu): JSX.Element {
   );
 }
 
-function tasks(items: Models.ItemNode<Task>[]): JSX.Element[] {
-  return items.map((item) => (
-    <Explorer.Item key={item.id} item={item}>
-      {item.title}
-      {taskContextMenu(item.contextMenu)}
+function tasks(tasks: Models.ItemNode<Task>[]): JSX.Element[] {
+  return tasks.map((task) => (
+    <Explorer.Item key={task.id} item={task}>
+      {task.title}
+      {taskContextMenu(task.contextMenu)}
     </Explorer.Item>
   ));
 }
