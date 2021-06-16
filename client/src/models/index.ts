@@ -1,4 +1,3 @@
-import * as _Activities from "./Activities";
 import * as _App from "./App";
 import * as _ContextMenu from "./ContextMenu";
 import * as _Explorer from "./explorer/Explorer";
@@ -18,8 +17,6 @@ import * as _WindowManager from "./WindowManager";
 
 export namespace Models {
   export import App = _App.App;
-  export import Activities = _Activities.Activities;
-  export import Activity = _Activities.Activity;
   export import ContextMenu = _ContextMenu.ContextMenu;
   export import Explorer = _Explorer.Explorer;
   export import GroupNode = _GroupNode.GroupNode;

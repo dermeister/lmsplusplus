@@ -1,2 +1,2 @@
-export { Explorer } from "./Explorer";
 export { useExplorerModel } from "./common";
+export { Explorer } from "./Explorer";

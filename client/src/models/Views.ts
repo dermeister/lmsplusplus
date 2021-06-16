@@ -1,8 +1,8 @@
 import { cached, ObservableObject, reaction, transaction, unobservable } from "reactronic";
+import { TasksView } from "./tasks/TasksView";
 import { DemoView } from "./views/DemoView";
 import { OptionsView } from "./views/OptionsView";
 import { SolutionsView } from "./views/SolutionsView";
-import { TasksView } from "./tasks/TasksView";
 
 export type View = TasksView | DemoView | SolutionsView | OptionsView;
 

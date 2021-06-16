@@ -2,8 +2,8 @@ import React from "react";
 import { IconType } from "react-icons";
 import { FaCode, FaCog, FaDesktop, FaTasks } from "react-icons/fa";
 import { Models } from "../models";
-import styles from "./ViewBar.module.css";
 import autorender from "./autorender";
+import styles from "./ViewBar.module.css";
 
 interface ViewBarProps {
   model: Models.Views;
