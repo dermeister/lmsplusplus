@@ -3,11 +3,11 @@ import { Models } from "../models";
 import styles from "./AppScreen.module.css";
 import autorender from "./autorender";
 import { Side, SidePanel } from "./SidePanel";
+import { TasksView } from "./tasks/TasksView";
 import { ViewBar } from "./ViewBar";
 import { DemoView } from "./views/DemoView";
 import { OptionsView } from "./views/OptionsView";
 import { SolutionsView } from "./views/SolutionsView";
-import { TasksView } from "./views/TasksView";
 
 interface AppScreenProps {
   model: Models.App;
