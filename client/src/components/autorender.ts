@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   cached,
+  observableArgs,
   ObservableObject,
   reaction,
   Reactronic,
@@ -9,14 +10,14 @@ import {
   unobservable,
 } from "reactronic";
 
-export default function autorender(jsx: () => JSX.Element): JSX.Element {
+export default function autorender(jsx: () => JSX.Element, deps: unknown[] = []): JSX.Element {
   const [state, refresh] = useState(createReactState);
   const { rx } = state;
 
   rx.refresh = refresh;
   useEffect(() => rx.unmount, []);
 
-  return rx.render(jsx);
+  return rx.render(useCallback(jsx, deps));
 }
 
 type ReactState = { rx: Rx };
@@ -28,6 +29,7 @@ class Rx extends ObservableObject {
   public unmount = () => standalone(() => Transaction.run(Reactronic.dispose, this));
 
   @cached
+  @observableArgs(true)
   public render(jsx: () => JSX.Element): JSX.Element {
     return jsx();
   }

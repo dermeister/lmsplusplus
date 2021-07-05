@@ -9,13 +9,16 @@ interface TasksViewProps {
 }
 
 export function TasksView({ model }: TasksViewProps): JSX.Element {
-  return autorender(() => (
-    <>
-      <AppScreen.LeftPanel model={model.leftPanel}>
-        <TasksExplorer model={model.explorer} />
-      </AppScreen.LeftPanel>
+  return autorender(
+    () => (
+      <>
+        <AppScreen.LeftPanel model={model.leftPanel}>
+          <TasksExplorer model={model.explorer} />
+        </AppScreen.LeftPanel>
 
-      <AppScreen.MainPanel>Tasks</AppScreen.MainPanel>
-    </>
-  ));
+        <AppScreen.MainPanel>Tasks</AppScreen.MainPanel>
+      </>
+    ),
+    [model]
+  );
 }

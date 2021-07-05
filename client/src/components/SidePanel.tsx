@@ -15,9 +15,7 @@ interface SidePanelProps {
   children?: React.ReactNode;
 }
 
-export function SidePanel(props: SidePanelProps): JSX.Element {
-  const { model, side, children } = props;
-
+export function SidePanel({ model, side, children }: SidePanelProps): JSX.Element {
   return autorender(() => {
     if (model.opened) {
       return (
@@ -39,7 +37,7 @@ export function SidePanel(props: SidePanelProps): JSX.Element {
         {model.title}
       </button>
     );
-  });
+  }, [model, side, children]);
 }
 
 function buildClassName(position: Side): string {

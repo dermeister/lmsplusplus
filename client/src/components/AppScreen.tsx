@@ -32,12 +32,15 @@ function content(model: Models.Views): JSX.Element | undefined {
 }
 
 export function AppScreen({ model }: AppScreenProps): JSX.Element {
-  return autorender(() => (
-    <>
-      <ViewBar model={model.views} />
-      <div className={styles.content}>{content(model.views)}</div>
-    </>
-  ));
+  return autorender(
+    () => (
+      <>
+        <ViewBar model={model.views} />
+        <div className={styles.content}>{content(model.views)}</div>
+      </>
+    ),
+    [model]
+  );
 }
 
 interface MainPanelProps {

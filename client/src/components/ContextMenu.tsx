@@ -40,7 +40,7 @@ export function ContextMenu({ model, children }: ContextMenuProps): JSX.Element 
       </Overlay>,
       document.getElementById("context-menu") as Element
     );
-  });
+  }, [model, children]);
 }
 
 function onContextMenu(e: React.MouseEvent): void {

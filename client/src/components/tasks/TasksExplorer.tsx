@@ -10,7 +10,7 @@ interface TasksExplorerProps {
 }
 
 export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
-  return autorender(() => <Explorer model={model}>{courses(model.courses)}</Explorer>);
+  return autorender(() => <Explorer model={model}>{courses(model.courses)}</Explorer>, [model]);
 }
 
 function courses(courses: Models.CourseNode[]): JSX.Element[] {

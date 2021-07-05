@@ -14,16 +14,19 @@ export function Item<T>({ item, children }: ItemProps<T>): JSX.Element {
   const offset = useOffset();
   const onContextMenu = useContextMenu(item.contextMenu);
 
-  return autorender(() => (
-    <li key={item.id}>
-      <p
-        onClick={() => model?.activateNode(item)}
-        onContextMenu={onContextMenu}
-        className={buildNodeClassName(item)}
-        style={{ paddingLeft: offset }}
-      >
-        {children}
-      </p>
-    </li>
-  ));
+  return autorender(
+    () => (
+      <li key={item.id}>
+        <p
+          onClick={() => model?.activateNode(item)}
+          onContextMenu={onContextMenu}
+          className={buildNodeClassName(item)}
+          style={{ paddingLeft: offset }}
+        >
+          {children}
+        </p>
+      </li>
+    ),
+    [item, children]
+  );
 }

@@ -64,5 +64,5 @@ export function SignInScreen({ model }: SignInScreenProps): JSX.Element {
         </form>
       </div>
     );
-  });
+  }, [model]);
 }

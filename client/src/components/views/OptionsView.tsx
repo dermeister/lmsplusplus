@@ -8,10 +8,13 @@ interface OptionsViewProps {
 }
 
 export function OptionsView({ model }: OptionsViewProps): JSX.Element {
-  return autorender(() => (
-    <>
-      <AppScreen.LeftPanel model={model.leftPanel}>Left</AppScreen.LeftPanel>
-      <AppScreen.MainPanel>Options</AppScreen.MainPanel>
-    </>
-  ));
+  return autorender(
+    () => (
+      <>
+        <AppScreen.LeftPanel model={model.leftPanel}>Left</AppScreen.LeftPanel>
+        <AppScreen.MainPanel>Options</AppScreen.MainPanel>
+      </>
+    ),
+    [model]
+  );
 }

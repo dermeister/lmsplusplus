@@ -20,5 +20,5 @@ export function Children({ group, children }: ChildrenProps): JSX.Element {
         <Offset value={offset + Number(styles.offsetDelta)}>{children}</Offset>
       </ul>
     );
-  });
+  }, [group, children]);
 }
