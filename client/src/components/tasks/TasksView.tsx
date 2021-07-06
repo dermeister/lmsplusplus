@@ -1,11 +1,11 @@
-import React from "react";
-import { Models } from "../../models";
-import { AppScreen } from "../AppScreen";
-import autorender from "../autorender";
-import { TasksExplorer } from "./TasksExplorer";
+import React from "react"
+import { Models } from "../../models"
+import { AppScreen } from "../AppScreen"
+import autorender from "../autorender"
+import { TasksExplorer } from "./TasksExplorer"
 
 interface TasksViewProps {
-  model: Models.TasksView;
+  model: Models.TasksView
 }
 
 export function TasksView({ model }: TasksViewProps): JSX.Element {
@@ -20,5 +20,5 @@ export function TasksView({ model }: TasksViewProps): JSX.Element {
       </>
     ),
     [model]
-  );
+  )
 }

@@ -1,30 +1,45 @@
-import { ObservableObject, transaction, unobservable } from "reactronic";
-import { Auth } from "../services/Auth";
+import { cached, ObservableObject, transaction, unobservable } from "reactronic"
+import { Auth } from "../services/Auth"
 
 export class SignIn extends ObservableObject {
-  @unobservable public readonly auth: Auth;
-  public login = "";
-  public password = "";
-  public error = false;
+  @unobservable readonly auth: Auth
+  private _login = ""
+  private _password = ""
+  private _error = false
 
-  public constructor(auth: Auth) {
-    super();
-    this.auth = auth;
+  @cached
+  get login(): string {
+    return this._login
+  }
+
+  @cached
+  get password(): string {
+    return this._password
+  }
+
+  @cached
+  get error(): boolean {
+    return this._error
+  }
+
+  constructor(auth: Auth) {
+    super()
+    this.auth = auth
   }
 
   @transaction
-  public setLogin(login: string): void {
-    this.login = login;
+  setLogin(login: string): void {
+    this._login = login
   }
 
   @transaction
-  public setPassword(password: string): void {
-    this.password = password;
+  setPassword(password: string): void {
+    this._password = password
   }
 
   @transaction
-  public async signIn(): Promise<void> {
-    const success = await this.auth.signIn(this.login, this.password);
-    this.error = !success;
+  async signIn(): Promise<void> {
+    const success = await this.auth.signIn(this._login, this._password)
+    this._error = !success
   }
 }

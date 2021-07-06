@@ -1,8 +1,8 @@
-import React from "react";
-import { FaTimes } from "react-icons/fa";
-import { Models } from "../models";
-import autorender from "./autorender";
-import styles from "./SidePanel.module.css";
+import React from "react"
+import { FaTimes } from "react-icons/fa"
+import { Models } from "../models"
+import autorender from "./autorender"
+import styles from "./SidePanel.module.css"
 
 export enum Side {
   Left,
@@ -10,9 +10,9 @@ export enum Side {
 }
 
 interface SidePanelProps {
-  model: Models.SidePanel;
-  side: Side;
-  children?: React.ReactNode;
+  model: Models.SidePanel
+  side: Side
+  children?: React.ReactNode
 }
 
 export function SidePanel({ model, side, children }: SidePanelProps): JSX.Element {
@@ -29,28 +29,28 @@ export function SidePanel({ model, side, children }: SidePanelProps): JSX.Elemen
 
           {children}
         </div>
-      );
+      )
     }
 
     return (
       <button onClick={() => model.open()} className={buildClassName(side)}>
         {model.title}
       </button>
-    );
-  }, [model, side, children]);
+    )
+  }, [model, side, children])
 }
 
 function buildClassName(position: Side): string {
-  let className = styles.sidePanelToggle;
+  let className = styles.sidePanelToggle
   switch (position) {
     case Side.Left:
-      className += ` ${styles.sidePanelToggleLeft}`;
-      break;
+      className += ` ${styles.sidePanelToggleLeft}`
+      break
 
     case Side.Right:
-      className += ` ${styles.sidePanelToggleRight}`;
-      break;
+      className += ` ${styles.sidePanelToggleRight}`
+      break
   }
 
-  return className;
+  return className
 }

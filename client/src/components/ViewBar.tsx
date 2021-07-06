@@ -1,12 +1,12 @@
-import React from "react";
-import { IconType } from "react-icons";
-import { FaCode, FaCog, FaDesktop, FaTasks } from "react-icons/fa";
-import { Models } from "../models";
-import autorender from "./autorender";
-import styles from "./ViewBar.module.css";
+import React from "react"
+import { IconType } from "react-icons"
+import { FaCode, FaCog, FaDesktop, FaTasks } from "react-icons/fa"
+import { Models } from "../models"
+import autorender from "./autorender"
+import styles from "./ViewBar.module.css"
 
 interface ViewBarProps {
-  model: Models.Views;
+  model: Models.Views
 }
 
 export function ViewBar({ model }: ViewBarProps): JSX.Element {
@@ -23,16 +23,16 @@ export function ViewBar({ model }: ViewBarProps): JSX.Element {
       </div>
     ),
     [model]
-  );
+  )
 }
 
 function button(model: Models.Views, view: Models.View, Icon: IconType): JSX.Element {
-  let className = styles.viewButton;
-  if (model.active === view) className += ` ${styles.selected}`;
+  let className = styles.viewButton
+  if (model.active === view) className += ` ${styles.selected}`
 
   return (
     <button onClick={() => model.activate(view)} className={className}>
       <Icon size={20} />
     </button>
-  );
+  )
 }

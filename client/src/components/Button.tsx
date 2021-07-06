@@ -1,29 +1,29 @@
-import React from "react";
-import styles from "./Button.module.css";
+import React from "react"
+import styles from "./Button.module.css"
 
 type ReactButtonProps = React.DetailedHTMLProps<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   HTMLButtonElement
->;
+>
 
 interface ButtonProps extends ReactButtonProps {
-  fluid?: boolean;
+  fluid?: boolean
 }
 
 export function Button(props: ButtonProps): JSX.Element {
-  return <button {...reactButtonProps(props)} className={buildClassName(props)} />;
+  return <button {...reactButtonProps(props)} className={buildClassName(props)} />
 }
 
 function reactButtonProps(props: ButtonProps): ReactButtonProps {
-  const buttonProps = { ...props };
-  delete buttonProps.fluid;
-  return buttonProps;
+  const buttonProps = { ...props }
+  delete buttonProps.fluid
+  return buttonProps
 }
 
 function buildClassName(props: ButtonProps): string {
-  let className = styles.button;
-  if (props.className !== undefined) className += ` ${props.className}`;
-  if (props.fluid) className += ` ${styles.fluid}`;
+  let className = styles.button
+  if (props.className !== undefined) className += ` ${props.className}`
+  if (props.fluid) className += ` ${styles.fluid}`
 
-  return className;
+  return className
 }

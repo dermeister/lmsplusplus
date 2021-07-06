@@ -1,26 +1,26 @@
-import React from "react";
-import { SignIn } from "../models/SignIn";
-import autorender from "./autorender";
-import { Button } from "./Button";
-import { Input } from "./Input";
-import styles from "./SignInScreen.module.css";
+import React from "react"
+import { SignIn } from "../models/SignIn"
+import autorender from "./autorender"
+import { Button } from "./Button"
+import { Input } from "./Input"
+import styles from "./SignInScreen.module.css"
 
 interface SignInScreenProps {
-  model: SignIn;
+  model: SignIn
 }
 
 export function SignInScreen({ model }: SignInScreenProps): JSX.Element {
   function onLogin(e: React.ChangeEvent<HTMLInputElement>): void {
-    model.setLogin(e.target.value);
+    model.setLogin(e.target.value)
   }
 
   function onPassword(e: React.ChangeEvent<HTMLInputElement>): void {
-    model.setPassword(e.target.value);
+    model.setPassword(e.target.value)
   }
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>): void {
-    e.preventDefault();
-    model.signIn();
+    e.preventDefault()
+    model.signIn()
   }
 
   return autorender(() => {
@@ -63,6 +63,6 @@ export function SignInScreen({ model }: SignInScreenProps): JSX.Element {
           </Button>
         </form>
       </div>
-    );
-  }, [model]);
+    )
+  }, [model])
 }

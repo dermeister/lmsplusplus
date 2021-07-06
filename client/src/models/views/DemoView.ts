@@ -1,6 +1,6 @@
-import { ObservableObject, unobservable } from "reactronic";
-import { SidePanel } from "../SidePanel";
+import { ObservableObject, unobservable } from "reactronic"
+import { SidePanel } from "../SidePanel"
 
 export class DemoView extends ObservableObject {
-  @unobservable public readonly leftPanel = new SidePanel("Demo");
+  @unobservable readonly leftPanel = new SidePanel("Demo")
 }
