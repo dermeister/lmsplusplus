@@ -53,20 +53,23 @@ AppScreen.MainPanel = function MainPanel({ children }: MainPanelProps): JSX.Elem
 
 interface SidePanelProps {
   model: Models.SidePanel
+  pulsing: boolean
   children?: React.ReactNode
 }
 
-AppScreen.LeftPanel = function LeftPanel({ model, children }: SidePanelProps): JSX.Element {
+AppScreen.LeftPanel = function LeftPanel(props: SidePanelProps): JSX.Element {
+  const { model, children, pulsing } = props
   return (
-    <SidePanel model={model} side={Side.Left}>
+    <SidePanel model={model} side={Side.Left} pulsing={pulsing}>
       {children}
     </SidePanel>
   )
 }
 
-AppScreen.RightPanel = function RightPanel({ model, children }: SidePanelProps): JSX.Element {
+AppScreen.RightPanel = function RightPanel(props: SidePanelProps): JSX.Element {
+  const { model, children, pulsing } = props
   return (
-    <SidePanel model={model} side={Side.Right}>
+    <SidePanel model={model} side={Side.Right} pulsing={pulsing}>
       {children}
     </SidePanel>
   )

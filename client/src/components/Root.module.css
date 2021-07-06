@@ -4,7 +4,9 @@
   --app-primary-background-color: #212121;
   --app-secondary-background-color: #424242;
   --app-primary-text-color: #ffffff;
+  --app-primary-text-color-hover: #e0e0e0;
   --app-secondary-text-color: #ffffff;
+  --app-secondary-text-color-hover: #e0e0e0;
 
   --input-text-color: #ffffff;
   --input-background-color: #424242;
@@ -23,6 +25,8 @@
 
   --shadow-color: #000000;
   --border-radius: 2px;
+
+  --header-pulsing-color: #ffc107;
 }
 
 .root {

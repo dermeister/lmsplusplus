@@ -12,15 +12,16 @@ export enum Side {
 interface SidePanelProps {
   model: Models.SidePanel
   side: Side
+  pulsing: boolean
   children?: React.ReactNode
 }
 
-export function SidePanel({ model, side, children }: SidePanelProps): JSX.Element {
+export function SidePanel({ model, side, pulsing, children }: SidePanelProps): JSX.Element {
   return autorender(() => {
     if (model.opened) {
       return (
         <div className={styles.sidePanel}>
-          <header className={styles.header}>
+          <header className={buildHeaderClassName(pulsing)}>
             <h2 className={styles.title}>{model.title}</h2>
             <button onClick={() => model.close()} className={styles.close}>
               <FaTimes />
@@ -33,14 +34,21 @@ export function SidePanel({ model, side, children }: SidePanelProps): JSX.Elemen
     }
 
     return (
-      <button onClick={() => model.open()} className={buildClassName(side)}>
+      <button onClick={() => model.open()} className={buildToggleClassName(side)}>
         {model.title}
       </button>
     )
-  }, [model, side, children])
+  }, [model, side, pulsing, children])
 }
 
-function buildClassName(position: Side): string {
+function buildHeaderClassName(pulsing: boolean): string {
+  let className = styles.header
+  if (pulsing) className += ` ${styles.headerPulsing}`
+
+  return className
+}
+
+function buildToggleClassName(position: Side): string {
   let className = styles.sidePanelToggle
   switch (position) {
     case Side.Left:

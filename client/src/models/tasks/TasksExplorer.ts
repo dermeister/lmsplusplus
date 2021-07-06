@@ -15,16 +15,26 @@ export class CourseNode extends GroupNode {
 }
 
 export class TasksExplorer extends Explorer<Task> {
-  @unobservable readonly courses: CourseNode[] = []
+  private _courses: CourseNode[] = []
 
   constructor(courses: Course[]) {
     super()
-    this.courses = this.courseNodes(courses)
+    this._courses = this.courseNodes(courses)
+  }
+
+  @cached
+  get courses(): CourseNode[] {
+    return this._courses
   }
 
   @cached
   get task(): Task | null {
     return this.activeNode?.item ?? null
+  }
+
+  @transaction
+  updateCourses(courses: Course[]): void {
+    this._courses = this.courseNodes(courses)
   }
 
   @transaction
