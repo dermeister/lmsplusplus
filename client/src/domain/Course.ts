@@ -11,7 +11,7 @@ export class Course {
       this._tasks = tasks
       this.tasksInitialized = true
     } else
-      throw new Error("Course tasks have already been initialized");
+      throw new Error("Course tasks have already been initialized")
   }
 
   constructor(name: string) { this.name = name }
