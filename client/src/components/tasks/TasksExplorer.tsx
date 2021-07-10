@@ -16,29 +16,22 @@ export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
   )
 }
 
-function courses(
-  model: Models.TasksExplorer,
-  courses: readonly Models.CourseNode[]
-): JSX.Element[] {
+function courses(model: Models.TasksExplorer, courses: readonly Models.CourseNode[]): JSX.Element[] {
   return courses.map(course => (
     <li key={course.id}>
       <Explorer.Group group={course}>
         {course.title}
-        {courseContextMenu(course.contextMenu)}
+
+        <ContextMenu model={course.contextMenu}>
+          <ContextMenu.Button onClick={() => model.createTask(course.item)}>New Task</ContextMenu.Button>
+          <ContextMenu.Button>Edit Course</ContextMenu.Button>
+          <ContextMenu.Button>Delete Course</ContextMenu.Button>
+        </ContextMenu>
       </Explorer.Group>
 
       <Explorer.Children group={course}>{tasks(model, course.children)}</Explorer.Children>
     </li>
   ))
-}
-
-function courseContextMenu(model: Models.ContextMenu): JSX.Element {
-  return (
-    <ContextMenu model={model}>
-      <ContextMenu.Button>Edit Course</ContextMenu.Button>
-      <ContextMenu.Button>Delete Course</ContextMenu.Button>
-    </ContextMenu>
-  )
 }
 
 function tasks(explorer: Models.TasksExplorer, tasks: Models.ItemNode<Task>[]): JSX.Element[] {
@@ -47,10 +40,8 @@ function tasks(explorer: Models.TasksExplorer, tasks: Models.ItemNode<Task>[]): 
       {task.title}
 
       <ContextMenu model={task.contextMenu}>
-        <ContextMenu.Button>Edit Task</ContextMenu.Button>
-        <ContextMenu.Button onClick={() => explorer.setTaskToDelete(task.item)}>
-          Delete Task
-        </ContextMenu.Button>
+        <ContextMenu.Button onClick={() => explorer.updateTask(task.item)}>Edit Task</ContextMenu.Button>
+        <ContextMenu.Button onClick={() => explorer.deleteTask(task.item)}>Delete Task</ContextMenu.Button>
       </ContextMenu>
     </Explorer.Item>
   ))

@@ -1,21 +1,17 @@
-import { cached, ObservableObject, transaction } from "reactronic"
 import { Task } from "./Task"
 
-export class Course extends ObservableObject {
-  private _name: string
-  private _tasks: Task[]
+export class Course {
+  readonly name: string
+  private _tasks: readonly Task[] = []
+  private tasksInitialized = false
 
-  @cached get name(): string { return this._name }
-  @cached get tasks(): readonly Task[] { return this._tasks }
-
-  constructor(name: string, tasks: Task[]) {
-    super()
-    this._name = name
-    this._tasks = tasks
+  get tasks(): readonly Task[] { return this._tasks }
+  set tasks(tasks: readonly Task[]) {
+    if (!this.tasksInitialized)
+      this._tasks = tasks
+    else
+      throw new Error("Course tasks have already been initialized");
   }
 
-  @transaction
-  deleteTask(task: Task): void {
-    this._tasks = this._tasks.filter(t => t !== task)
-  }
+  constructor(name: string) { this.name = name }
 }

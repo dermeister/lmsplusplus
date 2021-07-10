@@ -9,6 +9,12 @@ interface TasksViewProps {
 }
 
 export function TasksView({ model }: TasksViewProps): JSX.Element {
+  function rightPanel(): JSX.Element | undefined {
+    if (model.taskEditor !== null) {
+      return <AppScreen.RightPanel model={model.rightPanel}>Hello</AppScreen.RightPanel>
+    }
+  }
+
   return autorender(
     () => (
       <>
@@ -17,6 +23,8 @@ export function TasksView({ model }: TasksViewProps): JSX.Element {
         </AppScreen.LeftPanel>
 
         <AppScreen.MainPanel>Tasks</AppScreen.MainPanel>
+
+        {rightPanel()}
       </>
     ),
     [model, model.monitor]
