@@ -7,9 +7,10 @@ export class Course {
 
   get tasks(): readonly Task[] { return this._tasks }
   set tasks(tasks: readonly Task[]) {
-    if (!this.tasksInitialized)
+    if (!this.tasksInitialized) {
       this._tasks = tasks
-    else
+      this.tasksInitialized = true
+    } else
       throw new Error("Course tasks have already been initialized");
   }
 
