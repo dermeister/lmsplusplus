@@ -16,20 +16,35 @@ export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
   )
 }
 
-function courses(model: Models.TasksExplorer, courses: readonly Models.CourseNode[]): JSX.Element[] {
+function onCreateTask(explorer: Models.TasksExplorer, course: Models.CourseNode): void {
+  explorer.createTask(course.item)
+  course.contextMenu.close()
+}
+
+function onEditTask(explorer: Models.TasksExplorer, task: Models.ItemNode<Task>): void {
+  explorer.editTask(task.item)
+  task.contextMenu.close()
+}
+
+function onDeleteTask(explorer: Models.TasksExplorer, task: Models.ItemNode<Task>): void {
+  explorer.deleteTask(task.item)
+  task.contextMenu.close()
+}
+
+function courses(explorer: Models.TasksExplorer, courses: readonly Models.CourseNode[]): JSX.Element[] {
   return courses.map(course => (
     <li key={course.id}>
       <Explorer.Group group={course}>
         {course.title}
 
         <ContextMenu model={course.contextMenu}>
-          <ContextMenu.Button onClick={() => model.createTask(course.item)}>New Task</ContextMenu.Button>
+          <ContextMenu.Button onClick={() => onCreateTask(explorer, course)}>New Task</ContextMenu.Button>
           <ContextMenu.Button>Edit Course</ContextMenu.Button>
           <ContextMenu.Button>Delete Course</ContextMenu.Button>
         </ContextMenu>
       </Explorer.Group>
 
-      <Explorer.Children group={course}>{tasks(model, course.children)}</Explorer.Children>
+      <Explorer.Children group={course}>{tasks(explorer, course.children)}</Explorer.Children>
     </li>
   ))
 }
@@ -40,8 +55,8 @@ function tasks(explorer: Models.TasksExplorer, tasks: Models.ItemNode<Task>[]): 
       {task.title}
 
       <ContextMenu model={task.contextMenu}>
-        <ContextMenu.Button onClick={() => explorer.updateTask(task.item)}>Edit Task</ContextMenu.Button>
-        <ContextMenu.Button onClick={() => explorer.deleteTask(task.item)}>Delete Task</ContextMenu.Button>
+        <ContextMenu.Button onClick={() => onEditTask(explorer, task)}>Edit Task</ContextMenu.Button>
+        <ContextMenu.Button onClick={() => onDeleteTask(explorer, task)}>Delete Task</ContextMenu.Button>
       </ContextMenu>
     </Explorer.Item>
   ))

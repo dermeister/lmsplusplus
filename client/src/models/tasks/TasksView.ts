@@ -27,8 +27,8 @@ export class TasksView extends ObservableObject {
 
   @reaction
   private updateTask(): void {
-    if (this.explorer.taskToUpdate)
-      this._taskEditor = new TaskEditor(this.explorer.taskToUpdate)
+    if (this.explorer.taskToEdit)
+      this._taskEditor = new TaskEditor(this.explorer.taskToEdit)
     else
       this._taskEditor = null
   }
@@ -50,7 +50,7 @@ export class TasksView extends ObservableObject {
         this.explorer.completeTaskCreation()
       } else {
         this.tasksRepository.update(editedTask)
-        this.explorer.completeTaskUpdate()
+        this.explorer.completeTaskEditing()
       }
   }
 }

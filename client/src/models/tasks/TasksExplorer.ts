@@ -23,13 +23,13 @@ export class CourseNode extends GroupNode {
 export class TasksExplorer extends Explorer<Task> {
   private _courseNodes: CourseNode[]
   private _taskToCreate: Task | null = null
-  private _taskToUpdate: Task | null = null
+  private _taskToEdit: Task | null = null
   private _taskToDelete: Task | null = null
 
   @cached get courseNodes(): readonly CourseNode[] { return this._courseNodes }
   @cached get selectedTask(): Task | null { return this.activeNode?.item ?? null }
   @cached get taskToCreate(): Task | null { return this._taskToCreate }
-  @cached get taskToUpdate(): Task | null { return this._taskToUpdate }
+  @cached get taskToEdit(): Task | null { return this._taskToEdit }
   @cached get taskToDelete(): Task | null { return this._taskToDelete }
 
   constructor(courses: readonly Course[]) {
@@ -50,10 +50,10 @@ export class TasksExplorer extends Explorer<Task> {
   completeTaskCreation(): void { this._taskToCreate = null }
 
   @transaction
-  updateTask(task: Task): void { this._taskToUpdate = task }
+  editTask(task: Task): void { this._taskToEdit = task }
 
   @transaction
-  completeTaskUpdate(): void { this._taskToUpdate = null }
+  completeTaskEditing(): void { this._taskToEdit = null }
 
   @transaction
   deleteTask(task: Task): void { this._taskToDelete = task }
