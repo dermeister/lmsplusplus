@@ -15,7 +15,7 @@ export class Auth extends ObservableObject {
 
   @transaction
   async signIn(login: string, password: string): Promise<boolean> {
-    if (this._user !== null)
+    if (this._user)
       standalone(() => this.signOut())
     try {
       this._user = await Promise.resolve(new User())
@@ -31,16 +31,16 @@ export class Auth extends ObservableObject {
 
   private loadUserFromLocalStorage(): User | null {
     const serializedUser = localStorage.getItem(this.localStorageKey)
-    if (serializedUser === null)
+    if (!serializedUser)
       return null
     return User.deserialize(serializedUser)
   }
 
   @reaction
   private updateLocalStorage(): void {
-    if (this._user === null)
+    if (!this._user)
       localStorage.removeItem(this.localStorageKey)
-    else if (localStorage.getItem(this.localStorageKey) === null)
+    else if (!localStorage.getItem(this.localStorageKey))
       localStorage.setItem(this.localStorageKey, JSON.stringify(this._user))
   }
 }

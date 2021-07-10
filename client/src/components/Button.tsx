@@ -22,7 +22,7 @@ function reactButtonProps(props: ButtonProps): ReactButtonProps {
 
 function buildClassName(props: ButtonProps): string {
   let className = styles.button
-  if (props.className !== undefined)
+  if (props.className)
     className += ` ${props.className}`
   if (props.fluid)
     className += ` ${styles.fluid}`

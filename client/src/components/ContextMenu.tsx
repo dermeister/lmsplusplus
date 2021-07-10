@@ -12,7 +12,7 @@ interface ContextMenuProps {
 
 export function ContextMenu({ model, children }: ContextMenuProps): JSX.Element {
   function positionMenu(menu: HTMLElement | null): void {
-    if (menu !== null) {
+    if (menu) {
       const OFFSET = 10
       if (model.x + menu.clientWidth + OFFSET > window.innerWidth)
         menu.style.right = `${OFFSET}px`

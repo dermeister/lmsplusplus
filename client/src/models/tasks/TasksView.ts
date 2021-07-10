@@ -19,7 +19,7 @@ export class TasksView extends ObservableObject {
 
   @reaction
   private createTask(): void {
-    if (this.explorer.taskToCreate !== null)
+    if (this.explorer.taskToCreate)
       this._taskEditor = new TaskEditor(this.explorer.taskToCreate)
     else
       this._taskEditor = null
@@ -27,7 +27,7 @@ export class TasksView extends ObservableObject {
 
   @reaction
   private updateTask(): void {
-    if (this.explorer.taskToUpdate !== null)
+    if (this.explorer.taskToUpdate)
       this._taskEditor = new TaskEditor(this.explorer.taskToUpdate)
     else
       this._taskEditor = null
@@ -35,7 +35,7 @@ export class TasksView extends ObservableObject {
 
   @reaction
   private async deleteTask(): Promise<void> {
-    if (this.explorer.taskToDelete !== null) {
+    if (this.explorer.taskToDelete) {
       await this.tasksRepository.delete(this.explorer.taskToDelete)
       this.explorer.completeTaskDeletion()
     }
@@ -45,7 +45,7 @@ export class TasksView extends ObservableObject {
   private async persistTask(): Promise<void> {
     const editedTask = this._taskEditor?.editedTask
     if (editedTask)
-      if (editedTask.id === null) {
+      if (!editedTask.id) {
         this.tasksRepository.create(editedTask)
         this.explorer.completeTaskCreation()
       } else {

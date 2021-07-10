@@ -19,7 +19,8 @@ export function Overlay(props: OverlayProps): JSX.Element {
   }, [])
 
   function onFocusIn({ target }: FocusEvent): void {
-    if (target instanceof Node && !ref.current?.contains(target)) focusContent(ref.current)
+    if (target instanceof Node && !ref.current?.contains(target))
+      focusContent(ref.current)
   }
 
   function onMouseDown(e: React.MouseEvent): void {
@@ -66,7 +67,7 @@ function focusContent(overlay: HTMLDivElement | null): void {
 
 function buildClassName(props: OverlayProps): string {
   let className = styles.overlay
-  if (props.className !== undefined)
+  if (props.className)
     className += ` ${props.className}`
   return className
 }

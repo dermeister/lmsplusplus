@@ -10,7 +10,7 @@ interface TasksViewProps {
 
 export function TasksView({ model }: TasksViewProps): JSX.Element {
   function rightPanel(): JSX.Element | undefined {
-    if (model.taskEditor !== null) {
+    if (model.taskEditor) {
       return <AppScreen.RightPanel model={model.rightPanel}>Hello</AppScreen.RightPanel>
     }
   }
