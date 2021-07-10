@@ -3,13 +3,16 @@ import { Node } from "./Node"
 
 export class GroupNode extends Node {
   @unobservable readonly title: string
-  @unobservable readonly children: Node[]
+  private _children: Node[] = []
   private _isOpened = false
 
-  constructor(title: string, children: Node[] = []) {
+  constructor(title: string) {
     super(title)
     this.title = title
-    this.children = children
+  }
+
+  @cached get children(): Node[] {
+    return this._children
   }
 
   @cached

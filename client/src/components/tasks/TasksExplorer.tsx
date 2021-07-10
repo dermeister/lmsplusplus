@@ -10,10 +10,16 @@ interface TasksExplorerProps {
 }
 
 export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
-  return autorender(() => <Explorer model={model}>{courses(model.courses)}</Explorer>, [model])
+  return autorender(
+    () => <Explorer model={model}>{courses(model, model.courseNodes)}</Explorer>,
+    [model]
+  )
 }
 
-function courses(courses: Models.CourseNode[]): JSX.Element[] {
+function courses(
+  model: Models.TasksExplorer,
+  courses: readonly Models.CourseNode[]
+): JSX.Element[] {
   return courses.map(course => (
     <li key={course.id}>
       <Explorer.Group group={course}>
@@ -21,7 +27,7 @@ function courses(courses: Models.CourseNode[]): JSX.Element[] {
         {courseContextMenu(course.contextMenu)}
       </Explorer.Group>
 
-      <Explorer.Children group={course}>{tasks(course.children)}</Explorer.Children>
+      <Explorer.Children group={course}>{tasks(model, course.children)}</Explorer.Children>
     </li>
   ))
 }
@@ -35,20 +41,17 @@ function courseContextMenu(model: Models.ContextMenu): JSX.Element {
   )
 }
 
-function tasks(tasks: Models.ItemNode<Task>[]): JSX.Element[] {
+function tasks(explorer: Models.TasksExplorer, tasks: Models.ItemNode<Task>[]): JSX.Element[] {
   return tasks.map(task => (
     <Explorer.Item key={task.id} item={task}>
       {task.title}
-      {taskContextMenu(task.contextMenu)}
+
+      <ContextMenu model={task.contextMenu}>
+        <ContextMenu.Button>Edit Task</ContextMenu.Button>
+        <ContextMenu.Button onClick={() => explorer.setTaskToDelete(task.item)}>
+          Delete Task
+        </ContextMenu.Button>
+      </ContextMenu>
     </Explorer.Item>
   ))
-}
-
-function taskContextMenu(model: Models.ContextMenu): JSX.Element {
-  return (
-    <ContextMenu model={model}>
-      <ContextMenu.Button>Edit Task</ContextMenu.Button>
-      <ContextMenu.Button>Delete Task</ContextMenu.Button>
-    </ContextMenu>
-  )
 }

@@ -1,4 +1,4 @@
-import { cached, ObservableObject } from "reactronic"
+import { cached, ObservableObject, transaction } from "reactronic"
 import { Task } from "./Task"
 
 export class Course extends ObservableObject {
@@ -17,7 +17,12 @@ export class Course extends ObservableObject {
   }
 
   @cached
-  get tasks(): Task[] {
+  get tasks(): readonly Task[] {
     return this._tasks
+  }
+
+  @transaction
+  deleteTask(task: Task): void {
+    this._tasks = this._tasks.filter(t => t !== task)
   }
 }

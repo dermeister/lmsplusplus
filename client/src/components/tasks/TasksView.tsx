@@ -9,17 +9,16 @@ interface TasksViewProps {
 }
 
 export function TasksView({ model }: TasksViewProps): JSX.Element {
-  const { tasksMonitor } = Models.TasksView
   return autorender(
     () => (
       <>
-        <AppScreen.LeftPanel model={model.leftPanel} pulsing={tasksMonitor.isActive}>
+        <AppScreen.LeftPanel model={model.leftPanel} pulsing={model.monitor.isActive}>
           <TasksExplorer model={model.explorer} />
         </AppScreen.LeftPanel>
 
         <AppScreen.MainPanel>Tasks</AppScreen.MainPanel>
       </>
     ),
-    [model, tasksMonitor]
+    [model, model.monitor]
   )
 }

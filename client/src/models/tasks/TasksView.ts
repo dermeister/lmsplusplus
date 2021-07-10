@@ -1,22 +1,26 @@
-import { monitor, Monitor, ObservableObject, reaction, unobservable } from "reactronic"
-import { Course } from "../../domain/Course"
-import { Task } from "../../domain/Task"
+import { Monitor, ObservableObject, reaction, unobservable } from "reactronic"
+import { TasksRepository } from "../../repositories/TasksRepository"
 import { SidePanel } from "../SidePanel"
 import { TasksExplorer } from "../tasks/TasksExplorer"
 
 export class TasksView extends ObservableObject {
-  static readonly tasksMonitor = Monitor.create("Tasks monitor", 0, 0)
   @unobservable readonly leftPanel = new SidePanel("Tasks")
-  @unobservable readonly explorer = new TasksExplorer([])
+  @unobservable readonly tasksRepository = new TasksRepository()
+  @unobservable readonly explorer = new TasksExplorer(this.tasksRepository.courses)
+
+  get monitor(): Monitor {
+    return TasksRepository.monitor
+  }
 
   @reaction
-  @monitor(TasksView.tasksMonitor)
-  private async init(): Promise<void> {
-    const courses = await Promise.resolve([
-      new Course("СПП", [new Task("Task 1"), new Task("Task 2")]),
-      new Course("ЯП", [new Task("Task 1"), new Task("Task 2"), new Task("Task 3")]),
-    ])
+  private updateExplorer(): void {
+    this.explorer.updateCourses(this.tasksRepository.courses)
+  }
 
-    this.explorer.updateCourses(courses)
+  @reaction
+  private taskDeleted(): void {
+    if (this.explorer.taskToDelete !== null) {
+      this.tasksRepository.delete(this.explorer.taskToDelete)
+    }
   }
 }

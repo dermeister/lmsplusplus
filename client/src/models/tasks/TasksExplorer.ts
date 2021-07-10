@@ -1,4 +1,4 @@
-import { cached, transaction, unobservable } from "reactronic"
+import { cached, reaction, transaction, unobservable } from "reactronic"
 import { Course } from "../../domain/Course"
 import { Task } from "../../domain/Task"
 import { Explorer } from "../explorer/Explorer"
@@ -6,44 +6,61 @@ import { GroupNode } from "../explorer/GroupNode"
 import { ItemNode } from "../explorer/ItemNode"
 
 export class CourseNode extends GroupNode {
-  @unobservable readonly children: ItemNode<Task>[]
+  private _tasks: ItemNode<Task>[] = []
+  @unobservable private readonly course: Course
 
-  constructor(title: string, children: ItemNode<Task>[] = []) {
+  constructor(title: string, course: Course) {
     super(title)
-    this.children = children
+    this.course = course
+  }
+
+  @cached
+  get children(): ItemNode<Task>[] {
+    return this._tasks
+  }
+
+  @reaction
+  private updateTasks(): void {
+    this._tasks = this.course.tasks.map(t => new ItemNode(t.title, t))
   }
 }
 
 export class TasksExplorer extends Explorer<Task> {
-  private _courses: CourseNode[] = []
+  private _courseNodes: CourseNode[]
+  private _taskToDelete: Task | null = null
 
-  constructor(courses: Course[]) {
+  constructor(courses: readonly Course[]) {
     super()
-    this._courses = this.courseNodes(courses)
+    this._courseNodes = this.createCourseNodes(courses)
   }
 
   @cached
-  get courses(): CourseNode[] {
-    return this._courses
+  get courseNodes(): readonly CourseNode[] {
+    return this._courseNodes
   }
 
   @cached
-  get task(): Task | null {
+  get selectedTask(): Task | null {
     return this.activeNode?.item ?? null
   }
 
-  @transaction
-  updateCourses(courses: Course[]): void {
-    this._courses = this.courseNodes(courses)
+  @cached
+  get taskToDelete(): Task | null {
+    return this._taskToDelete
   }
 
   @transaction
-  private courseNodes(courses: Course[]): CourseNode[] {
-    return courses.map(c => new CourseNode(c.name, this.taskNodes(c.tasks)))
+  private createCourseNodes(courses: readonly Course[]): CourseNode[] {
+    return courses.map(c => new CourseNode(c.name, c))
   }
 
   @transaction
-  private taskNodes(tasks: Task[]): ItemNode<Task>[] {
-    return tasks.map(t => new ItemNode(t.title, t))
+  updateCourses(courses: readonly Course[]): void {
+    this._courseNodes = this.createCourseNodes(courses)
+  }
+
+  @transaction
+  setTaskToDelete(task: Task | null): void {
+    this._taskToDelete = task
   }
 }
