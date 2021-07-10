@@ -4,14 +4,11 @@ export class SidePanel extends ObservableObject {
   @unobservable readonly title: string
   private _opened = true
 
+  @cached get opened(): boolean { return this._opened }
+
   constructor(title: string) {
     super()
     this.title = title
-  }
-
-  @cached
-  get opened(): boolean {
-    return this._opened
   }
 
   @transaction

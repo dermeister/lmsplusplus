@@ -8,9 +8,7 @@ export class TasksView extends ObservableObject {
   @unobservable readonly tasksRepository = new TasksRepository()
   @unobservable readonly explorer = new TasksExplorer(this.tasksRepository.courses)
 
-  get monitor(): Monitor {
-    return TasksRepository.monitor
-  }
+  get monitor(): Monitor { return TasksRepository.monitor }
 
   @reaction
   private updateExplorer(): void {

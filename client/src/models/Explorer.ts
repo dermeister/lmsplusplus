@@ -23,14 +23,11 @@ export class ExplorerGroupNode extends ExplorerNode {
   private _isOpened = false
   @unobservable readonly children: ExplorerNode[]
 
+  @cached get isOpened(): boolean { return this._isOpened }
+
   constructor(title: string, key: string, children: ExplorerNode[]) {
     super(title, key)
     this.children = children
-  }
-
-  @cached
-  get isOpened(): boolean {
-    return this._isOpened
   }
 
   @transaction
@@ -40,5 +37,5 @@ export class ExplorerGroupNode extends ExplorerNode {
 }
 
 export class ExplorerItemNode extends ExplorerNode {
-  click(): void {}
+  click(): void { }
 }

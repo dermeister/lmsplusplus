@@ -6,10 +6,7 @@ export class TasksRepository extends ObservableObject {
   static readonly monitor = Monitor.create("Tasks monitor", 0, 0)
   private _courses: Course[] = []
 
-  @cached
-  get courses(): readonly Course[] {
-    return this._courses
-  }
+  @cached get courses(): readonly Course[] { return this._courses }
 
   @transaction
   @monitor(TasksRepository.monitor)

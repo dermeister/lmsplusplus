@@ -6,18 +6,12 @@ export class GroupNode extends Node {
   private _children: Node[] = []
   private _isOpened = false
 
+  @cached get children(): Node[] { return this._children }
+  @cached get isOpened(): boolean { return this._isOpened }
+
   constructor(title: string) {
     super(title)
     this.title = title
-  }
-
-  @cached get children(): Node[] {
-    return this._children
-  }
-
-  @cached
-  get isOpened(): boolean {
-    return this._isOpened
   }
 
   @transaction

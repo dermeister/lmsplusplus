@@ -5,15 +5,8 @@ export class ContextMenu extends ObservableObject {
   private _y: number = 0
   private _isOpened = false
 
-  @cached
-  get x(): number {
-    return this._x
-  }
-
-  @cached
-  get y(): number {
-    return this._y
-  }
+  @cached get x(): number { return this._x }
+  @cached get y(): number { return this._y }
 
   @cached
   get isOpened(): boolean {

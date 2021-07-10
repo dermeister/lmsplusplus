@@ -5,10 +5,7 @@ export class Auth extends ObservableObject {
   private _user: User | null = null
   private localStorageKey: string
 
-  @cached
-  get user(): User | null {
-    return this._user
-  }
+  @cached get user(): User | null { return this._user }
 
   constructor(localStorageKey: string) {
     super()

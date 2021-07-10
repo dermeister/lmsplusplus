@@ -13,10 +13,7 @@ export class Views extends ObservableObject {
   @unobservable readonly options = new OptionsView()
   private _active: View = this.tasks
 
-  @cached
-  get active(): View {
-    return this._active
-  }
+  @cached get active(): View { return this._active }
 
   @transaction
   activate(view: View): void {

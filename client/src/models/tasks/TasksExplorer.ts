@@ -9,14 +9,11 @@ export class CourseNode extends GroupNode {
   private _tasks: ItemNode<Task>[] = []
   @unobservable private readonly course: Course
 
+  @cached get children(): ItemNode<Task>[] { return this._tasks }
+
   constructor(title: string, course: Course) {
     super(title)
     this.course = course
-  }
-
-  @cached
-  get children(): ItemNode<Task>[] {
-    return this._tasks
   }
 
   @reaction
@@ -29,24 +26,13 @@ export class TasksExplorer extends Explorer<Task> {
   private _courseNodes: CourseNode[]
   private _taskToDelete: Task | null = null
 
+  @cached get courseNodes(): readonly CourseNode[] { return this._courseNodes }
+  @cached get selectedTask(): Task | null { return this.activeNode?.item ?? null }
+  @cached get taskToDelete(): Task | null { return this._taskToDelete }
+
   constructor(courses: readonly Course[]) {
     super()
     this._courseNodes = this.createCourseNodes(courses)
-  }
-
-  @cached
-  get courseNodes(): readonly CourseNode[] {
-    return this._courseNodes
-  }
-
-  @cached
-  get selectedTask(): Task | null {
-    return this.activeNode?.item ?? null
-  }
-
-  @cached
-  get taskToDelete(): Task | null {
-    return this._taskToDelete
   }
 
   @transaction

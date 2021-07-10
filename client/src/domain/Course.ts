@@ -5,20 +5,13 @@ export class Course extends ObservableObject {
   private _name: string
   private _tasks: Task[]
 
+  @cached get name(): string { return this._name }
+  @cached get tasks(): readonly Task[] { return this._tasks }
+
   constructor(name: string, tasks: Task[]) {
     super()
     this._name = name
     this._tasks = tasks
-  }
-
-  @cached
-  get name(): string {
-    return this._name
-  }
-
-  @cached
-  get tasks(): readonly Task[] {
-    return this._tasks
   }
 
   @transaction
