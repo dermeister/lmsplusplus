@@ -66,7 +66,7 @@ function focusContent(overlay: HTMLDivElement | null): void {
 
 function buildClassName(props: OverlayProps): string {
   let className = styles.overlay
-  if (props.className !== undefined) className += ` ${props.className}`
-
+  if (props.className !== undefined)
+    className += ` ${props.className}`
   return className
 }

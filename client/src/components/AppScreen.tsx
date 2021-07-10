@@ -14,20 +14,15 @@ interface AppScreenProps {
 }
 
 function content(model: Models.Views): JSX.Element | undefined {
-  if (model.tasks === model.active) {
-    return <TasksView model={model.tasks} />
-  }
-
-  if (model.solutions === model.active) {
-    return <SolutionsView model={model.solutions} />
-  }
-
-  if (model.demo === model.active) {
-    return <DemoView model={model.demo} />
-  }
-
-  if (model.options === model.active) {
-    return <OptionsView model={model.options} />
+  switch (model.active) {
+    case model.tasks:
+      return <TasksView model={model.tasks} />
+    case model.solutions:
+      return <SolutionsView model={model.solutions} />
+    case model.demo:
+      return <DemoView model={model.demo} />
+    case model.options:
+      return <OptionsView model={model.options} />
   }
 }
 

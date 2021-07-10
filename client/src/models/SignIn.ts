@@ -17,14 +17,10 @@ export class SignIn extends ObservableObject {
   }
 
   @transaction
-  setLogin(login: string): void {
-    this._login = login
-  }
+  setLogin(login: string): void { this._login = login }
 
   @transaction
-  setPassword(password: string): void {
-    this._password = password
-  }
+  setPassword(password: string): void { this._password = password }
 
   @transaction
   async signIn(): Promise<void> {

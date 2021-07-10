@@ -33,7 +33,7 @@ export function Group({ group, children }: GroupProps): JSX.Element {
 
 function arrow(group: Models.GroupNode): JSX.Element {
   let className = styles.arrow
-  if (group.isOpened) className += ` ${styles.arrowOpened}`
-
+  if (group.isOpened)
+    className += ` ${styles.arrowOpened}`
   return <FaChevronRight size={10} className={className} />
 }

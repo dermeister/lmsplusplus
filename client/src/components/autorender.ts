@@ -13,10 +13,8 @@ import {
 export default function autorender(jsx: () => JSX.Element, deps: unknown[] = []): JSX.Element {
   const [state, refresh] = useState(createReactState)
   const { rx } = state
-
   rx.refresh = refresh
   useEffect(() => rx.unmount, [])
-
   return rx.render(useCallback(jsx, deps))
 }
 
@@ -36,9 +34,8 @@ class Rx extends ObservableObject {
 
   @reaction
   private ensureUpToDate(): void {
-    if (!Reactronic.getController(this.render).isUpToDate) {
+    if (!Reactronic.getController(this.render).isUpToDate)
       standalone(() => this.refresh?.({ rx: this }))
-    }
   }
 }
 

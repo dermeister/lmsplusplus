@@ -32,9 +32,7 @@ export function SignInScreen({ model }: SignInScreenProps): JSX.Element {
           <p className={styles.formHeading}>Welcome back!</p>
 
           <div>
-            <label className={styles.label} htmlFor="sign-in-login">
-              Login
-            </label>
+            <label className={styles.label} htmlFor="sign-in-login">Login</label>
             <Input
               className={styles.input}
               value={model.login}
@@ -45,9 +43,7 @@ export function SignInScreen({ model }: SignInScreenProps): JSX.Element {
           </div>
 
           <div>
-            <label className={styles.label} htmlFor="sign-in-password">
-              Password
-            </label>
+            <label className={styles.label} htmlFor="sign-in-password">Password</label>
             <Input
               value={model.password}
               onChange={onPassword}
@@ -58,9 +54,7 @@ export function SignInScreen({ model }: SignInScreenProps): JSX.Element {
             />
           </div>
 
-          <Button className={styles.submit} fluid>
-            Sign in
-          </Button>
+          <Button className={styles.submit} fluid>Sign in</Button>
         </form>
       </div>
     )

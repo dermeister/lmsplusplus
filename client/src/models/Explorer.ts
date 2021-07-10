@@ -31,9 +31,7 @@ export class ExplorerGroupNode extends ExplorerNode {
   }
 
   @transaction
-  click(): void {
-    this._isOpened = !this._isOpened
-  }
+  click(): void { this._isOpened = !this._isOpened }
 }
 
 export class ExplorerItemNode extends ExplorerNode {

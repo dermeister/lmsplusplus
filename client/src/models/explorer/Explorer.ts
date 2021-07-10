@@ -6,9 +6,5 @@ export class Explorer<T> extends ObservableObject {
 
   @cached get activeNode(): ItemNode<T> | null { return this._activeNode }
 
-  activateNode(node: ItemNode<T>): void {
-    Transaction.run(() => {
-      this._activeNode = node
-    })
-  }
+  activateNode(node: ItemNode<T>): void { Transaction.run(() => { this._activeNode = node }) }
 }

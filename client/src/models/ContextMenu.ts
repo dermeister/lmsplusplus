@@ -7,11 +7,7 @@ export class ContextMenu extends ObservableObject {
 
   @cached get x(): number { return this._x }
   @cached get y(): number { return this._y }
-
-  @cached
-  get isOpened(): boolean {
-    return this._isOpened
-  }
+  @cached get isOpened(): boolean { return this._isOpened }
 
   @transaction
   open(x: number, y: number): void {

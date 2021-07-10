@@ -22,7 +22,7 @@ export function Root({ model }: RootProps): JSX.Element {
 }
 
 function content(model: Models.Root): JSX.Element {
-  if (model.auth.user === null) return <AppScreen model={model.app} />
-
+  if (model.auth.user === null)
+    return <AppScreen model={model.app} />
   return <SignInScreen model={model.signIn} />
 }

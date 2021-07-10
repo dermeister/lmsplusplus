@@ -16,18 +16,14 @@ export class Views extends ObservableObject {
   @cached get active(): View { return this._active }
 
   @transaction
-  activate(view: View): void {
-    this._active = view
-  }
+  activate(view: View): void { this._active = view }
 
   @reaction
   private syncSidePanels(): void {
     const views = [this.tasks, this.solutions, this.demo, this.options]
-    const { opened } = this._active.leftPanel
-
     for (const view of views) {
       const { leftPanel } = view
-      opened ? leftPanel.open() : leftPanel.close()
+      this._active.leftPanel ? leftPanel.open() : leftPanel.close()
     }
   }
 }

@@ -4,8 +4,8 @@ import styles from "./Explorer.module.css"
 
 export function buildNodeClassName(node: Models.Node): string {
   let className = styles.node
-  if (node.contextMenu.isOpened) className += ` ${styles.contextMenuOpened}`
-
+  if (node.contextMenu.isOpened)
+    className += ` ${styles.contextMenuOpened}`
   return className
 }
 

@@ -28,7 +28,8 @@ export function ViewBar({ model }: ViewBarProps): JSX.Element {
 
 function button(model: Models.Views, view: Models.View, Icon: IconType): JSX.Element {
   let className = styles.viewButton
-  if (model.active === view) className += ` ${styles.selected}`
+  if (model.active === view)
+    className += ` ${styles.selected}`
 
   return (
     <button onClick={() => model.activate(view)} className={className}>

@@ -15,7 +15,5 @@ export class GroupNode extends Node {
   }
 
   @transaction
-  toggle(): void {
-    this._isOpened = !this._isOpened
-  }
+  toggle(): void { this._isOpened = !this._isOpened }
 }

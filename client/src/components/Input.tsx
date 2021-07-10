@@ -22,8 +22,9 @@ function reactInputProps(props: InputProps): ReactInputProps {
 
 function buildClassName(props: InputProps): string {
   let className = styles.input
-  if (props.className !== undefined) className += ` ${props.className}`
-  if (props.fluid) className += ` ${styles.fluid}`
-
+  if (props.className !== undefined)
+    className += ` ${props.className}`
+  if (props.fluid)
+    className += ` ${styles.fluid}`
   return className
 }
