@@ -1,4 +1,5 @@
-import { cached, ObservableObject, transaction, unobservable } from "reactronic"
+import { cached, transaction, unobservable } from "reactronic"
+import { ObservableObject } from "../ObservableObject"
 
 export class SidePanel extends ObservableObject {
   @unobservable readonly title: string

@@ -1,5 +1,6 @@
-import { cached, ObservableObject, reaction, standalone, transaction } from "reactronic"
+import { cached, reaction, standalone, transaction } from "reactronic"
 import { User } from "../domain/User"
+import { ObservableObject } from "../ObservableObject"
 
 export class Auth extends ObservableObject {
   private _user: User | null = null

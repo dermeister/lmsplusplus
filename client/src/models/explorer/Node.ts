@@ -1,4 +1,5 @@
-import { ObservableObject, unobservable } from "reactronic"
+import { unobservable } from "reactronic"
+import { ObservableObject } from "../../ObservableObject"
 import { ContextMenu } from "../ContextMenu"
 
 export class Node extends ObservableObject {
@@ -10,5 +11,10 @@ export class Node extends ObservableObject {
   constructor(title: string) {
     super()
     this.title = title
+  }
+
+  dispose(): void {
+    this.contextMenu.dispose()
+    super.dispose()
   }
 }

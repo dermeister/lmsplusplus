@@ -18,17 +18,17 @@ export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
 
 function onCreateTask(explorer: Models.TasksExplorer, course: Models.CourseNode): void {
   course.contextMenu.close()
-  explorer.createTask(course.item)
+  explorer.setCoursesToCreateTaskAt(course.item)
 }
 
 function onEditTask(explorer: Models.TasksExplorer, task: Models.ItemNode<Task>): void {
   task.contextMenu.close()
-  explorer.editTask(task.item)
+  explorer.setTaskToEdit(task.item)
 }
 
 function onDeleteTask(explorer: Models.TasksExplorer, task: Models.ItemNode<Task>): void {
   task.contextMenu.close()
-  explorer.deleteTask(task.item)
+  explorer.setTaskToDelete(task.item)
 }
 
 function courses(explorer: Models.TasksExplorer, courses: readonly Models.CourseNode[]): JSX.Element[] {

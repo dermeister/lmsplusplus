@@ -1,4 +1,5 @@
-import { cached, ObservableObject, transaction } from "reactronic"
+import { cached, transaction } from "reactronic"
+import { ObservableObject } from "../ObservableObject"
 
 export class ContextMenu extends ObservableObject {
   private _x: number = 0

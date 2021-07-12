@@ -1,6 +1,7 @@
-import { cached, monitor, Monitor, ObservableObject, reaction, transaction } from "reactronic"
+import { cached, monitor, Monitor, reaction, transaction } from "reactronic"
 import { Course } from "../domain/Course"
 import { Task } from "../domain/Task"
+import { ObservableObject } from "../ObservableObject"
 
 export class TasksRepository extends ObservableObject {
   private static nextTaskId = 1

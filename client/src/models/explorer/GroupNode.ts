@@ -3,7 +3,7 @@ import { Node } from "./Node"
 
 export class GroupNode extends Node {
   @unobservable readonly title: string
-  private _children: Node[] = []
+  protected _children: Node[] = []
   private _isOpened = false
 
   @cached get children(): Node[] { return this._children }

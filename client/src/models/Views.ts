@@ -1,4 +1,5 @@
-import { cached, ObservableObject, reaction, transaction, unobservable } from "reactronic"
+import { cached, reaction, transaction, unobservable } from "reactronic"
+import { ObservableObject } from "../ObservableObject"
 import { TasksView } from "./tasks/TasksView"
 import { DemoView } from "./views/DemoView"
 import { OptionsView } from "./views/OptionsView"
@@ -17,6 +18,14 @@ export class Views extends ObservableObject {
 
   @transaction
   activate(view: View): void { this._active = view }
+
+  dispose(): void {
+    this.tasks.dispose()
+    this.solutions.dispose()
+    this.demo.dispose()
+    this.options.dispose()
+    super.dispose()
+  }
 
   @reaction
   private syncSidePanels(): void {

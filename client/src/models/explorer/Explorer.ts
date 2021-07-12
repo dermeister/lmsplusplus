@@ -1,4 +1,5 @@
-import { cached, ObservableObject, Transaction } from "reactronic"
+import { cached, Transaction } from "reactronic"
+import { ObservableObject } from "../../ObservableObject"
 import { ItemNode } from "./ItemNode"
 
 export class Explorer<T> extends ObservableObject {

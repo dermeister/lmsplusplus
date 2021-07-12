@@ -1,5 +1,7 @@
-import { cached, Monitor, ObservableObject, reaction, unobservable } from "reactronic"
+import { cached, Monitor, reaction, unobservable } from "reactronic"
+import { Task } from "../../domain/Task"
 import { TasksRepository } from "../../repositories/TasksRepository"
+import { ObservableObject } from "../../ObservableObject"
 import { SidePanel } from "../SidePanel"
 import { TasksExplorer } from "../tasks/TasksExplorer"
 import { TaskEditor } from "./TaskEditor"
@@ -14,43 +16,57 @@ export class TasksView extends ObservableObject {
   get monitor(): Monitor { return TasksRepository.monitor }
   @cached get taskEditor(): TaskEditor | null { return this._taskEditor }
 
+  dispose(): void {
+    this.leftPanel.dispose()
+    this.rightPanel.dispose()
+    this.tasksRepository.dispose()
+    this.explorer.dispose()
+    this._taskEditor?.dispose()
+    super.dispose()
+  }
+
   @reaction
   private updateExplorer(): void { this.explorer.updateCourses(this.tasksRepository.courses) }
 
   @reaction
   private createTask(): void {
-    if (this.explorer.taskToCreate)
-      this._taskEditor = new TaskEditor(this.explorer.taskToCreate)
-    else
-      this._taskEditor = null
+    let task: Task | null = null
+    const { courseToCreateTaskAt } = this.explorer
+    if (courseToCreateTaskAt)
+      task = new Task(null, courseToCreateTaskAt, "", "")
+    this.createOrDisposeTaskEditor(task)
   }
 
   @reaction
-  private updateTask(): void {
-    if (this.explorer.taskToEdit)
-      this._taskEditor = new TaskEditor(this.explorer.taskToEdit)
-    else
+  private editTask(): void { this.createOrDisposeTaskEditor(this.explorer.taskToEdit) }
+
+  private createOrDisposeTaskEditor(task: Task | null): void {
+    if (task)
+      this._taskEditor = new TaskEditor(task)
+    else {
+      this._taskEditor?.dispose()
       this._taskEditor = null
+    }
   }
 
   @reaction
   private async deleteTask(): Promise<void> {
     if (this.explorer.taskToDelete) {
       await this.tasksRepository.delete(this.explorer.taskToDelete)
-      this.explorer.completeTaskDeletion()
+      this.explorer.setTaskToDelete(null)
     }
   }
 
   @reaction
-  private async persistTask(): Promise<void> {
+  private async saveTask(): Promise<void> {
     const editedTask = this._taskEditor?.editedTask
     if (editedTask)
       if (!editedTask.id) {
         this.tasksRepository.create(editedTask)
-        this.explorer.completeTaskCreation()
+        this.explorer.setCoursesToCreateTaskAt(null)
       } else {
         this.tasksRepository.update(editedTask)
-        this.explorer.completeTaskEditing()
+        this.explorer.setTaskToEdit(null)
       }
   }
 }

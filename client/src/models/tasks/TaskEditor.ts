@@ -1,6 +1,7 @@
-import { cached, ObservableObject, transaction, unobservable } from "reactronic";
+import { cached, transaction, unobservable } from "reactronic";
 import { Course } from "../../domain/Course";
 import { Task } from "../../domain/Task";
+import { ObservableObject } from "../../ObservableObject";
 
 export class TaskEditor extends ObservableObject {
   private _editedTask: Task | null = null
