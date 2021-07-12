@@ -36,7 +36,7 @@ export class TasksRepository extends ObservableObject {
   @reaction
   @monitor(TasksRepository.monitor)
   private async synchronize(): Promise<void> {
-    const course1 = new Course("СПП");
+    const course1 = new Course("СПП")
     course1.tasks = [
       new Task(TasksRepository.nextTaskId++, course1, "Task 1", "Task 1"),
       new Task(TasksRepository.nextTaskId++, course1, "Task 2", "Task 2")
