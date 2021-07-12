@@ -30,19 +30,24 @@ export class TasksView extends ObservableObject {
 
   @reaction
   private createTask(): void {
-    if (this.explorer.courseToCreateTaskIn)
-      this._taskEditor = new TaskEditor(new Task(Task.NO_ID, this.explorer.courseToCreateTaskIn, "", ""))
+    if (this.explorer.courseToCreateTaskIn) {
+      this._taskEditor?.dispose()
+      const task = new Task(Task.NO_ID, this.explorer.courseToCreateTaskIn, "", "")
+      this._taskEditor = new TaskEditor(task)
+    }
   }
 
   @reaction
   private editTask(): void {
-    if (this.explorer.taskToEdit)
+    if (this.explorer.taskToEdit) {
+      this._taskEditor?.dispose()
       this._taskEditor = new TaskEditor(this.explorer.taskToEdit)
+    }
   }
 
   @reaction
   private disposeTaskEditor(): void {
-    if (!(this.explorer.taskToEdit || this.explorer.courseToCreateTaskIn)) {
+    if (!this.explorer.taskToEdit && !this.explorer.courseToCreateTaskIn) {
       this.taskEditor?.dispose()
       this._taskEditor = null
     }
@@ -52,7 +57,7 @@ export class TasksView extends ObservableObject {
   private async deleteTask(): Promise<void> {
     if (this.explorer.taskToDelete) {
       await this.tasksRepository.delete(this.explorer.taskToDelete)
-      this.explorer.setTaskToDelete(null)
+      this.explorer.reset()
     }
   }
 
@@ -63,10 +68,10 @@ export class TasksView extends ObservableObject {
       switch (editResult?.status) {
         case "saved":
           await this.tasksRepository.create(editResult.task)
-          this.explorer.setCourseToCreateTaskIn(null)
+          this.explorer.reset()
           break
         case "canceled":
-          this.explorer.setCourseToCreateTaskIn(null)
+          this.explorer.reset()
           break
       }
   }
@@ -78,10 +83,10 @@ export class TasksView extends ObservableObject {
       switch (editResult?.status) {
         case "saved":
           await this.tasksRepository.update(editResult.task)
-          this.explorer.setTaskToEdit(null)
+          this.explorer.reset()
           break
         case "canceled":
-          this.explorer.setTaskToEdit(null)
+          this.explorer.reset()
           break
       }
   }

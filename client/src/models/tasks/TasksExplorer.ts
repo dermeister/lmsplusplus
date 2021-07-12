@@ -49,31 +49,30 @@ export class TasksExplorer extends Explorer<Task> {
   }
 
   @transaction
-  setCourseToCreateTaskIn(course: Course | null): void {
-    if (course)
-      this.checkIfCanProcessAction()
+  setCourseToCreateTaskIn(course: Course): void {
+    this.reset()
     this._courseToCreateTaskIn = course
   }
 
   @transaction
-  setTaskToEdit(task: Task | null): void {
-    if (task)
-      this.checkIfCanProcessAction()
+  setTaskToEdit(task: Task): void {
+    this.reset()
     this._taskToEdit = task
   }
 
   @transaction
-  setTaskToDelete(task: Task | null): void {
-    if (task)
-      this.checkIfCanProcessAction()
+  setTaskToDelete(task: Task): void {
+    this.reset()
     this._taskToDelete = task
   }
 
   @transaction
-  private createCourseNodes(courses: readonly Course[]): CourseNode[] { return courses.map(c => new CourseNode(c.name, c)) }
-
-  private checkIfCanProcessAction(): void {
-    if (this.courseToCreateTaskIn || this.taskToEdit || this.taskToDelete)
-      throw new Error("Error processing action")
+  reset(): void {
+    this._courseToCreateTaskIn = null
+    this._taskToEdit = null
+    this._taskToDelete = null
   }
+
+  @transaction
+  private createCourseNodes(courses: readonly Course[]): CourseNode[] { return courses.map(c => new CourseNode(c.name, c)) }
 }
