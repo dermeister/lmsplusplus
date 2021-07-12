@@ -30,21 +30,20 @@ export class TasksView extends ObservableObject {
 
   @reaction
   private createTask(): void {
-    let task: Task | null = null
-    const { courseToCreateTaskAt } = this.explorer
-    if (courseToCreateTaskAt)
-      task = new Task(null, courseToCreateTaskAt, "", "")
-    this.createOrDisposeTaskEditor(task)
+    if (this.explorer.courseToCreateTaskIn)
+      this._taskEditor = new TaskEditor(new Task(Task.NO_ID, this.explorer.courseToCreateTaskIn, "", ""))
   }
 
   @reaction
-  private editTask(): void { this.createOrDisposeTaskEditor(this.explorer.taskToEdit) }
+  private editTask(): void {
+    if (this.explorer.taskToEdit)
+      this._taskEditor = new TaskEditor(this.explorer.taskToEdit)
+  }
 
-  private createOrDisposeTaskEditor(task: Task | null): void {
-    if (task)
-      this._taskEditor = new TaskEditor(task)
-    else {
-      this._taskEditor?.dispose()
+  @reaction
+  private disposeTaskEditor(): void {
+    if (!(this.explorer.taskToEdit || this.explorer.courseToCreateTaskIn)) {
+      this.taskEditor?.dispose()
       this._taskEditor = null
     }
   }
@@ -58,15 +57,32 @@ export class TasksView extends ObservableObject {
   }
 
   @reaction
-  private async saveTask(): Promise<void> {
-    const editedTask = this._taskEditor?.editedTask
-    if (editedTask)
-      if (!editedTask.id) {
-        this.tasksRepository.create(editedTask)
-        this.explorer.setCoursesToCreateTaskAt(null)
-      } else {
-        this.tasksRepository.update(editedTask)
-        this.explorer.setTaskToEdit(null)
+  private async saveCreatedTask(): Promise<void> {
+    const editResult = this._taskEditor?.editResult
+    if (this.explorer.courseToCreateTaskIn)
+      switch (editResult?.state) {
+        case "saved":
+          await this.tasksRepository.create(editResult.task)
+          this.explorer.setCourseToCreateTaskIn(null)
+          break
+        case "canceled":
+          this.explorer.setCourseToCreateTaskIn(null)
+          break
+      }
+  }
+
+  @reaction
+  private async saveEditedTask(): Promise<void> {
+    const editResult = this._taskEditor?.editResult
+    if (this.explorer.taskToEdit)
+      switch (editResult?.state) {
+        case "saved":
+          await this.tasksRepository.update(editResult.task)
+          this.explorer.setTaskToEdit(null)
+          break
+        case "canceled":
+          this.explorer.setTaskToEdit(null)
+          break
       }
   }
 }

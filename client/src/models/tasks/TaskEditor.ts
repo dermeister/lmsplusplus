@@ -3,14 +3,23 @@ import { Course } from "../../domain/Course";
 import { Task } from "../../domain/Task";
 import { ObservableObject } from "../../ObservableObject";
 
+interface ConfirmedResult {
+  readonly state: "saved"
+  readonly task: Task
+}
+
+interface CanceledResult {
+  readonly state: "canceled"
+}
+
 export class TaskEditor extends ObservableObject {
-  private _editedTask: Task | null = null
-  @unobservable private readonly id: number | null
+  private _editResult: ConfirmedResult | CanceledResult | null = null
+  @unobservable private readonly id: number
   private _course: Course
   private _title: string
   private _description: string
 
-  @cached get editedTask(): Task | null { return this._editedTask }
+  @cached get editResult(): ConfirmedResult | CanceledResult | null { return this._editResult }
   @cached get title(): string { return this._title }
 
   constructor(task: Task) {
@@ -25,5 +34,11 @@ export class TaskEditor extends ObservableObject {
   setTitle(title: string): void { this._title = title }
 
   @transaction
-  save(): void { this._editedTask = new Task(this.id, this._course, this._title, this._description) }
+  save(): void {
+    const task = new Task(this.id, this._course, this._title, this._description)
+    this._editResult = { state: "saved", task }
+  }
+
+  @transaction
+  cancel(): void { this._editResult = { state: "canceled" } }
 }

@@ -27,13 +27,13 @@ export class CourseNode extends GroupNode {
 
 export class TasksExplorer extends Explorer<Task> {
   private _courseNodes: CourseNode[]
-  private _courseToCreateTaskAt: Course | null = null
+  private _courseToCreateTaskIn: Course | null = null
   private _taskToEdit: Task | null = null
   private _taskToDelete: Task | null = null
 
   @cached get courseNodes(): readonly CourseNode[] { return this._courseNodes }
   @cached get selectedTask(): Task | null { return this.activeNode?.item ?? null }
-  @cached get courseToCreateTaskAt(): Course | null { return this._courseToCreateTaskAt }
+  @cached get courseToCreateTaskIn(): Course | null { return this._courseToCreateTaskIn }
   @cached get taskToEdit(): Task | null { return this._taskToEdit }
   @cached get taskToDelete(): Task | null { return this._taskToDelete }
 
@@ -49,14 +49,31 @@ export class TasksExplorer extends Explorer<Task> {
   }
 
   @transaction
-  setCoursesToCreateTaskAt(course: Course | null): void { this._courseToCreateTaskAt = course }
+  setCourseToCreateTaskIn(course: Course | null): void {
+    if (course)
+      this.checkIfCanProcessAction()
+    this._courseToCreateTaskIn = course
+  }
 
   @transaction
-  setTaskToEdit(task: Task | null): void { this._taskToEdit = task }
+  setTaskToEdit(task: Task | null): void {
+    if (task)
+      this.checkIfCanProcessAction()
+    this._taskToEdit = task
+  }
 
   @transaction
-  setTaskToDelete(task: Task | null): void { this._taskToDelete = task }
+  setTaskToDelete(task: Task | null): void {
+    if (task)
+      this.checkIfCanProcessAction()
+    this._taskToDelete = task
+  }
 
   @transaction
   private createCourseNodes(courses: readonly Course[]): CourseNode[] { return courses.map(c => new CourseNode(c.name, c)) }
+
+  private checkIfCanProcessAction(): void {
+    if (this.courseToCreateTaskIn || this.taskToEdit || this.taskToDelete)
+      throw new Error("Error processing action")
+  }
 }

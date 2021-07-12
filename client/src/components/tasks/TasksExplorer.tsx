@@ -18,7 +18,7 @@ export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
 
 function onCreateTask(explorer: Models.TasksExplorer, course: Models.CourseNode): void {
   course.contextMenu.close()
-  explorer.setCoursesToCreateTaskAt(course.item)
+  explorer.setCourseToCreateTaskIn(course.item)
 }
 
 function onEditTask(explorer: Models.TasksExplorer, task: Models.ItemNode<Task>): void {
