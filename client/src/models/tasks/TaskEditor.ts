@@ -4,12 +4,12 @@ import { Task } from "../../domain/Task";
 import { ObservableObject } from "../../ObservableObject";
 
 interface ConfirmedResult {
-  readonly state: "saved"
+  readonly status: "saved"
   readonly task: Task
 }
 
 interface CanceledResult {
-  readonly state: "canceled"
+  readonly status: "canceled"
 }
 
 export class TaskEditor extends ObservableObject {
@@ -36,9 +36,9 @@ export class TaskEditor extends ObservableObject {
   @transaction
   save(): void {
     const task = new Task(this.id, this._course, this._title, this._description)
-    this._editResult = { state: "saved", task }
+    this._editResult = { status: "saved", task }
   }
 
   @transaction
-  cancel(): void { this._editResult = { state: "canceled" } }
+  cancel(): void { this._editResult = { status: "canceled" } }
 }

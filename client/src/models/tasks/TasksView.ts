@@ -60,7 +60,7 @@ export class TasksView extends ObservableObject {
   private async saveCreatedTask(): Promise<void> {
     const editResult = this._taskEditor?.editResult
     if (this.explorer.courseToCreateTaskIn)
-      switch (editResult?.state) {
+      switch (editResult?.status) {
         case "saved":
           await this.tasksRepository.create(editResult.task)
           this.explorer.setCourseToCreateTaskIn(null)
@@ -75,7 +75,7 @@ export class TasksView extends ObservableObject {
   private async saveEditedTask(): Promise<void> {
     const editResult = this._taskEditor?.editResult
     if (this.explorer.taskToEdit)
-      switch (editResult?.state) {
+      switch (editResult?.status) {
         case "saved":
           await this.tasksRepository.update(editResult.task)
           this.explorer.setTaskToEdit(null)
