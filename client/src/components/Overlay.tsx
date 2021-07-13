@@ -4,8 +4,7 @@ import styles from "./Overlay.module.css"
 interface OverlayProps {
   children: React.ReactNode
   className?: string
-  beforeClick?(): void
-  afterClick?(): void
+  onClick?(): void
 }
 
 export function Overlay(props: OverlayProps): JSX.Element {
@@ -24,10 +23,8 @@ export function Overlay(props: OverlayProps): JSX.Element {
   }
 
   function onMouseDown(e: React.MouseEvent): void {
-    if (e.target === ref.current) {
-      props.beforeClick?.()
-      setTimeout(() => props.afterClick?.(), 0)
-    }
+    if (e.target === ref.current)
+      props.onClick?.()
   }
 
   function stopEvent(e: React.SyntheticEvent) {
@@ -58,11 +55,10 @@ export function Overlay(props: OverlayProps): JSX.Element {
 
 function focusContent(overlay: HTMLDivElement | null): void {
   const focusableChild = overlay?.querySelector(`:enabled:not([tabindex="-1"])`)
-  if (focusableChild instanceof HTMLElement) {
+  if (focusableChild instanceof HTMLElement)
     focusableChild.focus()
-  } else {
+  else
     overlay?.focus()
-  }
 }
 
 function buildClassName(props: OverlayProps): string {

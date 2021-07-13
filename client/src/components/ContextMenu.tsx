@@ -13,13 +13,13 @@ interface ContextMenuProps {
 export function ContextMenu({ model, children }: ContextMenuProps): JSX.Element {
   function positionMenu(menu: HTMLElement | null): void {
     if (menu) {
-      const OFFSET = 10
-      if (model.x + menu.clientWidth + OFFSET > window.innerWidth)
-        menu.style.right = `${OFFSET}px`
+      const offset = 10
+      if (model.x + menu.clientWidth + offset > window.innerWidth)
+        menu.style.right = `${offset}px`
       else
         menu.style.left = `${model.x}px`
-      if (model.y + menu.clientHeight + OFFSET > window.innerHeight)
-        menu.style.bottom = `${OFFSET}px`
+      if (model.y + menu.clientHeight + offset > window.innerHeight)
+        menu.style.bottom = `${offset}px`
       else
         menu.style.top = `${model.y}px`
     }
@@ -29,7 +29,7 @@ export function ContextMenu({ model, children }: ContextMenuProps): JSX.Element 
     if (!model.isOpened)
       return <></>
     return ReactDOM.createPortal(
-      <Overlay beforeClick={() => model.close()}>
+      <Overlay onClick={() => model.close()}>
         <menu ref={positionMenu} onContextMenu={onContextMenu} className={styles.contextMenu}>
           {children}
         </menu>
