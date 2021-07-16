@@ -13,16 +13,19 @@
 
   overflow: hidden;
 
-  font-size: var(--app-font-size-small);
+  font-size: var(--app-font-size-regular);
   user-select: none;
   white-space: nowrap;
   text-overflow: ellipsis;
 
   cursor: pointer;
+
+  &:hover {
+    background-color: var(--explorer-background-color-hover);
+  }
 }
 
-.context-menu-opened,
-.node:hover {
+.context-menu-opened {
   background-color: var(--explorer-background-color-hover);
 }
 

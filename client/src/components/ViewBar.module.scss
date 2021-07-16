@@ -1,0 +1,42 @@
+.view-bar {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  width: 74px;
+  padding: 14px;
+  height: 100%;
+
+  box-shadow: 1px 0 3px var(--shadow-primary-color);
+}
+
+.view-button {
+  margin-bottom: 14px;
+  width: 46px;
+  height: 46px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.selected {
+  transform-origin: center center;
+  animation: rotate 0.3s ease-in-out;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.bottom-buttons {
+  margin-top: auto;
+}

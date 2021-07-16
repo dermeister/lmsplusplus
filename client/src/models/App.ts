@@ -6,7 +6,7 @@ export class App extends ObservableObject {
   @unobservable readonly views = new Views()
 
   dispose(): void {
-    this.view.dispose()
+    this.views.dispose()
     super.dispose()
   }
 }

@@ -1,5 +1,5 @@
 import React from "react"
-import styles from "./Input.module.css"
+import styles from "./Input.module.scss"
 
 type ReactInputProps = React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -7,7 +7,7 @@ type ReactInputProps = React.DetailedHTMLProps<
 >
 
 interface InputProps extends ReactInputProps {
-  fluid?: boolean
+  variant: "primary" | "secondary"
 }
 
 export function Input(props: InputProps): JSX.Element {
@@ -15,16 +15,20 @@ export function Input(props: InputProps): JSX.Element {
 }
 
 function reactInputProps(props: InputProps): ReactInputProps {
-  const inputProps = { ...props }
-  delete inputProps.fluid
+  const inputProps: Record<string, unknown> = { ...props }
+  delete inputProps.variant
   return inputProps
+}
+
+const variants = {
+  "primary": styles.primary,
+  "secondary": styles.secondary
 }
 
 function buildClassName(props: InputProps): string {
   let className = styles.input
+  className += ` ${variants[props.variant]}`
   if (props.className)
     className += ` ${props.className}`
-  if (props.fluid)
-    className += ` ${styles.fluid}`
   return className
 }

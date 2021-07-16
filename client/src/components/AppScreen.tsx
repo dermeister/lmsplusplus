@@ -1,6 +1,6 @@
 import React from "react"
 import { Models } from "../models"
-import styles from "./AppScreen.module.css"
+import styles from "./AppScreen.module.scss"
 import autorender from "./autorender"
 import { Side, SidePanel } from "./SidePanel"
 import { TasksView } from "./tasks/TasksView"
@@ -30,7 +30,7 @@ export function AppScreen({ model }: AppScreenProps): JSX.Element {
   return autorender(
     () => (
       <>
-        <ViewBar model={model.views} />
+        <ViewBar model={model.views} className={styles.viewBar} />
         <div className={styles.content}>{content(model.views)}</div>
       </>
     ),
@@ -55,7 +55,7 @@ interface SidePanelProps {
 AppScreen.LeftPanel = function LeftPanel(props: SidePanelProps): JSX.Element {
   const { model, children, pulsing } = props
   return (
-    <SidePanel model={model} side={Side.Left} pulsing={pulsing ?? false}>
+    <SidePanel model={model} side={Side.Left} pulsing={pulsing} className={styles.sidePanel}>
       {children}
     </SidePanel>
   )
@@ -64,7 +64,7 @@ AppScreen.LeftPanel = function LeftPanel(props: SidePanelProps): JSX.Element {
 AppScreen.RightPanel = function RightPanel(props: SidePanelProps): JSX.Element {
   const { model, children, pulsing } = props
   return (
-    <SidePanel model={model} side={Side.Right} pulsing={pulsing ?? false}>
+    <SidePanel model={model} side={Side.Right} pulsing={pulsing} className={styles.sidePanel}>
       {children}
     </SidePanel>
   )

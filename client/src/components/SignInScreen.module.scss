@@ -17,6 +17,7 @@
 
   color: var(--app-primary-text-color);
   font-size: 40px;
+
   user-select: none;
 }
 
@@ -26,8 +27,8 @@
   width: 400px;
 
   background-color: var(--app-primary-background-color);
-  border-radius: var(--border-radius);
-  box-shadow: 0 0 15px var(--shadow-color);
+  border-radius: var(--app-border-radius);
+  box-shadow: 0 0 var(--shadow-size) var(--shadow-primary-color);
 }
 
 .form-heading {
@@ -46,15 +47,21 @@
 
   margin-bottom: 4px;
 
-  font-size: var(--app-font-size-regular);
+  font-size: var(--app-font-size-large);
   color: var(--app-primary-text-color);
   user-select: none;
 }
 
 .input {
   margin-bottom: 12px;
+  padding: 7px;
+  width: 100%;
+
+  font-size: var(--app-font-size-large);
 }
 
 .submit {
   margin-top: 10px;
+  padding: 5px;
+  width: 100%;
 }

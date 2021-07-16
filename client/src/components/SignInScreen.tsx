@@ -3,7 +3,7 @@ import { SignIn } from "../models/SignIn"
 import autorender from "./autorender"
 import { Button } from "./Button"
 import { Input } from "./Input"
-import styles from "./SignInScreen.module.css"
+import styles from "./SignInScreen.module.scss"
 
 interface SignInScreenProps {
   model: SignIn
@@ -34,27 +34,27 @@ export function SignInScreen({ model }: SignInScreenProps): JSX.Element {
           <div>
             <label className={styles.label} htmlFor="sign-in-login">Login</label>
             <Input
-              className={styles.input}
+              id="sign-in-login"
+              variant="primary"
               value={model.login}
               onChange={onLogin}
-              id="sign-in-login"
-              fluid
+              className={styles.input}
             />
           </div>
 
           <div>
             <label className={styles.label} htmlFor="sign-in-password">Password</label>
             <Input
+              id="sign-in-password"
+              variant="primary"
               value={model.password}
               onChange={onPassword}
-              className={styles.input}
-              id="sign-in-password"
               type="password"
-              fluid
+              className={styles.input}
             />
           </div>
 
-          <Button className={styles.submit} fluid>Sign in</Button>
+          <Button className={styles.submit} variant="primary">Sign in</Button>
         </form>
       </div>
     )

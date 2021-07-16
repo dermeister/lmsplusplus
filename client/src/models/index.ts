@@ -9,6 +9,7 @@ import * as _SidePanel from "./SidePanel"
 import * as _SignIn from "./SignIn"
 import * as _TasksExplorer from "./tasks/TasksExplorer"
 import * as _TasksView from "./tasks/TasksView"
+import * as _TaskEditor from "./tasks/TaskEditor"
 import * as _Views from "./Views"
 import * as _DemoView from "./views/DemoView"
 import * as _OptionsView from "./views/OptionsView"
@@ -30,6 +31,7 @@ export namespace Models {
   export import DemoView = _DemoView.DemoView
   export import OptionsView = _OptionsView.OptionsView
   export import TasksExplorer = _TasksExplorer.TasksExplorer
+  export import TaskEditor = _TaskEditor.TaskEditor
   export import CourseNode = _TasksExplorer.CourseNode
   export import Views = _Views.Views
   export import View = _Views.View

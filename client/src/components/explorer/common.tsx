@@ -1,6 +1,6 @@
 import React, { createContext, ProviderProps, useContext } from "react"
 import { Models } from "../../models"
-import styles from "./Explorer.module.css"
+import styles from "./Explorer.module.scss"
 
 export function buildNodeClassName(node: Models.Node): string {
   let className = styles.node

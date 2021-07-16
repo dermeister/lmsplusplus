@@ -2,7 +2,8 @@ import React from "react"
 import ReactDOM from "react-dom"
 import { Models } from "../models"
 import autorender from "./autorender"
-import styles from "./ContextMenu.module.css"
+import { Button } from "./Button"
+import styles from "./ContextMenu.module.scss"
 import { Overlay } from "./Overlay"
 
 interface ContextMenuProps {
@@ -51,8 +52,8 @@ interface ContextMenuButtonProps {
 
 ContextMenu.Button = function ContextMenuButton(props: ContextMenuButtonProps): JSX.Element {
   return (
-    <button onClick={props.onClick} className={styles.contextMenuButton} tabIndex={-1}>
+    <Button variant="secondary" onClick={props.onClick} tabIndex={-1} className={styles.contextMenuButton}>
       {props.children}
-    </button>
+    </Button>
   )
 }

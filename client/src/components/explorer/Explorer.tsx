@@ -2,7 +2,7 @@ import React from "react"
 import { Models } from "../../models"
 import { Children } from "./Children"
 import { ExplorerModel, Offset } from "./common"
-import styles from "./Explorer.module.css"
+import styles from "./Explorer.module.scss"
 import { Group } from "./Group"
 import { Item } from "./Item"
 

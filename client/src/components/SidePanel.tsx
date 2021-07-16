@@ -2,7 +2,8 @@ import React from "react"
 import { FaTimes } from "react-icons/fa"
 import { Models } from "../models"
 import autorender from "./autorender"
-import styles from "./SidePanel.module.css"
+import { Button } from "./Button"
+import styles from "./SidePanel.module.scss"
 
 export enum Side {
   Left,
@@ -12,15 +13,16 @@ export enum Side {
 interface SidePanelProps {
   model: Models.SidePanel
   side: Side
-  pulsing: boolean
+  pulsing?: boolean
+  className?: string
   children?: React.ReactNode
 }
 
-export function SidePanel({ model, side, pulsing, children }: SidePanelProps): JSX.Element {
+export function SidePanel({ model, side, pulsing, className, children }: SidePanelProps): JSX.Element {
   return autorender(() => {
     if (model.opened)
       return (
-        <div className={styles.sidePanel}>
+        <div className={buildSidePanelClassName(className)}>
           <header className={buildHeaderClassName(pulsing)}>
             <h2 className={styles.title}>{model.title}</h2>
             <button onClick={() => model.close()} className={styles.close}><FaTimes /></button>
@@ -30,14 +32,21 @@ export function SidePanel({ model, side, pulsing, children }: SidePanelProps): J
         </div>
       )
     return (
-      <button onClick={() => model.open()} className={buildToggleClassName(side)}>
+      <Button variant="secondary" className={buildToggleClassName(side)} onClick={() => model.open()}>
         {model.title}
-      </button>
+      </Button>
     )
-  }, [model, side, pulsing, children])
+  }, [model, side, pulsing, className, children])
 }
 
-function buildHeaderClassName(pulsing: boolean): string {
+function buildSidePanelClassName(className?: string): string {
+  let result = styles.sidePanel
+  if (className)
+    result += ` ${className}`
+  return result
+}
+
+function buildHeaderClassName(pulsing?: boolean): string {
   let className = styles.header
   if (pulsing)
     className += ` ${styles.headerPulsing}`

@@ -3,16 +3,18 @@ import { IconType } from "react-icons"
 import { FaCode, FaCog, FaDesktop, FaTasks } from "react-icons/fa"
 import { Models } from "../models"
 import autorender from "./autorender"
-import styles from "./ViewBar.module.css"
+import { Button } from "./Button"
+import styles from "./ViewBar.module.scss"
 
 interface ViewBarProps {
   model: Models.Views
+  className?: string
 }
 
-export function ViewBar({ model }: ViewBarProps): JSX.Element {
+export function ViewBar({ model, className }: ViewBarProps): JSX.Element {
   return autorender(
     () => (
-      <div className={styles.viewBar}>
+      <div className={buildClassName(className)}>
         <div className={styles.topButtons}>
           {button(model, model.tasks, FaTasks)}
           {button(model, model.solutions, FaCode)}
@@ -22,18 +24,29 @@ export function ViewBar({ model }: ViewBarProps): JSX.Element {
         <div className={styles.bottomButtons}>{button(model, model.options, FaCog)}</div>
       </div>
     ),
-    [model]
+    [model, className]
   )
+}
+
+function buildClassName(className?: string): string {
+  let result = styles.viewBar
+  if (className)
+    result += ` ${className}`
+  return result
 }
 
 function button(model: Models.Views, view: Models.View, Icon: IconType): JSX.Element {
   let className = styles.viewButton
-  if (model.active === view)
+  let variant: "primary" | "secondary"
+  if (model.active === view) {
     className += ` ${styles.selected}`
+    variant = "secondary"
+  } else
+    variant = "primary"
 
   return (
-    <button onClick={() => model.activate(view)} className={className}>
+    <Button variant={variant} onClick={() => model.activate(view)} className={className}>
       <Icon size={20} />
-    </button>
+    </Button>
   )
 }

@@ -2,6 +2,7 @@ import React from "react"
 import { Models } from "../../models"
 import { AppScreen } from "../AppScreen"
 import autorender from "../autorender"
+import { TaskEditor } from "./TaskEditor"
 import { TasksExplorer } from "./TasksExplorer"
 
 interface TasksViewProps {
@@ -10,14 +11,12 @@ interface TasksViewProps {
 
 export function TasksView({ model }: TasksViewProps): JSX.Element {
   function rightPanel(): JSX.Element | undefined {
-    if (model.taskEditor) {
+    if (model.taskEditor)
       return (
         <AppScreen.RightPanel model={model.rightPanel}>
-          <button onClick={() => model.taskEditor?.save()}>Save</button>
-          <button onClick={() => model.taskEditor?.cancel()}>Cancel</button>
+          <TaskEditor model={model.taskEditor} />
         </AppScreen.RightPanel>
       )
-    }
   }
 
   return autorender(

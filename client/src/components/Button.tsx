@@ -1,5 +1,5 @@
 import React from "react"
-import styles from "./Button.module.css"
+import styles from "./Button.module.scss"
 
 type ReactButtonProps = React.DetailedHTMLProps<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -7,7 +7,7 @@ type ReactButtonProps = React.DetailedHTMLProps<
 >
 
 interface ButtonProps extends ReactButtonProps {
-  fluid?: boolean
+  variant: "primary" | "secondary" | "danger"
 }
 
 export function Button(props: ButtonProps): JSX.Element {
@@ -15,16 +15,21 @@ export function Button(props: ButtonProps): JSX.Element {
 }
 
 function reactButtonProps(props: ButtonProps): ReactButtonProps {
-  const buttonProps = { ...props }
-  delete buttonProps.fluid
+  const buttonProps: Record<string, unknown> = { ...props }
+  delete buttonProps.variant
   return buttonProps
+}
+
+const variants = {
+  primary: styles.primary,
+  danger: styles.danger,
+  secondary: styles.secondary
 }
 
 function buildClassName(props: ButtonProps): string {
   let className = styles.button
+  className += ` ${variants[props.variant]}`
   if (props.className)
     className += ` ${props.className}`
-  if (props.fluid)
-    className += ` ${styles.fluid}`
   return className
 }

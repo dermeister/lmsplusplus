@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react"
-import styles from "./Overlay.module.css"
+import styles from "./Overlay.module.scss"
 
 interface OverlayProps {
   children: React.ReactNode

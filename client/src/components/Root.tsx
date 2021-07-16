@@ -2,7 +2,7 @@ import React from "react"
 import { Models } from "../models"
 import { AppScreen } from "./AppScreen"
 import autorender from "./autorender"
-import styles from "./Root.module.css"
+import styles from "./Root.module.scss"
 import { SignInScreen } from "./SignInScreen"
 import { WindowManager } from "./WindowManager"
 

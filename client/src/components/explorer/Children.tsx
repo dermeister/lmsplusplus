@@ -2,7 +2,7 @@ import React from "react"
 import { Models } from "../../models"
 import autorender from "../autorender"
 import { Offset, useOffset } from "./common"
-import styles from "./Explorer.module.css"
+import styles from "./Explorer.module.scss"
 
 interface ChildrenProps {
   group: Models.GroupNode

@@ -1,0 +1,57 @@
+:root {
+  /* App general */
+  --app-font-size-large: 1rem;
+  --app-font-size-regular: 0.85rem;
+  --app-font-size-small: 0.75rem;
+  --app-border-radius: 2px;
+  /* App primary */
+  --app-primary-background-color: #212121;
+  --app-primary-text-color: #e0e0e0;
+  --app-primary-text-color-hover: #eeeeee;
+  /* App secondary */
+  --app-secondary-background-color: #424242;
+  --app-secondary-text-color: #e0e0e0;
+  --app-secondary-text-color-hover: #eeeeee;
+
+  /* Input primary */
+  --input-primary-background-color: #616161;
+  --input-primary-background-color-focus: #757575;
+  --input-primary-text-color: #e0e0e0;
+  /* Input secondary */
+  --input-secondary-background-color: #212121;
+  --input-secondary-background-color-focus: #757575;
+  --input-secondary-text-color: #e0e0e0;
+
+  /* Button primary */
+  --button-primary-background-color: #1976d2; /* 700 */
+  --button-primary-background-color-hover: #1e88e5; /* 600 */
+  --button-primary-text-color: #e0e0e0;
+  /* Button secondary */
+  --button-secondary-background-color: #616161;
+  --button-secondary-background-color-hover: #757575;
+  --button-secondary-text-color: #e0e0e0;
+  /* Button danger */
+  --button-danger-background-color: #d32f2f;
+  --button-danger-background-color-hover: #e53935;
+  --button-danger-text-color: #e0e0e0;
+
+  /* Shadow */
+  --shadow-primary-color: #000000;
+  --shadow-secondary-color: #212121;
+  --shadow-size: 4px;
+
+  /* Explorer */
+  --explorer-background-color-hover: #616161;
+
+  /* Side panel */
+  --side-panel-header-pulsing-color: #1e88e5;
+}
+
+.root {
+  display: flex;
+
+  width: 100vw;
+  height: 100vh;
+
+  background-color: var(--app-primary-background-color);
+}

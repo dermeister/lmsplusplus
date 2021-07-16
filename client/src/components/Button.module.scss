@@ -1,0 +1,50 @@
+.button {
+  border: none;
+  border-radius: var(--app-border-radius);
+  box-shadow: 0 0 var(--shadow-size) var(--shadow-primary-color);
+
+  font-weight: bold;
+  font-size: var(--app-font-size-regular);
+
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+
+  &:hover:active {
+    transform: scale(0.99);
+  }
+}
+
+@mixin button-variant($background-color, $background-color-hover, $text-color) {
+  background-color: $background-color;
+  color: $text-color;
+
+  &:hover,
+  &:focus-visible {
+    background-color: $background-color-hover;
+  }
+}
+
+.primary {
+  @include button-variant(
+    var(--button-primary-background-color),
+    var(--button-primary-background-color-hover),
+    var(--button-primary-text-color)
+  );
+}
+
+.secondary {
+  @include button-variant(
+    var(--button-secondary-background-color),
+    var(--button-secondary-background-color-hover),
+    var(--button-secondary-text-color)
+  );
+}
+
+.danger {
+  @include button-variant(
+    var(--button-danger-background-color),
+    var(--button-danger-background-color-hover),
+    var(--button-danger-text-color)
+  );
+}
