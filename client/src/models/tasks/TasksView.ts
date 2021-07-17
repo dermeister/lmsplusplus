@@ -1,7 +1,7 @@
 import { cached, Monitor, reaction, unobservable } from "reactronic"
 import { Task } from "../../domain/Task"
-import { TasksRepository } from "../../repositories/TasksRepository"
 import { ObservableObject } from "../../ObservableObject"
+import { TasksRepository } from "../../repositories/TasksRepository"
 import { SidePanel } from "../SidePanel"
 import { TasksExplorer } from "../tasks/TasksExplorer"
 import { TaskEditor } from "./TaskEditor"
@@ -15,6 +15,7 @@ export class TasksView extends ObservableObject {
 
   get monitor(): Monitor { return TasksRepository.monitor }
   @cached get taskEditor(): TaskEditor | null { return this._taskEditor }
+  @cached get selectedTask(): Task | null { return this.explorer.selectedTask }
 
   dispose(): void {
     this.leftPanel.dispose()

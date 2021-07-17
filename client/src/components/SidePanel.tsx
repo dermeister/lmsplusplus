@@ -14,15 +14,17 @@ interface SidePanelProps {
   model: Models.SidePanel
   side: Side
   pulsing?: boolean
-  className?: string
+  panelClassName?: string
+  toggleClassName?: string
   children?: React.ReactNode
 }
 
-export function SidePanel({ model, side, pulsing, className, children }: SidePanelProps): JSX.Element {
+export function SidePanel(props: SidePanelProps): JSX.Element {
+  const { model, side, pulsing, panelClassName, toggleClassName, children } = props;
   return autorender(() => {
     if (model.opened)
       return (
-        <div className={buildSidePanelClassName(className)}>
+        <div className={buildPanelClassName(panelClassName)}>
           <header className={buildHeaderClassName(pulsing)}>
             <h2 className={styles.title}>{model.title}</h2>
             <button onClick={() => model.close()} className={styles.close}><FaTimes /></button>
@@ -32,14 +34,18 @@ export function SidePanel({ model, side, pulsing, className, children }: SidePan
         </div>
       )
     return (
-      <Button variant="secondary" className={buildToggleClassName(side)} onClick={() => model.open()}>
+      <Button
+        variant="secondary"
+        className={buildToggleClassName(side, toggleClassName)}
+        onClick={() => model.open()}
+      >
         {model.title}
       </Button>
     )
-  }, [model, side, pulsing, className, children])
+  }, [model, side, pulsing, panelClassName, children])
 }
 
-function buildSidePanelClassName(className?: string): string {
+function buildPanelClassName(className?: string): string {
   let result = styles.sidePanel
   if (className)
     result += ` ${className}`
@@ -53,15 +59,17 @@ function buildHeaderClassName(pulsing?: boolean): string {
   return className
 }
 
-function buildToggleClassName(position: Side): string {
-  let className = styles.sidePanelToggle
+function buildToggleClassName(position: Side, className?: string): string {
+  let result = styles.sidePanelToggle
   switch (position) {
     case Side.Left:
-      className += ` ${styles.sidePanelToggleLeft}`
+      result += ` ${styles.sidePanelToggleLeft}`
       break
     case Side.Right:
-      className += ` ${styles.sidePanelToggleRight}`
+      result += ` ${styles.sidePanelToggleRight}`
       break
   }
-  return className
+  if (className)
+    result += ` ${className}`
+  return result
 }

@@ -55,7 +55,13 @@ interface SidePanelProps {
 AppScreen.LeftPanel = function LeftPanel(props: SidePanelProps): JSX.Element {
   const { model, children, pulsing } = props
   return (
-    <SidePanel model={model} side={Side.Left} pulsing={pulsing} className={styles.sidePanel}>
+    <SidePanel
+      model={model}
+      side={Side.Left}
+      pulsing={pulsing}
+      panelClassName={styles.sidePanel}
+      toggleClassName={styles.sidePanelToggle}
+    >
       {children}
     </SidePanel>
   )
@@ -64,7 +70,13 @@ AppScreen.LeftPanel = function LeftPanel(props: SidePanelProps): JSX.Element {
 AppScreen.RightPanel = function RightPanel(props: SidePanelProps): JSX.Element {
   const { model, children, pulsing } = props
   return (
-    <SidePanel model={model} side={Side.Right} pulsing={pulsing} className={styles.sidePanel}>
+    <SidePanel
+      model={model}
+      side={Side.Right}
+      pulsing={pulsing}
+      panelClassName={styles.sidePanel}
+      toggleClassName={styles.sidePanelToggle}
+    >
       {children}
     </SidePanel>
   )

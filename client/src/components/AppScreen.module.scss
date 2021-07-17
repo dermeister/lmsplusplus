@@ -12,14 +12,13 @@
   z-index: 2;
 }
 
-.side-panel {
+.side-panel,
+.side-panel-toggle {
   z-index: 1;
 }
 
 .main-panel {
   flex-grow: 1;
-
-  padding: 16px 16px;
 
   background-color: var(--app-primary-background-color);
 
