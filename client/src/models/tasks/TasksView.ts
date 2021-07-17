@@ -50,20 +50,6 @@ export class TasksView extends ObservableObject {
   }
 
   @reaction
-  @throttling(0)
-  private disposeTaskEditor(): void {
-    this.taskEditorToDispose?.dispose();
-  }
-
-  @reaction
-  private setTaskEditorToBeDisposed(): void {
-    if (!this.explorer.taskToEdit && !this.explorer.courseToCreateTaskIn) {
-      this.taskEditorToDispose = this._taskEditor
-      this._taskEditor = null
-    }
-  }
-
-  @reaction
   private async deleteTask(): Promise<void> {
     if (this.explorer.taskToDelete) {
       await this.tasksRepository.delete(this.explorer.taskToDelete)
@@ -99,5 +85,19 @@ export class TasksView extends ObservableObject {
           this.explorer.reset()
           break
       }
+  }
+
+  @reaction
+  private setTaskEditorToBeDisposed(): void {
+    if (!this.explorer.taskToEdit && !this.explorer.courseToCreateTaskIn) {
+      this.taskEditorToDispose = this._taskEditor
+      this._taskEditor = null
+    }
+  }
+
+  @reaction
+  @throttling(0)
+  private disposeTaskEditor(): void {
+    this.taskEditorToDispose?.dispose()
   }
 }

@@ -1,10 +1,7 @@
 import React from "react"
 import styles from "./Input.module.scss"
 
-type ReactInputProps = React.DetailedHTMLProps<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  HTMLInputElement
->
+type ReactInputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
 
 interface InputProps extends ReactInputProps {
   variant: "primary" | "secondary"

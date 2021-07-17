@@ -15,20 +15,17 @@ export function Group({ group, children }: GroupProps): JSX.Element {
   const offset = useOffset()
   const onContextMenu = useContextMenu(group.contextMenu)
 
-  return autorender(
-    () => (
-      <p
-        onClick={() => group.toggle()}
-        onContextMenu={onContextMenu}
-        className={buildNodeClassName(group)}
-        style={{ paddingLeft: offset }}
-      >
-        {arrow(group)}
-        {children}
-      </p>
-    ),
-    [group, children]
-  )
+  return autorender(() => (
+    <p
+      onClick={() => group.toggle()}
+      onContextMenu={onContextMenu}
+      className={buildNodeClassName(group)}
+      style={{ paddingLeft: offset }}
+    >
+      {arrow(group)}
+      {children}
+    </p>
+  ), [group, children])
 }
 
 function arrow(group: Models.GroupNode): JSX.Element {

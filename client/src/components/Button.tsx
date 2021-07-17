@@ -1,10 +1,7 @@
 import React from "react"
 import styles from "./Button.module.scss"
 
-type ReactButtonProps = React.DetailedHTMLProps<
-  React.ButtonHTMLAttributes<HTMLButtonElement>,
-  HTMLButtonElement
->
+type ReactButtonProps = React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>
 
 interface ButtonProps extends ReactButtonProps {
   variant: "primary" | "secondary" | "danger"

@@ -34,17 +34,14 @@ export function TasksView({ model }: TasksViewProps): JSX.Element {
       )
   }
 
-  return autorender(
-    () => (
-      <>
-        <AppScreen.LeftPanel model={model.leftPanel} pulsing={model.monitor.isActive}>
-          <TasksExplorer model={model.explorer} />
-        </AppScreen.LeftPanel>
+  return autorender(() => (
+    <>
+      <AppScreen.LeftPanel model={model.leftPanel} pulsing={model.monitor.isActive}>
+        <TasksExplorer model={model.explorer} />
+      </AppScreen.LeftPanel>
 
-        {mainPanel()}
-        {rightPanel()}
-      </>
-    ),
-    [model, model.monitor]
-  )
+      {mainPanel()}
+      {rightPanel()}
+    </>
+  ), [model, model.monitor])
 }

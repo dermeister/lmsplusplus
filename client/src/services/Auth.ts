@@ -4,7 +4,7 @@ import { ObservableObject } from "../ObservableObject"
 
 export class Auth extends ObservableObject {
   private _user: User | null = null
-  private localStorageKey: string
+  private readonly localStorageKey: string
 
   @cached get user(): User | null { return this._user }
 
@@ -21,7 +21,8 @@ export class Auth extends ObservableObject {
     try {
       this._user = await Promise.resolve(new User())
     } catch (e) {
-      if (e.message === "Bad Request") return false
+      if (e.message === "Bad Request")
+        return false
       throw e
     }
     return true
@@ -30,18 +31,18 @@ export class Auth extends ObservableObject {
   @transaction
   signOut(): void { this._user = null }
 
-  private loadUserFromLocalStorage(): User | null {
-    const serializedUser = localStorage.getItem(this.localStorageKey)
-    if (!serializedUser)
-      return null
-    return User.deserialize(serializedUser)
-  }
-
   @reaction
   private updateLocalStorage(): void {
     if (!this._user)
       localStorage.removeItem(this.localStorageKey)
     else if (!localStorage.getItem(this.localStorageKey))
       localStorage.setItem(this.localStorageKey, JSON.stringify(this._user))
+  }
+
+  private loadUserFromLocalStorage(): User | null {
+    const serializedUser = localStorage.getItem(this.localStorageKey)
+    if (!serializedUser)
+      return null
+    return User.deserialize(serializedUser)
   }
 }

@@ -10,25 +10,22 @@ interface TaskEditorProps {
 }
 
 export function TaskEditor({ model }: TaskEditorProps): JSX.Element {
-  return autorender(
-    () => (
-      <div className={styles.container}>
-        <div>
-          <label className={styles.label} htmlFor="task-title">Title</label>
-          <Input
-            id="task-title"
-            variant="secondary"
-            className={styles.input}
-            value={model.title}
-            onChange={e => model.setTitle(e.target.value)}
-          />
-        </div>
-        <div className={styles.buttons}>
-          <Button className={`${styles.button} ${styles.primary}`} variant="primary" onClick={() => model.save()}>Save</Button>
-          <Button className={`${styles.button} ${styles.danger}`} variant="danger" onClick={() => model.cancel()}>Cancel</Button>
-        </div>
-      </div >
-    ),
-    [model]
-  )
+  return autorender(() => (
+    <div className={styles.container}>
+      <div>
+        <label className={styles.label} htmlFor="task-title">Title</label>
+        <Input
+          id="task-title"
+          variant="secondary"
+          className={styles.input}
+          value={model.title}
+          onChange={e => model.setTitle(e.target.value)}
+        />
+      </div>
+      <div className={styles.buttons}>
+        <Button className={`${styles.button} ${styles.primary}`} variant="primary" onClick={() => model.save()}>Save</Button>
+        <Button className={`${styles.button} ${styles.danger}`} variant="danger" onClick={() => model.cancel()}>Cancel</Button>
+      </div>
+    </div >
+  ), [model])
 }

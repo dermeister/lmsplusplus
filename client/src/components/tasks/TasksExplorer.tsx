@@ -10,10 +10,9 @@ interface TasksExplorerProps {
 }
 
 export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
-  return autorender(
-    () => <Explorer model={model}>{courses(model, model.courseNodes)}</Explorer>,
-    [model]
-  )
+  return autorender(() => (
+    <Explorer model={model}>{courses(model, model.courseNodes)}</Explorer>
+  ), [model])
 }
 
 function onCreateTask(explorer: Models.TasksExplorer, course: Models.CourseNode): void {
@@ -49,7 +48,7 @@ function courses(explorer: Models.TasksExplorer, courses: readonly Models.Course
   ))
 }
 
-function tasks(explorer: Models.TasksExplorer, tasks: Models.ItemNode<Task>[]): JSX.Element[] {
+function tasks(explorer: Models.TasksExplorer, tasks: readonly Models.ItemNode<Task>[]): JSX.Element[] {
   return tasks.map(task => (
     <Explorer.Item key={task.id} item={task}>
       {task.title}

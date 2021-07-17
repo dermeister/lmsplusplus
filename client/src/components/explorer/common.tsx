@@ -11,7 +11,7 @@ export function buildNodeClassName(node: Models.Node): string {
 
 const ExplorerModelContext = createContext<Models.Explorer<unknown> | null>(null)
 
-export function ExplorerModel(props: ProviderProps<Models.Explorer<any> | null>): JSX.Element {
+export function ExplorerModel(props: ProviderProps<Models.Explorer<unknown> | null>): JSX.Element {
   return <ExplorerModelContext.Provider {...props} />
 }
 

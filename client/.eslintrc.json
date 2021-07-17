@@ -1,0 +1,53 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": { "project": "./tsconfig.json" },
+  "plugins": ["@typescript-eslint"],
+  "rules": {
+    "eol-last": ["error", "always"],
+    "arrow-parens": ["error", "as-needed"],
+    "no-multiple-empty-lines": ["error", { "max": 1 }],
+    "@typescript-eslint/semi": ["error", "never"],
+    "@typescript-eslint/quotes": ["error", "double"],
+    "@typescript-eslint/indent": ["error", 2, { "SwitchCase": 1 }],
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/explicit-module-boundary-types": "error",
+    "@typescript-eslint/prefer-readonly": "error",
+    "@typescript-eslint/member-ordering": [
+      "error",
+      {
+        "default": [
+          "public-static-field",
+          "public-decorated-field",
+          "public-instance-field",
+          "public-abstract-field",
+          "protected-static-field",
+          "protected-decorated-field",
+          "protected-instance-field",
+          "protected-abstract-field",
+          "private-static-field",
+          "private-decorated-field",
+          "private-instance-field",
+          "private-abstract-field",
+
+          "public-constructor",
+          "protected-constructor",
+          "private-constructor",
+
+          "public-static-method",
+          "public-decorated-method",
+          "public-instance-method",
+          "public-abstract-method",
+          "protected-static-method",
+          "protected-decorated-method",
+          "protected-instance-method",
+          "protected-abstract-method",
+          "private-static-method",
+          "private-decorated-method",
+          "private-instance-method",
+          "private-abstract-method"
+        ]
+      }
+    ]
+  }
+}

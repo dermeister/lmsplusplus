@@ -27,15 +27,12 @@ function content(model: Models.Views): JSX.Element | undefined {
 }
 
 export function AppScreen({ model }: AppScreenProps): JSX.Element {
-  return autorender(
-    () => (
-      <>
-        <ViewBar model={model.views} className={styles.viewBar} />
-        <div className={styles.content}>{content(model.views)}</div>
-      </>
-    ),
-    [model]
-  )
+  return autorender(() => (
+    <>
+      <ViewBar model={model.views} className={styles.viewBar} />
+      <div className={styles.content}>{content(model.views)}</div>
+    </>
+  ), [model])
 }
 
 interface MainPanelProps {

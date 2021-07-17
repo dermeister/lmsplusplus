@@ -8,13 +8,10 @@ interface DemoViewProps {
 }
 
 export function DemoView({ model }: DemoViewProps): JSX.Element {
-  return autorender(
-    () => (
-      <>
-        <AppScreen.LeftPanel model={model.leftPanel}>Left</AppScreen.LeftPanel>
-        <AppScreen.MainPanel>Demo</AppScreen.MainPanel>
-      </>
-    ),
-    [model]
-  )
+  return autorender(() => (
+    <>
+      <AppScreen.LeftPanel model={model.leftPanel}>Left</AppScreen.LeftPanel>
+      <AppScreen.MainPanel>Demo</AppScreen.MainPanel>
+    </>
+  ), [model])
 }

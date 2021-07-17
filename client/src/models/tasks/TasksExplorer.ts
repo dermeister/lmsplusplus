@@ -6,10 +6,10 @@ import { GroupNode } from "../explorer/GroupNode"
 import { ItemNode } from "../explorer/ItemNode"
 
 export class CourseNode extends GroupNode {
-  protected override _children: ItemNode<Task>[] = []
   @unobservable readonly item: Course
+  protected override _children: readonly ItemNode<Task>[] = []
 
-  @cached override get children(): ItemNode<Task>[] { return this._children }
+  @cached override get children(): readonly ItemNode<Task>[] { return this._children }
 
   constructor(title: string, course: Course) {
     super(title)

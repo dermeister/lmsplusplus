@@ -5,7 +5,6 @@ import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker"
 import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker"
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker"
 import React, { useEffect, useRef } from "react"
-import autorender from "./autorender"
 import styles from "./MonacoEditor.module.scss"
 
 declare global {
@@ -17,15 +16,15 @@ declare global {
 self.MonacoEnvironment = {
   getWorker(_workerId: string, label: string): Worker {
     switch (label) {
-      case 'json':
+      case "json":
         return new jsonWorker()
-      case 'css':
+      case "css":
         return new cssWorker()
-      case 'html':
-      case 'handlebars':
+      case "html":
+      case "handlebars":
       case "razor":
         return new htmlWorker()
-      case 'typescript':
+      case "typescript":
       case "javascript":
         return new tsWorker()
       default:
@@ -46,7 +45,7 @@ export function MonacoEditor({ model }: MonacoEditorProps): JSX.Element {
     if (ref.current)
       editor.current = monaco.editor.create(ref.current, {
         model,
-        theme: 'vs-dark',
+        theme: "vs-dark",
         automaticLayout: true,
         cursorSmoothCaretAnimation: true,
         padding: { top: 10 }
@@ -59,12 +58,9 @@ export function MonacoEditor({ model }: MonacoEditorProps): JSX.Element {
       editor.current.setModel(model)
   }, [model])
 
-  return autorender(
-    () => (
-      <div className={styles.container}>
-        <div ref={ref} className={styles.editor} />
-      </div>
-    ),
-    [model]
+  return (
+    <div className={styles.container}>
+      <div ref={ref} className={styles.editor} />
+    </div>
   )
 }

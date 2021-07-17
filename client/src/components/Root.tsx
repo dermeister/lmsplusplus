@@ -11,14 +11,11 @@ interface RootProps {
 }
 
 export function Root({ model }: RootProps): JSX.Element {
-  return autorender(
-    () => (
-      <WindowManager model={model.windowManager}>
-        <div className={styles.root}>{content(model)}</div>
-      </WindowManager>
-    ),
-    [model]
-  )
+  return autorender(() => (
+    <WindowManager model={model.windowManager}>
+      <div className={styles.root}>{content(model)}</div>
+    </WindowManager>
+  ), [model])
 }
 
 function content(model: Models.Root): JSX.Element {

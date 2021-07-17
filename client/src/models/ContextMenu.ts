@@ -2,8 +2,8 @@ import { cached, transaction } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
 
 export class ContextMenu extends ObservableObject {
-  private _x: number = 0
-  private _y: number = 0
+  private _x = 0
+  private _y = 0
   private _isOpened = false
 
   @cached get x(): number { return this._x }
