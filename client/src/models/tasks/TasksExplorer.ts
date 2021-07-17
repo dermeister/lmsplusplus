@@ -6,17 +6,17 @@ import { GroupNode } from "../explorer/GroupNode"
 import { ItemNode } from "../explorer/ItemNode"
 
 export class CourseNode extends GroupNode {
-  protected _children: ItemNode<Task>[] = []
+  protected override _children: ItemNode<Task>[] = []
   @unobservable readonly item: Course
 
-  @cached get children(): ItemNode<Task>[] { return this._children }
+  @cached override get children(): ItemNode<Task>[] { return this._children }
 
   constructor(title: string, course: Course) {
     super(title)
     this.item = course
   }
 
-  dispose(): void {
+  override dispose(): void {
     standalone(Transaction.run, () => {
       this.children.forEach(c => c.dispose())
       super.dispose()

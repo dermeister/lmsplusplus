@@ -11,7 +11,7 @@ export class Root extends ObservableObject {
   @unobservable readonly app = new App()
   @unobservable readonly windowManager = new WindowManager()
 
-  dispose(): void {
+  override dispose(): void {
     standalone(Transaction.run, () => {
       this.auth.dispose()
       this.signIn.dispose()

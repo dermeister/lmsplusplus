@@ -44,7 +44,7 @@ export class TaskEditor extends ObservableObject {
   @transaction
   cancel(): void { this._editResult = { status: "canceled" } }
 
-  dispose(): void {
+  override dispose(): void {
     standalone(Transaction.run, () => {
       this._description.dispose()
       super.dispose()

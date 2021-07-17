@@ -19,7 +19,7 @@ export class Views extends ObservableObject {
   @transaction
   activate(view: View): void { this._active = view }
 
-  dispose(): void {
+  override dispose(): void {
     standalone(Transaction.run, () => {
       this.tasks.dispose()
       this.solutions.dispose()

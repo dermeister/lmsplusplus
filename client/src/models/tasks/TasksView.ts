@@ -18,7 +18,7 @@ export class TasksView extends ObservableObject {
   @cached get taskEditor(): TaskEditor | null { return this._taskEditor }
   @cached get selectedTask(): Task | null { return this.explorer.selectedTask }
 
-  dispose(): void {
+  override dispose(): void {
     standalone(Transaction.run, () => {
       this.leftPanel.dispose()
       this.rightPanel.dispose()

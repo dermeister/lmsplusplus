@@ -5,7 +5,7 @@ import { Views } from "./Views"
 export class App extends ObservableObject {
   @unobservable readonly views = new Views()
 
-  dispose(): void {
+  override dispose(): void {
     standalone(Transaction.run, () => {
       this.views.dispose()
       super.dispose()

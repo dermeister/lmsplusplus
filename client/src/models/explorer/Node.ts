@@ -13,7 +13,7 @@ export class Node extends ObservableObject {
     this.title = title
   }
 
-  dispose(): void {
+  override dispose(): void {
     standalone(Transaction.run, () => {
       this.contextMenu.dispose()
       super.dispose()
