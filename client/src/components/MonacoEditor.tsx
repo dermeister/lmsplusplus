@@ -42,15 +42,22 @@ export function MonacoEditor({ model }: MonacoEditorProps): JSX.Element {
   const editor = useRef<monaco.editor.IEditor | null>(null)
 
   useEffect(() => {
-    if (ref.current)
+    let observer: ResizeObserver | null = null
+    if (ref.current) {
       editor.current = monaco.editor.create(ref.current, {
         model,
         theme: "vs-dark",
-        automaticLayout: true,
         cursorSmoothCaretAnimation: true,
         padding: { top: 10 }
       })
-    return () => editor.current?.dispose()
+      observer = new ResizeObserver(() => editor.current?.layout())
+      observer.observe(ref.current)
+    }
+    return () => {
+      editor.current?.dispose()
+      if (ref.current)
+        observer?.unobserve(ref.current)
+    }
   }, [])
 
   useEffect(() => {

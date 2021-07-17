@@ -98,7 +98,7 @@ export class TasksView extends ObservableObject {
   @reaction
   @throttling(0)
   private disposeTaskEditor(): void {
-    this.taskEditorToDispose
     standalone(() => this.taskEditorToDispose?.dispose())
+    this.taskEditorToDispose = null
   }
 }
