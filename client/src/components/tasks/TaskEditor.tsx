@@ -6,7 +6,7 @@ import { Input } from "../Input"
 import styles from "./TaskEditor.module.scss"
 
 interface TaskEditorProps {
-  model: Models.TaskEditor;
+  model: Models.TaskEditor
 }
 
 export function TaskEditor({ model }: TaskEditorProps): JSX.Element {

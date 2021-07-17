@@ -1,10 +1,10 @@
-import React from "react";
-import { Models } from "../../models";
-import { AppScreen } from "../AppScreen";
-import autorender from "../autorender";
+import React from "react"
+import { Models } from "../../models"
+import { AppScreen } from "../AppScreen"
+import autorender from "../autorender"
 
 interface OptionsViewProps {
-  model: Models.OptionsView;
+  model: Models.OptionsView
 }
 
 export function OptionsView({ model }: OptionsViewProps): JSX.Element {
@@ -16,5 +16,5 @@ export function OptionsView({ model }: OptionsViewProps): JSX.Element {
       </>
     ),
     [model]
-  );
+  )
 }

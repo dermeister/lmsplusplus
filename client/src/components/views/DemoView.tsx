@@ -1,10 +1,10 @@
-import React from "react";
-import { Models } from "../../models";
-import { AppScreen } from "../AppScreen";
-import autorender from "../autorender";
+import React from "react"
+import { Models } from "../../models"
+import { AppScreen } from "../AppScreen"
+import autorender from "../autorender"
 
 interface DemoViewProps {
-  model: Models.DemoView;
+  model: Models.DemoView
 }
 
 export function DemoView({ model }: DemoViewProps): JSX.Element {
@@ -16,5 +16,5 @@ export function DemoView({ model }: DemoViewProps): JSX.Element {
       </>
     ),
     [model]
-  );
+  )
 }

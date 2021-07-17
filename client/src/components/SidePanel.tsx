@@ -20,7 +20,7 @@ interface SidePanelProps {
 }
 
 export function SidePanel(props: SidePanelProps): JSX.Element {
-  const { model, side, pulsing, panelClassName, toggleClassName, children } = props;
+  const { model, side, pulsing, panelClassName, toggleClassName, children } = props
   return autorender(() => {
     if (model.opened)
       return (

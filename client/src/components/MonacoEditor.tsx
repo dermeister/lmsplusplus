@@ -10,7 +10,7 @@ import styles from "./MonacoEditor.module.scss"
 
 declare global {
   interface Window {
-    MonacoEnvironment: monaco.Environment;
+    MonacoEnvironment: monaco.Environment
   }
 }
 

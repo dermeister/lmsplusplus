@@ -1,10 +1,10 @@
-import React from "react";
-import { Models } from "../../models";
-import { AppScreen } from "../AppScreen";
-import autorender from "../autorender";
+import React from "react"
+import { Models } from "../../models"
+import { AppScreen } from "../AppScreen"
+import autorender from "../autorender"
 
 interface SolutionsViewProps {
-  model: Models.SolutionsView;
+  model: Models.SolutionsView
 }
 
 export function SolutionsView({ model }: SolutionsViewProps): JSX.Element {
@@ -16,5 +16,5 @@ export function SolutionsView({ model }: SolutionsViewProps): JSX.Element {
       </>
     ),
     [model]
-  );
+  )
 }
