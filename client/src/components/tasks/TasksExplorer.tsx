@@ -1,7 +1,7 @@
 import React from "react"
 import { Task } from "../../domain/Task"
 import { Models } from "../../models"
-import autorender from "../autorender"
+import { autorender } from "../autorender"
 import { ContextMenu } from "../ContextMenu"
 import { Explorer } from "../explorer"
 

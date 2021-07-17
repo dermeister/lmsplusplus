@@ -1,7 +1,7 @@
 import React from "react"
 import { Models } from "../models"
 import styles from "./AppScreen.module.scss"
-import autorender from "./autorender"
+import { autorender } from "./autorender"
 import { Side, SidePanel } from "./SidePanel"
 import { TasksView } from "./tasks/TasksView"
 import { ViewBar } from "./ViewBar"

@@ -1,7 +1,7 @@
 import React from "react"
 import { Models } from "../../models"
 import { AppScreen } from "../AppScreen"
-import autorender from "../autorender"
+import { autorender } from "../autorender"
 import { MonacoEditor } from "../MonacoEditor"
 import { TaskEditor } from "./TaskEditor"
 import { TasksExplorer } from "./TasksExplorer"

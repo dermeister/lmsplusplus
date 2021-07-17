@@ -1,7 +1,7 @@
 import React from "react"
 import { FaChevronRight } from "react-icons/fa"
 import { Models } from "../../models"
-import autorender from "../autorender"
+import { autorender } from "../autorender"
 import { useContextMenu } from "../WindowManager"
 import { buildNodeClassName, useOffset } from "./common"
 import styles from "./Explorer.module.scss"

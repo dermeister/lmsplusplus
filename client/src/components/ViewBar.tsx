@@ -2,7 +2,7 @@ import React from "react"
 import { IconType } from "react-icons"
 import { FaCode, FaCog, FaDesktop, FaTasks } from "react-icons/fa"
 import { Models } from "../models"
-import autorender from "./autorender"
+import { autorender } from "./autorender"
 import { Button } from "./Button"
 import styles from "./ViewBar.module.scss"
 

@@ -1,6 +1,6 @@
 import React from "react"
 import { Models } from "../../models"
-import autorender from "../autorender"
+import { autorender } from "../autorender"
 import { Button } from "../Button"
 import { Input } from "../Input"
 import styles from "./TaskEditor.module.scss"

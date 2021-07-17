@@ -1,7 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import { Models } from "../models"
-import autorender from "./autorender"
+import { autorender } from "./autorender"
 import { Button } from "./Button"
 import styles from "./ContextMenu.module.scss"
 import { Overlay } from "./Overlay"

@@ -1,6 +1,6 @@
 import React from "react"
 import { SignIn } from "../models/SignIn"
-import autorender from "./autorender"
+import { autorender } from "./autorender"
 import { Button } from "./Button"
 import { Input } from "./Input"
 import styles from "./SignInScreen.module.scss"

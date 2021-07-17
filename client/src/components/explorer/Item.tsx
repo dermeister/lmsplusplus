@@ -1,6 +1,6 @@
 import React from "react"
 import { Models } from "../../models"
-import autorender from "../autorender"
+import { autorender } from "../autorender"
 import { useContextMenu } from "../WindowManager"
 import { buildNodeClassName, useExplorerModel, useOffset } from "./common"
 
