@@ -1,4 +1,4 @@
-import { cached, Monitor, reaction, throttling, unobservable } from "reactronic"
+import { cached, Monitor, reaction, standalone, throttling, Transaction, unobservable } from "reactronic"
 import { Task } from "../../domain/Task"
 import { ObservableObject } from "../../ObservableObject"
 import { TasksRepository } from "../../repositories/TasksRepository"
@@ -19,12 +19,14 @@ export class TasksView extends ObservableObject {
   @cached get selectedTask(): Task | null { return this.explorer.selectedTask }
 
   dispose(): void {
-    this.leftPanel.dispose()
-    this.rightPanel.dispose()
-    this.tasksRepository.dispose()
-    this.explorer.dispose()
-    this._taskEditor?.dispose()
-    super.dispose()
+    standalone(Transaction.run, () => {
+      this.leftPanel.dispose()
+      this.rightPanel.dispose()
+      this.tasksRepository.dispose()
+      this.explorer.dispose()
+      this._taskEditor?.dispose()
+      super.dispose()
+    })
   }
 
   @reaction

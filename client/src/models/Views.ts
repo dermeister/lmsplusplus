@@ -1,4 +1,4 @@
-import { cached, reaction, transaction, unobservable } from "reactronic"
+import { cached, reaction, standalone, Transaction, transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
 import { TasksView } from "./tasks/TasksView"
 import { DemoView } from "./views/DemoView"
@@ -20,11 +20,13 @@ export class Views extends ObservableObject {
   activate(view: View): void { this._active = view }
 
   dispose(): void {
-    this.tasks.dispose()
-    this.solutions.dispose()
-    this.demo.dispose()
-    this.options.dispose()
-    super.dispose()
+    standalone(Transaction.run, () => {
+      this.tasks.dispose()
+      this.solutions.dispose()
+      this.demo.dispose()
+      this.options.dispose()
+      super.dispose()
+    })
   }
 
   @reaction

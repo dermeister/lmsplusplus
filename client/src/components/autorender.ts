@@ -24,7 +24,7 @@ class Rx extends ObservableObject {
   @unobservable
   public refresh: ((rx: ReactState) => void) | null = null
   @unobservable
-  public unmount = () => standalone(() => Transaction.run(Reactronic.dispose, this))
+  public unmount: () => void = () => standalone(Transaction.run, () => Reactronic.dispose(this))
 
   @cached
   @observableArgs(true)

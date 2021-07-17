@@ -1,4 +1,4 @@
-import { unobservable } from "reactronic"
+import { standalone, Transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
 import { Auth } from "../services/Auth"
 import { App } from "./App"
@@ -12,9 +12,11 @@ export class Root extends ObservableObject {
   @unobservable readonly windowManager = new WindowManager()
 
   dispose(): void {
-    this.auth.dispose()
-    this.signIn.dispose()
-    this.app.dispose()
-    super.dispose()
+    standalone(Transaction.run, () => {
+      this.auth.dispose()
+      this.signIn.dispose()
+      this.app.dispose()
+      super.dispose()
+    })
   }
 }

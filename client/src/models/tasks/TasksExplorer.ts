@@ -1,4 +1,4 @@
-import { cached, reaction, transaction, unobservable } from "reactronic"
+import { cached, reaction, standalone, Transaction, transaction, unobservable } from "reactronic"
 import { Course } from "../../domain/Course"
 import { Task } from "../../domain/Task"
 import { Explorer } from "../explorer/Explorer"
@@ -17,8 +17,10 @@ export class CourseNode extends GroupNode {
   }
 
   dispose(): void {
-    this.children.forEach(c => c.dispose())
-    super.dispose()
+    standalone(Transaction.run, () => {
+      this.children.forEach(c => c.dispose())
+      super.dispose()
+    })
   }
 
   @reaction
