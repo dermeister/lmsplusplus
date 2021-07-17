@@ -19,7 +19,7 @@ export class TasksView extends ObservableObject {
   @cached get selectedTask(): Task | null { return this.explorer.selectedTask }
 
   override dispose(): void {
-    standalone(Transaction.run, () => {
+    Transaction.run(() => {
       this.leftPanel.dispose()
       this.rightPanel.dispose()
       this.tasksRepository.dispose()
@@ -35,7 +35,7 @@ export class TasksView extends ObservableObject {
   @reaction
   private createTask(): void {
     if (this.explorer.courseToCreateTaskIn) {
-      this._taskEditor?.dispose()
+      this.taskEditorToDispose = this._taskEditor
       const task = new Task(Task.NO_ID, this.explorer.courseToCreateTaskIn, "", "")
       this._taskEditor = new TaskEditor(task)
     }
@@ -98,6 +98,7 @@ export class TasksView extends ObservableObject {
   @reaction
   @throttling(0)
   private disposeTaskEditor(): void {
-    this.taskEditorToDispose?.dispose()
+    this.taskEditorToDispose
+    standalone(() => this.taskEditorToDispose?.dispose())
   }
 }

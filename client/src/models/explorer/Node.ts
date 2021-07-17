@@ -1,4 +1,4 @@
-import { standalone, Transaction, unobservable } from "reactronic"
+import { Transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import { ContextMenu } from "../ContextMenu"
 
@@ -14,7 +14,7 @@ export class Node extends ObservableObject {
   }
 
   override dispose(): void {
-    standalone(Transaction.run, () => {
+    Transaction.run(() => {
       this.contextMenu.dispose()
       super.dispose()
     })

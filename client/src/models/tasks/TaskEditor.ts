@@ -1,5 +1,5 @@
 import * as monaco from "monaco-editor"
-import { cached, standalone, Transaction, transaction, unobservable } from "reactronic"
+import { cached, Transaction, transaction, unobservable } from "reactronic"
 import { Course } from "../../domain/Course"
 import { Task } from "../../domain/Task"
 import { ObservableObject } from "../../ObservableObject"
@@ -45,7 +45,7 @@ export class TaskEditor extends ObservableObject {
   cancel(): void { this._editResult = { status: "canceled" } }
 
   override dispose(): void {
-    standalone(Transaction.run, () => {
+    Transaction.run(() => {
       this._description.dispose()
       super.dispose()
     })
