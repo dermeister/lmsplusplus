@@ -1,4 +1,4 @@
-import { cached, Monitor, reaction, unobservable } from "reactronic"
+import { cached, Monitor, reaction, throttling, unobservable } from "reactronic"
 import { Task } from "../../domain/Task"
 import { ObservableObject } from "../../ObservableObject"
 import { TasksRepository } from "../../repositories/TasksRepository"
@@ -12,6 +12,7 @@ export class TasksView extends ObservableObject {
   @unobservable readonly tasksRepository = new TasksRepository()
   @unobservable readonly explorer = new TasksExplorer(this.tasksRepository.courses)
   private _taskEditor: TaskEditor | null = null
+  private taskEditorToDispose: TaskEditor | null = null
 
   get monitor(): Monitor { return TasksRepository.monitor }
   @cached get taskEditor(): TaskEditor | null { return this._taskEditor }
@@ -41,15 +42,21 @@ export class TasksView extends ObservableObject {
   @reaction
   private editTask(): void {
     if (this.explorer.taskToEdit) {
-      this._taskEditor?.dispose()
+      this.taskEditorToDispose = this._taskEditor
       this._taskEditor = new TaskEditor(this.explorer.taskToEdit)
     }
   }
 
   @reaction
+  @throttling(0)
   private disposeTaskEditor(): void {
+    this.taskEditorToDispose?.dispose();
+  }
+
+  @reaction
+  private setTaskEditorToBeDisposed(): void {
     if (!this.explorer.taskToEdit && !this.explorer.courseToCreateTaskIn) {
-      this.taskEditor?.dispose()
+      this.taskEditorToDispose = this._taskEditor
       this._taskEditor = null
     }
   }
