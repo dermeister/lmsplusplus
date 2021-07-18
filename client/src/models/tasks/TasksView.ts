@@ -30,75 +30,71 @@ export class TasksView extends ObservableObject {
   }
 
   @reaction
-  private updateExplorer(): void { this.explorer.updateCourses(this.tasksRepository.courses) }
+  private updateExplorer(): void {
+    this.explorer.updateCourses(this.tasksRepository.courses)
+  }
 
   @reaction
   private createTask(): void {
-    if (this.explorer.courseToCreateTaskIn) {
-      this.taskEditorToDispose = this._taskEditor
-      const task = new Task(Task.NO_ID, this.explorer.courseToCreateTaskIn, "", "")
+    const { courseToCreateTaskIn } = this.explorer
+    if (courseToCreateTaskIn) {
+      this.markCurrentTaskEditorToBeDisposed()
+      const task = new Task(Task.NO_ID, courseToCreateTaskIn, "", "")
       this._taskEditor = new TaskEditor(task)
     }
   }
 
   @reaction
   private editTask(): void {
-    if (this.explorer.taskToEdit) {
-      this.taskEditorToDispose = this._taskEditor
-      this._taskEditor = new TaskEditor(this.explorer.taskToEdit)
+    const { taskToEdit } = this.explorer
+    if (taskToEdit) {
+      this.markCurrentTaskEditorToBeDisposed()
+      this._taskEditor = new TaskEditor(taskToEdit)
     }
   }
 
   @reaction
   private async deleteTask(): Promise<void> {
-    if (this.explorer.taskToDelete) {
-      await this.tasksRepository.delete(this.explorer.taskToDelete)
-      this.explorer.reset()
+    const { taskToDelete } = this.explorer
+    if (taskToDelete) {
+      await this.tasksRepository.delete(taskToDelete)
+      this.explorer.setTaskToDelete(null)
     }
   }
 
   @reaction
-  private async saveCreatedTask(): Promise<void> {
-    const editResult = this._taskEditor?.editResult
-    if (this.explorer.courseToCreateTaskIn)
+  private async saveTask(): Promise<void> {
+    const { courseToCreateTaskIn, taskToEdit } = this.explorer
+    if (courseToCreateTaskIn || taskToEdit) {
+      const editResult = this._taskEditor?.editResult
       switch (editResult?.status) {
         case "saved":
-          await this.tasksRepository.create(editResult.task)
-          this.explorer.reset()
+          if (courseToCreateTaskIn) {
+            await this.tasksRepository.create(editResult.task)
+            this.explorer.setCourseToCreateTaskIn(null)
+          } else if (taskToEdit) {
+            await this.tasksRepository.update(editResult.task)
+            this.explorer.setTaskToEdit(null)
+          }
           break
         case "canceled":
-          this.explorer.reset()
           break
       }
+    } else
+      this.markCurrentTaskEditorToBeDisposed()
   }
 
-  @reaction
-  private async saveEditedTask(): Promise<void> {
-    const editResult = this._taskEditor?.editResult
-    if (this.explorer.taskToEdit)
-      switch (editResult?.status) {
-        case "saved":
-          await this.tasksRepository.update(editResult.task)
-          this.explorer.reset()
-          break
-        case "canceled":
-          this.explorer.reset()
-          break
-      }
-  }
-
-  @reaction
-  private setTaskEditorToBeDisposed(): void {
-    if (!this.explorer.taskToEdit && !this.explorer.courseToCreateTaskIn) {
-      this.taskEditorToDispose = this._taskEditor
-      this._taskEditor = null
-    }
-  }
-
-  @reaction
-  @throttling(0)
+  @reaction @throttling(0)
   private disposeTaskEditor(): void {
-    standalone(() => this.taskEditorToDispose?.dispose())
-    this.taskEditorToDispose = null
+    if (this.taskEditorToDispose)
+      standalone(Transaction.run, () => {
+        this.taskEditorToDispose?.dispose()
+        this.taskEditorToDispose = null
+      })
+  }
+
+  private markCurrentTaskEditorToBeDisposed(): void {
+    this.taskEditorToDispose = this._taskEditor
+    this._taskEditor = null
   }
 }

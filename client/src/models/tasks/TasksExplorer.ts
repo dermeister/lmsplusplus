@@ -46,35 +46,36 @@ export class TasksExplorer extends Explorer<Task> {
 
   @transaction
   updateCourses(courses: readonly Course[]): void {
+    this._courseToCreateTaskIn = null
+    this._taskToEdit = null
+    this._taskToDelete = null
     this._courseNodes.forEach(c => c.dispose())
     this._courseNodes = this.createCourseNodes(courses)
   }
 
   @transaction
-  setCourseToCreateTaskIn(course: Course): void {
-    this.reset()
+  setCourseToCreateTaskIn(course: Course | null): void {
+    this._taskToEdit = null
+    this._taskToDelete = null
     this._courseToCreateTaskIn = course
   }
 
   @transaction
-  setTaskToEdit(task: Task): void {
-    this.reset()
+  setTaskToEdit(task: Task | null): void {
+    this._courseToCreateTaskIn = null
+    this._taskToDelete = null
     this._taskToEdit = task
   }
 
   @transaction
-  setTaskToDelete(task: Task): void {
-    this.reset()
+  setTaskToDelete(task: Task | null): void {
+    this._courseToCreateTaskIn = null
+    this._taskToEdit = null
     this._taskToDelete = task
   }
 
   @transaction
-  reset(): void {
-    this._courseToCreateTaskIn = null
-    this._taskToEdit = null
-    this._taskToDelete = null
+  private createCourseNodes(courses: readonly Course[]): CourseNode[] {
+    return courses.map(c => new CourseNode(c.name, c))
   }
-
-  @transaction
-  private createCourseNodes(courses: readonly Course[]): CourseNode[] { return courses.map(c => new CourseNode(c.name, c)) }
 }
