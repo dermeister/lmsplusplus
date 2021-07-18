@@ -3,9 +3,9 @@ import { ObservableObject } from "../ObservableObject"
 
 export class SidePanel extends ObservableObject {
   @unobservable readonly title: string
-  private _opened = true
+  private _isOpened = true
 
-  @cached get opened(): boolean { return this._opened }
+  @cached get isOpened(): boolean { return this._isOpened }
 
   constructor(title: string) {
     super()
@@ -13,8 +13,8 @@ export class SidePanel extends ObservableObject {
   }
 
   @transaction
-  close(): void { this._opened = false }
+  close(): void { this._isOpened = false }
 
   @transaction
-  open(): void { this._opened = true }
+  open(): void { this._isOpened = true }
 }

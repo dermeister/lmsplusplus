@@ -29,14 +29,15 @@ export function ContextMenu({ model, children }: ContextMenuProps): JSX.Element 
   return autorender(() => {
     if (!model.isOpened)
       return <></>
-    return ReactDOM.createPortal(
-      <Overlay onClick={() => model.close()}>
-        <menu ref={positionMenu} onContextMenu={onContextMenu} className={styles.contextMenu}>
-          {children}
-        </menu>
-      </Overlay>,
-      document.getElementById("context-menu") as Element
-    )
+    else
+      return ReactDOM.createPortal(
+        <Overlay onClick={() => model.close()}>
+          <menu ref={positionMenu} onContextMenu={onContextMenu} className={styles.contextMenu}>
+            {children}
+          </menu>
+        </Overlay>,
+        document.getElementById("context-menu") as Element
+      )
   }, [model, children])
 }
 

@@ -1,9 +1,7 @@
 import React from "react"
 import styles from "./Button.module.scss"
 
-type ReactButtonProps = React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>
-
-interface ButtonProps extends ReactButtonProps {
+interface ButtonProps extends React.ComponentProps<"button"> {
   variant: "primary" | "secondary" | "danger"
 }
 
@@ -11,7 +9,7 @@ export function Button(props: ButtonProps): JSX.Element {
   return <button {...reactButtonProps(props)} className={buildClassName(props)} />
 }
 
-function reactButtonProps(props: ButtonProps): ReactButtonProps {
+function reactButtonProps(props: ButtonProps): React.ComponentProps<"button"> {
   const buttonProps: Record<string, unknown> = { ...props }
   delete buttonProps.variant
   return buttonProps

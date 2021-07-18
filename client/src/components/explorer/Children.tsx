@@ -15,10 +15,11 @@ export function Children({ group, children }: ChildrenProps): JSX.Element {
   return autorender(() => {
     if (!group.isOpened)
       return <></>
-    return (
-      <ul className={styles.list}>
-        <Offset value={offset + Number(styles.offsetDelta)}>{children}</Offset>
-      </ul>
-    )
+    else
+      return (
+        <ul className={styles.list}>
+          <Offset value={offset + Number(styles.offsetDelta)}>{children}</Offset>
+        </ul>
+      )
   }, [group, children])
 }

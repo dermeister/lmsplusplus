@@ -23,8 +23,21 @@ export function TaskEditor({ model }: TaskEditorProps): JSX.Element {
         />
       </div>
       <div className={styles.buttons}>
-        <Button className={`${styles.button} ${styles.primary}`} variant="primary" onClick={() => model.save()}>Save</Button>
-        <Button className={`${styles.button} ${styles.danger}`} variant="danger" onClick={() => model.cancel()}>Cancel</Button>
+        <Button
+          variant="primary"
+          onClick={() => model.save()}
+          className={`${styles.button} ${styles.primary}`}
+        >
+          Save
+        </Button>
+
+        <Button
+          variant="danger"
+          onClick={() => model.cancel()}
+          className={`${styles.button} ${styles.danger}`}
+        >
+          Cancel
+        </Button>
       </div>
     </div >
   ), [model])

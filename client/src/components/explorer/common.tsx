@@ -25,6 +25,4 @@ export function Offset(props: ProviderProps<number>): JSX.Element {
   return <OffsetContext.Provider {...props} />
 }
 
-export function useOffset(): number {
-  return useContext(OffsetContext)
-}
+export function useOffset(): number { return useContext(OffsetContext) }

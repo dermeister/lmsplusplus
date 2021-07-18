@@ -22,7 +22,7 @@ interface SidePanelProps {
 export function SidePanel(props: SidePanelProps): JSX.Element {
   const { model, side, pulsing, panelClassName, toggleClassName, children } = props
   return autorender(() => {
-    if (model.opened)
+    if (model.isOpened)
       return (
         <div className={buildPanelClassName(panelClassName)}>
           <header className={buildHeaderClassName(pulsing)}>
@@ -33,11 +33,16 @@ export function SidePanel(props: SidePanelProps): JSX.Element {
           {children}
         </div>
       )
-    return (
-      <Button variant="secondary" onClick={() => model.open()} className={buildToggleClassName(side, toggleClassName)} >
-        {model.title}
-      </Button>
-    )
+    else
+      return (
+        <Button
+          variant="secondary"
+          onClick={() => model.open()}
+          className={buildToggleClassName(side, toggleClassName)}
+        >
+          {model.title}
+        </Button>
+      )
   }, [model, side, pulsing, panelClassName, children])
 }
 

@@ -21,5 +21,6 @@ export function Root({ model }: RootProps): JSX.Element {
 function content(model: Models.Root): JSX.Element {
   if (!model.auth.user)
     return <AppScreen model={model.app} />
-  return <SignInScreen model={model.signIn} />
+  else
+    return <SignInScreen model={model.signIn} />
 }

@@ -1,9 +1,7 @@
 import React from "react"
 import styles from "./Input.module.scss"
 
-type ReactInputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
-
-interface InputProps extends ReactInputProps {
+interface InputProps extends React.ComponentProps<"input"> {
   variant: "primary" | "secondary"
 }
 
@@ -11,7 +9,7 @@ export function Input(props: InputProps): JSX.Element {
   return <input autoComplete="off" {...reactInputProps(props)} className={buildClassName(props)} />
 }
 
-function reactInputProps(props: InputProps): ReactInputProps {
+function reactInputProps(props: InputProps): React.ComponentProps<"input"> {
   const inputProps: Record<string, unknown> = { ...props }
   delete inputProps.variant
   return inputProps
