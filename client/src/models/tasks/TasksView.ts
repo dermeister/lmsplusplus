@@ -78,6 +78,10 @@ export class TasksView extends ObservableObject {
           }
           break
         case "canceled":
+          if (courseToCreateTaskIn)
+            this.explorer.setCourseToCreateTaskIn(null)
+          else if (taskToEdit)
+            this.explorer.setTaskToEdit(null)
           break
       }
     } else
