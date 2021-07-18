@@ -38,7 +38,7 @@ export class TasksView extends ObservableObject {
   private createTask(): void {
     const { courseToCreateTaskIn } = this.explorer
     if (courseToCreateTaskIn) {
-      this.markCurrentTaskEditorToBeDisposed()
+      this.markCurrentTaskEditorToDispose()
       const task = new Task(Task.NO_ID, courseToCreateTaskIn, "", "")
       this._taskEditor = new TaskEditor(task)
     }
@@ -48,7 +48,7 @@ export class TasksView extends ObservableObject {
   private editTask(): void {
     const { taskToEdit } = this.explorer
     if (taskToEdit) {
-      this.markCurrentTaskEditorToBeDisposed()
+      this.markCurrentTaskEditorToDispose()
       this._taskEditor = new TaskEditor(taskToEdit)
     }
   }
@@ -64,28 +64,25 @@ export class TasksView extends ObservableObject {
 
   @reaction
   private async saveTask(): Promise<void> {
-    const { courseToCreateTaskIn, taskToEdit } = this.explorer
-    if (courseToCreateTaskIn || taskToEdit) {
-      const editResult = this._taskEditor?.editResult
-      switch (editResult?.status) {
-        case "saved":
-          if (courseToCreateTaskIn) {
-            await this.tasksRepository.create(editResult.task)
-            this.explorer.setCourseToCreateTaskIn(null)
-          } else if (taskToEdit) {
-            await this.tasksRepository.update(editResult.task)
-            this.explorer.setTaskToEdit(null)
-          }
-          break
-        case "canceled":
-          if (courseToCreateTaskIn)
-            this.explorer.setCourseToCreateTaskIn(null)
-          else if (taskToEdit)
-            this.explorer.setTaskToEdit(null)
-          break
-      }
-    } else
-      this.markCurrentTaskEditorToBeDisposed()
+    const editResult = this._taskEditor?.editResult
+    switch (editResult?.status) {
+      case "saved":
+        if (this.explorer.courseToCreateTaskIn)
+          await this.tasksRepository.create(editResult.task)
+        else if (this.explorer.taskToEdit)
+          await this.tasksRepository.update(editResult.task)
+        this.resetExplorerCreateAndEditTasks()
+        break
+      case "canceled":
+        this.resetExplorerCreateAndEditTasks()
+        break
+    }
+  }
+
+  @reaction
+  private markTaskEditorToDisposeAfterResettingExplorer(): void {
+    if (!this.explorer.courseToCreateTaskIn && !this.explorer.taskToEdit)
+      this.markCurrentTaskEditorToDispose()
   }
 
   @reaction @throttling(0)
@@ -97,8 +94,14 @@ export class TasksView extends ObservableObject {
       })
   }
 
-  private markCurrentTaskEditorToBeDisposed(): void {
+  private markCurrentTaskEditorToDispose(): void {
     this.taskEditorToDispose = this._taskEditor
     this._taskEditor = null
+  }
+
+  private resetExplorerCreateAndEditTasks(): void {
+    this.explorer.setCourseToCreateTaskIn(null)
+    this.explorer.setTaskToEdit(null)
+    this.markCurrentTaskEditorToDispose()
   }
 }
