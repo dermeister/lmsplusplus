@@ -32,7 +32,7 @@ export class Auth extends ObservableObject {
   signOut(): void { this._user = null }
 
   @reaction
-  private updateLocalStorage(): void {
+  private localStorageContainsCurrentUser(): void {
     if (!this._user)
       localStorage.removeItem(this.localStorageKey)
     else if (!localStorage.getItem(this.localStorageKey))

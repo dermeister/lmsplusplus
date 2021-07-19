@@ -24,7 +24,9 @@ export class CourseNode extends GroupNode {
   }
 
   @reaction
-  private updateTasks(): void { this._children = this.item.tasks.map(t => new ItemNode(t.title, t)) }
+  private initChildren(): void {
+    this._children = this.item.tasks.map(t => new ItemNode(t.title, t))
+  }
 }
 
 export class TasksExplorer extends Explorer<Task> {

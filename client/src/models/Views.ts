@@ -30,7 +30,7 @@ export class Views extends ObservableObject {
   }
 
   @reaction
-  private syncSidePanels(): void {
+  private allSidePanelsAreInSameStateAsActive(): void {
     const views = [this.tasks, this.solutions, this.demo, this.options]
     for (const view of views) {
       const { leftPanel } = view

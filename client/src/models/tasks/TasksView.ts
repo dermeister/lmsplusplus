@@ -30,12 +30,12 @@ export class TasksView extends ObservableObject {
   }
 
   @reaction
-  private updateExplorer(): void {
+  private explorerSynchronizedWithRepositoryCourses(): void {
     this.explorer.updateCourses(this.tasksRepository.courses)
   }
 
   @reaction
-  private createTask(): void {
+  private taskEditorCreatedOnTaskToCreate(): void {
     const { courseToCreateTaskIn } = this.explorer
     if (courseToCreateTaskIn) {
       this.markCurrentTaskEditorToDispose()
@@ -45,7 +45,7 @@ export class TasksView extends ObservableObject {
   }
 
   @reaction
-  private editTask(): void {
+  private taskEditorCreatedOnTaskToEdit(): void {
     const { taskToEdit } = this.explorer
     if (taskToEdit) {
       this.markCurrentTaskEditorToDispose()
@@ -54,7 +54,7 @@ export class TasksView extends ObservableObject {
   }
 
   @reaction
-  private async deleteTask(): Promise<void> {
+  private async taskDeletedOnTaskToDelete(): Promise<void> {
     const { taskToDelete } = this.explorer
     if (taskToDelete) {
       await this.tasksRepository.delete(taskToDelete)
@@ -63,7 +63,7 @@ export class TasksView extends ObservableObject {
   }
 
   @reaction
-  private async saveTask(): Promise<void> {
+  private async taskPersistedInRepositoryOnTaskEditorResult(): Promise<void> {
     const editResult = this._taskEditor?.editResult
     switch (editResult?.status) {
       case "saved":
@@ -80,13 +80,13 @@ export class TasksView extends ObservableObject {
   }
 
   @reaction
-  private markTaskEditorToDisposeAfterResettingExplorer(): void {
+  private taskEditorMarkedToDisposeIfNoCourseToCreateTaskInOrTaskToEditSet(): void {
     if (!this.explorer.courseToCreateTaskIn && !this.explorer.taskToEdit)
       this.markCurrentTaskEditorToDispose()
   }
 
   @reaction @throttling(0)
-  private disposeTaskEditor(): void {
+  private taskEditorToDisposeIsDisposed(): void {
     if (this.taskEditorToDispose)
       standalone(Transaction.run, () => {
         this.taskEditorToDispose?.dispose()
