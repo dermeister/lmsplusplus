@@ -24,7 +24,7 @@ export class CourseNode extends GroupNode {
   }
 
   @reaction
-  private initChildren(): void {
+  private init_children(): void {
     this._children = this.item.tasks.map(t => new ItemNode(t.title, t))
   }
 }

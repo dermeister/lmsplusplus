@@ -30,12 +30,12 @@ export class TasksView extends ObservableObject {
   }
 
   @reaction
-  private explorerSynchronizedWithRepositoryCourses(): void {
+  private explorer_synchronized_with_repository_courses(): void {
     this.explorer.updateCourses(this.tasksRepository.courses)
   }
 
   @reaction
-  private taskEditorCreatedOnCourseToCreateTaskIn(): void {
+  private taskEditor_created_on_courseToCreateTaskIn(): void {
     const { courseToCreateTaskIn } = this.explorer
     if (courseToCreateTaskIn) {
       this.markCurrentTaskEditorToDispose()
@@ -45,7 +45,7 @@ export class TasksView extends ObservableObject {
   }
 
   @reaction
-  private taskEditorCreatedOnTaskToEdit(): void {
+  private taskEditor_created_on_taskToEdit(): void {
     const { taskToEdit } = this.explorer
     if (taskToEdit) {
       this.markCurrentTaskEditorToDispose()
@@ -54,7 +54,7 @@ export class TasksView extends ObservableObject {
   }
 
   @reaction
-  private async taskDeletedOnTaskToDelete(): Promise<void> {
+  private async task_deleted_on_taskToDelete(): Promise<void> {
     const { taskToDelete } = this.explorer
     if (taskToDelete) {
       await this.tasksRepository.delete(taskToDelete)
@@ -63,13 +63,13 @@ export class TasksView extends ObservableObject {
   }
 
   @reaction
-  private taskEditorMarkedToDisposeIfNoCourseToCreateTaskInOrTaskToEditSet(): void {
+  private taskEditor_marked_to_dispose_if_no_courseToCreateTaskIn_or_taskToEdit_set(): void {
     if (!this.explorer.courseToCreateTaskIn && !this.explorer.taskToEdit && this._taskEditor)
       this.markCurrentTaskEditorToDispose()
   }
 
   @reaction
-  private async taskPersistedInRepositoryOnTaskEditorResult(): Promise<void> {
+  private async task_persisted_in_repository_on_taskEditor_editResult(): Promise<void> {
     const editResult = this._taskEditor?.editResult
     switch (editResult?.status) {
       case "saved":
@@ -86,7 +86,7 @@ export class TasksView extends ObservableObject {
   }
 
   @reaction @throttling(0)
-  private taskEditorToDisposeDisposed(): void {
+  private taskEditorToDispose_disposed(): void {
     if (this.taskEditorToDispose)
       standalone(Transaction.run, () => {
         this.taskEditorToDispose?.dispose()
