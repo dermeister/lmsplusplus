@@ -35,7 +35,7 @@ export class TasksView extends ObservableObject {
   }
 
   @reaction
-  private taskEditorCreatedOnTaskToCreate(): void {
+  private taskEditorCreatedOnCourseToCreateTaskIn(): void {
     const { courseToCreateTaskIn } = this.explorer
     if (courseToCreateTaskIn) {
       this.markCurrentTaskEditorToDispose()
@@ -63,6 +63,12 @@ export class TasksView extends ObservableObject {
   }
 
   @reaction
+  private taskEditorMarkedToDisposeIfNoCourseToCreateTaskInOrTaskToEditSet(): void {
+    if (!this.explorer.courseToCreateTaskIn && !this.explorer.taskToEdit && this._taskEditor)
+      this.markCurrentTaskEditorToDispose()
+  }
+
+  @reaction
   private async taskPersistedInRepositoryOnTaskEditorResult(): Promise<void> {
     const editResult = this._taskEditor?.editResult
     switch (editResult?.status) {
@@ -71,22 +77,16 @@ export class TasksView extends ObservableObject {
           await this.tasksRepository.create(editResult.task)
         else if (this.explorer.taskToEdit)
           await this.tasksRepository.update(editResult.task)
-        this.resetExplorerCreateAndEditTasks()
+        this.resetCourseToCreateTaskInAndTaskToEdit()
         break
       case "canceled":
-        this.resetExplorerCreateAndEditTasks()
+        this.resetCourseToCreateTaskInAndTaskToEdit()
         break
     }
   }
 
-  @reaction
-  private taskEditorMarkedToDisposeIfNoCourseToCreateTaskInOrTaskToEditSet(): void {
-    if (!this.explorer.courseToCreateTaskIn && !this.explorer.taskToEdit)
-      this.markCurrentTaskEditorToDispose()
-  }
-
   @reaction @throttling(0)
-  private taskEditorToDisposeIsDisposed(): void {
+  private taskEditorToDisposeDisposed(): void {
     if (this.taskEditorToDispose)
       standalone(Transaction.run, () => {
         this.taskEditorToDispose?.dispose()
@@ -99,9 +99,8 @@ export class TasksView extends ObservableObject {
     this._taskEditor = null
   }
 
-  private resetExplorerCreateAndEditTasks(): void {
+  private resetCourseToCreateTaskInAndTaskToEdit(): void {
     this.explorer.setCourseToCreateTaskIn(null)
     this.explorer.setTaskToEdit(null)
-    this.markCurrentTaskEditorToDispose()
   }
 }
