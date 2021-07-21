@@ -15,9 +15,9 @@ export function Item<T>({ item, children }: ItemProps<T>): JSX.Element {
   const onContextMenu = useContextMenu(item.contextMenu)
 
   return autorender(() => (
-    <li key={item.id}>
+    <li key={item.key}>
       <p
-        onClick={() => model?.activateNode(item)}
+        onClick={() => model?.setSelectedNode(item)}
         onContextMenu={onContextMenu}
         className={buildNodeClassName(item)}
         style={{ paddingLeft: offset }}

@@ -32,7 +32,7 @@ function onDeleteTask(explorer: Models.TasksExplorer, task: Models.ItemNode<Task
 
 function courses(explorer: Models.TasksExplorer, courses: readonly Models.CourseNode[]): JSX.Element[] {
   return courses.map(course => (
-    <li key={course.id}>
+    <li key={course.key}>
       <Explorer.Group group={course}>
         {course.title}
 
@@ -43,14 +43,14 @@ function courses(explorer: Models.TasksExplorer, courses: readonly Models.Course
         </ContextMenu>
       </Explorer.Group>
 
-      <Explorer.Children group={course}>{tasks(explorer, course.children)}</Explorer.Children>
+      <Explorer.Children group={course}>{tasks(explorer, course.taskNodes)}</Explorer.Children>
     </li>
   ))
 }
 
 function tasks(explorer: Models.TasksExplorer, tasks: readonly Models.ItemNode<Task>[]): JSX.Element[] {
   return tasks.map(task => (
-    <Explorer.Item key={task.id} item={task}>
+    <Explorer.Item key={task.key} item={task}>
       {task.title}
 
       <ContextMenu model={task.contextMenu}>

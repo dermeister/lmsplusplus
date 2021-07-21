@@ -1,13 +1,44 @@
-import { cached, Transaction } from "reactronic"
+import { cached, transaction, Transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
+import { ExplorerReconciler } from "./ExplorerReconciler"
+import { GroupNode } from "./GroupNode"
 import { ItemNode } from "./ItemNode"
+import { Node } from "./Node"
 
-export class Explorer<T> extends ObservableObject {
-  private _activeNode: ItemNode<T> | null = null
+class ExplorerRootNode extends GroupNode {
+  override get isOpened(): boolean { return true }
 
-  @cached get activeNode(): ItemNode<T> | null { return this._activeNode }
+  constructor(children: readonly Node[]) { super("Explorer", "explorer", children) }
 
-  activateNode(node: ItemNode<T>): void {
-    Transaction.run(() => this._activeNode = node)
+  @transaction
+  updateExplorerRootNode(children: readonly Node[]): void { this.updateGroupNode(this.title, children) }
+}
+
+export abstract class Explorer<T> extends ObservableObject {
+  @unobservable readonly root: ExplorerRootNode
+  @unobservable private readonly reconciler: ExplorerReconciler<this, T> = new ExplorerReconciler(this)
+  private _selectedNode: ItemNode<T> | null = null
+
+  @cached get selectedNode(): ItemNode<T> | null { return this._selectedNode }
+  @cached protected get children(): readonly Node[] { return this.root.children }
+
+  constructor(children: readonly Node[] = []) {
+    super()
+    this.root = new ExplorerRootNode(children)
+    this.reconciler.reconcile(children)
+  }
+
+  @transaction
+  updateExplorer(children: readonly Node[]): void { this.reconciler.reconcile(children) }
+
+  @transaction
+  setSelectedNode(node: ItemNode<T> | null): void { this._selectedNode = node }
+
+  override dispose(): void {
+    Transaction.run(() => {
+      this.root.dispose()
+      this.reconciler.dispose()
+      super.dispose()
+    })
   }
 }
