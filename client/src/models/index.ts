@@ -10,7 +10,6 @@ import * as _SignIn from "./SignIn"
 import * as _TasksExplorer from "./tasks/TasksExplorer"
 import * as _TasksView from "./tasks/TasksView"
 import * as _TaskEditor from "./tasks/TaskEditor"
-import * as _Views from "./Views"
 import * as _DemoView from "./views/DemoView"
 import * as _OptionsView from "./views/OptionsView"
 import * as _SolutionsView from "./views/SolutionsView"
@@ -18,6 +17,7 @@ import * as _WindowManager from "./WindowManager"
 
 export namespace Models {
   export import App = _App.App
+  export import View = _App.View
   export import ContextMenu = _ContextMenu.ContextMenu
   export import Explorer = _Explorer.Explorer
   export import GroupNode = _GroupNode.GroupNode
@@ -33,7 +33,5 @@ export namespace Models {
   export import TasksExplorer = _TasksExplorer.TasksExplorer
   export import TaskEditor = _TaskEditor.TaskEditor
   export import CourseNode = _TasksExplorer.CourseNode
-  export import Views = _Views.Views
-  export import View = _Views.View
   export import WindowManager = _WindowManager.WindowManager
 }

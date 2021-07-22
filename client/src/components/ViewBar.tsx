@@ -7,7 +7,7 @@ import { Button } from "./Button"
 import styles from "./ViewBar.module.scss"
 
 interface ViewBarProps {
-  model: Models.Views
+  model: Models.App
   className?: string
 }
 
@@ -32,17 +32,17 @@ function buildClassName(className?: string): string {
   return result
 }
 
-function button(model: Models.Views, view: Models.View, Icon: IconType): JSX.Element {
+function button(model: Models.App, view: Models.View, Icon: IconType): JSX.Element {
   let className = styles.viewButton
   let variant: "primary" | "secondary"
-  if (model.active === view) {
+  if (model.activeView === view) {
     className += ` ${styles.selected}`
     variant = "secondary"
   } else
     variant = "primary"
 
   return (
-    <Button variant={variant} onClick={() => model.activate(view)} className={className}>
+    <Button variant={variant} onClick={() => model.setActiveView(view)} className={className}>
       <Icon size={20} />
     </Button>
   )

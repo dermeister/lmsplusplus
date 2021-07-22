@@ -1,7 +1,39 @@
-import { Views } from "./Views"
+import { cached, reaction, transaction, Transaction, unobservable } from "reactronic"
+import { ObservableObject } from "../ObservableObject"
+import { TasksView } from "./tasks/TasksView"
+import { DemoView } from "./views/DemoView"
+import { OptionsView } from "./views/OptionsView"
+import { SolutionsView } from "./views/SolutionsView"
 
-export class App {
-  readonly views = new Views()
+export type View = TasksView | DemoView | SolutionsView | OptionsView
 
-  dispose(): void { this.views.dispose() }
+export class App extends ObservableObject {
+  @unobservable readonly tasks = new TasksView()
+  @unobservable readonly solutions = new SolutionsView()
+  @unobservable readonly demo = new DemoView()
+  @unobservable readonly options = new OptionsView()
+  private _active: View = this.tasks
+
+  @cached get activeView(): View { return this._active }
+
+  @transaction
+  setActiveView(view: View): void { this._active = view }
+
+  override dispose(): void {
+    Transaction.run(() => {
+      this.tasks.dispose()
+      this.solutions.dispose()
+      this.demo.dispose()
+      this.options.dispose()
+    })
+  }
+
+  @reaction
+  private all_left_panels_in_same_state_as_active(): void {
+    const leftPanelsExceptActive = [this.tasks, this.solutions, this.demo, this.options]
+      .filter(v => v !== this._active)
+      .map(v => v.leftPanel)
+    for (const leftPanel of leftPanelsExceptActive)
+      this._active.leftPanel.isOpened ? leftPanel.open() : leftPanel.close()
+  }
 }

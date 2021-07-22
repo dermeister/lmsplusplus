@@ -13,8 +13,8 @@ interface AppScreenProps {
   model: Models.App
 }
 
-function content(model: Models.Views): JSX.Element | undefined {
-  switch (model.active) {
+function content(model: Models.App): JSX.Element | undefined {
+  switch (model.activeView) {
     case model.tasks:
       return <TasksView model={model.tasks} />
     case model.solutions:
@@ -29,8 +29,8 @@ function content(model: Models.Views): JSX.Element | undefined {
 export function AppScreen({ model }: AppScreenProps): JSX.Element {
   return autorender(() => (
     <>
-      <ViewBar model={model.views} className={styles.viewBar} />
-      <div className={styles.content}>{content(model.views)}</div>
+      <ViewBar model={model} className={styles.viewBar} />
+      <div className={styles.content}>{content(model)}</div>
     </>
   ), [model])
 }
