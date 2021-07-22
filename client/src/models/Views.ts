@@ -30,11 +30,11 @@ export class Views extends ObservableObject {
   }
 
   @reaction
-  private all_side_panels_in_same_state_as_active(): void {
-    const views = [this.tasks, this.solutions, this.demo, this.options]
-    for (const view of views) {
-      const { leftPanel } = view
-      this._active.leftPanel ? leftPanel.open() : leftPanel.close()
-    }
+  private all_left_panels_in_same_state_as_active(): void {
+    const leftPanelsExceptActive = [this.tasks, this.solutions, this.demo, this.options]
+      .filter(v => v !== this._active)
+      .map(v => v.leftPanel)
+    for (const leftPanel of leftPanelsExceptActive)
+      this._active.leftPanel.isOpened ? leftPanel.open() : leftPanel.close()
   }
 }
