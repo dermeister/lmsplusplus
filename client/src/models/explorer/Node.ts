@@ -16,10 +16,10 @@ export abstract class Node extends ObservableObject {
     this.key = key
   }
 
+  abstract accept(_visitor: NodeVisitor): Node
+
   @transaction
   updateNode(title: string): void { this._title = title }
-
-  abstract accept(_visitor: NodeVisitor): Node
 
   override dispose(): void {
     Transaction.run(() => {

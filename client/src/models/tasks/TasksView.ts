@@ -40,7 +40,7 @@ export class TasksView extends ObservableObject {
     if (courseToCreateTaskIn) {
       this.markCurrentTaskEditorToDispose()
       const task = new Task(Task.NO_ID, courseToCreateTaskIn, "", "")
-      this._taskEditor = new TaskEditor(task)
+      this.createTaskEditor(task)
     }
   }
 
@@ -49,7 +49,7 @@ export class TasksView extends ObservableObject {
     const { taskToEdit } = this.explorer
     if (taskToEdit) {
       this.markCurrentTaskEditorToDispose()
-      this._taskEditor = new TaskEditor(taskToEdit)
+      this.createTaskEditor(taskToEdit)
     }
   }
 
@@ -92,6 +92,11 @@ export class TasksView extends ObservableObject {
         this.taskEditorToDispose?.dispose()
         this.taskEditorToDispose = null
       })
+  }
+
+  private createTaskEditor(task: Task): void {
+    this._taskEditor = new TaskEditor(task)
+    this.rightPanel.open()
   }
 
   private markCurrentTaskEditorToDispose(): void {
