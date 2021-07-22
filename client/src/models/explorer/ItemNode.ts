@@ -13,7 +13,7 @@ export class ItemNode<T> extends Node {
   }
 
   @transaction
-  updateItem(title: string, item: T): void {
+  updateItemNode(title: string, item: T): void {
     this.updateNode(title)
     this._item = item
   }

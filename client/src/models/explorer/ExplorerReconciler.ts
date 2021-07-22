@@ -38,7 +38,7 @@ export class ExplorerReconciler<T extends Explorer<K>, K> extends NodeVisitor {
     let result = super.visitItemNode(node) as ItemNode<K>
     if (this.oldNodes.has(result.key)) {
       const oldNode = this.oldNodes.get(result.key) as ItemNode<K>
-      oldNode.updateItem(result.title, result.item)
+      oldNode.updateItemNode(result.title, result.item)
       this.removeFromOldNodes(oldNode)
       result = oldNode
     }

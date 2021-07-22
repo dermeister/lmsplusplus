@@ -15,9 +15,9 @@ interface CanceledResult {
 
 export class TaskEditor extends ObservableObject {
   @unobservable private readonly id: number
-  private readonly _course: Course
+  @unobservable private readonly _course: Course
   private _title: string
-  private readonly _description: monaco.editor.ITextModel
+  @unobservable private readonly _description: monaco.editor.ITextModel
   private _editResult: ConfirmedResult | CanceledResult | null = null
 
   @cached get editResult(): ConfirmedResult | CanceledResult | null { return this._editResult }

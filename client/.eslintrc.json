@@ -18,34 +18,28 @@
       "error",
       {
         "default": [
-          "public-abstract-field",
           "public-static-field",
-          "public-decorated-field",
+          "public-abstract-field",
           "public-instance-field",
-          "protected-abstract-field",
           "protected-static-field",
-          "protected-decorated-field",
+          "protected-abstract-field",
           "protected-instance-field",
-          "private-abstract-field",
           "private-static-field",
-          "private-decorated-field",
+          "private-abstract-field",
           "private-instance-field",
 
           "public-constructor",
           "protected-constructor",
           "private-constructor",
 
-          "public-abstract-method",
           "public-static-method",
-          "public-decorated-method",
+          "public-abstract-method",
           "public-instance-method",
-          "protected-abstract-method",
           "protected-static-method",
-          "protected-decorated-method",
+          "protected-abstract-method",
           "protected-instance-method",
-          "private-abstract-method",
           "private-static-method",
-          "private-decorated-method",
+          "private-abstract-method",
           "private-instance-method"
         ]
       }

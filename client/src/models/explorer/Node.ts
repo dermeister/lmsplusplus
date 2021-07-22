@@ -16,7 +16,7 @@ export abstract class Node extends ObservableObject {
     this.key = key
   }
 
-  abstract accept(_visitor: NodeVisitor): Node
+  abstract accept(visitor: NodeVisitor): Node
 
   @transaction
   updateNode(title: string): void { this._title = title }
