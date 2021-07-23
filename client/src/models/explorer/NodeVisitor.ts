@@ -11,8 +11,8 @@ export abstract class NodeVisitor extends ObservableObject {
   visitItemNode(node: ItemNode<Object>): ItemNode<Object> { return node }
 
   visitGroupNode(node: GroupNode): GroupNode {
-    const childNodes = this.visitNodes(node.nonCachedChildren)
-    node.updateGroupNode(node.title, childNodes)
+    const children = this.visitNodes(node.nonCachedChildren)
+    node.updateGroupNode(node.title, children)
     return node
   }
 }

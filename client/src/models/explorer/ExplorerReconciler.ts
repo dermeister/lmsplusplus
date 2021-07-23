@@ -1,4 +1,4 @@
-import { transaction, unobservable } from "reactronic"
+import { Transaction, transaction, unobservable } from "reactronic"
 import { Explorer } from "./Explorer"
 import { GroupNode } from "./GroupNode"
 import { ItemNode } from "./ItemNode"
@@ -17,8 +17,8 @@ export class ExplorerReconciler<T extends Explorer<K>, K> extends NodeVisitor {
 
   @transaction
   reconcile(children: readonly Node[]): void {
-    this.explorer.root.updateExplorerRootNode(children)
-    this.visitNode(this.explorer.root)
+    const reconciledChildren = this.visitNodes(children)
+    this.explorer.root.updateExplorerRootNode(reconciledChildren)
     for (const node of this.oldNodes.values()) {
       if (node === this.explorer.selectedNode)
         this.explorer.setSelectedNode(null)
@@ -30,7 +30,15 @@ export class ExplorerReconciler<T extends Explorer<K>, K> extends NodeVisitor {
 
   override visitNode(node: Node): Node {
     const result = super.visitNode(node)
-    this.addToNewNodes(result)
+    if (result !== node) { // visitNode returned reused old node
+      const oldNodes = this.oldNodes.toMutable()
+      oldNodes.delete(result.key)
+      this.oldNodes = oldNodes
+      node.dispose()
+    }
+    const newNodes = this.newNodes.toMutable()
+    newNodes.set(result.key, result)
+    this.newNodes = newNodes
     return result
   }
 
@@ -39,7 +47,6 @@ export class ExplorerReconciler<T extends Explorer<K>, K> extends NodeVisitor {
     if (this.oldNodes.has(result.key)) {
       const oldNode = this.oldNodes.get(result.key) as ItemNode<K>
       oldNode.updateItemNode(result.title, result.item)
-      this.removeFromOldNodes(oldNode)
       result = oldNode
     }
     return result
@@ -50,21 +57,16 @@ export class ExplorerReconciler<T extends Explorer<K>, K> extends NodeVisitor {
     if (this.oldNodes.has(result.key)) {
       const oldNode = this.oldNodes.get(result.key) as GroupNode
       oldNode.updateGroupNode(result.title, result.nonCachedChildren)
-      this.removeFromOldNodes(oldNode)
       result = oldNode
     }
     return result
   }
 
-  private removeFromOldNodes(node: Node): void {
-    const oldNodes = this.oldNodes.toMutable()
-    oldNodes.delete(node.key)
-    this.oldNodes = oldNodes
-  }
-
-  private addToNewNodes(node: Node): void {
-    const newNodes = this.newNodes.toMutable()
-    newNodes.set(node.key, node)
-    this.newNodes = newNodes
+  override dispose(): void {
+    Transaction.run(() => {
+      for (const node of this.oldNodes.values())
+        node.dispose()
+      super.dispose()
+    })
   }
 }

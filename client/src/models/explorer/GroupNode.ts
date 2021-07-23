@@ -25,11 +25,4 @@ export class GroupNode extends Node {
   }
 
   override accept(visitor: NodeVisitor): Node { return visitor.visitGroupNode(this) }
-
-  override dispose(): void {
-    Transaction.run(() => {
-      this._children.forEach(c => c.dispose())
-      super.dispose()
-    })
-  }
 }
