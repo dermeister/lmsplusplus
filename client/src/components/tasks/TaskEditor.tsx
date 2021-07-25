@@ -1,12 +1,12 @@
 import React from "react"
-import { Models } from "../../models"
+import * as models from "../../models"
 import { autorender } from "../autorender"
 import { Button } from "../Button"
 import { Input } from "../Input"
 import styles from "./TaskEditor.module.scss"
 
 interface TaskEditorProps {
-  model: Models.TaskEditor
+  model: models.TaskEditor
 }
 
 export function TaskEditor({ model }: TaskEditorProps): JSX.Element {

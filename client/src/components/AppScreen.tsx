@@ -1,5 +1,5 @@
 import React from "react"
-import { Models } from "../models"
+import * as models from "../models"
 import styles from "./AppScreen.module.scss"
 import { autorender } from "./autorender"
 import { Side, SidePanel } from "./SidePanel"
@@ -10,10 +10,10 @@ import { OptionsView } from "./views/OptionsView"
 import { SolutionsView } from "./views/SolutionsView"
 
 interface AppScreenProps {
-  model: Models.App
+  model: models.App
 }
 
-function content(model: Models.App): JSX.Element | undefined {
+function content(model: models.App): JSX.Element | undefined {
   switch (model.activeView) {
     case model.tasks:
       return <TasksView model={model.tasks} />
@@ -44,7 +44,7 @@ AppScreen.MainPanel = function MainPanel({ children }: MainPanelProps): JSX.Elem
 }
 
 interface SidePanelProps {
-  model: Models.SidePanel
+  model: models.SidePanel
   pulsing?: boolean
   children?: React.ReactNode
 }

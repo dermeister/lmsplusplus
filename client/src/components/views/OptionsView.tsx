@@ -1,10 +1,10 @@
 import React from "react"
-import { Models } from "../../models"
+import * as models from "../../models"
 import { AppScreen } from "../AppScreen"
 import { autorender } from "../autorender"
 
 interface OptionsViewProps {
-  model: Models.OptionsView
+  model: models.OptionsView
 }
 
 export function OptionsView({ model }: OptionsViewProps): JSX.Element {

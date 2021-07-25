@@ -1,11 +1,11 @@
 import React from "react"
-import { Models } from "../../models"
+import * as models from "../../models"
 import { autorender } from "../autorender"
 import { Offset, useOffset } from "./common"
 import styles from "./Explorer.module.scss"
 
 interface ChildrenProps {
-  group: Models.GroupNode
+  group: models.GroupNode
   children?: React.ReactNode
 }
 

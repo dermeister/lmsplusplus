@@ -1,10 +1,10 @@
 import React from "react"
-import { Models } from "../../models"
+import * as models from "../../models"
 import { AppScreen } from "../AppScreen"
 import { autorender } from "../autorender"
 
 interface DemoViewProps {
-  model: Models.DemoView
+  model: models.DemoView
 }
 
 export function DemoView({ model }: DemoViewProps): JSX.Element {

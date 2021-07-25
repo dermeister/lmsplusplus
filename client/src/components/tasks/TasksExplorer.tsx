@@ -1,12 +1,12 @@
 import React from "react"
 import { Task } from "../../domain/Task"
-import { Models } from "../../models"
+import * as models from "../../models"
 import { autorender } from "../autorender"
 import { ContextMenu } from "../ContextMenu"
 import { Explorer } from "../explorer"
 
 interface TasksExplorerProps {
-  model: Models.TasksExplorer
+  model: models.TasksExplorer
 }
 
 export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
@@ -15,22 +15,22 @@ export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
   ), [model])
 }
 
-function onCreateTask(explorer: Models.TasksExplorer, course: Models.CourseNode): void {
+function onCreateTask(explorer: models.TasksExplorer, course: models.CourseNode): void {
   course.contextMenu.close()
   explorer.setCourseToCreateTaskIn(course.item)
 }
 
-function onEditTask(explorer: Models.TasksExplorer, task: Models.ItemNode<Task>): void {
+function onEditTask(explorer: models.TasksExplorer, task: models.ItemNode<Task>): void {
   task.contextMenu.close()
   explorer.setTaskToEdit(task.item)
 }
 
-function onDeleteTask(explorer: Models.TasksExplorer, task: Models.ItemNode<Task>): void {
+function onDeleteTask(explorer: models.TasksExplorer, task: models.ItemNode<Task>): void {
   task.contextMenu.close()
   explorer.setTaskToDelete(task.item)
 }
 
-function courses(explorer: Models.TasksExplorer, courses: readonly Models.CourseNode[]): JSX.Element[] {
+function courses(explorer: models.TasksExplorer, courses: readonly models.CourseNode[]): JSX.Element[] {
   return courses.map(course => (
     <li key={course.key}>
       <Explorer.Group group={course}>
@@ -48,7 +48,7 @@ function courses(explorer: Models.TasksExplorer, courses: readonly Models.Course
   ))
 }
 
-function tasks(explorer: Models.TasksExplorer, tasks: readonly Models.ItemNode<Task>[]): JSX.Element[] {
+function tasks(explorer: models.TasksExplorer, tasks: readonly models.ItemNode<Task>[]): JSX.Element[] {
   return tasks.map(task => (
     <Explorer.Item key={task.key} item={task}>
       {task.title}

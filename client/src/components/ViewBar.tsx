@@ -1,13 +1,13 @@
 import React from "react"
 import { IconType } from "react-icons"
 import { FaCode, FaCog, FaDesktop, FaTasks } from "react-icons/fa"
-import { Models } from "../models"
+import * as models from "../models"
 import { autorender } from "./autorender"
 import { Button } from "./Button"
 import styles from "./ViewBar.module.scss"
 
 interface ViewBarProps {
-  model: Models.App
+  model: models.App
   className?: string
 }
 
@@ -32,7 +32,7 @@ function buildClassName(className?: string): string {
   return result
 }
 
-function button(model: Models.App, view: Models.View, Icon: IconType): JSX.Element {
+function button(model: models.App, view: models.View, Icon: IconType): JSX.Element {
   let className = styles.viewButton
   let variant: "primary" | "secondary"
   if (model.activeView === view) {

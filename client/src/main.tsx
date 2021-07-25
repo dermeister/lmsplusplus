@@ -3,8 +3,8 @@ import ReactDOM from "react-dom"
 import { Transaction } from "reactronic"
 import { Root } from "./components/Root"
 import "./index.css"
-import { Models } from "./models"
+import * as models from "./models"
 
-const model = Transaction.run(() => new Models.Root())
+const model = Transaction.run(() => new models.Root())
 
 ReactDOM.render(<Root model={model} />, document.getElementById("root"))

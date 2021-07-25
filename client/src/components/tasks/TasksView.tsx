@@ -1,5 +1,5 @@
 import React from "react"
-import { Models } from "../../models"
+import * as models from "../../models"
 import { AppScreen } from "../AppScreen"
 import { autorender } from "../autorender"
 import { MonacoEditor } from "../MonacoEditor"
@@ -8,7 +8,7 @@ import { TasksExplorer } from "./TasksExplorer"
 import styles from "./TasksView.module.scss"
 
 interface TasksViewProps {
-  model: Models.TasksView
+  model: models.TasksView
 }
 
 export function TasksView({ model }: TasksViewProps): JSX.Element {

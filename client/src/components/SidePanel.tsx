@@ -1,6 +1,6 @@
 import React from "react"
 import { FaTimes } from "react-icons/fa"
-import { Models } from "../models"
+import * as models from "../models"
 import { autorender } from "./autorender"
 import { Button } from "./Button"
 import styles from "./SidePanel.module.scss"
@@ -11,7 +11,7 @@ export enum Side {
 }
 
 interface SidePanelProps {
-  model: Models.SidePanel
+  model: models.SidePanel
   side: Side
   pulsing?: boolean
   panelClassName?: string

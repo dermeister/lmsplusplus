@@ -1,21 +1,21 @@
 import React, { createContext, ProviderProps, useContext } from "react"
-import { Models } from "../../models"
+import * as models from "../../models"
 import styles from "./Explorer.module.scss"
 
-export function buildNodeClassName(node: Models.Node): string {
+export function buildNodeClassName(node: models.Node): string {
   let className = styles.node
   if (node.contextMenu.isOpened)
     className += ` ${styles.contextMenuOpened}`
   return className
 }
 
-const ExplorerModelContext = createContext<Models.Explorer<unknown> | null>(null)
+const ExplorerModelContext = createContext<models.Explorer<unknown> | null>(null)
 
-export function ExplorerModel(props: ProviderProps<Models.Explorer<unknown> | null>): JSX.Element {
+export function ExplorerModel(props: ProviderProps<models.Explorer<unknown> | null>): JSX.Element {
   return <ExplorerModelContext.Provider {...props} />
 }
 
-export function useExplorerModel<T extends Models.Explorer<unknown>>(): T | null {
+export function useExplorerModel<T extends models.Explorer<unknown>>(): T | null {
   return useContext(ExplorerModelContext as React.Context<T | null>)
 }
 

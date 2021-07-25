@@ -1,13 +1,13 @@
 import React from "react"
 import { FaChevronRight } from "react-icons/fa"
-import { Models } from "../../models"
+import * as models from "../../models"
 import { autorender } from "../autorender"
 import { useContextMenu } from "../WindowManager"
 import { buildNodeClassName, useOffset } from "./common"
 import styles from "./Explorer.module.scss"
 
 interface GroupProps {
-  group: Models.GroupNode
+  group: models.GroupNode
   children?: React.ReactNode
 }
 
@@ -28,7 +28,7 @@ export function Group({ group, children }: GroupProps): JSX.Element {
   ), [group, children])
 }
 
-function arrow(group: Models.GroupNode): JSX.Element {
+function arrow(group: models.GroupNode): JSX.Element {
   let className = styles.arrow
   if (group.isOpened)
     className += ` ${styles.arrowOpened}`

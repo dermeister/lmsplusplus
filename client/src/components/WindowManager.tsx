@@ -1,18 +1,18 @@
 import React, { useContext } from "react"
-import { Models } from "../models/"
+import * as models from "../models"
 
 interface WindowManagerProps {
-  model: Models.WindowManager
+  model: models.WindowManager
   children: React.ReactNode
 }
 
-const WindowManagerContext = React.createContext<Models.WindowManager | null>(null)
+const WindowManagerContext = React.createContext<models.WindowManager | null>(null)
 
 export function WindowManager({ model, children }: WindowManagerProps): JSX.Element {
   return <WindowManagerContext.Provider value={model}>{children}</WindowManagerContext.Provider>
 }
 
-export function useContextMenu(contextMenu: Models.ContextMenu): (e: React.MouseEvent) => void {
+export function useContextMenu(contextMenu: models.ContextMenu): (e: React.MouseEvent) => void {
   const windowManager = useContext(WindowManagerContext)
 
   return e => {
