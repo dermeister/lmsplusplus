@@ -1,4 +1,4 @@
-import { cached, monitor, Monitor, reaction, transaction } from "reactronic"
+import { monitor, Monitor, reaction, transaction } from "reactronic"
 import { Course } from "../domain/Course"
 import { Task } from "../domain/Task"
 import { ObservableObject } from "../ObservableObject"
@@ -9,7 +9,7 @@ export class TasksRepository extends ObservableObject {
   private static nextCourseId = 1
   private _courses: Course[] = []
 
-  @cached get courses(): readonly Course[] { return this._courses }
+  get courses(): readonly Course[] { return this._courses }
 
   @transaction @monitor(TasksRepository.monitor)
   async create(task: Task): Promise<void> {
@@ -58,7 +58,7 @@ export class TasksRepository extends ObservableObject {
   }
 
   @reaction @monitor(TasksRepository.monitor)
-  private async init_tasks(): Promise<void> {
+  private async tasks_fetched_from_api(): Promise<void> {
     const course1 = new Course(TasksRepository.nextCourseId++, "СПП")
     course1.tasks = [
       new Task(TasksRepository.nextTaskId++, course1, "Task 1", "Task 1"),

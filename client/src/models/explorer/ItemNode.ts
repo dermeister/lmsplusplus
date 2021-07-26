@@ -1,11 +1,11 @@
-import { cached, transaction } from "reactronic"
+import { transaction } from "reactronic"
 import { Node } from "./Node"
 import { NodeVisitor } from "./NodeVisitor"
 
 export class ItemNode<T> extends Node {
   private _item: T
 
-  @cached get item(): T { return this._item }
+  get item(): T { return this._item }
 
   constructor(title: string, key: string, value: T) {
     super(title, key)

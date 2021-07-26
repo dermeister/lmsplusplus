@@ -1,5 +1,5 @@
 import * as monaco from "monaco-editor"
-import { cached, Transaction, transaction, unobservable } from "reactronic"
+import { Transaction, transaction, unobservable } from "reactronic"
 import { Course } from "../../domain/Course"
 import { Task } from "../../domain/Task"
 import { ObservableObject } from "../../ObservableObject"
@@ -20,9 +20,9 @@ export class TaskEditor extends ObservableObject {
   @unobservable private readonly _description: monaco.editor.ITextModel
   private _editResult: ConfirmedResult | CanceledResult | null = null
 
-  @cached get editResult(): ConfirmedResult | CanceledResult | null { return this._editResult }
-  @cached get title(): string { return this._title }
-  @cached get description(): monaco.editor.ITextModel { return this._description }
+  get editResult(): ConfirmedResult | CanceledResult | null { return this._editResult }
+  get title(): string { return this._title }
+  get description(): monaco.editor.ITextModel { return this._description }
 
   constructor(task: Task) {
     super()

@@ -1,7 +1,7 @@
-import { ObservableObject, Transaction } from "reactronic"
+export class User {
+  static readonly default = User.createDefaultUser()
 
-export class User extends ObservableObject {
-  static deserialize(serializedUser: string): User {
-    return Transaction.run(() => new User())
-  }
+  static deserialize(serializedUser: string): User { return new User() }
+
+  private static createDefaultUser(): User { return new User() }
 }

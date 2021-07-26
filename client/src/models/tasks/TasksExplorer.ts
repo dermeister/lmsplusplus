@@ -1,4 +1,4 @@
-import { cached, Transaction, transaction, unobservable } from "reactronic"
+import { Transaction, transaction, unobservable } from "reactronic"
 import { Course } from "../../domain/Course"
 import { Task } from "../../domain/Task"
 import { Explorer } from "../explorer/Explorer"
@@ -8,7 +8,7 @@ import { ItemNode } from "../explorer/ItemNode"
 export class CourseNode extends GroupNode {
   @unobservable readonly item: Course
 
-  @cached get taskNodes(): readonly ItemNode<Task>[] { return this.children as readonly ItemNode<Task>[] }
+  override get children(): readonly ItemNode<Task>[] { return super.children as readonly ItemNode<Task>[] }
 
   constructor(title: string, course: Course, children: readonly ItemNode<Task>[]) {
     super(title, `course-${course.id}`, children)
@@ -21,11 +21,11 @@ export class TasksExplorer extends Explorer<Task> {
   private _taskToEdit: Task | null = null
   private _taskToDelete: Task | null = null
 
-  @cached get courseNodes(): readonly CourseNode[] { return this.children as readonly CourseNode[] }
-  @cached get selectedTask(): Task | null { return this.selectedNode?.item ?? null }
-  @cached get courseToCreateTaskIn(): Course | null { return this._courseToCreateTaskIn }
-  @cached get taskToEdit(): Task | null { return this._taskToEdit }
-  @cached get taskToDelete(): Task | null { return this._taskToDelete }
+  override get children(): readonly CourseNode[] { return super.children as readonly CourseNode[] }
+  get selectedTask(): Task | null { return this.selectedNode?.item ?? null }
+  get courseToCreateTaskIn(): Course | null { return this._courseToCreateTaskIn }
+  get taskToEdit(): Task | null { return this._taskToEdit }
+  get taskToDelete(): Task | null { return this._taskToDelete }
 
   constructor(courses: readonly Course[]) { super(TasksExplorer.createCourseNodes(courses)) }
 

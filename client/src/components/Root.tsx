@@ -19,7 +19,7 @@ export function Root({ model }: RootProps): JSX.Element {
 }
 
 function content(model: models.Root): JSX.Element {
-  if (!model.auth.user)
+  if (model.app)
     return <AppScreen model={model.app} />
   else
     return <SignInScreen model={model.signIn} />

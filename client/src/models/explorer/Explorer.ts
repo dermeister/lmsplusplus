@@ -1,4 +1,4 @@
-import { cached, transaction, Transaction, unobservable } from "reactronic"
+import { transaction, Transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import { ExplorerReconciler } from "./ExplorerReconciler"
 import { GroupNode } from "./GroupNode"
@@ -19,8 +19,8 @@ export abstract class Explorer<T> extends ObservableObject {
   @unobservable private readonly reconciler: ExplorerReconciler<this, T> = new ExplorerReconciler(this)
   private _selectedNode: ItemNode<T> | null = null
 
-  @cached get selectedNode(): ItemNode<T> | null { return this._selectedNode }
-  @cached protected get children(): readonly Node[] { return this.root.children }
+  get selectedNode(): ItemNode<T> | null { return this._selectedNode }
+  protected get children(): readonly Node[] { return this.root.children }
 
   constructor(children: readonly Node[] = []) {
     super()

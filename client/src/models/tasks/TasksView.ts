@@ -1,4 +1,4 @@
-import { cached, Monitor, reaction, standalone, throttling, Transaction, unobservable } from "reactronic"
+import { Monitor, reaction, standalone, throttling, Transaction, unobservable } from "reactronic"
 import { Task } from "../../domain/Task"
 import { ObservableObject } from "../../ObservableObject"
 import { TasksRepository } from "../../repositories/TasksRepository"
@@ -15,8 +15,8 @@ export class TasksView extends ObservableObject {
   private taskEditorToDispose: TaskEditor | null = null
 
   get monitor(): Monitor { return TasksRepository.monitor }
-  @cached get taskEditor(): TaskEditor | null { return this._taskEditor }
-  @cached get selectedTask(): Task | null { return this.explorer.selectedTask }
+  get taskEditor(): TaskEditor | null { return this._taskEditor }
+  get selectedTask(): Task | null { return this.explorer.selectedTask }
 
   override dispose(): void {
     Transaction.run(() => {
@@ -57,8 +57,10 @@ export class TasksView extends ObservableObject {
   private async task_deleted_on_taskToDelete(): Promise<void> {
     const { taskToDelete } = this.explorer
     if (taskToDelete) {
-      await this.tasksRepository.delete(taskToDelete)
-      this.explorer.setTaskToDelete(null)
+      await standalone(Transaction.run, async () => {
+        await this.tasksRepository.delete(taskToDelete)
+        this.explorer.setTaskToDelete(null)
+      })
     }
   }
 
@@ -71,18 +73,20 @@ export class TasksView extends ObservableObject {
   @reaction
   private async task_persisted_in_repository_on_taskEditor_editResult(): Promise<void> {
     const editResult = this._taskEditor?.editResult
-    switch (editResult?.status) {
-      case "saved":
-        if (this.explorer.courseToCreateTaskIn)
-          await this.tasksRepository.create(editResult.task)
-        else if (this.explorer.taskToEdit)
-          await this.tasksRepository.update(editResult.task)
-        this.resetCourseToCreateTaskInAndTaskToEdit()
-        break
-      case "canceled":
-        this.resetCourseToCreateTaskInAndTaskToEdit()
-        break
-    }
+    await standalone(Transaction.run, async () => {
+      switch (editResult?.status) {
+        case "saved":
+          if (this.explorer.courseToCreateTaskIn)
+            await this.tasksRepository.create(editResult.task)
+          else if (this.explorer.taskToEdit)
+            await this.tasksRepository.update(editResult.task)
+          this.resetCourseToCreateTaskInAndTaskToEdit()
+          break
+        case "canceled":
+          this.resetCourseToCreateTaskInAndTaskToEdit()
+          break
+      }
+    })
   }
 
   @reaction @throttling(0)

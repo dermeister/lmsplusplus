@@ -1,4 +1,4 @@
-import { cached, reaction, standalone, transaction } from "reactronic"
+import { reaction, standalone, transaction } from "reactronic"
 import { User } from "../domain/User"
 import { ObservableObject } from "../ObservableObject"
 
@@ -6,7 +6,7 @@ export class Auth extends ObservableObject {
   private _user: User | null = null
   private readonly localStorageKey: string
 
-  @cached get user(): User | null { return this._user }
+  get user(): User | null { return this._user }
 
   constructor(localStorageKey: string) {
     super()

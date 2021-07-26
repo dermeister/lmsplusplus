@@ -11,7 +11,7 @@ interface TasksExplorerProps {
 
 export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
   return autorender(() => (
-    <Explorer model={model}>{courses(model, model.courseNodes)}</Explorer>
+    <Explorer model={model}>{courses(model, model.children)}</Explorer>
   ), [model])
 }
 
@@ -43,7 +43,7 @@ function courses(explorer: models.TasksExplorer, courses: readonly models.Course
         </ContextMenu>
       </Explorer.Group>
 
-      <Explorer.Children group={course}>{tasks(explorer, course.taskNodes)}</Explorer.Children>
+      <Explorer.Children group={course}>{tasks(explorer, course.children)}</Explorer.Children>
     </li>
   ))
 }

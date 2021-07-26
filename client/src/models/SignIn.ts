@@ -1,4 +1,4 @@
-import { cached, transaction, unobservable } from "reactronic"
+import { transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
 import { Auth } from "../services/Auth"
 
@@ -8,9 +8,9 @@ export class SignIn extends ObservableObject {
   private _password = ""
   private _error = false
 
-  @cached get login(): string { return this._login }
-  @cached get password(): string { return this._password }
-  @cached get error(): boolean { return this._error }
+  get login(): string { return this._login }
+  get password(): string { return this._password }
+  get error(): boolean { return this._error }
 
   constructor(auth: Auth) {
     super()

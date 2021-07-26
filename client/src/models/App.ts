@@ -1,4 +1,4 @@
-import { cached, reaction, transaction, Transaction, unobservable } from "reactronic"
+import { reaction, transaction, Transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
 import { TasksView } from "./tasks/TasksView"
 import { DemoView } from "./views/DemoView"
@@ -14,7 +14,7 @@ export class App extends ObservableObject {
   @unobservable readonly options = new OptionsView()
   private _active: View = this.tasks
 
-  @cached get activeView(): View { return this._active }
+  get activeView(): View { return this._active }
 
   @transaction
   setActiveView(view: View): void { this._active = view }

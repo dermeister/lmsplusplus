@@ -1,4 +1,4 @@
-import { cached, transaction, Transaction, unobservable } from "reactronic"
+import { transaction, Transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import { ContextMenu } from "../ContextMenu"
 import { NodeVisitor } from "./NodeVisitor"
@@ -8,7 +8,7 @@ export abstract class Node extends ObservableObject {
   @unobservable readonly contextMenu = new ContextMenu()
   private _title: string
 
-  @cached get title(): string { return this._title }
+  get title(): string { return this._title }
 
   constructor(title: string, key: string) {
     super()

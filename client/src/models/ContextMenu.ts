@@ -1,4 +1,4 @@
-import { cached, transaction } from "reactronic"
+import { transaction } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
 
 export class ContextMenu extends ObservableObject {
@@ -6,9 +6,9 @@ export class ContextMenu extends ObservableObject {
   private _y = 0
   private _isOpened = false
 
-  @cached get x(): number { return this._x }
-  @cached get y(): number { return this._y }
-  @cached get isOpened(): boolean { return this._isOpened }
+  get x(): number { return this._x }
+  get y(): number { return this._y }
+  get isOpened(): boolean { return this._isOpened }
 
   @transaction
   open(x: number, y: number): void {
