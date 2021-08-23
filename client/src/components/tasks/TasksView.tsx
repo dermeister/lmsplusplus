@@ -14,22 +14,22 @@ interface TasksViewProps {
 export function TasksView({ model }: TasksViewProps): JSX.Element {
   function mainPanel(): JSX.Element {
     let content: JSX.Element
-    if (model.taskEditor)
-      content = <MonacoEditor model={model.taskEditor.description} />
+    if (model.explorer.taskEditor)
+      content = <MonacoEditor model={model.explorer.taskEditor.description} />
     else
       content = (
         <div className={styles.description}>
-          {model.selectedTask?.description ?? "No task"}
+          {model.explorer.selectedTask?.description ?? "No task"}
         </div>
       )
     return <AppScreen.MainPanel>{content}</AppScreen.MainPanel>
   }
 
   function rightPanel(): JSX.Element | undefined {
-    if (model.taskEditor)
+    if (model.explorer.taskEditor)
       return (
         <AppScreen.RightPanel model={model.rightPanel}>
-          <TaskEditor model={model.taskEditor} />
+          <TaskEditor model={model.explorer.taskEditor} />
         </AppScreen.RightPanel>
       )
   }

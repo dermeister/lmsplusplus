@@ -1,9 +1,17 @@
-import { Transaction, transaction, unobservable } from "reactronic"
+import {
+  reaction,
+  Reentrance,
+  reentrance,
+  standalone,
+  throttling,
+  Transaction,
+  transaction,
+  unobservable
+} from "reactronic"
 import { Course } from "../../domain/Course"
 import { Task } from "../../domain/Task"
-import { Explorer } from "../explorer/Explorer"
-import { GroupNode } from "../explorer/GroupNode"
-import { ItemNode } from "../explorer/ItemNode"
+import { Explorer, GroupNode, ItemNode } from "../explorer"
+import { TaskEditor } from "./TaskEditor"
 
 export class CourseNode extends GroupNode {
   @unobservable readonly item: Course
@@ -17,58 +25,84 @@ export class CourseNode extends GroupNode {
 }
 
 export class TasksExplorer extends Explorer<Task> {
-  private _courseToCreateTaskIn: Course | null = null
-  private _taskToEdit: Task | null = null
-  private _taskToDelete: Task | null = null
+  private _deletedTask: Task | null = null
+  private _taskEditor: TaskEditor | null = null
+  private _editedTask: Task | null = null
+  private taskEditorToBeDisposed: TaskEditor | null = null
 
   override get children(): readonly CourseNode[] { return super.children as readonly CourseNode[] }
   get selectedTask(): Task | null { return this.selectedNode?.item ?? null }
-  get courseToCreateTaskIn(): Course | null { return this._courseToCreateTaskIn }
-  get taskToEdit(): Task | null { return this._taskToEdit }
-  get taskToDelete(): Task | null { return this._taskToDelete }
+  get taskEditor(): TaskEditor | null { return this._taskEditor }
+  get editedTask(): Task | null { return this._editedTask }
+  get deletedTask(): Task | null { return this._deletedTask }
 
   constructor(courses: readonly Course[]) { super(TasksExplorer.createCourseNodes(courses)) }
 
   @transaction
   updateCourses(courses: readonly Course[]): void {
     this.updateExplorer(TasksExplorer.createCourseNodes(courses))
-    this._courseToCreateTaskIn = null
-    this._taskToEdit = null
-    this._taskToDelete = null
   }
 
   @transaction
-  setCourseToCreateTaskIn(course: Course | null): void {
-    this._taskToEdit = null
-    this._taskToDelete = null
-    this._courseToCreateTaskIn = course
+  createTask(course: Course): void {
+    if (this._taskEditor != null)
+      throw new Error("Task already being edited")
+    const task = new Task(Task.NO_ID, course, "", "")
+    this._taskEditor = new TaskEditor(task)
   }
 
   @transaction
-  setTaskToEdit(task: Task | null): void {
-    this._courseToCreateTaskIn = null
-    this._taskToDelete = null
-    this._taskToEdit = task
+  updateTask(task: Task): void {
+    if (this._taskEditor != null)
+      throw new Error("Task already being edited")
+    this._taskEditor = new TaskEditor(task)
   }
 
   @transaction
-  setTaskToDelete(task: Task | null): void {
-    this._courseToCreateTaskIn = null
-    this._taskToEdit = null
-    this._taskToDelete = task
+  deleteTask(task: Task): void {
+    this._deletedTask = task
+    // Here _deletedTask must be reset to null,
+    // but can only be done when reactions are run in same transaction
   }
 
   private static createCourseNodes(courses: readonly Course[]): readonly CourseNode[] {
-    const courseNodes = Transaction.run(() => {
+    return Transaction.run(() => {
       return courses.map(c => new CourseNode(c.name, c, TasksExplorer.createTaskNodes(c.tasks)))
     })
-    return courseNodes
   }
 
   private static createTaskNodes(tasks: readonly Task[]): readonly ItemNode<Task>[] {
-    const taskNodes = Transaction.run(() => {
-      return tasks.map(t => new ItemNode(t.title, `task-${t.id}`, t))
-    })
-    return taskNodes
+    return Transaction.run(() => tasks.map(t => new ItemNode(t.title, `task-${t.id}`, t)))
+  }
+
+  @transaction @reentrance(Reentrance.WaitAndRestart)
+  private setTaskToDelete(task: Task | null): void { this._deletedTask = task }
+
+  @reaction
+  private taskEditor_editResult_propagated(): void {
+    const editResult = this._taskEditor?.editResult
+    switch (editResult?.status) {
+      case "saved":
+        this._editedTask = editResult.task
+        this.markCurrentTaskEditorToBeDisposed()
+        // Here _editedTask must be reset to null,
+        // but can only be done when reactions are run in same transaction
+        break
+      case "canceled":
+        this.markCurrentTaskEditorToBeDisposed()
+        break
+    }
+  }
+
+  private markCurrentTaskEditorToBeDisposed(): void { this.taskEditorToBeDisposed = this._taskEditor }
+
+  @reaction @throttling(0)
+  private taskEditorToBeDisposed_disposed(): void {
+    if (this.taskEditorToBeDisposed)
+      standalone(Transaction.run, () => {
+        this.taskEditorToBeDisposed?.dispose()
+        this.taskEditorToBeDisposed = null
+        this._taskEditor = null
+      })
   }
 }

@@ -1,4 +1,4 @@
-import { reaction, standalone, Transaction, unobservable } from "reactronic"
+import { reaction, Transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
 import { Auth } from "../services/Auth"
 import { App } from "./App"
@@ -23,11 +23,13 @@ export class Root extends ObservableObject {
 
   @reaction
   private app_created_on_signed_in_and_disposed_on_sign_out(): void {
-    if (this.auth.user)
-      standalone(Transaction.run, () => this._app = new App())
-    else {
-      this._app?.dispose()
-      this._app = null
-    }
+    Transaction.run(() => {
+      if (this.auth.user)
+        this._app = new App()
+      else {
+        this._app?.dispose()
+        this._app = null
+      }
+    })
   }
 }

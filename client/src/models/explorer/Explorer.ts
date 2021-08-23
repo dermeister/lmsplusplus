@@ -22,7 +22,7 @@ export abstract class Explorer<T> extends ObservableObject {
   get selectedNode(): ItemNode<T> | null { return this._selectedNode }
   protected get children(): readonly Node[] { return this.root.children }
 
-  constructor(children: readonly Node[] = []) {
+  protected constructor(children: readonly Node[] = []) {
     super()
     this.root = new ExplorerRootNode(children)
     this.reconciler.reconcile(children)

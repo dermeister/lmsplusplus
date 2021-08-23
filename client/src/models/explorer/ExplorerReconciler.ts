@@ -75,8 +75,7 @@ export class ExplorerReconciler<T extends Explorer<K>, K> extends NodeVisitor {
   private nodesToDispose_disposed(): void {
     if (this.nodesToDispose.length > 0)
       standalone(Transaction.run, () => {
-        for (const node of this.nodesToDispose)
-          node.dispose()
+        this.nodesToDispose.forEach(n => n.dispose())
         this.nodesToDispose = []
       })
   }

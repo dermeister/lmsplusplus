@@ -1,6 +1,7 @@
 import { reaction, transaction, Transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
-import { TasksView } from "./tasks/TasksView"
+import { Database } from "../repositories"
+import { TasksView } from "./tasks"
 import { DemoView } from "./views/DemoView"
 import { OptionsView } from "./views/OptionsView"
 import { SolutionsView } from "./views/SolutionsView"
@@ -8,16 +9,20 @@ import { SolutionsView } from "./views/SolutionsView"
 export type View = TasksView | DemoView | SolutionsView | OptionsView
 
 export class App extends ObservableObject {
-  @unobservable readonly tasks = new TasksView()
+  @unobservable readonly tasks: TasksView
   @unobservable readonly solutions = new SolutionsView()
   @unobservable readonly demo = new DemoView()
   @unobservable readonly options = new OptionsView()
-  private _active: View = this.tasks
+  @unobservable private readonly database = new Database()
+  private _activeView: View
 
-  get activeView(): View { return this._active }
+  get activeView(): View { return this._activeView }
 
-  @transaction
-  setActiveView(view: View): void { this._active = view }
+  constructor() {
+    super()
+    this.tasks = new TasksView(this.database.tasksRepository)
+    this._activeView = this.tasks
+  }
 
   override dispose(): void {
     Transaction.run(() => {
@@ -28,12 +33,32 @@ export class App extends ObservableObject {
     })
   }
 
+  @transaction setActiveView(view: View): void { this._activeView = view }
+
+  @reaction
+  private async createdTask_created_in_database(): Promise<void> {
+    if (this.tasks.createdTask)
+      await this.database.createTask(this.tasks.createdTask)
+  }
+
+  @reaction
+  private async updatedTask_updated_in_database(): Promise<void> {
+    if (this.tasks.updatedTask)
+      await this.database.updateTask(this.tasks.updatedTask)
+  }
+
+  @reaction
+  private async deletedTask_deleted_from_database(): Promise<void> {
+    if (this.tasks.deletedTask)
+      await this.database.deleteTask(this.tasks.deletedTask)
+  }
+
   @reaction
   private all_left_panels_in_same_state_as_active(): void {
     const leftPanelsExceptActive = [this.tasks, this.solutions, this.demo, this.options]
-      .filter(v => v !== this._active)
+      .filter(v => v !== this._activeView)
       .map(v => v.leftPanel)
     for (const leftPanel of leftPanelsExceptActive)
-      this._active.leftPanel.isOpened ? leftPanel.open() : leftPanel.close()
+      this._activeView.leftPanel.isOpened ? leftPanel.open() : leftPanel.close()
   }
 }
