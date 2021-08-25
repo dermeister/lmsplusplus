@@ -1,5 +1,4 @@
 import React from "react"
-import { FaChevronRight } from "react-icons/fa"
 import * as models from "../../models"
 import { autorender } from "../autorender"
 import { useContextMenu } from "../WindowManager"
@@ -24,18 +23,17 @@ export function Group({ group, children }: GroupProps): JSX.Element {
     <p
       onClick={onClick}
       onContextMenu={onContextMenu}
-      className={buildNodeClassName(group)}
+      className={buildGroupClassName(group)}
       style={{ paddingLeft: offset }}
     >
-      {arrow(group)}
       {children}
     </p>
   ), [group, children])
 }
 
-function arrow(group: models.GroupNode): JSX.Element {
-  let className = styles.arrow
+function buildGroupClassName(group: models.GroupNode): string {
+  let result = ` ${buildNodeClassName(group)} ${styles.group}`
   if (group.isOpened)
-    className += ` ${styles.arrowOpened}`
-  return <FaChevronRight size={10} className={className} />
+    result += ` ${styles.groupOpened}`
+  return result
 }

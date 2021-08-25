@@ -1,5 +1,4 @@
 import React from "react"
-import { FaTimes } from "react-icons/fa"
 import * as models from "../models"
 import { autorender } from "./autorender"
 import { Button } from "./Button"
@@ -27,7 +26,7 @@ export function SidePanel(props: SidePanelProps): JSX.Element {
         <div className={buildPanelClassName(panelClassName)}>
           <header className={buildHeaderClassName(pulsing)}>
             <h2 className={styles.title}>{model.title}</h2>
-            <button onClick={() => model.close()} className={styles.close}><FaTimes /></button>
+            <button onClick={() => model.close()} className={styles.close} />
           </header>
 
           {children}

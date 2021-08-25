@@ -20,6 +20,29 @@
   }
 }
 
+@mixin view-button-image($url) {
+  background-image: url($url);
+  background-repeat: no-repeat;
+  background-size: 26px;
+  background-position: center;
+}
+
+.tasks {
+  @include view-button-image("../assets/tasks.svg");
+}
+
+.solutions {
+  @include view-button-image("../assets/code.svg");
+}
+
+.demo {
+  @include view-button-image("../assets/desktop.svg");
+}
+
+.options {
+  @include view-button-image("../assets/cog.svg");
+}
+
 .selected {
   transform-origin: center center;
   animation: rotate 0.3s ease-in-out;

@@ -29,13 +29,27 @@
   background-color: var(--app-secondary-background-color-hover);
 }
 
-.arrow {
-  margin-right: 6px;
+.group {
+  display: flex;
 
-  transition: transform 0.15s;
+  &::before {
+    content: "";
+
+    display: block;
+    margin-left: 2px;
+    margin-right: 6px;
+    margin-top: 3px;
+    width: 5px;
+    height: 9px;
+
+    background: url("../../assets/chevron-right.svg") no-repeat;
+    background-size: 6px;
+
+    transition: transform 0.15s;
+  }
 }
 
-.arrow-opened {
+.group-opened::before {
   transform: rotate(90deg);
 }
 

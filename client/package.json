@@ -12,7 +12,6 @@
     "monaco-editor": "^0.26.1",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
-    "react-icons": "^4.2.0",
     "reactronic": "^0.21.512"
   },
   "devDependencies": {
