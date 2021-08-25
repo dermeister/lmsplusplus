@@ -1,36 +1,41 @@
+import { transaction, unobservable } from "reactronic";
 import { Preferences } from "../../domain/Preferences"
 import { Account, Provider, VscConfiguration } from "../../domain/VscConfiguration"
-import { Database, PreferencesRepository, VscConfigurationRepository } from "../../repositories"
+import { ObservableObject } from "../../ObservableObject";
+import { PreferencesRepository, VscConfigurationRepository } from "../../repositories"
 
-export class Options {
-  private readonly preferencesRepository: PreferencesRepository
-  private readonly vscConfigurationRepository: VscConfigurationRepository
-  private readonly database: Database
+export class Options extends ObservableObject {
+  @unobservable private readonly preferencesRepository: PreferencesRepository
+  @unobservable private readonly vscConfigurationRepository: VscConfigurationRepository
+  private _updatedPreferences: Preferences | null = null
+  private _updatedVcsConfiguration: VscConfiguration | null = null
 
   get darkMode(): boolean { return this.preferencesRepository.preferences.darkMode }
   get vscProviders(): readonly Provider[] { return this.vscConfigurationRepository.configuration.providers }
   get vscAccounts(): readonly Account[] { return this.vscConfigurationRepository.configuration.accounts }
+  get updatedPreferences(): Preferences | null { return this._updatedPreferences }
+  get updatedVcsConfiguration(): VscConfiguration | null { return this._updatedVcsConfiguration }
 
-  constructor(database: Database) {
-    this.database = database
-    this.preferencesRepository = this.database.preferencesRepository
-    this.vscConfigurationRepository = this.database.vsConfigurationRepository
+  constructor(preferences: PreferencesRepository, vscConfiguration: VscConfigurationRepository) {
+    super()
+    this.preferencesRepository = preferences
+    this.vscConfigurationRepository = vscConfiguration
   }
 
-  async setDarkMode(value: boolean): Promise<void> {
-    const preferences = new Preferences(value)
-    await this.database.updatePreferences(preferences)
+  @transaction
+  setDarkMode(darkMode: boolean): void {
+    this._updatedPreferences = new Preferences(darkMode)
   }
 
-  async setVcsProviders(providers: readonly Provider[]): Promise<void> {
+  @transaction
+  setVcsProviders(providers: readonly Provider[]): void {
     const { accounts } = this.vscConfigurationRepository.configuration
-    const vscConfiguration = new VscConfiguration(providers, accounts)
-    await this.database.updateVscConfiguration(vscConfiguration)
+    this._updatedVcsConfiguration = new VscConfiguration(providers, accounts)
   }
 
-  async setVcsAccounts(accounts: readonly Account[]): Promise<void> {
+  @transaction
+  setVcsAccounts(accounts: readonly Account[]): void {
     const { providers } = this.vscConfigurationRepository.configuration
-    const vscConfiguration = new VscConfiguration(providers, accounts)
-    await this.database.updateVscConfiguration(vscConfiguration)
+    this._updatedVcsConfiguration = new VscConfiguration(providers, accounts)
   }
 }

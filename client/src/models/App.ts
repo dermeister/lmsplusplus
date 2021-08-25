@@ -22,7 +22,7 @@ export class App extends ObservableObject {
   constructor() {
     super()
     this.tasksView = new TasksView(this.database.tasksRepository)
-    this.options = new Options(this.database)
+    this.options = new Options(this.database.preferencesRepository, this.database.vscConfigurationRepository)
     this.optionsView = new OptionsView(this.options)
     this._activeView = this.optionsView
   }
@@ -57,6 +57,18 @@ export class App extends ObservableObject {
   private async deletedTask_deleted_from_database(): Promise<void> {
     if (this.tasksView.deletedTask)
       await this.database.deleteTask(this.tasksView.deletedTask)
+  }
+
+  @reaction
+  async updatedPreferences_updated_in_database(): Promise<void> {
+    if (this.options.updatedPreferences)
+      await this.database.updatePreferences(this.options.updatedPreferences)
+  }
+
+  @reaction
+  async updatedVcsConfiguration_updated_in_database(): Promise<void> {
+    if (this.options.updatedVcsConfiguration)
+      await this.database.updateVscConfiguration(this.options.updatedVcsConfiguration)
   }
 
   @reaction

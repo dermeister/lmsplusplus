@@ -12,7 +12,7 @@ export class Database {
 
   get tasksRepository(): TasksRepository { return this._tasksRepository }
   get preferencesRepository(): PreferencesRepository { return this._preferencesRepository }
-  get vsConfigurationRepository(): VscConfigurationRepository { return this._vscConfigurationRepository }
+  get vscConfigurationRepository(): VscConfigurationRepository { return this._vscConfigurationRepository }
 
   async createTask(task: Task): Promise<void> {
     await this._tasksRepository.create(task)
