@@ -5,11 +5,12 @@ import styles from "./OptionCategories.module.scss"
 
 interface OptionCategoriesProps {
   model: models.OptionCategories
+  className?: string
 }
 
-export function OptionCategories({ model }: OptionCategoriesProps): JSX.Element {
+export function OptionCategories({ model, className }: OptionCategoriesProps): JSX.Element {
   return autorender(() => (
-    <ul className={styles.categories}>
+    <ul className={buildCategoriesClassName(className)}>
       {optionCategory(model, models.OptionCategory.Vsc, "VSC")}
       {optionCategory(model, models.OptionCategory.Preferences, "Preferences")}
     </ul>
@@ -17,14 +18,21 @@ export function OptionCategories({ model }: OptionCategoriesProps): JSX.Element 
 }
 
 function optionCategory(model: models.OptionCategories,
-                        category: models.OptionCategory,
-                        text: string): JSX.Element {
+  category: models.OptionCategory,
+  text: string): JSX.Element {
   const isSelected = model.currentCategory === category
   return (
     <li onClick={() => model.setCurrentItem(category)} className={buildCategoryClassName(isSelected)}>
       {text}
     </li>
   )
+}
+
+function buildCategoriesClassName(className?: string): string {
+  let result = styles.categories
+  if (className)
+    result += ` ${className}`
+  return result
 }
 
 function buildCategoryClassName(isSelected: boolean): string {

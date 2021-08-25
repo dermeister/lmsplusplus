@@ -29,7 +29,9 @@ export class Auth extends ObservableObject {
   }
 
   @transaction
-  signOut(): void { this._user = null }
+  signOut(): void {
+    this._user = null
+  }
 
   @reaction
   private localStorage_contains_current_user(): void {

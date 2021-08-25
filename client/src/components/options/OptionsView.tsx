@@ -2,7 +2,9 @@ import React from "react"
 import * as models from "../../models"
 import { OptionCategory } from "../../models"
 import { AppScreen } from "../AppScreen"
+import { useAuth } from "../auth"
 import { autorender } from "../autorender"
+import { Button } from "../Button"
 import { Dropdown } from "../Dropdown"
 import { Field } from "../Field"
 import { OptionCategories } from "./OptionCategories"
@@ -13,10 +15,15 @@ interface OptionsViewProps {
 }
 
 export function OptionsView({ model }: OptionsViewProps): JSX.Element {
+  const auth = useAuth()
+
   return autorender(() => (
     <>
       <AppScreen.LeftPanel model={model.leftPanel}>
-        <OptionCategories model={model.categories} />
+        <OptionCategories model={model.categories} className={styles.categories} />
+        <Button variant="danger" onClick={() => auth.signOut()} className={styles.signOut}>
+          Sign out
+        </Button>
       </AppScreen.LeftPanel>
       <AppScreen.MainPanel>{content(model)}</AppScreen.MainPanel>
     </>

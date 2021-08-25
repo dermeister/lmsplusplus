@@ -1,8 +1,13 @@
 .preview, .option {
   background-color: var(--app-secondary-background-color);
 
+  overflow: hidden;
+
+  color: var(--app-primary-text-color);
   font-size: var(--app-font-size-regular);
   user-select: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 
   cursor: pointer;
 
@@ -12,17 +17,19 @@
 }
 
 .preview {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding: 3px 16px 3px 3px;
 
-  padding: 3px;
+  background-image: url("../assets/chevron-down.svg");
+  background-repeat: no-repeat;
+  background-size: 9px;
+  background-position: calc(100% - 4px) 6px;
 }
 
 .dropdown-opened .preview {
-  padding: 2px;
+  padding: 2px 15px 2px 2px;
 
   border: 1px solid var(--dropdown-border-color);
+  background-position: calc(100% - 3px) 5px;
 }
 
 .option {

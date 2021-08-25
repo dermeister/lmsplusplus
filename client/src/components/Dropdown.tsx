@@ -1,7 +1,6 @@
 import React, { useState } from "react"
 import styles from "./Dropdown.module.scss"
 import { Overlay } from "./Overlay"
-import { FaChevronDown } from "react-icons/fa"
 
 interface DropdownProps {
   active: string
@@ -15,12 +14,7 @@ export function Dropdown(props: DropdownProps): JSX.Element {
   const [isOpened, setIsOpened] = useState(false)
 
   function preview(): JSX.Element {
-    return (
-      <div onClick={() => setIsOpened(!isOpened)} className={styles.preview}>
-        {active}
-        <FaChevronDown size={10} className={styles.arrow} />
-      </div>
-    )
+    return <div onClick={() => setIsOpened(!isOpened)} className={styles.preview}>{active}</div>
   }
 
   function onChange(option: string): void {

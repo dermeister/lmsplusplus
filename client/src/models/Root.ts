@@ -1,6 +1,6 @@
-import { reaction, Transaction, unobservable } from "reactronic"
+import { reaction, transaction, Transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
-import { Auth } from "../services/Auth"
+import { Auth } from "../services"
 import { App } from "./App"
 import { SignIn } from "./SignIn"
 import { WindowManager } from "./WindowManager"
@@ -18,18 +18,23 @@ export class Root extends ObservableObject {
       this.auth.dispose()
       this.signIn.dispose()
       this.app?.dispose()
+      super.dispose()
     })
   }
 
   @reaction
-  private app_created_on_signed_in_and_disposed_on_sign_out(): void {
-    Transaction.run(() => {
-      if (this.auth.user)
-        this._app = new App()
-      else {
-        this._app?.dispose()
-        this._app = null
-      }
-    })
+  private app_created_on_sign_in_and_disposed_on_sign_out(): void {
+    this.auth.user ? this.createApp() : this.disposeApp()
+  }
+
+  @transaction
+  private createApp(): void {
+    this._app = new App()
+  }
+
+  @transaction
+  private disposeApp(): void {
+    this._app?.dispose()
+    this._app = null
   }
 }

@@ -1,7 +1,7 @@
-import { transaction, unobservable } from "reactronic";
+import { transaction, unobservable } from "reactronic"
 import { Preferences } from "../../domain/Preferences"
 import { Account, Provider, VcsConfiguration } from "../../domain/VcsConfiguration"
-import { ObservableObject } from "../../ObservableObject";
+import { ObservableObject } from "../../ObservableObject"
 import { PreferencesRepository, VscConfigurationRepository } from "../../repositories"
 
 export class Options extends ObservableObject {

@@ -33,6 +33,9 @@ export class App extends ObservableObject {
       this.solutionsView.dispose()
       this.demoView.dispose()
       this.optionsView.dispose()
+      this.options.dispose()
+      this.database.dispose()
+      super.dispose()
     })
   }
 
@@ -60,13 +63,13 @@ export class App extends ObservableObject {
   }
 
   @reaction
-  async updatedPreferences_updated_in_database(): Promise<void> {
+  private async updatedPreferences_updated_in_database(): Promise<void> {
     if (this.options.updatedPreferences)
       await this.database.updatePreferences(this.options.updatedPreferences)
   }
 
   @reaction
-  async updatedVcsConfiguration_updated_in_database(): Promise<void> {
+  private async updatedVcsConfiguration_updated_in_database(): Promise<void> {
     if (this.options.updatedVscConfiguration)
       await this.database.updateVscConfiguration(this.options.updatedVscConfiguration)
   }

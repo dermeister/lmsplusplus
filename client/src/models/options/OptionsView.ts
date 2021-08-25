@@ -1,3 +1,4 @@
+import { Transaction } from "reactronic"
 import { Disposable } from "../../Disposable"
 import { Options } from "./Options"
 import { SidePanel } from "../SidePanel"
@@ -10,5 +11,10 @@ export class OptionsView implements Disposable {
 
   constructor(options: Options) { this.options = options }
 
-  dispose(): void { this.leftPanel.dispose() }
+  dispose(): void {
+    Transaction.run(() => {
+      this.leftPanel.dispose()
+      this.categories.dispose()
+    })
+  }
 }
