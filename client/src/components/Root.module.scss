@@ -46,6 +46,16 @@
 
   /* Dropdown */
   --dropdown-border-color: #1976d2;
+
+  /* Icons */
+  --tasks-icon-url: url("../assets/tasks.svg");
+  --solutions-icon-url: url("../assets/code.svg");
+  --demo-icon-url: url("../assets/desktop.svg");
+  --options-icon-url: url("../assets/cog.svg");
+  --arrow-down-icon-url: url("../assets/chevron-down.svg");
+  --arrow-right-icon-url: url("../assets/chevron-right.svg");
+  --cross-icon-url: url("../assets/times.svg");
+  --cross-hovered-icon-url: url("../assets/times-hovered.svg");
 }
 
 .root {
@@ -53,6 +63,10 @@
 
   width: 100vw;
   height: 100vh;
+
+  color: var(--app-primary-text-color);
+  font-size: var(--app-font-size-regular);
+  user-select: none;
 
   background-color: var(--app-primary-background-color);
 }

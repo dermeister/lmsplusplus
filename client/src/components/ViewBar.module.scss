@@ -21,26 +21,26 @@
 }
 
 @mixin view-button-image($url) {
-  background-image: url($url);
+  background-image: $url;
   background-repeat: no-repeat;
   background-size: 26px;
   background-position: center;
 }
 
 .tasks {
-  @include view-button-image("../assets/tasks.svg");
+  @include view-button-image(var(--tasks-icon-url));
 }
 
 .solutions {
-  @include view-button-image("../assets/code.svg");
+  @include view-button-image(var(--solutions-icon-url));
 }
 
 .demo {
-  @include view-button-image("../assets/desktop.svg");
+  @include view-button-image(var(--demo-icon-url));
 }
 
 .options {
-  @include view-button-image("../assets/cog.svg");
+  @include view-button-image(var(--options-icon-url));
 }
 
 .selected {

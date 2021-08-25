@@ -7,21 +7,19 @@
 
   background-color: var(--app-primary-background-color);
   box-shadow: 0 0 var(--shadow-size) var(--shadow-primary-color);
-
-  color: var(--app-primary-text-color);
 }
 
 .context-menu-button {
   padding: 6px;
   width: 100%;
 
-  background-color: transparent;
-  overflow: hidden;
-
   font-weight: 500;
   text-align: left;
   white-space: nowrap;
   text-overflow: ellipsis;
+
+  background-color: transparent;
+  overflow: hidden;
 
   &:not(:hover) {
     box-shadow: none;

@@ -3,10 +3,10 @@
   width: 280px;
   height: 100%;
 
+  color: var(--app-secondary-text-color);
+
   background-color: var(--app-secondary-background-color);
   box-shadow: 0 0 var(--shadow-size) var(--shadow-primary-color);
-
-  color: var(--app-secondary-text-color);
 }
 
 .header {
@@ -57,26 +57,21 @@
   font-size: var(--app-font-size-regular);
   font-weight: normal;
   text-transform: uppercase;
-  user-select: none;
 }
 
 .close {
   padding: 0;
   width: 16px;
 
-  background: url("../assets/times.svg") transparent no-repeat center;
+  background: var(--cross-icon-url) transparent no-repeat center;
   background-size: 9px;
   border: none;
-
-  color: var(--app-secondary-text-color);
-  text-align: center;
-
-  cursor: pointer;
   outline: none;
 
+  cursor: pointer;
 
   &:hover {
-    background-image: url("../assets/times-hovered.svg");
+    background-image: var(--cross-hovered-icon-url);
   }
 
   &:hover:active {
@@ -90,12 +85,12 @@
 
   padding: 4px 8px;
 
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-
   font-size: var(--app-font-size-small);
   font-weight: normal;
   text-transform: uppercase;
+
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 @mixin side-toggle($side, $rotate) {

@@ -19,6 +19,7 @@ export class TasksRepositoryInternal extends TasksRepository {
   async create(task: Task): Promise<void> {
     await new Promise(r => setTimeout(r, 1000))
 
+    task = new Task(TasksRepositoryInternal.nextTaskId++, task.course, task.title, task.description)
     const courses = this._courses.toMutable()
     const course = courses.find(c => c.id === task.course.id)
     if (course) {

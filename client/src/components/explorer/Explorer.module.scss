@@ -11,14 +11,11 @@
   margin: 0;
   padding: 3px;
 
-  overflow: hidden;
-
-  font-size: var(--app-font-size-regular);
-  user-select: none;
   white-space: nowrap;
   text-overflow: ellipsis;
-
   cursor: pointer;
+
+  overflow: hidden;
 
   &:hover {
     background-color: var(--app-secondary-background-color-hover);
@@ -42,7 +39,7 @@
     width: 5px;
     height: 9px;
 
-    background: url("../../assets/chevron-right.svg") no-repeat;
+    background: var(--arrow-right-icon-url) no-repeat;
     background-size: 6px;
 
     transition: transform 0.15s;

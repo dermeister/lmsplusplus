@@ -4,8 +4,6 @@
   overflow: hidden;
 
   color: var(--app-primary-text-color);
-  font-size: var(--app-font-size-regular);
-  user-select: none;
   white-space: nowrap;
   text-overflow: ellipsis;
 
@@ -19,7 +17,7 @@
 .preview {
   padding: 3px 16px 3px 3px;
 
-  background-image: url("../assets/chevron-down.svg");
+  background-image: var(--arrow-down-icon-url);
   background-repeat: no-repeat;
   background-size: 9px;
   background-position: calc(100% - 4px) 6px;

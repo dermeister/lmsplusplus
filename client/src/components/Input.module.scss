@@ -2,15 +2,13 @@
   border: none;
   border-radius: var(--app-border-radius);
   box-shadow: 0 0 var(--shadow-size) var(--shadow-primary-color);
-
-  font-size: var(--app-font-size-regular);
-
   outline: none;
 }
 
 @mixin input-variant($background-color, $background-color-focus, $text-color) {
-  background-color: $background-color;
   color: $text-color;
+
+  background-color: $background-color;
 
   &:focus {
     background-color: $background-color-focus;
@@ -18,17 +16,13 @@
 }
 
 .primary {
-  @include input-variant(
-    var(--input-primary-background-color),
-    var(--input-primary-background-color-focus),
-    var(--input-primary-text-color)
-  );
+  @include input-variant(var(--input-primary-background-color),
+          var(--input-primary-background-color-focus),
+          var(--input-primary-text-color));
 }
 
 .secondary {
-  @include input-variant(
-    var(--input-secondary-background-color),
-    var(--input-secondary-background-color-focus),
-    var(--input-secondary-text-color)
-  );
+  @include input-variant(var(--input-secondary-background-color),
+          var(--input-secondary-background-color-focus),
+          var(--input-secondary-text-color));
 }

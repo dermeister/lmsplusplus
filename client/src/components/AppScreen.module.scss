@@ -5,6 +5,7 @@
   justify-content: space-between;
 
   width: 100%;
+
   overflow: hidden;
 }
 
@@ -12,8 +13,7 @@
   z-index: 2;
 }
 
-.side-panel,
-.side-panel-toggle {
+.side-panel, .side-panel-toggle {
   z-index: 1;
 }
 
@@ -21,6 +21,4 @@
   flex-grow: 1;
 
   background-color: var(--app-primary-background-color);
-
-  color: var(--app-primary-text-color);
 }
