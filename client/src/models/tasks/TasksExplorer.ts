@@ -1,13 +1,4 @@
-import {
-  reaction,
-  Reentrance,
-  reentrance,
-  standalone,
-  throttling,
-  Transaction,
-  transaction,
-  unobservable
-} from "reactronic"
+import { reaction, throttling, Transaction, transaction, unobservable } from "reactronic"
 import { Course } from "../../domain/Course"
 import { Task } from "../../domain/Task"
 import { Explorer, GroupNode, ItemNode } from "../explorer"
@@ -75,9 +66,6 @@ export class TasksExplorer extends Explorer<Task> {
     return Transaction.run(() => tasks.map(t => new ItemNode(t.title, `task-${t.id}`, t)))
   }
 
-  @transaction @reentrance(Reentrance.WaitAndRestart)
-  private setTaskToDelete(task: Task | null): void { this._deletedTask = task }
-
   @reaction
   private taskEditor_editResult_propagated(): void {
     const editResult = this._taskEditor?.editResult
@@ -94,15 +82,19 @@ export class TasksExplorer extends Explorer<Task> {
     }
   }
 
-  private markCurrentTaskEditorToBeDisposed(): void { this.taskEditorToBeDisposed = this._taskEditor }
+  private markCurrentTaskEditorToBeDisposed(): void {
+    Transaction.runAs({ standalone: true }, () => {
+      this.taskEditorToBeDisposed = this._taskEditor
+      this._taskEditor = null
+    })
+  }
 
   @reaction @throttling(0)
   private taskEditorToBeDisposed_disposed(): void {
     if (this.taskEditorToBeDisposed)
-      standalone(Transaction.run, () => {
+      Transaction.runAs({ standalone: true }, () => {
         this.taskEditorToBeDisposed?.dispose()
         this.taskEditorToBeDisposed = null
-        this._taskEditor = null
       })
   }
 }

@@ -1,0 +1,23 @@
+.categories {
+  margin: 0;
+  padding: 0;
+
+  overflow: hidden;
+
+  list-style: none;
+}
+
+.category {
+  padding: 3px 3px 3px 16px;
+
+  font-size: var(--app-font-size-regular);
+  user-select: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--app-secondary-background-color-hover);
+  }
+}

@@ -31,7 +31,7 @@ export function ContextMenu({ model, children }: ContextMenuProps): JSX.Element 
       return <></>
     else
       return ReactDOM.createPortal(
-        <Overlay onClick={() => model.close()}>
+        <Overlay onClick={() => model.close()} trapFocus>
           <menu ref={positionMenu} onContextMenu={onContextMenu} className={styles.contextMenu}>
             {children}
           </menu>

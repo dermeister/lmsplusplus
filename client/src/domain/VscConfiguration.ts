@@ -1,10 +1,10 @@
-class Provider {
+export class Provider {
   readonly name: string
 
   constructor(name: string) { this.name = name }
 }
 
-class Account {
+export class Account {
   readonly provider: Provider
   readonly username: string
 
@@ -19,14 +19,18 @@ export class VscConfiguration {
   readonly providers: readonly Provider[]
   readonly accounts: readonly Account[]
 
-  constructor() {
+  constructor(providers: readonly Provider[], accounts: readonly Account[]) {
+    this.providers = providers
+    this.accounts = accounts
+  }
+
+  private static createDefaultConfiguration(): VscConfiguration {
     const github = new Provider("GitHub")
     const bitbucket = new Provider("BitBucket")
     const gitlab = new Provider("GitLab")
-    this.providers = [github, bitbucket, gitlab]
+    const providers = [github, bitbucket, gitlab]
     const account = new Account(github, "dermeister")
-    this.accounts = [account]
+    const accounts = [account]
+    return new VscConfiguration(providers, accounts)
   }
-
-  private static createDefaultConfiguration(): VscConfiguration { return new VscConfiguration() }
 }

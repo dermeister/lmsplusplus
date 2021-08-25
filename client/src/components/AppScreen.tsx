@@ -2,11 +2,11 @@ import React from "react"
 import * as models from "../models"
 import styles from "./AppScreen.module.scss"
 import { autorender } from "./autorender"
+import { OptionsView } from "./options/OptionsView"
 import { Side, SidePanel } from "./SidePanel"
 import { TasksView } from "./tasks/TasksView"
 import { ViewBar } from "./ViewBar"
 import { DemoView } from "./views/DemoView"
-import { OptionsView } from "./views/OptionsView"
 import { SolutionsView } from "./views/SolutionsView"
 
 interface AppScreenProps {
@@ -15,14 +15,14 @@ interface AppScreenProps {
 
 function content(model: models.App): JSX.Element | undefined {
   switch (model.activeView) {
-    case model.tasks:
-      return <TasksView model={model.tasks} />
-    case model.solutions:
-      return <SolutionsView model={model.solutions} />
-    case model.demo:
-      return <DemoView model={model.demo} />
-    case model.options:
-      return <OptionsView model={model.options} />
+    case model.tasksView:
+      return <TasksView model={model.tasksView} />
+    case model.solutionsView:
+      return <SolutionsView model={model.solutionsView} />
+    case model.demoView:
+      return <DemoView model={model.demoView} />
+    case model.optionsView:
+      return <OptionsView model={model.optionsView} />
   }
 }
 

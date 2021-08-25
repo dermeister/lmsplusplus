@@ -2,6 +2,7 @@ import React from "react"
 import * as models from "../../models"
 import { autorender } from "../autorender"
 import { Button } from "../Button"
+import { Field } from "../Field"
 import { Input } from "../Input"
 import styles from "./TaskEditor.module.scss"
 
@@ -13,14 +14,15 @@ export function TaskEditor({ model }: TaskEditorProps): JSX.Element {
   return autorender(() => (
     <div className={styles.container}>
       <div>
-        <label className={styles.label} htmlFor="task-title">Title</label>
-        <Input
-          id="task-title"
-          variant="secondary"
-          className={styles.input}
-          value={model.title}
-          onChange={e => model.setTitle(e.target.value)}
-        />
+        <Field label="Title">
+          <Input
+            id="task-title"
+            variant="secondary"
+            className={styles.input}
+            value={model.title}
+            onChange={e => model.setTitle(e.target.value)}
+          />
+        </Field>
       </div>
       <div className={styles.buttons}>
         <Button
@@ -39,6 +41,6 @@ export function TaskEditor({ model }: TaskEditorProps): JSX.Element {
           Cancel
         </Button>
       </div>
-    </div >
+    </div>
   ), [model])
 }

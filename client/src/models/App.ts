@@ -1,18 +1,19 @@
 import { reaction, transaction, Transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
 import { Database } from "../repositories"
+import { Options, OptionsView } from "./options"
 import { TasksView } from "./tasks"
 import { DemoView } from "./views/DemoView"
-import { OptionsView } from "./views/OptionsView"
 import { SolutionsView } from "./views/SolutionsView"
 
 export type View = TasksView | DemoView | SolutionsView | OptionsView
 
 export class App extends ObservableObject {
-  @unobservable readonly tasks: TasksView
-  @unobservable readonly solutions = new SolutionsView()
-  @unobservable readonly demo = new DemoView()
-  @unobservable readonly options = new OptionsView()
+  @unobservable readonly tasksView: TasksView
+  @unobservable readonly solutionsView = new SolutionsView()
+  @unobservable readonly demoView = new DemoView()
+  @unobservable readonly optionsView: OptionsView
+  @unobservable readonly options: Options
   @unobservable private readonly database = new Database()
   private _activeView: View
 
@@ -20,42 +21,47 @@ export class App extends ObservableObject {
 
   constructor() {
     super()
-    this.tasks = new TasksView(this.database.tasksRepository)
-    this._activeView = this.tasks
+    this.tasksView = new TasksView(this.database.tasksRepository)
+    this.options = new Options(this.database)
+    this.optionsView = new OptionsView(this.options)
+    this._activeView = this.optionsView
   }
 
   override dispose(): void {
     Transaction.run(() => {
-      this.tasks.dispose()
-      this.solutions.dispose()
-      this.demo.dispose()
-      this.options.dispose()
+      this.tasksView.dispose()
+      this.solutionsView.dispose()
+      this.demoView.dispose()
+      this.optionsView.dispose()
     })
   }
 
-  @transaction setActiveView(view: View): void { this._activeView = view }
+  @transaction
+  setActiveView(view: View): void {
+    this._activeView = view
+  }
 
   @reaction
   private async createdTask_created_in_database(): Promise<void> {
-    if (this.tasks.createdTask)
-      await this.database.createTask(this.tasks.createdTask)
+    if (this.tasksView.createdTask)
+      await this.database.createTask(this.tasksView.createdTask)
   }
 
   @reaction
   private async updatedTask_updated_in_database(): Promise<void> {
-    if (this.tasks.updatedTask)
-      await this.database.updateTask(this.tasks.updatedTask)
+    if (this.tasksView.updatedTask)
+      await this.database.updateTask(this.tasksView.updatedTask)
   }
 
   @reaction
   private async deletedTask_deleted_from_database(): Promise<void> {
-    if (this.tasks.deletedTask)
-      await this.database.deleteTask(this.tasks.deletedTask)
+    if (this.tasksView.deletedTask)
+      await this.database.deleteTask(this.tasksView.deletedTask)
   }
 
   @reaction
   private all_left_panels_in_same_state_as_active(): void {
-    const leftPanelsExceptActive = [this.tasks, this.solutions, this.demo, this.options]
+    const leftPanelsExceptActive = [this.tasksView, this.solutionsView, this.demoView, this.optionsView]
       .filter(v => v !== this._activeView)
       .map(v => v.leftPanel)
     for (const leftPanel of leftPanelsExceptActive)

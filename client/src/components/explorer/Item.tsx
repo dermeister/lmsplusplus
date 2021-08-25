@@ -14,10 +14,15 @@ export function Item<T>({ item, children }: ItemProps<T>): JSX.Element {
   const offset = useOffset()
   const onContextMenu = useContextMenu(item.contextMenu)
 
+  function onClick(e: React.MouseEvent): void {
+    if (e.target === e.currentTarget)
+      model?.setSelectedNode(item)
+  }
+
   return autorender(() => (
     <li key={item.key}>
       <p
-        onClick={() => model?.setSelectedNode(item)}
+        onClick={onClick}
         onContextMenu={onContextMenu}
         className={buildNodeClassName(item)}
         style={{ paddingLeft: offset }}

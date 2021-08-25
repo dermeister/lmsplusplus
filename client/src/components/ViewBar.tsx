@@ -15,12 +15,12 @@ export function ViewBar({ model, className }: ViewBarProps): JSX.Element {
   return autorender(() => (
     <div className={buildClassName(className)}>
       <div className={styles.topButtons}>
-        {button(model, model.tasks, FaTasks)}
-        {button(model, model.solutions, FaCode)}
-        {button(model, model.demo, FaDesktop)}
+        {button(model, model.tasksView, FaTasks)}
+        {button(model, model.solutionsView, FaCode)}
+        {button(model, model.demoView, FaDesktop)}
       </div>
 
-      <div className={styles.bottomButtons}>{button(model, model.options, FaCog)}</div>
+      <div className={styles.bottomButtons}>{button(model, model.optionsView, FaCog)}</div>
     </div>
   ), [model, className])
 }

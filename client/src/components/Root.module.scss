@@ -10,6 +10,7 @@
   --app-primary-text-color-hover: #eeeeee;
   /* App secondary */
   --app-secondary-background-color: #424242;
+  --app-secondary-background-color-hover: #616161;
   --app-secondary-text-color: #e0e0e0;
   --app-secondary-text-color-hover: #eeeeee;
 
@@ -40,11 +41,11 @@
   --shadow-secondary-color: #212121;
   --shadow-size: 4px;
 
-  /* Explorer */
-  --explorer-background-color-hover: #616161;
-
   /* Side panel */
   --side-panel-header-pulsing-color: #1e88e5;
+
+  /* Dropdown */
+  --dropdown-border-color: #1976d2;
 }
 
 .root {

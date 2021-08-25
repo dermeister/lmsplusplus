@@ -2,14 +2,16 @@ import { reaction, transaction } from "reactronic"
 import { Preferences } from "../domain/Preferences"
 import { ObservableObject } from "../ObservableObject"
 
-export class PreferencesRepository extends ObservableObject {
-  private _preferences: Preferences = Preferences.default
+export abstract class PreferencesRepository extends ObservableObject {
+  protected _preferences: Preferences = Preferences.default
 
   get preferences(): Preferences { return this._preferences }
+}
 
+export class PreferencesRepositoryInternal extends PreferencesRepository {
   @transaction
   async update(preferences: Preferences): Promise<void> {
-    await new Promise(r => setTimeout(r, 1000))
+    await new Promise(r => setTimeout(r, 0))
 
     this._preferences = preferences
   }

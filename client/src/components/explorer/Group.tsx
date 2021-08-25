@@ -15,9 +15,14 @@ export function Group({ group, children }: GroupProps): JSX.Element {
   const offset = useOffset()
   const onContextMenu = useContextMenu(group.contextMenu)
 
+  function onClick(e: React.MouseEvent): void {
+    if (e.target === e.currentTarget)
+      group.toggle()
+  }
+
   return autorender(() => (
     <p
-      onClick={() => group.toggle()}
+      onClick={onClick}
       onContextMenu={onContextMenu}
       className={buildNodeClassName(group)}
       style={{ paddingLeft: offset }}
