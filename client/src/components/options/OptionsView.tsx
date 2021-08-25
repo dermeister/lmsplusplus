@@ -26,8 +26,8 @@ export function OptionsView({ model }: OptionsViewProps): JSX.Element {
 function content(model: models.OptionsView): JSX.Element {
   let body: JSX.Element
   switch (model.categories.currentCategory) {
-    case OptionCategory.Vcs:
-      body = <span>VCS</span>
+    case OptionCategory.Vsc:
+      body = <span>VSC</span>
       break
     case OptionCategory.Preferences:
       body = preferences(model.options)

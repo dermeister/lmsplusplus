@@ -7,21 +7,29 @@ interface OptionCategoriesProps {
   model: models.OptionCategories
 }
 
+export function OptionCategories({ model }: OptionCategoriesProps): JSX.Element {
+  return autorender(() => (
+    <ul className={styles.categories}>
+      {optionCategory(model, models.OptionCategory.Vsc, "VSC")}
+      {optionCategory(model, models.OptionCategory.Preferences, "Preferences")}
+    </ul>
+  ), [model])
+}
+
 function optionCategory(model: models.OptionCategories,
-  category: models.OptionCategory,
-  text: string): JSX.Element {
+                        category: models.OptionCategory,
+                        text: string): JSX.Element {
+  const isSelected = model.currentCategory === category
   return (
-    <li onClick={() => model.setCurrentItem(category)} className={styles.category}>
+    <li onClick={() => model.setCurrentItem(category)} className={buildCategoryClassName(isSelected)}>
       {text}
     </li>
   )
 }
 
-export function OptionCategories({ model }: OptionCategoriesProps): JSX.Element {
-  return autorender(() => (
-    <ul className={styles.categories}>
-      {optionCategory(model, models.OptionCategory.Vcs, "VCS")}
-      {optionCategory(model, models.OptionCategory.Preferences, "Preferences")}
-    </ul>
-  ), [model])
+function buildCategoryClassName(isSelected: boolean): string {
+  let result = styles.category
+  if (isSelected)
+    result += ` ${styles.selected}`
+  return result
 }

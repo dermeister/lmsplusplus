@@ -22,7 +22,7 @@ export class App extends ObservableObject {
   constructor() {
     super()
     this.tasksView = new TasksView(this.database.tasksRepository)
-    this.options = new Options(this.database.preferencesRepository, this.database.vscConfigurationRepository)
+    this.options = new Options(this.database.preferencesRepository, this.database.vcsConfigurationRepository)
     this.optionsView = new OptionsView(this.options)
     this._activeView = this.optionsView
   }
@@ -67,8 +67,8 @@ export class App extends ObservableObject {
 
   @reaction
   async updatedVcsConfiguration_updated_in_database(): Promise<void> {
-    if (this.options.updatedVcsConfiguration)
-      await this.database.updateVscConfiguration(this.options.updatedVcsConfiguration)
+    if (this.options.updatedVscConfiguration)
+      await this.database.updateVscConfiguration(this.options.updatedVscConfiguration)
   }
 
   @reaction

@@ -14,8 +14,8 @@ export class Account {
   }
 }
 
-export class VscConfiguration {
-  static readonly default = VscConfiguration.createDefaultConfiguration()
+export class VcsConfiguration {
+  static readonly default = VcsConfiguration.createDefaultConfiguration()
   readonly providers: readonly Provider[]
   readonly accounts: readonly Account[]
 
@@ -24,13 +24,13 @@ export class VscConfiguration {
     this.accounts = accounts
   }
 
-  private static createDefaultConfiguration(): VscConfiguration {
+  private static createDefaultConfiguration(): VcsConfiguration {
     const github = new Provider("GitHub")
     const bitbucket = new Provider("BitBucket")
     const gitlab = new Provider("GitLab")
     const providers = [github, bitbucket, gitlab]
     const account = new Account(github, "dermeister")
     const accounts = [account]
-    return new VscConfiguration(providers, accounts)
+    return new VcsConfiguration(providers, accounts)
   }
 }

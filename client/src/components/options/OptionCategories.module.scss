@@ -16,8 +16,8 @@
   text-overflow: ellipsis;
 
   cursor: pointer;
+}
 
-  &:hover {
-    background-color: var(--app-secondary-background-color-hover);
-  }
+.category:hover, .selected {
+  background-color: var(--app-secondary-background-color-hover);
 }

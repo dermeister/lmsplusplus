@@ -1,6 +1,6 @@
 import { Preferences } from "../domain/Preferences"
 import { Task } from "../domain/Task"
-import { VscConfiguration } from "../domain/VscConfiguration"
+import { VcsConfiguration } from "../domain/VcsConfiguration"
 import { PreferencesRepository, PreferencesRepositoryInternal } from "./PreferencesRepository"
 import { TasksRepository, TasksRepositoryInternal } from "./TasksRepository"
 import { VscConfigurationRepository, VscConfigurationRepositoryInternal } from "./VscConfigurationRepository"
@@ -8,11 +8,11 @@ import { VscConfigurationRepository, VscConfigurationRepositoryInternal } from "
 export class Database {
   private readonly _tasksRepository = new TasksRepositoryInternal()
   private readonly _preferencesRepository = new PreferencesRepositoryInternal()
-  private readonly _vscConfigurationRepository = new VscConfigurationRepositoryInternal()
+  private readonly _vcsConfigurationRepository = new VscConfigurationRepositoryInternal()
 
   get tasksRepository(): TasksRepository { return this._tasksRepository }
   get preferencesRepository(): PreferencesRepository { return this._preferencesRepository }
-  get vscConfigurationRepository(): VscConfigurationRepository { return this._vscConfigurationRepository }
+  get vcsConfigurationRepository(): VscConfigurationRepository { return this._vcsConfigurationRepository }
 
   async createTask(task: Task): Promise<void> {
     await this._tasksRepository.create(task)
@@ -30,7 +30,7 @@ export class Database {
     await this._preferencesRepository.update(preferences)
   }
 
-  async updateVscConfiguration(vscConfiguration: VscConfiguration): Promise<void> {
-    await this._vscConfigurationRepository.update(vscConfiguration)
+  async updateVscConfiguration(vscConfiguration: VcsConfiguration): Promise<void> {
+    await this._vcsConfigurationRepository.update(vscConfiguration)
   }
 }

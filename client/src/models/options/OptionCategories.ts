@@ -2,7 +2,7 @@ import { transaction } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 
 export enum OptionCategory {
-  Vcs,
+  Vsc,
   Preferences
 }
 
