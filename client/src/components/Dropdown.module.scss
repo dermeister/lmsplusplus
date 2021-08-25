@@ -23,6 +23,7 @@
   background-repeat: no-repeat;
   background-size: 9px;
   background-position: calc(100% - 4px) 6px;
+  border-radius: var(--app-border-radius);
 }
 
 .dropdown-opened .preview {
@@ -30,6 +31,8 @@
 
   border: 1px solid var(--dropdown-border-color);
   background-position: calc(100% - 3px) 5px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .option {
@@ -45,6 +48,8 @@
   &:last-child {
     border-bottom: 1px solid var(--dropdown-border-color);
     box-shadow: 0 2px 4px -1px var(--shadow-primary-color);
+    border-bottom-left-radius: var(--app-border-radius);
+    border-bottom-right-radius: var(--app-border-radius);
   }
 }
 
