@@ -1,6 +1,7 @@
 import React from "react"
 import * as models from "../../models"
 import { autorender } from "../autorender"
+import { combineClassNames, maybeValue } from "../utils"
 import { useContextMenu } from "../WindowManager"
 import { buildNodeClassName, useOffset } from "./common"
 import styles from "./Explorer.module.scss"
@@ -19,21 +20,19 @@ export function Group({ group, children }: GroupProps): JSX.Element {
       group.toggle()
   }
 
-  return autorender(() => (
-    <p
-      onClick={onClick}
-      onContextMenu={onContextMenu}
-      className={buildGroupClassName(group)}
-      style={{ paddingLeft: offset }}
-    >
-      {children}
-    </p>
-  ), [group, children])
-}
-
-function buildGroupClassName(group: models.GroupNode): string {
-  let result = ` ${buildNodeClassName(group)} ${styles.group}`
-  if (group.isOpened)
-    result += ` ${styles.groupOpened}`
-  return result
+  return autorender(() => {
+    const className = combineClassNames(buildNodeClassName(group),
+                                        styles.group,
+                                        maybeValue(styles.groupOpened, group.isOpened))
+    return (
+      <p
+        onClick={onClick}
+        onContextMenu={onContextMenu}
+        className={className}
+        style={{ paddingLeft: offset }}
+      >
+        {children}
+      </p>
+    )
+  }, [group, children])
 }

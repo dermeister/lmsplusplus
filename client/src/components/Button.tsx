@@ -1,12 +1,16 @@
 import React from "react"
 import styles from "./Button.module.scss"
+import { combineClassNames, maybeValue } from "./utils"
 
 interface ButtonProps extends React.ComponentProps<"button"> {
   variant: "primary" | "secondary" | "danger"
 }
 
 export function Button(props: ButtonProps): JSX.Element {
-  return <button {...reactButtonProps(props)} className={buildClassName(props)} />
+  const className = combineClassNames(styles.button,
+                                      variants[props.variant],
+                                      maybeValue(props.className, Boolean(props.className)))
+  return <button {...reactButtonProps(props)} className={className} />
 }
 
 function reactButtonProps(props: ButtonProps): React.ComponentProps<"button"> {
@@ -19,12 +23,4 @@ const variants = {
   primary: styles.primary,
   danger: styles.danger,
   secondary: styles.secondary
-}
-
-function buildClassName(props: ButtonProps): string {
-  let className = styles.button
-  className += ` ${variants[props.variant]}`
-  if (props.className)
-    className += ` ${props.className}`
-  return className
 }

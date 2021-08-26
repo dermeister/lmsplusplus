@@ -23,14 +23,14 @@ export function Item<T>({ item, children }: ItemProps<T>): JSX.Element {
 
   return autorender(() => {
     const isSelected = model?.selectedNode === item
-    const combinedClassName = combineClassNames(buildNodeClassName(item),
+    const className = combineClassNames(buildNodeClassName(item),
                                                 maybeValue(styles.selected, isSelected))
     return (
       <li key={item.key}>
         <p
           onClick={onClick}
           onContextMenu={onContextMenu}
-          className={combinedClassName}
+          className={className}
           style={{ paddingLeft: offset }}
         >
           {children}

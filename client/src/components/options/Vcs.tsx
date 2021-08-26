@@ -57,22 +57,28 @@ function createAccountDropdownItem(account: Account): DropdownItem<Account> {
 }
 
 function providerList(options: models.Options): JSX.Element[] {
-  return options.vcsProviders.map(p => (
-    <ul key={p.name} className={styles.provider}>
+  return options.vcsProviders.map(provider => (
+    <ul key={provider.name} className={styles.provider}>
       <div className={styles.providerHeading}>
         <h2 className={styles.providerName}>
-          <img src={p.iconUrl} alt={p.name} width={11} height={11} className={styles.providerIcon} />
-          {p.name}
+          <img
+            src={provider.iconUrl}
+            alt={provider.name}
+            width={11}
+            height={11}
+            className={styles.providerIcon}
+          />
+          {provider.name}
         </h2>
         <button className={styles.addAccount} />
       </div>
-      {accounts(options, p)}
+      {accountList(options, provider)}
     </ul>
   ))
 }
 
-function accounts(options: models.Options, provider: Provider): JSX.Element[] {
-  return options.vcsAccounts.filter(a => a.provider === provider).map(a => (
+function accountList(options: models.Options, provider: Provider): JSX.Element[] {
+  return options.vcsAccounts.filter(account => account.provider === provider).map(a => (
     <li key={a.username} className={styles.account}>
       <button className={styles.deleteAccount} />
       <span className={styles.accountName}>{a.username}</span>

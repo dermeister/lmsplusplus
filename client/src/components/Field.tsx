@@ -9,18 +9,11 @@ interface FieldProps {
 
 export function Field({ label, children, className }: FieldProps): JSX.Element {
   return (
-    <div className={buildClassName(className)}>
+    <div className={className ?? ""}>
       <label>
         <p className={styles.label}>{label}</p>
         {children}
       </label>
     </div>
   )
-}
-
-function buildClassName(className?: string): string {
-  let result = ""
-  if (className)
-    result += ` ${className}`
-  return result
 }

@@ -2,6 +2,7 @@ import React from "react"
 import * as models from "../models"
 import { autorender } from "./autorender"
 import { Button } from "./Button"
+import { combineClassNames, maybeValue } from "./utils"
 import styles from "./ViewBar.module.scss"
 
 interface ViewBarProps {
@@ -10,24 +11,20 @@ interface ViewBarProps {
 }
 
 export function ViewBar({ model, className }: ViewBarProps): JSX.Element {
-  return autorender(() => (
-    <div className={buildClassName(className)}>
-      <div className={styles.topButtons}>
-        {button(model, model.tasksView)}
-        {button(model, model.solutionsView)}
-        {button(model, model.demoView)}
+  return autorender(() => {
+    const combinedClassName = combineClassNames(styles.viewBar, maybeValue(className, Boolean(className)))
+    return (
+      <div className={combinedClassName}>
+        <div className={styles.topButtons}>
+          {button(model, model.tasksView)}
+          {button(model, model.solutionsView)}
+          {button(model, model.demoView)}
+        </div>
+
+        <div className={styles.bottomButtons}>{button(model, model.optionsView)}</div>
       </div>
-
-      <div className={styles.bottomButtons}>{button(model, model.optionsView)}</div>
-    </div>
-  ), [model, className])
-}
-
-function buildClassName(className?: string): string {
-  let result = styles.viewBar
-  if (className)
-    result += ` ${className}`
-  return result
+    )
+  }, [model, className])
 }
 
 function button(model: models.App, view: models.View): JSX.Element {

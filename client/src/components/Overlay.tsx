@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react"
 import styles from "./Overlay.module.scss"
+import { combineClassNames, maybeValue } from "./utils"
 
 interface OverlayProps {
   trapFocus?: boolean
@@ -71,7 +72,9 @@ export function Overlay(props: OverlayProps): JSX.Element {
     }
   }
 
-  return <div ref={ref} className={buildClassName(props)} tabIndex={-1}>{props.children}</div>
+  const className = combineClassNames(styles.overlay,
+                                      maybeValue(styles.trapFocusOverlay, Boolean(props.trapFocus)))
+  return <div ref={ref} className={className} tabIndex={-1}>{props.children}</div>
 }
 
 function focusContent(overlay: HTMLDivElement | null): void {
@@ -80,11 +83,4 @@ function focusContent(overlay: HTMLDivElement | null): void {
     focusableChild.focus()
   else
     overlay?.focus()
-}
-
-function buildClassName(props: OverlayProps): string {
-  let result = styles.overlay
-  if (props.trapFocus)
-    result += ` ${styles.trapFocusOverlay}`
-  return result
 }

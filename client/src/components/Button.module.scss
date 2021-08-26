@@ -24,19 +24,25 @@
 }
 
 .primary {
-  @include button-variant(var(--button-primary-background-color),
-      var(--button-primary-background-color-hover),
-      var(--button-primary-text-color));
+  @include button-variant(
+          var(--button-primary-background-color),
+          var(--button-primary-background-color-hover),
+          var(--button-primary-text-color)
+  );
 }
 
 .secondary {
-  @include button-variant(var(--button-secondary-background-color),
-      var(--button-secondary-background-color-hover),
-      var(--button-secondary-text-color));
+  @include button-variant(
+          var(--button-secondary-background-color),
+          var(--button-secondary-background-color-hover),
+          var(--button-secondary-text-color)
+  );
 }
 
 .danger {
-  @include button-variant(var(--button-danger-background-color),
-      var(--button-danger-background-color-hover),
-      var(--button-danger-text-color));
+  @include button-variant(
+          var(--button-danger-background-color),
+          var(--button-danger-background-color-hover),
+          var(--button-danger-text-color)
+  );
 }

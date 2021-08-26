@@ -1,12 +1,16 @@
 import React from "react"
 import styles from "./Input.module.scss"
+import { combineClassNames } from "./utils"
 
 interface InputProps extends React.ComponentProps<"input"> {
   variant: "primary" | "secondary"
 }
 
 export function Input(props: InputProps): JSX.Element {
-  return <input autoComplete="off" {...reactInputProps(props)} className={buildClassName(props)} />
+  const className = combineClassNames(styles.input,
+                                      variants[props.variant],
+                                      props.className)
+  return <input autoComplete="off" {...reactInputProps(props)} className={className} />
 }
 
 function reactInputProps(props: InputProps): React.ComponentProps<"input"> {
@@ -18,12 +22,4 @@ function reactInputProps(props: InputProps): React.ComponentProps<"input"> {
 const variants = {
   "primary": styles.primary,
   "secondary": styles.secondary
-}
-
-function buildClassName(props: InputProps): string {
-  let className = styles.input
-  className += ` ${variants[props.variant]}`
-  if (props.className)
-    className += ` ${props.className}`
-  return className
 }
