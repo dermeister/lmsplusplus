@@ -7,11 +7,9 @@ export enum OptionCategory {
 }
 
 export class OptionCategories extends Explorer<OptionCategory> {
-  private static readonly nodes = OptionCategories.createNodes()
-
   constructor() {
-    super(OptionCategories.nodes)
-    this.setSelectedNode(OptionCategories.nodes[0])
+    super(OptionCategories.createNodes())
+    this.setSelectedNode(this.children[0])
   }
 
   get selectedCategory(): OptionCategory { return this.selectedNode?.item as OptionCategory }
