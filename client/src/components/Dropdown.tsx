@@ -51,9 +51,10 @@ export function Dropdown<T>(props: DropdownProps<T>): JSX.Element {
         <div className={styles.relativelyPositionedContainer}>
           <ul className={styles.options}>
             {itemsWithoutSelected.map(item => (
-              <li key={item.key}
-                  onClick={() => onChange(items.indexOf(item))}
-                  className={styles.option}
+              <li
+                key={item.key}
+                onClick={() => onChange(items.indexOf(item))}
+                className={styles.option}
               >
                 {item.title}
               </li>

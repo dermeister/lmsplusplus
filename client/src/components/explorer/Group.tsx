@@ -27,7 +27,7 @@ export function Group({ group, children }: GroupProps): JSX.Element {
     return (
       <p
         onClick={onClick}
-        onContextMenu={onContextMenu}
+        onContextMenu={onContextMenu ?? undefined}
         className={className}
         style={{ paddingLeft: offset }}
       >

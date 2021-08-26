@@ -25,33 +25,33 @@ export class VcsConfigurationRepositoryInternal extends VscConfigurationReposito
   @reaction
   private async vcs_configuration_fetched_from_api(): Promise<void> {
     const github = new Provider(VcsConfigurationRepositoryInternal.nextProviderId++,
-      "GitHub",
-      githubIcon)
+                                "GitHub",
+                                githubIcon)
     const bitbucket = new Provider(VcsConfigurationRepositoryInternal.nextProviderId++,
-      "BitBucket",
-      bitbucketIcon)
+                                   "BitBucket",
+                                   bitbucketIcon)
     const gitlab = new Provider(VcsConfigurationRepositoryInternal.nextProviderId++,
-      "GitLab",
-      gitlabIcon)
+                                "GitLab",
+                                gitlabIcon)
     const providers = [github, bitbucket, gitlab]
     const account1 = new Account(VcsConfigurationRepositoryInternal.nextAccountId++,
-      github,
-      "dermeister")
+                                 github,
+                                 "dermeister")
     const account2 = new Account(VcsConfigurationRepositoryInternal.nextAccountId++,
-      github,
-      "denis.duzh")
+                                 github,
+                                 "denis.duzh")
     const account3 = new Account(VcsConfigurationRepositoryInternal.nextAccountId++,
-      bitbucket,
-      "dermeister")
+                                 bitbucket,
+                                 "dermeister")
     const account4 = new Account(VcsConfigurationRepositoryInternal.nextAccountId++,
-      bitbucket,
-      "denis.duzh")
+                                 bitbucket,
+                                 "denis.duzh")
     const account5 = new Account(VcsConfigurationRepositoryInternal.nextAccountId++,
-      gitlab,
-      "dermeister")
+                                 gitlab,
+                                 "dermeister")
     const account6 = new Account(VcsConfigurationRepositoryInternal.nextAccountId++,
-      gitlab,
-      "denis.duzh")
+                                 gitlab,
+                                 "denis.duzh")
     const accounts = [account1, account2, account3, account4, account5, account6]
     this._configuration = new VcsConfiguration(providers, accounts, account1)
   }
