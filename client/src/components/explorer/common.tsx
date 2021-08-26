@@ -5,7 +5,7 @@ import styles from "./Explorer.module.scss"
 
 export function buildNodeClassName(node: models.Node): string {
   return combineClassNames(styles.node,
-                           maybeValue(styles.contextMenuOpened, node.contextMenu.isOpened))
+                           maybeValue(styles.contextMenuOpened, Boolean(node.contextMenu?.isOpened)))
 }
 
 const ExplorerModelContext = createContext<models.Explorer<unknown> | null>(null)

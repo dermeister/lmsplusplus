@@ -8,7 +8,7 @@ import { Node } from "./Node"
 class ExplorerRootNode extends GroupNode {
   override get isOpened(): boolean { return true }
 
-  constructor(children: readonly Node[]) { super("Explorer Root", "explorer-root", children) }
+  constructor(children: readonly Node[]) { super("Explorer Root", "explorer-root", false, children) }
 
   @transaction
   updateExplorerRootNode(children: readonly Node[]): void { this.updateGroupNode(this.title, children) }

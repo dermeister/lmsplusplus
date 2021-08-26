@@ -29,7 +29,7 @@ export function Item<T>({ item, children }: ItemProps<T>): JSX.Element {
       <li key={item.key}>
         <p
           onClick={onClick}
-          onContextMenu={onContextMenu}
+          onContextMenu={onContextMenu ?? undefined}
           className={className}
           style={{ paddingLeft: offset }}
         >

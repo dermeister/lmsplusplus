@@ -10,7 +10,7 @@ export class CourseNode extends GroupNode {
   override get children(): readonly ItemNode<Task>[] { return super.children as readonly ItemNode<Task>[] }
 
   constructor(title: string, course: Course, children: readonly ItemNode<Task>[]) {
-    super(title, `course-${course.id}`, children)
+    super(title, `course-${course.id}`, true, children)
     this.item = course
   }
 }
@@ -63,7 +63,7 @@ export class TasksExplorer extends Explorer<Task> {
   }
 
   private static createTaskNodes(tasks: readonly Task[]): readonly ItemNode<Task>[] {
-    return Transaction.run(() => tasks.map(t => new ItemNode(t.title, `task-${t.id}`, t)))
+    return Transaction.run(() => tasks.map(t => new ItemNode(t.title, `task-${t.id}`, true, t)))
   }
 
   @reaction

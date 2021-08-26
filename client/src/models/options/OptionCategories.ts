@@ -25,8 +25,8 @@ export class OptionCategories extends Explorer<OptionCategory> {
 
   private static createNodes(): ItemNode<OptionCategory>[] {
     return Transaction.run(() => {
-      const vcs = new ItemNode("VCS", "0", OptionCategory.Vsc)
-      const preferences = new ItemNode("Preferences", "1", OptionCategory.Preferences)
+      const vcs = new ItemNode("VCS", "0", false, OptionCategory.Vsc)
+      const preferences = new ItemNode("Preferences", "1", false, OptionCategory.Preferences)
       return [vcs, preferences]
     })
   }
