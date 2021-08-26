@@ -6,7 +6,7 @@ export function combineClassNames(...classNames: (string | undefined)[]): string
   return result
 }
 
-export function valueOrUndefined<T>(value: T, condition: boolean): T | undefined {
+export function maybeValue<T>(value: T, condition: boolean): T | undefined {
   if (condition)
     return value
 }

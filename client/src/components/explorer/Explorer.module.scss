@@ -22,6 +22,10 @@
   }
 }
 
+.selected {
+  background-color: var(--app-secondary-background-color-hover);
+}
+
 .context-menu-opened {
   background-color: var(--app-secondary-background-color-hover);
 }

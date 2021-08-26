@@ -21,7 +21,7 @@ export function OptionsView({ model }: OptionsViewProps): JSX.Element {
     <>
       <AppScreen.LeftPanel model={model.leftPanel}>
         <div className={styles.leftPanelContent}>
-          <OptionCategories model={model.categories} className={styles.categories} />
+          <OptionCategories model={model.categories} />
           <Button variant="danger" onClick={() => auth.signOut()} className={styles.signOut}>
             Sign out
           </Button>

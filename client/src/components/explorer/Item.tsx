@@ -1,8 +1,10 @@
 import React from "react"
 import * as models from "../../models"
 import { autorender } from "../autorender"
+import { combineClassNames, maybeValue } from "../utils"
 import { useContextMenu } from "../WindowManager"
 import { buildNodeClassName, useExplorerModel, useOffset } from "./common"
+import styles from "./Explorer.module.scss"
 
 interface ItemProps<T> {
   item: models.ItemNode<T>
@@ -19,16 +21,21 @@ export function Item<T>({ item, children }: ItemProps<T>): JSX.Element {
       model?.setSelectedNode(item)
   }
 
-  return autorender(() => (
-    <li key={item.key}>
-      <p
-        onClick={onClick}
-        onContextMenu={onContextMenu}
-        className={buildNodeClassName(item)}
-        style={{ paddingLeft: offset }}
-      >
-        {children}
-      </p>
-    </li>
-  ), [item, children])
+  return autorender(() => {
+    const isSelected = model?.selectedNode === item
+    const combinedClassName = combineClassNames(buildNodeClassName(item),
+                                                maybeValue(styles.selected, isSelected))
+    return (
+      <li key={item.key}>
+        <p
+          onClick={onClick}
+          onContextMenu={onContextMenu}
+          className={combinedClassName}
+          style={{ paddingLeft: offset }}
+        >
+          {children}
+        </p>
+      </li>
+    )
+  }, [item, children])
 }

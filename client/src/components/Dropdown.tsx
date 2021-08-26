@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import styles from "./Dropdown.module.scss"
 import { Overlay } from "./Overlay"
-import { combineClassNames, valueOrUndefined } from "./utils"
+import { combineClassNames, maybeValue } from "./utils"
 
 export interface DropdownItem<T> {
   value: T
@@ -44,7 +44,7 @@ export function Dropdown<T>(props: DropdownProps<T>): JSX.Element {
   let content
   if (isOpened) {
     const itemsWithoutSelected = items
-      .filter(i => selectedItemIndex === undefined || i.key !== items[selectedItemIndex].key)
+      .filter(i => selectedItemIndex !== undefined && i.key !== items[selectedItemIndex].key)
     content = (
       <Overlay onClick={() => setIsOpened(false)}>
         {preview()}
@@ -65,6 +65,6 @@ export function Dropdown<T>(props: DropdownProps<T>): JSX.Element {
   } else
     content = preview()
 
-  const combinedClassName = combineClassNames(valueOrUndefined(styles.dropdownOpened, isOpened), className)
+  const combinedClassName = combineClassNames(maybeValue(styles.dropdownOpened, isOpened), className)
   return <div className={combinedClassName}>{content}</div>
 }

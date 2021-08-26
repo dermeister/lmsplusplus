@@ -1,12 +1,11 @@
 import React, { createContext, ProviderProps, useContext } from "react"
 import * as models from "../../models"
+import { combineClassNames, maybeValue } from "../utils"
 import styles from "./Explorer.module.scss"
 
 export function buildNodeClassName(node: models.Node): string {
-  let className = styles.node
-  if (node.contextMenu.isOpened)
-    className += ` ${styles.contextMenuOpened}`
-  return className
+  return combineClassNames(styles.node,
+                           maybeValue(styles.contextMenuOpened, node.contextMenu.isOpened))
 }
 
 const ExplorerModelContext = createContext<models.Explorer<unknown> | null>(null)
