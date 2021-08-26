@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import styles from "./Dropdown.module.scss"
 import { Overlay } from "./Overlay"
+import { combineClassNames, valueOrUndefined } from "./utils"
 
 export interface DropdownItem<T> {
   value: T
@@ -8,50 +9,62 @@ export interface DropdownItem<T> {
   key: number
 }
 
-interface DropdownProps<T> {
-  selectedItem: DropdownItem<T>
+interface DropdownPropsBase<T> {
   items: DropdownItem<T>[]
   className?: string
-  onChange?(active: T): void
+  onChange?(active: number): void
 }
 
+interface DropdownPropsWithSelectedItem<T> extends DropdownPropsBase<T> {
+  selectedItemIndex: number
+  placeholder?: undefined
+}
+
+interface DropdownPropsWithPlaceholder<T> extends DropdownPropsBase<T> {
+  selectedItemIndex?: undefined
+  placeholder: string
+}
+
+type DropdownProps<T> = DropdownPropsWithSelectedItem<T> | DropdownPropsWithPlaceholder<T>
+
 export function Dropdown<T>(props: DropdownProps<T>): JSX.Element {
-  const { selectedItem, items, className } = props
+  const { selectedItemIndex, placeholder, items, className } = props
   const [isOpened, setIsOpened] = useState(false)
 
   function preview(): JSX.Element {
-    return <div onClick={() => setIsOpened(!isOpened)} className={styles.preview}>{selectedItem.title}</div>
+    let content = selectedItemIndex !== undefined ? items[selectedItemIndex].title : placeholder
+    return <div onClick={() => setIsOpened(!isOpened)} className={styles.preview}>{content}</div>
   }
 
-  function onChange(value: T): void {
+  function onChange(value: number): void {
     props.onChange?.(value)
     setIsOpened(false)
   }
 
   let content
-  if (isOpened)
+  if (isOpened) {
+    const itemsWithoutSelected = items
+      .filter(i => selectedItemIndex === undefined || i.key !== items[selectedItemIndex].key)
     content = (
       <Overlay onClick={() => setIsOpened(false)}>
         {preview()}
         <div className={styles.relativelyPositionedContainer}>
           <ul className={styles.options}>
-            {items.filter(o => o.value !== selectedItem.value).map(o => (
-              <li key={o.key} onClick={() => onChange(o.value)} className={styles.option}>{o.title}</li>
+            {itemsWithoutSelected.map(item => (
+              <li key={item.key}
+                  onClick={() => onChange(items.indexOf(item))}
+                  className={styles.option}
+              >
+                {item.title}
+              </li>
             ))}
           </ul>
         </div>
       </Overlay>
     )
-  else
+  } else
     content = preview()
-  return <div className={buildDropdownClassName(isOpened, className)}>{content}</div>
-}
 
-function buildDropdownClassName(isOpened: boolean, className?: string): string {
-  let result = ""
-  if (isOpened)
-    result += ` ${styles.dropdownOpened}`
-  if (className)
-    result += ` ${className}`
-  return result
+  const combinedClassName = combineClassNames(valueOrUndefined(styles.dropdownOpened, isOpened), className)
+  return <div className={combinedClassName}>{content}</div>
 }

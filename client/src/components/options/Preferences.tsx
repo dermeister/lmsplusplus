@@ -8,26 +8,19 @@ interface PreferencesProps {
   model: models.Options
 }
 
-const darkTheme = {
-  value: "Dark",
-  title: "Dark",
-  key: 1
-}
-
-const lightTheme = {
-  value: "Light",
-  title: "Light",
-  key: 1
-}
+const themes = [
+  { value: "Dark", title: "Dark", key: 0 },
+  { value: "Light", title: "Light", key: 1 }
+]
 
 export function Preferences({ model }: PreferencesProps): JSX.Element {
   return autorender(() => (
     <>
       <Field label="Theme">
         <Dropdown
-          selectedItem={model.darkMode ? darkTheme : lightTheme}
-          items={[darkTheme, lightTheme]}
-          onChange={v => model.setDarkMode(v === darkTheme.value)}
+          selectedItemIndex={model.darkMode ? 0 : 1}
+          items={themes}
+          onChange={i => model.setDarkMode(i === 0)}
         />
       </Field>
     </>

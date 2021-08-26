@@ -30,13 +30,12 @@ export function Vcs({ model }: VcsProps): JSX.Element {
 }
 
 function providerDropdown(options: models.Options): JSX.Element {
-  const providerNotSelected = createProviderOrNullDropdownItem(null)
   const providers = options.vcsProviders.map(createProviderOrNullDropdownItem)
   if (providers.length === 0)
     throw new Error("No providers available")
   return (
     <Field label="Add VCS account">
-      <Dropdown selectedItem={providerNotSelected} items={providers} />
+      <Dropdown items={providers} placeholder="Select VCS provider" />
     </Field>
   )
 }
@@ -44,14 +43,12 @@ function providerDropdown(options: models.Options): JSX.Element {
 function accountDropdown(options: models.Options): JSX.Element {
   if (!options.vcsCurrentAccount)
     throw new Error("Some account must be set to current by default")
+  const selectedAccountIndex = options.vcsAccounts.indexOf(options.vcsCurrentAccount)
   const accounts = options.vcsAccounts.map(createAccountDropdownItem)
-  const selectedAccount = createAccountDropdownItem(options.vcsCurrentAccount)
-  return <Dropdown selectedItem={selectedAccount} items={accounts} />
+  return <Dropdown selectedItemIndex={selectedAccountIndex} items={accounts} />
 }
 
-function createProviderOrNullDropdownItem(provider: Provider | null): DropdownItem<Provider | null> {
-  if (!provider)
-    return { value: null, title: "Select VCS provider", key: -1 }
+function createProviderOrNullDropdownItem(provider: Provider): DropdownItem<Provider> {
   return { value: provider, title: provider.name, key: provider.id }
 }
 
