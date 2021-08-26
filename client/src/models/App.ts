@@ -70,8 +70,8 @@ export class App extends ObservableObject {
 
   @reaction
   private async updatedVcsConfiguration_updated_in_database(): Promise<void> {
-    if (this.options.updatedVscConfiguration)
-      await this.database.updateVscConfiguration(this.options.updatedVscConfiguration)
+    if (this.options.updatedVcsConfiguration)
+      await this.database.updateVscConfiguration(this.options.updatedVcsConfiguration)
   }
 
   @reaction

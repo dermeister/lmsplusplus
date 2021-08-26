@@ -6,20 +6,22 @@ import { PreferencesRepository, VscConfigurationRepository } from "../../reposit
 
 export class Options extends ObservableObject {
   @unobservable private readonly preferencesRepository: PreferencesRepository
-  @unobservable private readonly vscConfigurationRepository: VscConfigurationRepository
+  @unobservable private readonly vcsConfigurationRepository: VscConfigurationRepository
   private _updatedPreferences: Preferences | null = null
-  private _updatedVscConfiguration: VcsConfiguration | null = null
+  private _updatedVcsConfiguration: VcsConfiguration | null = null
 
+  private get vcsConfiguration(): VcsConfiguration { return this.vcsConfigurationRepository.configuration }
   get darkMode(): boolean { return this.preferencesRepository.preferences.darkMode }
-  get vscProviders(): readonly Provider[] { return this.vscConfigurationRepository.configuration.providers }
-  get vscAccounts(): readonly Account[] { return this.vscConfigurationRepository.configuration.accounts }
+  get vcsProviders(): readonly Provider[] { return this.vcsConfiguration.providers }
+  get vcsAccounts(): readonly Account[] { return this.vcsConfiguration.accounts }
+  get vcsCurrentAccount(): Account | null { return this.vcsConfiguration.currentAccount }
   get updatedPreferences(): Preferences | null { return this._updatedPreferences }
-  get updatedVscConfiguration(): VcsConfiguration | null { return this._updatedVscConfiguration }
+  get updatedVcsConfiguration(): VcsConfiguration | null { return this._updatedVcsConfiguration }
 
   constructor(preferences: PreferencesRepository, vscConfiguration: VscConfigurationRepository) {
     super()
     this.preferencesRepository = preferences
-    this.vscConfigurationRepository = vscConfiguration
+    this.vcsConfigurationRepository = vscConfiguration
   }
 
   @transaction
@@ -29,13 +31,13 @@ export class Options extends ObservableObject {
 
   @transaction
   setVcsProviders(providers: readonly Provider[]): void {
-    const { accounts } = this.vscConfigurationRepository.configuration
-    this._updatedVscConfiguration = new VcsConfiguration(providers, accounts)
+    const { accounts, currentAccount } = this.vcsConfigurationRepository.configuration
+    this._updatedVcsConfiguration = new VcsConfiguration(providers, accounts, currentAccount)
   }
 
   @transaction
   setVcsAccounts(accounts: readonly Account[]): void {
-    const { providers } = this.vscConfigurationRepository.configuration
-    this._updatedVscConfiguration = new VcsConfiguration(providers, accounts)
+    const { providers, currentAccount } = this.vcsConfigurationRepository.configuration
+    this._updatedVcsConfiguration = new VcsConfiguration(providers, accounts, currentAccount)
   }
 }

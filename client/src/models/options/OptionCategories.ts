@@ -7,12 +7,12 @@ export enum OptionCategory {
 }
 
 export class OptionCategories extends ObservableObject {
-  private _currentCategory: OptionCategory = OptionCategory.Preferences
+  private _selectedCategory: OptionCategory = OptionCategory.Vsc
 
-  get currentCategory(): OptionCategory { return this._currentCategory }
+  get selectedCategory(): OptionCategory { return this._selectedCategory }
 
   @transaction
-  setCurrentItem(category: OptionCategory): void {
-    this._currentCategory = category
+  setSelectedCategory(category: OptionCategory): void {
+    this._selectedCategory = category
   }
 }

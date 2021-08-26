@@ -1,14 +1,22 @@
 export class Provider {
+  readonly id: number
   readonly name: string
+  readonly iconUrl: string
 
-  constructor(name: string) { this.name = name }
+  constructor(id: number, name: string, iconUrl: string) {
+    this.id = id
+    this.name = name
+    this.iconUrl = iconUrl
+  }
 }
 
 export class Account {
+  readonly id: number
   readonly provider: Provider
   readonly username: string
 
-  constructor(provider: Provider, username: string) {
+  constructor(id: number, provider: Provider, username: string) {
+    this.id = id
     this.provider = provider
     this.username = username
   }
@@ -18,19 +26,15 @@ export class VcsConfiguration {
   static readonly default = VcsConfiguration.createDefaultConfiguration()
   readonly providers: readonly Provider[]
   readonly accounts: readonly Account[]
+  readonly currentAccount: Account | null = null
 
-  constructor(providers: readonly Provider[], accounts: readonly Account[]) {
+  constructor(providers: readonly Provider[], accounts: readonly Account[], selectedAccount: Account | null) {
     this.providers = providers
     this.accounts = accounts
+    this.currentAccount = selectedAccount
   }
 
   private static createDefaultConfiguration(): VcsConfiguration {
-    const github = new Provider("GitHub")
-    const bitbucket = new Provider("BitBucket")
-    const gitlab = new Provider("GitLab")
-    const providers = [github, bitbucket, gitlab]
-    const account = new Account(github, "dermeister")
-    const accounts = [account]
-    return new VcsConfiguration(providers, accounts)
+    return new VcsConfiguration([], [], null)
   }
 }

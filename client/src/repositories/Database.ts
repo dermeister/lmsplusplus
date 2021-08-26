@@ -5,12 +5,12 @@ import { Task } from "../domain/Task"
 import { VcsConfiguration } from "../domain/VcsConfiguration"
 import { PreferencesRepository, PreferencesRepositoryInternal } from "./PreferencesRepository"
 import { TasksRepository, TasksRepositoryInternal } from "./TasksRepository"
-import { VscConfigurationRepository, VscConfigurationRepositoryInternal } from "./VscConfigurationRepository"
+import { VcsConfigurationRepositoryInternal, VscConfigurationRepository } from "./VscConfigurationRepository"
 
 export class Database implements Disposable {
   private readonly _tasksRepository = new TasksRepositoryInternal()
   private readonly _preferencesRepository = new PreferencesRepositoryInternal()
-  private readonly _vcsConfigurationRepository = new VscConfigurationRepositoryInternal()
+  private readonly _vcsConfigurationRepository = new VcsConfigurationRepositoryInternal()
 
   get tasksRepository(): TasksRepository { return this._tasksRepository }
   get preferencesRepository(): PreferencesRepository { return this._preferencesRepository }

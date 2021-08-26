@@ -9,7 +9,9 @@ export class OptionsView implements Disposable {
   readonly categories = new OptionCategories()
   readonly options: Options
 
-  constructor(options: Options) { this.options = options }
+  constructor(options: Options) {
+    this.options = options
+  }
 
   dispose(): void {
     Transaction.run(() => {

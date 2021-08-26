@@ -2,19 +2,29 @@
   margin-bottom: 24px;
 }
 
+.left-panel-content {
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+}
+
 .sign-out {
-  margin-left: 14px;
-  margin-right: 14px;
+  margin: auto 14px 16px;
   padding: 4px;
   width: calc(100% - 28px);
 
   box-shadow: 0 0 var(--shadow-size) var(--shadow-secondary-color);
 }
 
-.content {
-  padding: 14px 30px;
+.centering-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.field {
-  width: 320px;
+.content {
+  padding: 14px 30px;
+  min-width: 320px;
+  width: 60%;
 }

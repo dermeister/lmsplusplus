@@ -20,9 +20,9 @@ export function OptionCategories({ model, className }: OptionCategoriesProps): J
 function optionCategory(model: models.OptionCategories,
   category: models.OptionCategory,
   text: string): JSX.Element {
-  const isSelected = model.currentCategory === category
+  const isSelected = model.selectedCategory === category
   return (
-    <li onClick={() => model.setCurrentItem(category)} className={buildCategoryClassName(isSelected)}>
+    <li onClick={() => model.setSelectedCategory(category)} className={buildCategoryClassName(isSelected)}>
       {text}
     </li>
   )

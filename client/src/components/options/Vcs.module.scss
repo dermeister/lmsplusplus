@@ -1,0 +1,98 @@
+.no-vcs {
+  margin: 0 0 8px;
+
+  font-size: var(--app-font-size-large);
+  font-weight: normal;
+}
+
+.selected-account-field {
+  margin-bottom: 14px;
+}
+
+.provider {
+  margin: 0 0 14px;
+  padding: 0;
+
+  list-style: none;
+}
+
+.provider-heading {
+  display: flex;
+  justify-content: space-between;
+
+  padding-bottom: 6px;
+
+  border-bottom: 1px solid var(--app-primary-text-color);
+}
+
+.provider-name {
+  margin: 0;
+
+  font-size: var(--app-font-size-regular);
+  font-weight: normal;
+  text-transform: uppercase;
+}
+
+.provider-icon {
+  margin-right: 6px;
+}
+
+.add-account, .delete-account {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 0;
+  width: 20px;
+
+  background-color: transparent;
+  border: none;
+  outline: none;
+
+  cursor: pointer;
+
+  &::before {
+    content: "";
+
+    width: 12px;
+    height: 100%;
+
+    background: no-repeat center;
+  }
+
+  &:hover:active::before {
+    transform: scale(0.9);
+  }
+}
+
+.add-account::before {
+  background-image: var(--plus-icon-url);
+}
+
+.delete-account {
+  margin-bottom: -4px;
+
+  &::before {
+    background-image: var(--minus-danger-icon-url);
+  }
+
+  &:hover::before {
+    background-image: var(--minus-danger-hovered-icon-url);
+  }
+}
+
+.account {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+
+  margin-top: 12px;
+
+  &:first-of-type {
+    margin-top: 12px;
+  }
+}
+
+.delete-account:hover + .account-name {
+  color: var(--button-danger-background-color-hover);
+}

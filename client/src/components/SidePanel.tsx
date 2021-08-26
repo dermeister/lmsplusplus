@@ -29,7 +29,7 @@ export function SidePanel(props: SidePanelProps): JSX.Element {
             <button onClick={() => model.close()} className={styles.close} />
           </header>
 
-          {children}
+          <div className={styles.children}>{children}</div>
         </div>
       )
     else
