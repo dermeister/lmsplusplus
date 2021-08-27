@@ -43,7 +43,7 @@ function content(model: models.OptionsView): JSX.Element {
       break
   }
   return (
-    <div className={styles.centeringWrapper}>
+    <div className={styles.contentWrapper}>
       <div className={styles.content}>{body}</div>
     </div>
   )

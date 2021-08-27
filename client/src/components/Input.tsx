@@ -7,9 +7,7 @@ interface InputProps extends React.ComponentProps<"input"> {
 }
 
 export function Input(props: InputProps): JSX.Element {
-  const className = combineClassNames(styles.input,
-                                      variants[props.variant],
-                                      props.className)
+  const className = combineClassNames(styles.input, variants[props.variant], props.className)
   return <input autoComplete="off" {...reactInputProps(props)} className={className} />
 }
 

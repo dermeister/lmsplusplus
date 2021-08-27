@@ -1,5 +1,6 @@
 import React from "react"
 import styles from "./Field.module.scss"
+import { combineClassNames } from "./utils"
 
 interface FieldProps {
   label: string
@@ -9,11 +10,9 @@ interface FieldProps {
 
 export function Field({ label, children, className }: FieldProps): JSX.Element {
   return (
-    <div className={className ?? ""}>
-      <label>
-        <p className={styles.label}>{label}</p>
-        {children}
-      </label>
-    </div>
+    <label className={combineClassNames(styles.container, className)}>
+      <p className={styles.label}>{label}</p>
+      {children}
+    </label>
   )
 }

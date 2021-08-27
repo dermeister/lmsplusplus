@@ -15,6 +15,6 @@ export function Auth({ children, auth }: AuthProps): JSX.Element {
 export function useAuth(): services.Auth {
   const auth = useContext(AuthContext)
   if (!auth)
-    throw new Error("Auth service is not available")
+    throw new Error("Auth service is not provided")
   return auth
 }

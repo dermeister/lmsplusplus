@@ -5,13 +5,13 @@ import gitlabIcon from "../assets/gitlab.svg"
 import { Account, Provider, VcsConfiguration } from "../domain/VcsConfiguration"
 import { ObservableObject } from "../ObservableObject"
 
-export abstract class VscConfigurationRepository extends ObservableObject {
+export abstract class VcsConfigurationRepository extends ObservableObject {
   protected _configuration = VcsConfiguration.default
 
   get configuration(): VcsConfiguration { return this._configuration }
 }
 
-export class VcsConfigurationRepositoryInternal extends VscConfigurationRepository {
+export class VcsConfigurationRepositoryInternal extends VcsConfigurationRepository {
   @unobservable private static nextProviderId = 1
   @unobservable private static nextAccountId = 1
 

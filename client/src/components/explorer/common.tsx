@@ -14,8 +14,11 @@ export function ExplorerModel(props: ProviderProps<models.Explorer<unknown> | nu
   return <ExplorerModelContext.Provider {...props} />
 }
 
-export function useExplorerModel<T extends models.Explorer<unknown>>(): T | null {
-  return useContext(ExplorerModelContext as React.Context<T | null>)
+export function useExplorerModel<T extends models.Explorer<unknown>>(): T {
+  const model = useContext(ExplorerModelContext as React.Context<T | null>)
+  if (!model)
+    throw new Error("Explorer model not provided")
+  return model
 }
 
 const OffsetContext = createContext(Number(styles.offsetBase))

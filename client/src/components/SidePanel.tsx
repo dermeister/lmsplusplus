@@ -10,6 +10,11 @@ export enum Side {
   Right,
 }
 
+const sidePanelToggleClasseNames = {
+  [Side.Left]: styles.sidePanelToggleLeft,
+  [Side.Right]: styles.sidePanelToggleRight,
+}
+
 interface SidePanelProps {
   model: models.SidePanel
   side: Side
@@ -23,8 +28,7 @@ export function SidePanel(props: SidePanelProps): JSX.Element {
   const { model, side, pulsing, panelClassName, toggleClassName, children } = props
   return autorender(() => {
     if (model.isOpened) {
-      const combinedPanelClassName = combineClassNames(styles.sidePanel,
-                                                       maybeValue(panelClassName, Boolean(panelClassName)))
+      const combinedPanelClassName = combineClassNames(styles.sidePanel, panelClassName)
       const combinedHeaderClassName = combineClassNames(styles.header,
                                                         maybeValue(styles.headerPulsing, Boolean(pulsing)))
       return (
@@ -39,11 +43,8 @@ export function SidePanel(props: SidePanelProps): JSX.Element {
       )
     } else {
       const combinedToggleClassName = combineClassNames(styles.sidePanelToggle,
-                                                        maybeValue(styles.sidePanelToggleLeft,
-                                                                   side === Side.Left),
-                                                        maybeValue(styles.sidePanelToggleRight,
-                                                                   side === Side.Right),
-                                                        maybeValue(toggleClassName, Boolean(toggleClassName)))
+                                                        sidePanelToggleClasseNames[side],
+                                                        toggleClassName)
       return (
         <Button
           variant="secondary"

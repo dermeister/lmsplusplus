@@ -22,9 +22,8 @@ export function Item<T>({ item, children }: ItemProps<T>): JSX.Element {
   }
 
   return autorender(() => {
-    const isSelected = model?.selectedNode === item
     const className = combineClassNames(buildNodeClassName(item),
-                                        maybeValue(styles.selected, isSelected))
+                                        maybeValue(styles.selected, model.selectedNode === item))
     return (
       <li key={item.key}>
         <p

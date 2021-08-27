@@ -1,15 +1,13 @@
 import React from "react"
 import styles from "./Button.module.scss"
-import { combineClassNames, maybeValue } from "./utils"
+import { combineClassNames } from "./utils"
 
 interface ButtonProps extends React.ComponentProps<"button"> {
   variant: "primary" | "secondary" | "danger"
 }
 
 export function Button(props: ButtonProps): JSX.Element {
-  const className = combineClassNames(styles.button,
-                                      variants[props.variant],
-                                      maybeValue(props.className, Boolean(props.className)))
+  const className = combineClassNames(styles.button, variants[props.variant], props.className)
   return <button {...reactButtonProps(props)} className={className} />
 }
 

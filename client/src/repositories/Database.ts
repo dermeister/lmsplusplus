@@ -5,7 +5,7 @@ import { Task } from "../domain/Task"
 import { VcsConfiguration } from "../domain/VcsConfiguration"
 import { PreferencesRepository, PreferencesRepositoryInternal } from "./PreferencesRepository"
 import { TasksRepository, TasksRepositoryInternal } from "./TasksRepository"
-import { VcsConfigurationRepositoryInternal, VscConfigurationRepository } from "./VscConfigurationRepository"
+import { VcsConfigurationRepositoryInternal, VcsConfigurationRepository } from "./VcsConfigurationRepository"
 
 export class Database implements Disposable {
   private readonly _tasksRepository = new TasksRepositoryInternal()
@@ -14,7 +14,7 @@ export class Database implements Disposable {
 
   get tasksRepository(): TasksRepository { return this._tasksRepository }
   get preferencesRepository(): PreferencesRepository { return this._preferencesRepository }
-  get vcsConfigurationRepository(): VscConfigurationRepository { return this._vcsConfigurationRepository }
+  get vcsConfigurationRepository(): VcsConfigurationRepository { return this._vcsConfigurationRepository }
 
   dispose(): void {
     Transaction.run(() => {
