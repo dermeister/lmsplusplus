@@ -17,7 +17,7 @@ export class VcsConfigurationRepositoryInternal extends VcsConfigurationReposito
 
   @transaction
   async update(configuration: VcsConfiguration): Promise<void> {
-    await new Promise(r => setTimeout(r, 1000))
+    await new Promise(r => setTimeout(r, 0))
 
     this._configuration = configuration
   }

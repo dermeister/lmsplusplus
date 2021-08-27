@@ -13,10 +13,7 @@ interface VcsProps {
 export function Vcs({ model }: VcsProps): JSX.Element {
   return autorender(() => {
     if (model.vcsProviders.length === 0)
-      return <h2 className={styles.noVcs}>There are no available VCS providers</h2>
-
-    if (model.vcsAccounts.length === 0)
-      return providerDropdown(model)
+      return <h2 className={styles.noVcsProviders}>There are no available VCS providers</h2>
 
     return (
       <>
@@ -29,27 +26,16 @@ export function Vcs({ model }: VcsProps): JSX.Element {
   }, [model])
 }
 
-function providerDropdown(options: models.Options): JSX.Element {
-  const providers = options.vcsProviders.map(createProviderOrNullDropdownItem)
-  if (providers.length === 0)
-    throw new Error("No providers available")
-  return (
-    <Field label="Add VCS account">
-      <Dropdown items={providers} placeholder="Select VCS provider" />
-    </Field>
-  )
-}
-
 function accountDropdown(options: models.Options): JSX.Element {
-  if (!options.vcsCurrentAccount)
-    throw new Error("Some account must be set to current by default")
-  const selectedAccountIndex = options.vcsAccounts.indexOf(options.vcsCurrentAccount)
-  const accounts = options.vcsAccounts.map(createAccountDropdownItem)
-  return <Dropdown selectedItemIndex={selectedAccountIndex} items={accounts} />
-}
+  function onChange(index: number): void {
+    options.setSelectedAccount(accounts[index].value)
+  }
 
-function createProviderOrNullDropdownItem(provider: Provider): DropdownItem<Provider> {
-  return { value: provider, title: provider.name, key: provider.id }
+  const accounts = options.vcsAccounts.map(createAccountDropdownItem)
+  if (!options.vcsCurrentAccount)
+    return <Dropdown items={accounts} onChange={onChange} placeholder="Choose account" />
+  const selectedAccountIndex = options.vcsAccounts.indexOf(options.vcsCurrentAccount)
+  return <Dropdown selectedItemIndex={selectedAccountIndex} items={accounts} onChange={onChange} />
 }
 
 function createAccountDropdownItem(account: Account): DropdownItem<Account> {
@@ -58,7 +44,7 @@ function createAccountDropdownItem(account: Account): DropdownItem<Account> {
 
 function providerList(options: models.Options): JSX.Element[] {
   return options.vcsProviders.map(provider => (
-    <ul key={provider.name} className={styles.provider}>
+    <ul key={provider.id} className={styles.provider}>
       <div className={styles.providerHeading}>
         <h2 className={styles.providerName}>
           <img
@@ -78,10 +64,10 @@ function providerList(options: models.Options): JSX.Element[] {
 }
 
 function accountList(options: models.Options, provider: Provider): JSX.Element[] {
-  return options.vcsAccounts.filter(account => account.provider === provider).map(a => (
-    <li key={a.username} className={styles.account}>
-      <button className={styles.deleteAccount} />
-      <span className={styles.accountName}>{a.username}</span>
+  return options.vcsAccounts.filter(account => account.provider === provider).map(account => (
+    <li key={account.id} className={styles.account}>
+      <button onClick={() => options.deleteAccount(account)} className={styles.deleteAccount} />
+      <span className={styles.accountName}>{account.username}</span>
     </li>
   ))
 }

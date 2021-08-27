@@ -44,7 +44,7 @@ export function Dropdown<T>(props: DropdownProps<T>): JSX.Element {
   let content
   if (isOpened) {
     const itemsWithoutSelected = items
-      .filter(i => selectedItemIndex !== undefined && i.key !== items[selectedItemIndex].key)
+      .filter(i => selectedItemIndex === undefined || i.key !== items[selectedItemIndex].key)
     content = (
       <Overlay onClick={() => setIsOpened(false)}>
         {preview()}
