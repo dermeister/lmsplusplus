@@ -2,11 +2,11 @@ import React from "react"
 import * as models from "../models"
 import styles from "./AppScreen.module.scss"
 import { autorender } from "./autorender"
+import { DemoView } from "./demo/DemoView"
 import { OptionsView } from "./options/OptionsView"
 import { Side, SidePanel } from "./SidePanel"
 import { TasksView } from "./tasks/TasksView"
 import { ViewBar } from "./ViewBar"
-import { DemoView } from "./views/DemoView"
 import { SolutionsView } from "./views/SolutionsView"
 
 interface AppScreenProps {

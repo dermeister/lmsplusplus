@@ -9,9 +9,17 @@ export class CourseNode extends GroupNode {
 
   override get children(): readonly ItemNode<Task>[] { return super.children as readonly ItemNode<Task>[] }
 
-  constructor(title: string, course: Course, children: readonly ItemNode<Task>[]) {
-    super(title, `course-${course.id}`, true, children)
+  constructor(course: Course) {
+    super(course.name, `course-${course.id}`, true, CourseNode.createTaskNodes(course.tasks))
     this.item = course
+  }
+
+  private static createTaskNodes(tasks: readonly Task[]): readonly ItemNode<Task>[] {
+    function createItemNode(task: Task): ItemNode<Task> {
+      return new ItemNode(task.title, `task-${task.id}`, true, task)
+    }
+
+    return Transaction.run(() => tasks.map(createItemNode))
   }
 }
 
@@ -57,13 +65,7 @@ export class TasksExplorer extends Explorer<Task> {
   }
 
   private static createCourseNodes(courses: readonly Course[]): readonly CourseNode[] {
-    return Transaction.run(() => {
-      return courses.map(c => new CourseNode(c.name, c, TasksExplorer.createTaskNodes(c.tasks)))
-    })
-  }
-
-  private static createTaskNodes(tasks: readonly Task[]): readonly ItemNode<Task>[] {
-    return Transaction.run(() => tasks.map(t => new ItemNode(t.title, `task-${t.id}`, true, t)))
+    return Transaction.run(() => courses.map(c => new CourseNode(c)))
   }
 
   @reaction

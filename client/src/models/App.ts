@@ -1,17 +1,17 @@
 import { reaction, transaction, Transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
 import { Database } from "../repositories"
+import { DemoView } from "./demo"
 import { Options, OptionsView } from "./options"
+import { SolutionsView } from "./solutions"
 import { TasksView } from "./tasks"
-import { DemoView } from "./views/DemoView"
-import { SolutionsView } from "./views/SolutionsView"
 
 export type View = TasksView | DemoView | SolutionsView | OptionsView
 
 export class App extends ObservableObject {
   @unobservable readonly tasksView: TasksView
   @unobservable readonly solutionsView = new SolutionsView()
-  @unobservable readonly demoView = new DemoView()
+  @unobservable readonly demoView = new DemoView(null)
   @unobservable readonly optionsView: OptionsView
   @unobservable readonly options: Options
   @unobservable private readonly database = new Database()
@@ -21,10 +21,10 @@ export class App extends ObservableObject {
 
   constructor() {
     super()
-    this.tasksView = new TasksView(this.database.tasksRepository)
-    this.options = new Options(this.database.preferencesRepository, this.database.vcsConfigurationRepository)
+    this.tasksView = new TasksView(this.database.courses)
+    this.options = new Options(this.database.preferences, this.database.vcsConfiguration)
     this.optionsView = new OptionsView(this.options)
-    this._activeView = this.optionsView
+    this._activeView = this.tasksView
   }
 
   override dispose(): void {
@@ -42,6 +42,11 @@ export class App extends ObservableObject {
   @transaction
   setActiveView(view: View): void {
     this._activeView = view
+  }
+
+  @reaction
+  private tasksView_synchronized_with_courses(): void {
+    this.tasksView.update(this.database.courses)
   }
 
   @reaction
@@ -63,6 +68,17 @@ export class App extends ObservableObject {
   }
 
   @reaction
+  private async demoView_synchronized_with_selected_task(): Promise<void> {
+    const task = this.tasksView.explorer.selectedTask
+    this.demoView.updateDemos(task ? this.database.getDemos(task) : null)
+  }
+
+  @reaction
+  private options_synchronized_with_preferences_and_vcsConfiguration(): void {
+    this.options.update(this.database.preferences, this.database.vcsConfiguration)
+  }
+
+  @reaction
   private async updatedPreferences_updated_in_database(): Promise<void> {
     if (this.options.updatedPreferences)
       await this.database.updatePreferences(this.options.updatedPreferences)
@@ -71,7 +87,7 @@ export class App extends ObservableObject {
   @reaction
   private async updatedVcsConfiguration_updated_in_database(): Promise<void> {
     if (this.options.updatedVcsConfiguration)
-      await this.database.updateVscConfiguration(this.options.updatedVcsConfiguration)
+      await this.database.updateVcsConfiguration(this.options.updatedVcsConfiguration)
   }
 
   @reaction

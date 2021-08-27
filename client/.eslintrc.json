@@ -12,6 +12,7 @@
     "@typescript-eslint/quotes": ["error", "double"],
     "@typescript-eslint/indent": ["error", 2, {
       "SwitchCase": 1,
+      "FunctionDeclaration": { "parameters": "first" },
       "CallExpression": { "arguments": "first" }
     }],
     "@typescript-eslint/no-explicit-any": "error",
