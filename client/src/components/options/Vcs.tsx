@@ -28,7 +28,7 @@ export function Vcs({ model }: VcsProps): JSX.Element {
 
 function accountDropdown(options: models.Options): JSX.Element {
   function onChange(index: number): void {
-    options.setSelectedAccount(accounts[index].value)
+    options.setCurrentAccount(accounts[index].value)
   }
 
   const accounts = options.vcsAccounts.map(createAccountDropdownItem)

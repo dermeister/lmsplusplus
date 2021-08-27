@@ -30,17 +30,15 @@ export class Options extends ObservableObject {
   }
 
   @transaction
-  setSelectedAccount(account: Account): void {
-    let { providers, accounts } = this.vcsConfigurationRepository.configuration
-    this._updatedVcsConfiguration = new VcsConfiguration(providers, accounts, account)
+  setCurrentAccount(account: Account): void {
+    this._updatedVcsConfiguration = this.vcsConfiguration.update({ currentAccount: account })
   }
 
   @transaction
   deleteAccount(account: Account): void {
-    const updatedAccounts = this.vcsAccounts.filter(a => a !== account)
-    let { providers, currentAccount } = this.vcsConfigurationRepository.configuration
-    if (account === currentAccount)
-      currentAccount = null
-    this._updatedVcsConfiguration = new VcsConfiguration(providers, updatedAccounts, currentAccount)
+    const accounts = this.vcsAccounts.filter(a => a !== account)
+    const { currentAccount } = this.vcsConfiguration
+    const fields = { accounts, currentAccount: account === currentAccount ? null : currentAccount }
+    this._updatedVcsConfiguration = this.vcsConfiguration.update(fields)
   }
 }
