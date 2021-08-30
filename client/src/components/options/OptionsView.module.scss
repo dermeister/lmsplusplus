@@ -21,10 +21,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  margin-top: 14px;
 }
 
 .content {
-  padding: 14px 30px;
   min-width: 320px;
   width: 60%;
 }

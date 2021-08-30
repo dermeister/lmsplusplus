@@ -7,7 +7,7 @@
   padding: 14px;
   height: 100%;
 
-  box-shadow: 1px 0 3px var(--shadow-primary-color);
+  box-shadow: var(--shadow-primary-right);
 }
 
 .view-button {
@@ -31,14 +31,6 @@
   @include view-button-image(var(--tasks-icon-url));
 }
 
-.solutions {
-  @include view-button-image(var(--solutions-icon-url));
-}
-
-.demo {
-  @include view-button-image(var(--demo-icon-url));
-}
-
 .options {
   @include view-button-image(var(--options-icon-url));
 }
@@ -58,8 +50,4 @@
   100% {
     transform: rotate(0deg);
   }
-}
-
-.bottom-buttons {
-  margin-top: auto;
 }

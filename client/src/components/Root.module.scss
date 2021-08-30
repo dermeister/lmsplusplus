@@ -8,6 +8,8 @@
   --app-primary-background-color: #212121;
   --app-primary-text-color: #e0e0e0;
   --app-primary-text-color-hover: #eeeeee;
+  --app-primary-highlight: #1976d2;
+  --app-primary-highlight-hover: #1e88e5;
   /* App secondary */
   --app-secondary-background-color: #424242;
   --app-secondary-background-color-hover: #616161;
@@ -40,9 +42,8 @@
   --shadow-primary-color: #000000;
   --shadow-secondary-color: #212121;
   --shadow-size: 4px;
-
-  /* Side panel */
-  --side-panel-header-pulsing-color: #1e88e5;
+  --shadow-primary-right: 1px 0 var(--shadow-size) -1px var(--shadow-primary-color);
+  --shadow-primary-left: -1px 0 var(--shadow-size) -1px var(--shadow-primary-color);
 
   /* Dropdown */
   --dropdown-border-color: #1976d2;
@@ -54,12 +55,10 @@
   --options-icon-url: url("../assets/cog.svg");
   --arrow-down-icon-url: url("../assets/chevron-down.svg");
   --arrow-right-icon-url: url("../assets/chevron-right.svg");
-  --cross-icon-url: url("../assets/times.svg");
-  --cross-hovered-icon-url: url("../assets/times-hovered.svg");
   --plus-icon-url: url("../assets/plus.svg");
   --plus-hovered-icon-url: url("../assets/plus-hovered.svg");
-  --minus-danger-icon-url: url("../assets/minus-danger.svg");
-  --minus-danger-hovered-icon-url: url("../assets/minus-danger-hovered.svg");
+  --minus-danger-icon-url: url("../assets/trash-danger.svg");
+  --minus-danger-hovered-icon-url: url("../assets/trash-danger-hovered.svg");
 }
 
 .root {

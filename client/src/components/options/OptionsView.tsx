@@ -17,19 +17,26 @@ interface OptionsViewProps {
 export function OptionsView({ model }: OptionsViewProps): JSX.Element {
   const auth = useAuth()
 
-  return autorender(() => (
-    <>
-      <AppScreen.LeftPanel model={model.leftPanel}>
-        <div className={styles.leftPanelContent}>
-          <OptionCategories model={model.categories} />
-          <Button variant="danger" onClick={() => auth.signOut()} className={styles.signOut}>
-            Sign out
-          </Button>
-        </div>
-      </AppScreen.LeftPanel>
-      <AppScreen.MainPanel>{content(model)}</AppScreen.MainPanel>
-    </>
-  ), [model])
+  function optionCategoriesPanel(): JSX.Element {
+    return (
+      <div className={styles.leftPanelContent}>
+        <OptionCategories model={model.categories} />
+        <Button variant="danger" onClick={() => auth.signOut()} className={styles.signOut}>
+          Sign out
+        </Button>
+      </div>
+    )
+  }
+
+  return autorender(() => {
+    const panels = new Map([[model.leftPanel, optionCategoriesPanel]])
+    return (
+      <>
+        <AppScreen.SidePanelGroup model={model.leftPanelGroup} panels={panels} />
+        <AppScreen.MainPanel>{content(model)}</AppScreen.MainPanel>
+      </>
+    )
+  }, [model])
 }
 
 function content(model: models.OptionsView): JSX.Element {

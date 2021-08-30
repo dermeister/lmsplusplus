@@ -1,7 +1,7 @@
-import { transaction, Transaction, unobservable } from "reactronic"
+import { transaction, unobservable } from "reactronic"
 import { Demo } from "../../domain/Demo"
 import { ObservableObject } from "../../ObservableObject"
-import { SidePanel } from "../SidePanel"
+import { SidePanel } from "../SidePanelGroup"
 import { DemoExplorer } from "./DemoExplorer"
 
 export class DemoView extends ObservableObject {
@@ -21,12 +21,5 @@ export class DemoView extends ObservableObject {
   updateDemos(demos: readonly Demo[] | null): void {
     this._isTaskOpened = demos !== null
     this.explorer.updateDemos(demos ?? [])
-  }
-
-  override dispose(): void {
-    Transaction.run(() => {
-      this.leftPanel.dispose()
-      super.dispose()
-    })
   }
 }

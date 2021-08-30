@@ -6,37 +6,37 @@ import { ContextMenu } from "../ContextMenu"
 import { Explorer } from "../explorer"
 
 interface TasksExplorerProps {
-  model: models.TasksExplorer
+  model: models.TasksView
 }
 
 export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
   return autorender(() => (
-    <Explorer model={model}>{courses(model, model.children)}</Explorer>
+    <Explorer model={model.explorer}>{courses(model, model.explorer.children)}</Explorer>
   ), [model])
 }
 
-function onCreateTask(explorer: models.TasksExplorer, course: models.CourseNode): void {
+function onCreateTask(model: models.TasksView, course: models.CourseNode): void {
   course.contextMenu?.close()
-  explorer.createTask(course.item)
+  model.createTask(course.item)
 }
 
-function onEditTask(explorer: models.TasksExplorer, task: models.ItemNode<Task>): void {
+function onEditTask(tasks: models.TasksView, task: models.ItemNode<Task>): void {
   task.contextMenu?.close()
-  explorer.updateTask(task.item)
+  tasks.updateTask(task.item)
 }
 
-function onDeleteTask(explorer: models.TasksExplorer, task: models.ItemNode<Task>): void {
+function onDeleteTask(tasks: models.TasksView, task: models.ItemNode<Task>): void {
   task.contextMenu?.close()
-  explorer.deleteTask(task.item)
+  tasks.deleteTask(task.item)
 }
 
-function courses(explorer: models.TasksExplorer, courses: readonly models.CourseNode[]): JSX.Element[] {
+function courses(model: models.TasksView, courses: readonly models.CourseNode[]): JSX.Element[] {
   return courses.map(course => {
     let contextMenu
     if (course.contextMenu)
       contextMenu = (
         <ContextMenu model={course.contextMenu}>
-          <ContextMenu.Button onClick={() => onCreateTask(explorer, course)}>New Task</ContextMenu.Button>
+          <ContextMenu.Button onClick={() => onCreateTask(model, course)}>New Task</ContextMenu.Button>
           <ContextMenu.Button>Edit Course</ContextMenu.Button>
           <ContextMenu.Button>Delete Course</ContextMenu.Button>
         </ContextMenu>
@@ -47,20 +47,20 @@ function courses(explorer: models.TasksExplorer, courses: readonly models.Course
           {course.title}
           {contextMenu}
         </Explorer.Group>
-        <Explorer.Children group={course}>{tasks(explorer, course.children)}</Explorer.Children>
+        <Explorer.Children group={course}>{tasks(model, course.children)}</Explorer.Children>
       </li>
     )
   })
 }
 
-function tasks(explorer: models.TasksExplorer, tasks: readonly models.ItemNode<Task>[]): JSX.Element[] {
+function tasks(model: models.TasksView, tasks: readonly models.ItemNode<Task>[]): JSX.Element[] {
   return tasks.map(task => {
     let contextMenu
     if (task.contextMenu)
       contextMenu = (
         <ContextMenu model={task.contextMenu}>
-          <ContextMenu.Button onClick={() => onEditTask(explorer, task)}>Edit Task</ContextMenu.Button>
-          <ContextMenu.Button onClick={() => onDeleteTask(explorer, task)}>Delete Task</ContextMenu.Button>
+          <ContextMenu.Button onClick={() => onEditTask(model, task)}>Edit Task</ContextMenu.Button>
+          <ContextMenu.Button onClick={() => onDeleteTask(model, task)}>Delete Task</ContextMenu.Button>
         </ContextMenu>
       )
     return (

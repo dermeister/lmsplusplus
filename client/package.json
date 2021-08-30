@@ -12,7 +12,9 @@
     "monaco-editor": "^0.26.1",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
-    "reactronic": "^0.21.512"
+    "reactronic": "^0.21.512",
+    "xterm": "^4.13.0",
+    "xterm-addon-fit": "^0.5.0"
   },
   "devDependencies": {
     "@types/react": "^17.0.0",

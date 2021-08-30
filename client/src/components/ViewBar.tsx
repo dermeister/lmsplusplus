@@ -1,8 +1,9 @@
 import React from "react"
 import * as models from "../models"
+import { View } from "../models"
 import { autorender } from "./autorender"
 import { Button } from "./Button"
-import { combineClassNames } from "./utils"
+import { combineClassNames, maybeValue } from "./utils"
 import styles from "./ViewBar.module.scss"
 
 interface ViewBarProps {
@@ -13,38 +14,18 @@ interface ViewBarProps {
 export function ViewBar({ model, className }: ViewBarProps): JSX.Element {
   return autorender(() => (
     <div className={combineClassNames(styles.viewBar, className)}>
-      <div className={styles.topButtons}>
-        {button(model, model.tasksView)}
-        {button(model, model.solutionsView)}
-        {button(model, model.demoView)}
-      </div>
-
-      <div className={styles.bottomButtons}>{button(model, model.optionsView)}</div>
+      {button(model, model.tasksView)}
+      {button(model, model.optionsView)}
     </div>
   ), [model, className])
 }
 
 function button(model: models.App, view: models.View): JSX.Element {
-  let className = styles.viewButton
-  let variant: "primary" | "secondary"
-  if (model.activeView === view) {
-    className += ` ${styles.selected}`
-    variant = "secondary"
-  } else
-    variant = "primary"
-  switch (view) {
-    case model.tasksView:
-      className += ` ${styles.tasks}`
-      break
-    case model.solutionsView:
-      className += ` ${styles.solutions}`
-      break
-    case model.demoView:
-      className += ` ${styles.demo}`
-      break
-    case model.optionsView:
-      className += ` ${styles.options}`
-      break
-  }
+  const viewStylesIterable = [[model.tasksView, styles.tasks], [model.optionsView, styles.options]]
+  const viewStyles = new Map<View, string>(viewStylesIterable as [View, string][])
+  const className = combineClassNames(styles.viewButton,
+                                      viewStyles.get(view),
+                                      maybeValue(styles.selected, model.activeView === view))
+  const variant = model.activeView === view ? "primary" : "secondary"
   return <Button variant={variant} onClick={() => model.setActiveView(view)} className={className} />
 }

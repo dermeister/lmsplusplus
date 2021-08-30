@@ -3,15 +3,12 @@ import { ObservableObject } from "../ObservableObject"
 import { Database } from "../repositories"
 import { DemoView } from "./demo"
 import { Options, OptionsView } from "./options"
-import { SolutionsView } from "./solutions"
 import { TasksView } from "./tasks"
 
-export type View = TasksView | DemoView | SolutionsView | OptionsView
+export type View = TasksView | DemoView | OptionsView
 
 export class App extends ObservableObject {
   @unobservable readonly tasksView: TasksView
-  @unobservable readonly solutionsView = new SolutionsView()
-  @unobservable readonly demoView = new DemoView(null)
   @unobservable readonly optionsView: OptionsView
   @unobservable readonly options: Options
   @unobservable private readonly database = new Database()
@@ -22,16 +19,15 @@ export class App extends ObservableObject {
   constructor() {
     super()
     this.tasksView = new TasksView(this.database.courses)
+    this._activeView = this.tasksView
     this.options = new Options(this.database.preferences, this.database.vcsConfiguration)
     this.optionsView = new OptionsView(this.options)
-    this._activeView = this.tasksView
+
   }
 
   override dispose(): void {
     Transaction.run(() => {
       this.tasksView.dispose()
-      this.solutionsView.dispose()
-      this.demoView.dispose()
       this.optionsView.dispose()
       this.options.dispose()
       this.database.dispose()
@@ -68,12 +64,6 @@ export class App extends ObservableObject {
   }
 
   @reaction
-  private async demoView_synchronized_with_selected_task(): Promise<void> {
-    const task = this.tasksView.explorer.selectedTask
-    this.demoView.updateDemos(task ? this.database.getDemos(task) : null)
-  }
-
-  @reaction
   private options_synchronized_with_preferences_and_vcsConfiguration(): void {
     this.options.update(this.database.preferences, this.database.vcsConfiguration)
   }
@@ -88,14 +78,5 @@ export class App extends ObservableObject {
   private async updatedVcsConfiguration_updated_in_database(): Promise<void> {
     if (this.options.updatedVcsConfiguration)
       await this.database.updateVcsConfiguration(this.options.updatedVcsConfiguration)
-  }
-
-  @reaction
-  private all_left_panels_in_same_state_as_active(): void {
-    const leftPanelsExceptActive = [this.tasksView, this.solutionsView, this.demoView, this.optionsView]
-      .filter(v => v !== this._activeView)
-      .map(v => v.leftPanel)
-    for (const leftPanel of leftPanelsExceptActive)
-      this._activeView.leftPanel.isOpened ? leftPanel.open() : leftPanel.close()
   }
 }

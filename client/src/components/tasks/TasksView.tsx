@@ -26,22 +26,34 @@ export function TasksView({ model }: TasksViewProps): JSX.Element {
   }
 
   function rightPanel(): JSX.Element | undefined {
-    if (model.explorer.taskEditor)
-      return (
-        <AppScreen.RightPanel model={model.rightPanel}>
-          <TaskEditor model={model.explorer.taskEditor} />
-        </AppScreen.RightPanel>
-      )
+    if (model.explorer.taskEditor) {
+      const panels = new Map([[model.rightPanel, taskEditor]])
+      return <AppScreen.SidePanelGroup model={model.rightSidePanelGroup} panels={panels} />
+    }
   }
 
-  return autorender(() => (
-    <>
-      <AppScreen.LeftPanel model={model.leftPanel} pulsing={model.monitor.isActive}>
-        <TasksExplorer model={model.explorer} />
-      </AppScreen.LeftPanel>
+  function tasksExplorer(): JSX.Element {
+    return <TasksExplorer model={model} />
+  }
 
-      {mainPanel()}
-      {rightPanel()}
-    </>
-  ), [model, model.monitor])
+  function taskEditor(): JSX.Element {
+    if (!model.explorer.taskEditor)
+      throw new Error("Task editor is not created")
+    return <TaskEditor model={model.explorer.taskEditor} />
+  }
+
+  return autorender(() => {
+    const panels = new Map([[model.leftPanel, tasksExplorer]])
+    return (
+      <>
+        <AppScreen.SidePanelGroup
+          model={model.leftSidePanelGroup}
+          panels={panels}
+          pulsing={model.monitor.isActive}
+        />
+        {mainPanel()}
+        {rightPanel()}
+      </>
+    )
+  }, [model, model.monitor])
 }
