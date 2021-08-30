@@ -10,15 +10,15 @@ const sidePanelGroupClasses = {
 }
 
 interface SidePanelGroupProps {
-  model: models.SidePanelGroup
-  panels: Map<models.SidePanel, () => React.ReactNode>
+  model: models.PanelGroup
+  panels: Record<string, () => React.ReactNode>
   pulsing?: boolean
 }
 
 export function SidePanelGroup({ model, panels, pulsing }: SidePanelGroupProps): JSX.Element {
   function panel(): JSX.Element | undefined {
     if (model.isOpened && model.activePanel) {
-      const panelContent = panels.get(model.activePanel)
+      const panelContent = panels[model.activePanel]
       if (!panelContent)
         throw new Error("Render function is not provided for active panel")
       const combinedPanelClassName = combineClassNames(styles.sidePanel)
@@ -27,7 +27,7 @@ export function SidePanelGroup({ model, panels, pulsing }: SidePanelGroupProps):
       return (
         <div className={combinedPanelClassName}>
           <header className={combinedHeaderClassName}>
-            <h2 className={styles.title}>{model.activePanel.title}</h2>
+            <h2 className={styles.title}>{model.activePanel}</h2>
           </header>
           <div className={styles.panelContent}>{panelContent()}</div>
         </div>
@@ -43,9 +43,9 @@ export function SidePanelGroup({ model, panels, pulsing }: SidePanelGroupProps):
         <button
           onClick={() => model.togglePanel(panel)}
           className={className}
-          key={panel.title}
+          key={panel}
         >
-          <span>{panel.title}</span>
+          <span>{panel}</span>
         </button>
       )
     })

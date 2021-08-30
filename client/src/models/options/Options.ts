@@ -1,31 +1,26 @@
-import { transaction } from "reactronic"
+import { transaction, unobservable } from "reactronic"
+import { ReadOnlyDatabase } from "../../database"
 import { Preferences } from "../../domain/Preferences"
 import { Account, Provider, VcsConfiguration } from "../../domain/VcsConfiguration"
 import { ObservableObject } from "../../ObservableObject"
 
 export class Options extends ObservableObject {
-  private _preferences: Preferences
-  private _vcsConfiguration: VcsConfiguration
+  @unobservable private readonly database: ReadOnlyDatabase
   private _updatedPreferences: Preferences | null = null
   private _updatedVcsConfiguration: VcsConfiguration | null = null
 
-  get darkMode(): boolean { return this._preferences.darkMode }
-  get vcsProviders(): readonly Provider[] { return this._vcsConfiguration.providers }
-  get vcsAccounts(): readonly Account[] { return this._vcsConfiguration.accounts }
-  get vcsCurrentAccount(): Account | null { return this._vcsConfiguration.currentAccount }
+  get darkMode(): boolean { return this.preferences.darkMode }
+  get vcsProviders(): readonly Provider[] { return this.vcsConfiguration.providers }
+  get vcsAccounts(): readonly Account[] { return this.vcsConfiguration.accounts }
+  get vcsCurrentAccount(): Account | null { return this.vcsConfiguration.currentAccount }
   get updatedPreferences(): Preferences | null { return this._updatedPreferences }
   get updatedVcsConfiguration(): VcsConfiguration | null { return this._updatedVcsConfiguration }
+  private get preferences(): Preferences { return this.database.preferences }
+  private get vcsConfiguration(): VcsConfiguration { return this.database.vcsConfiguration }
 
-  constructor(preferences: Preferences, vcsConfiguration: VcsConfiguration) {
+  constructor(database: ReadOnlyDatabase) {
     super()
-    this._preferences = preferences
-    this._vcsConfiguration = vcsConfiguration
-  }
-
-  @transaction
-  update(preferences: Preferences, vcsConfiguration: VcsConfiguration): void {
-    this._preferences = preferences
-    this._vcsConfiguration = vcsConfiguration
+    this.database = database
   }
 
   @transaction
@@ -35,14 +30,14 @@ export class Options extends ObservableObject {
 
   @transaction
   setCurrentAccount(account: Account): void {
-    this._updatedVcsConfiguration = this._vcsConfiguration.update({ currentAccount: account })
+    this._updatedVcsConfiguration = this.vcsConfiguration.update({ currentAccount: account })
   }
 
   @transaction
   deleteAccount(account: Account): void {
     const accounts = this.vcsAccounts.filter(a => a !== account)
-    const { currentAccount } = this._vcsConfiguration
+    const { currentAccount } = this.vcsConfiguration
     const fields = { accounts, currentAccount: account === currentAccount ? null : currentAccount }
-    this._updatedVcsConfiguration = this._vcsConfiguration.update(fields)
+    this._updatedVcsConfiguration = this.vcsConfiguration.update(fields)
   }
 }

@@ -29,10 +29,9 @@ export function OptionsView({ model }: OptionsViewProps): JSX.Element {
   }
 
   return autorender(() => {
-    const panels = new Map([[model.leftPanel, optionCategoriesPanel]])
     return (
       <>
-        <AppScreen.SidePanelGroup model={model.leftPanelGroup} panels={panels} />
+        <AppScreen.SidePanelGroup model={model.leftPanelGroup} panels={{ options: optionCategoriesPanel }} />
         <AppScreen.MainPanel>{content(model)}</AppScreen.MainPanel>
       </>
     )

@@ -22,11 +22,6 @@ export class Root extends ObservableObject {
     })
   }
 
-  @reaction
-  private app_created_on_sign_in_and_disposed_on_sign_out(): void {
-    this.auth.user ? this.createApp() : this.disposeApp()
-  }
-
   @transaction
   private createApp(): void {
     this._app = new App()
@@ -36,5 +31,10 @@ export class Root extends ObservableObject {
   private disposeApp(): void {
     this._app?.dispose()
     this._app = null
+  }
+
+  @reaction
+  private app_created_on_sign_in_and_disposed_on_sign_out(): void {
+    this.auth.user ? this.createApp() : this.disposeApp()
   }
 }

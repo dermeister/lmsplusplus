@@ -11,7 +11,7 @@ interface TasksExplorerProps {
 
 export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
   return autorender(() => (
-    <Explorer model={model.explorer}>{courses(model, model.explorer.children)}</Explorer>
+    <Explorer model={model.tasksExplorer}>{courses(model, model.tasksExplorer.children)}</Explorer>
   ), [model])
 }
 
@@ -20,14 +20,19 @@ function onCreateTask(model: models.TasksView, course: models.CourseNode): void 
   model.createTask(course.item)
 }
 
-function onEditTask(tasks: models.TasksView, task: models.ItemNode<Task>): void {
+function onRunDemo(model: models.TasksView, task: models.ItemNode<Task>): void {
   task.contextMenu?.close()
-  tasks.updateTask(task.item)
+  model.runDemo(task.item)
 }
 
-function onDeleteTask(tasks: models.TasksView, task: models.ItemNode<Task>): void {
+function onEditTask(model: models.TasksView, task: models.ItemNode<Task>): void {
   task.contextMenu?.close()
-  tasks.deleteTask(task.item)
+  model.updateTask(task.item)
+}
+
+function onDeleteTask(model: models.TasksView, task: models.ItemNode<Task>): void {
+  task.contextMenu?.close()
+  model.deleteTask(task.item)
 }
 
 function courses(model: models.TasksView, courses: readonly models.CourseNode[]): JSX.Element[] {
@@ -59,6 +64,7 @@ function tasks(model: models.TasksView, tasks: readonly models.ItemNode<Task>[])
     if (task.contextMenu)
       contextMenu = (
         <ContextMenu model={task.contextMenu}>
+          <ContextMenu.Button onClick={() => onRunDemo(model, task)}>Run Demo</ContextMenu.Button>
           <ContextMenu.Button onClick={() => onEditTask(model, task)}>Edit Task</ContextMenu.Button>
           <ContextMenu.Button onClick={() => onDeleteTask(model, task)}>Delete Task</ContextMenu.Button>
         </ContextMenu>

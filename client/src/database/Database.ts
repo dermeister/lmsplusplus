@@ -10,9 +10,10 @@ import { Task } from "../domain/Task"
 import { User } from "../domain/User"
 import { Account, Provider, VcsConfiguration } from "../domain/VcsConfiguration"
 import { ObservableObject } from "../ObservableObject"
+import { ReadOnlyDatabase } from "./ReadOnlyDatabase"
 
-export class Database extends ObservableObject {
-  static readonly monitor = Monitor.create("Database", 0, 0)
+export class Database extends ObservableObject implements ReadOnlyDatabase {
+  private static readonly _monitor = Monitor.create("Database", 0, 0)
   private static nextId = 1
   private _courses: Course[] = []
   private _solutions: Solution[] = []
@@ -21,6 +22,7 @@ export class Database extends ObservableObject {
   private _preferences = Preferences.default
   private _user = User.default
 
+  get monitor(): Monitor { return Database._monitor }
   get courses(): readonly Course[] { return this._courses }
   get vcsConfiguration(): VcsConfiguration { return this._vcsConfiguration }
   get preferences(): Preferences { return this._preferences }
@@ -34,7 +36,7 @@ export class Database extends ObservableObject {
     return this._demos.filter(d => d.solution.task === task)
   }
 
-  @transaction @monitor(Database.monitor)
+  @transaction @monitor(Database._monitor)
   async createTask(task: Task): Promise<void> {
     await new Promise(r => setTimeout(r, 1000))
 
@@ -49,7 +51,7 @@ export class Database extends ObservableObject {
     this._courses = courses
   }
 
-  @transaction @monitor(Database.monitor)
+  @transaction @monitor(Database._monitor)
   async updateTask(task: Task): Promise<void> {
     await new Promise(r => setTimeout(r, 1000))
 
@@ -67,7 +69,7 @@ export class Database extends ObservableObject {
     this._courses = courses
   }
 
-  @transaction @monitor(Database.monitor)
+  @transaction @monitor(Database._monitor)
   async deleteTask(task: Task): Promise<void> {
     await new Promise(r => setTimeout(r, 1000))
 
@@ -81,21 +83,21 @@ export class Database extends ObservableObject {
     this._courses = courses
   }
 
-  @transaction @monitor(Database.monitor)
+  @transaction @monitor(Database._monitor)
   async updatePreferences(preferences: Preferences): Promise<void> {
     await new Promise(r => setTimeout(r, 0))
 
     this._preferences = preferences
   }
 
-  @transaction @monitor(Database.monitor)
+  @transaction @monitor(Database._monitor)
   async updateUser(user: User): Promise<void> {
     await new Promise(r => setTimeout(r, 1000))
 
     this._user = user
   }
 
-  @transaction @monitor(Database.monitor)
+  @transaction @monitor(Database._monitor)
   async updateVcsConfiguration(vcsConfiguration: VcsConfiguration): Promise<void> {
     await new Promise(r => setTimeout(r, 0))
 

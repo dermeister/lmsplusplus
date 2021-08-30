@@ -1,11 +1,10 @@
 import { reaction, transaction, Transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
-import { Database } from "../repositories"
-import { DemoView } from "./demo"
+import { Database } from "../database"
 import { Options, OptionsView } from "./options"
 import { TasksView } from "./tasks"
 
-export type View = TasksView | DemoView | OptionsView
+export type View = TasksView | OptionsView
 
 export class App extends ObservableObject {
   @unobservable readonly tasksView: TasksView
@@ -18,11 +17,10 @@ export class App extends ObservableObject {
 
   constructor() {
     super()
-    this.tasksView = new TasksView(this.database.courses)
+    this.tasksView = new TasksView(this.database)
     this._activeView = this.tasksView
-    this.options = new Options(this.database.preferences, this.database.vcsConfiguration)
+    this.options = new Options(this.database)
     this.optionsView = new OptionsView(this.options)
-
   }
 
   override dispose(): void {
@@ -41,11 +39,6 @@ export class App extends ObservableObject {
   }
 
   @reaction
-  private tasksView_synchronized_with_courses(): void {
-    this.tasksView.update(this.database.courses)
-  }
-
-  @reaction
   private async createdTask_created_in_database(): Promise<void> {
     if (this.tasksView.createdTask)
       await this.database.createTask(this.tasksView.createdTask)
@@ -61,11 +54,6 @@ export class App extends ObservableObject {
   private async deletedTask_deleted_from_database(): Promise<void> {
     if (this.tasksView.deletedTask)
       await this.database.deleteTask(this.tasksView.deletedTask)
-  }
-
-  @reaction
-  private options_synchronized_with_preferences_and_vcsConfiguration(): void {
-    this.options.update(this.database.preferences, this.database.vcsConfiguration)
   }
 
   @reaction
