@@ -17,7 +17,7 @@ interface OptionsViewProps {
 export function OptionsView({ model }: OptionsViewProps): JSX.Element {
   const auth = useAuth()
 
-  function optionCategoriesPanel(): JSX.Element {
+  function optionCategories(): JSX.Element {
     return (
       <div className={styles.leftPanelContent}>
         <OptionCategories model={model.categories} />
@@ -31,7 +31,12 @@ export function OptionsView({ model }: OptionsViewProps): JSX.Element {
   return autorender(() => {
     return (
       <>
-        <AppScreen.SidePanelGroup model={model.leftPanelGroup} panels={{ options: optionCategoriesPanel }} />
+        <AppScreen.SidePanelGroup model={model.leftPanelGroup}>
+          {panel => {
+            if (panel === "options")
+              return optionCategories()
+          }}
+        </AppScreen.SidePanelGroup>
         <AppScreen.MainPanel>{content(model)}</AppScreen.MainPanel>
       </>
     )

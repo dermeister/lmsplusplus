@@ -11,16 +11,13 @@ const sidePanelGroupClasses = {
 
 interface SidePanelGroupProps {
   model: models.PanelGroup
-  panels: Record<string, () => React.ReactNode>
   pulsing?: boolean
+  children(panel: string): React.ReactNode
 }
 
-export function SidePanelGroup({ model, panels, pulsing }: SidePanelGroupProps): JSX.Element {
+export function SidePanelGroup({ model, pulsing, children }: SidePanelGroupProps): JSX.Element {
   function panel(): JSX.Element | undefined {
     if (model.isOpened && model.activePanel) {
-      const panelContent = panels[model.activePanel]
-      if (!panelContent)
-        throw new Error("Render function is not provided for active panel")
       const combinedPanelClassName = combineClassNames(styles.sidePanel)
       const combinedHeaderClassName = combineClassNames(styles.header,
                                                         maybeValue(styles.headerPulsing, Boolean(pulsing)))
@@ -29,7 +26,7 @@ export function SidePanelGroup({ model, panels, pulsing }: SidePanelGroupProps):
           <header className={combinedHeaderClassName}>
             <h2 className={styles.title}>{model.activePanel}</h2>
           </header>
-          <div className={styles.panelContent}>{panelContent()}</div>
+          <div className={styles.panelContent}>{children(model.activePanel)}</div>
         </div>
       )
     }
@@ -56,5 +53,5 @@ export function SidePanelGroup({ model, panels, pulsing }: SidePanelGroupProps):
       <div className={combineClassNames(styles.toggles)}>{toggles()}</div>
       {panel()}
     </div>
-  ), [model, panels, pulsing])
+  ), [model, pulsing, children])
 }

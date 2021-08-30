@@ -38,10 +38,16 @@ function rightSidePanelGroup(model: models.TasksView): JSX.Element | undefined {
     return <DemoExplorer model={model.demoExplorer} />
   }
 
-  return <AppScreen.SidePanelGroup
-    model={model.rightPanels}
-    panels={{ editor: taskEditor, demo: demoExplorer }}
-  />
+  return <AppScreen.SidePanelGroup model={model.rightPanels}>
+    {panel => {
+      switch (panel) {
+        case "editor":
+          return taskEditor()
+        case "demo":
+          return demoExplorer()
+      }
+    }}
+  </AppScreen.SidePanelGroup>
 }
 
 export function TasksView({ model }: TasksViewProps): JSX.Element {
@@ -51,11 +57,12 @@ export function TasksView({ model }: TasksViewProps): JSX.Element {
 
   return autorender(() => (
     <>
-      <AppScreen.SidePanelGroup
-        model={model.leftPanels}
-        panels={{ tasks: tasksExplorer }}
-        pulsing={model.monitor.isActive}
-      />
+      <AppScreen.SidePanelGroup model={model.leftPanels} pulsing={model.monitor.isActive}>
+        {panel => {
+          if (panel === "tasks")
+            return tasksExplorer()
+        }}
+      </AppScreen.SidePanelGroup>
       {mainPanel(model)}
       {rightSidePanelGroup(model)}
     </>
