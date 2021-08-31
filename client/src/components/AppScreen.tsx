@@ -1,43 +1,51 @@
 import React from "react"
 import * as models from "../models"
+import { View } from "../models"
 import styles from "./AppScreen.module.scss"
 import { autorender } from "./autorender"
+import { Button } from "./Button"
 import { OptionsView } from "./options/OptionsView"
-import { SidePanelGroup } from "./SidePanelGroup"
-import { TasksView } from "./tasks/TasksView"
-import { ViewBar } from "./ViewBar"
+import { MainView } from "./tasks/MainView"
+import { combineClassNames, maybeValue } from "./utils"
+import { ViewGroup } from "./ViewGroup"
 
 interface AppScreenProps {
   model: models.App
 }
 
-function content(model: models.App): JSX.Element | undefined {
-  switch (model.activeView) {
-    case model.tasksView:
-      return <TasksView model={model.tasksView} />
-    case model.optionsView:
-      return <OptionsView model={model.optionsView} />
-  }
-}
-
 export function AppScreen({ model }: AppScreenProps): JSX.Element {
+  function viewSwitch(viewGroup: models.ViewGroup): JSX.Element {
+    const viewStylesIterable = [[model.mainView, styles.tasks], [model.optionsView, styles.options]]
+    const viewSwitchStyles = new Map<View, string>(viewStylesIterable as [View, string][])
+
+    function button(viewGroup: models.ViewGroup, view: View): JSX.Element {
+      const className = combineClassNames(styles.viewButton,
+                                          viewSwitchStyles.get(view),
+                                          maybeValue(styles.selected, viewGroup.activeView === view))
+      const variant = viewGroup.activeView === view ? "primary" : "secondary"
+      return <Button variant={variant} onClick={() => viewGroup.setActiveView(view)} className={className} />
+    }
+
+    return (
+      <div className={styles.viewBar}>
+        {button(viewGroup, model.mainView)}
+        {button(viewGroup, model.optionsView)}
+      </div>
+    )
+  }
+
+  function viewContent(viewGroup: models.ViewGroup): JSX.Element {
+    switch (viewGroup.activeView) {
+      case model.mainView:
+        return <MainView model={model.mainView} />
+      case model.optionsView:
+        return <OptionsView model={model.optionsView} />
+      default:
+        throw new Error("Invalid view")
+    }
+  }
+
   return autorender(() => (
-    <>
-      <ViewBar model={model} className={styles.viewBar} />
-      <div className={styles.content}>{content(model)}</div>
-    </>
+    <ViewGroup model={model.views} renderViewSwitch={viewSwitch} renderViewContent={viewContent} />
   ), [model])
-}
-
-interface MainPanelProps {
-  children?: React.ReactNode
-}
-
-AppScreen.MainPanel = function AppScreenMainPanel({ children }: MainPanelProps): JSX.Element {
-  return <div className={styles.mainPanel}>{children}</div>
-}
-
-AppScreen.SidePanelGroup = function AppScreenSidePanelGroup(
-  props: React.ComponentProps<typeof SidePanelGroup>): JSX.Element {
-  return <SidePanelGroup {...props} />
 }

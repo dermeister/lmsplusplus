@@ -1,31 +1,28 @@
-import { reaction, transaction, Transaction, unobservable } from "reactronic"
-import { ObservableObject } from "../ObservableObject"
+import { reaction, Transaction, unobservable } from "reactronic"
 import { Database } from "../database"
+import { ObservableObject } from "../ObservableObject"
 import { Options, OptionsView } from "./options"
-import { TasksView } from "./tasks"
-
-export type View = TasksView | OptionsView
+import { MainView } from "./tasks"
+import { ViewGroup } from "./ViewGroup"
 
 export class App extends ObservableObject {
-  @unobservable readonly tasksView: TasksView
+  @unobservable readonly views: ViewGroup
+  @unobservable readonly mainView: MainView
   @unobservable readonly optionsView: OptionsView
   @unobservable readonly options: Options
   @unobservable private readonly database = new Database()
-  private _activeView: View
-
-  get activeView(): View { return this._activeView }
 
   constructor() {
     super()
-    this.tasksView = new TasksView(this.database)
-    this._activeView = this.tasksView
+    this.mainView = new MainView(this.database)
     this.options = new Options(this.database)
     this.optionsView = new OptionsView(this.options)
+    this.views = new ViewGroup([this.mainView, this.optionsView], this.mainView)
   }
 
   override dispose(): void {
     Transaction.run(() => {
-      this.tasksView.dispose()
+      this.mainView.dispose()
       this.optionsView.dispose()
       this.options.dispose()
       this.database.dispose()
@@ -33,27 +30,22 @@ export class App extends ObservableObject {
     })
   }
 
-  @transaction
-  setActiveView(view: View): void {
-    this._activeView = view
-  }
-
   @reaction
   private async createdTask_created_in_database(): Promise<void> {
-    if (this.tasksView.createdTask)
-      await this.database.createTask(this.tasksView.createdTask)
+    if (this.mainView.createdTask)
+      await this.database.createTask(this.mainView.createdTask)
   }
 
   @reaction
   private async updatedTask_updated_in_database(): Promise<void> {
-    if (this.tasksView.updatedTask)
-      await this.database.updateTask(this.tasksView.updatedTask)
+    if (this.mainView.updatedTask)
+      await this.database.updateTask(this.mainView.updatedTask)
   }
 
   @reaction
   private async deletedTask_deleted_from_database(): Promise<void> {
-    if (this.tasksView.deletedTask)
-      await this.database.deleteTask(this.tasksView.deletedTask)
+    if (this.mainView.deletedTask)
+      await this.database.deleteTask(this.mainView.deletedTask)
   }
 
   @reaction

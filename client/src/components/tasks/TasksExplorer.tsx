@@ -20,11 +20,6 @@ function onCreateTask(model: models.TasksView, course: models.CourseNode): void 
   model.createTask(course.item)
 }
 
-function onRunDemo(model: models.TasksView, task: models.ItemNode<Task>): void {
-  task.contextMenu?.close()
-  model.runDemo(task.item)
-}
-
 function onEditTask(model: models.TasksView, task: models.ItemNode<Task>): void {
   task.contextMenu?.close()
   model.updateTask(task.item)
@@ -32,7 +27,7 @@ function onEditTask(model: models.TasksView, task: models.ItemNode<Task>): void 
 
 function onDeleteTask(model: models.TasksView, task: models.ItemNode<Task>): void {
   task.contextMenu?.close()
-  model.deleteTask(task.item)
+  model.setDeletedTask(task.item)
 }
 
 function courses(model: models.TasksView, courses: readonly models.CourseNode[]): JSX.Element[] {
@@ -64,7 +59,6 @@ function tasks(model: models.TasksView, tasks: readonly models.ItemNode<Task>[])
     if (task.contextMenu)
       contextMenu = (
         <ContextMenu model={task.contextMenu}>
-          <ContextMenu.Button onClick={() => onRunDemo(model, task)}>Run Demo</ContextMenu.Button>
           <ContextMenu.Button onClick={() => onEditTask(model, task)}>Edit Task</ContextMenu.Button>
           <ContextMenu.Button onClick={() => onDeleteTask(model, task)}>Delete Task</ContextMenu.Button>
         </ContextMenu>

@@ -15,14 +15,12 @@ const themes = [
 
 export function Preferences({ model }: PreferencesProps): JSX.Element {
   return autorender(() => (
-    <>
-      <Field label="Theme">
-        <Dropdown
-          selectedItemIndex={model.darkMode ? 0 : 1}
-          items={themes}
-          onChange={i => model.setDarkMode(i === 0)}
-        />
-      </Field>
-    </>
+    <Field label="Theme">
+      <Dropdown
+        selectedItemIndex={model.darkMode ? 0 : 1}
+        items={themes}
+        onChange={i => model.setDarkMode(i === 0)}
+      />
+    </Field>
   ), [model])
 }

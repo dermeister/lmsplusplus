@@ -1,98 +1,52 @@
-import { Monitor, reaction, transaction, Transaction, unobservable } from "reactronic"
+import { reaction, transaction, Transaction, unobservable } from "reactronic"
 import { ReadOnlyDatabase } from "../../database"
 import { Course } from "../../domain/Course"
-import { Demo } from "../../domain/Demo"
 import { Task } from "../../domain/Task"
-import { ObservableObject } from "../../ObservableObject"
-import { PanelGroup, Side } from "../PanelGroup"
-import { DemoExplorer } from "./DemoExplorer"
+import { SidePanel } from "../SidePanel"
+import { View } from "../View"
 import { TasksExplorer } from "./TasksExplorer"
 
-export class TasksView extends ObservableObject {
+export class TasksView extends View {
   @unobservable readonly database: ReadOnlyDatabase
   @unobservable readonly tasksExplorer: TasksExplorer
-  @unobservable readonly demoExplorer: DemoExplorer
-  @unobservable readonly leftPanels: PanelGroup
-  @unobservable readonly rightPanels: PanelGroup
-  private runningDemos: Demo[] = []
+  @unobservable readonly sidePanel = new SidePanel("Tasks")
+  private _editedTask: Task | null = null
+  private _deletedTask: Task | null = null
 
-  get monitor(): Monitor { return this.database.monitor }
-  get createdTask(): Task | null {
-    const task = this.tasksExplorer.editedTask
-    if (task?.id !== Task.NO_ID)
-      return null
-    return task
-  }
-  get updatedTask(): Task | null {
-    const task = this.tasksExplorer.editedTask
-    if (!task || task.id === Task.NO_ID)
-      return null
-    return task
-  }
-  get deletedTask(): Task | null { return this.tasksExplorer.deletedTask }
+  get editedTask(): Task | null { return this._editedTask }
+  get deletedTask(): Task | null { return this._deletedTask }
 
   constructor(database: ReadOnlyDatabase) {
-    super()
+    super("Tasks")
     this.database = database
-    this.tasksExplorer = new TasksExplorer(database.courses)
-    this.demoExplorer = new DemoExplorer(this.runningDemos)
-    this.leftPanels = new PanelGroup(["tasks"], "tasks", Side.Left)
-    this.rightPanels = new PanelGroup([], null, Side.Right)
+    this.tasksExplorer = new TasksExplorer(this.database.courses)
   }
 
   override dispose(): void {
     Transaction.run(() => {
       this.tasksExplorer.dispose()
-      this.demoExplorer.dispose()
-      this.leftPanels.dispose()
-      this.rightPanels.dispose()
+      this.sidePanel.dispose()
       super.dispose()
     })
   }
 
   @transaction
-  createTask(course: Course): void {
-    this.rightPanels.addPanel("editor")
-    this.rightPanels.togglePanel("editor")
-    this.tasksExplorer.createTask(course)
+  createTask(course: Course | null): void {
+    this._editedTask = course ? new Task(Task.NO_ID, course, "", "") : null
   }
 
   @transaction
-  updateTask(task: Task): void {
-    this.rightPanels.addPanel("editor")
-    this.rightPanels.togglePanel("editor")
-    this.tasksExplorer.updateTask(task)
+  updateTask(task: Task | null): void {
+    this._editedTask = task
   }
 
   @transaction
-  deleteTask(task: Task): void {
-    this.tasksExplorer.deleteTask(task)
-  }
-
-  @transaction
-  runDemo(task: Task): void {
-    const demos = this.database.getDemos(task)
-    const runningDemos = this.runningDemos.toMutable()
-    if (demos.length > 0) {
-      const demo = demos[0]
-      if (!runningDemos.includes(demo)) {
-        runningDemos.push(demos[0])
-        this.runningDemos = runningDemos
-        this.rightPanels.addPanel("demo")
-        this.rightPanels.togglePanel("demo")
-        this.demoExplorer.updateDemos(this.runningDemos)
-      }
-    }
+  setDeletedTask(task: Task | null): void {
+    this._deletedTask = task
   }
 
   @reaction
   private explorer_synchronized_with_database(): void {
     this.tasksExplorer.updateCourses(this.database.courses)
-  }
-
-  @reaction
-  private taskEditorPanel_removed_from_panel_group_when_taskEditor_disposed(): void {
-    if (!this.tasksExplorer.taskEditor)
-      this.rightPanels.removePanel("editor")
   }
 }
