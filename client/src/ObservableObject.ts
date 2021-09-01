@@ -2,5 +2,7 @@ import { ObservableObject as NonDisposableObservableObject, Reactronic, Transact
 import { Disposable } from "./Disposable"
 
 export class ObservableObject extends NonDisposableObservableObject implements Disposable {
-  dispose(): void { Transaction.run(() => Reactronic.dispose(this)) }
+  dispose(): void {
+    Transaction.run(() => Reactronic.dispose(this))
+  }
 }

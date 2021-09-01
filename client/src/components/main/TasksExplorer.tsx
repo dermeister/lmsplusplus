@@ -11,7 +11,7 @@ interface TasksExplorerProps {
 
 export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
   return autorender(() => (
-    <Explorer model={model.tasksExplorer}>{courses(model, model.tasksExplorer.children)}</Explorer>
+    <Explorer model={model.explorer}>{courses(model, model.explorer.children)}</Explorer>
   ), [model])
 }
 
@@ -27,7 +27,7 @@ function onEditTask(model: models.TasksView, task: models.ItemNode<Task>): void 
 
 function onDeleteTask(model: models.TasksView, task: models.ItemNode<Task>): void {
   task.contextMenu?.close()
-  model.setDeletedTask(task.item)
+  model.deleteTask(task.item)
 }
 
 function courses(model: models.TasksView, courses: readonly models.CourseNode[]): JSX.Element[] {

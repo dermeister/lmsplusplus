@@ -10,8 +10,7 @@ interface SidePanelProps {
   children?: React.ReactNode
 }
 
-export function SidePanel(props: SidePanelProps): JSX.Element {
-  const { model, pulsing, children } = props
+export function SidePanel({ model, pulsing, children }: SidePanelProps): JSX.Element {
   return autorender(() => {
     if (!model.isOpened)
       return <></>

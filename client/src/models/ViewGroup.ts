@@ -16,14 +16,14 @@ export class ViewGroup extends ObservableObject {
   }
 
   @transaction
-  addView(view: View): void {
+  add(view: View): void {
     const views = this._views.toMutable()
     views.push(view)
     this._views = views
   }
 
   @transaction
-  removeView(view: View): void {
+  remove(view: View): void {
     if (this._activeView === view)
       throw new Error("Cannot remove active view")
     const views = this._views.toMutable()
@@ -31,7 +31,15 @@ export class ViewGroup extends ObservableObject {
   }
 
   @transaction
-  setActiveView(view: View): void {
+  setActive(view: View): void {
     this._activeView = view
+  }
+
+  @transaction
+  replace(oldView: View, newView: View): void {
+    if (this._activeView === oldView)
+      this._activeView = newView
+    const view = this._views.toMutable()
+    this._views = view.map(view => view === oldView ? newView : view)
   }
 }

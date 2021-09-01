@@ -12,7 +12,7 @@ interface SubViewBarProps {
 
 export function SubViewBar({ model, onToggleClick }: SubViewBarProps): JSX.Element {
   function onClick(view: View): void {
-    model.setActiveView(view)
+    model.setActive(view)
     onToggleClick?.(view)
   }
 

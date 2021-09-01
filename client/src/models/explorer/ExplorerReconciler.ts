@@ -1,4 +1,5 @@
-import { reaction, standalone, Transaction, transaction, unobservable } from "reactronic"
+import { Transaction, transaction, unobservable } from "reactronic"
+import { DelayedDisposer } from "../DelayedDisposer"
 import { Explorer } from "./Explorer"
 import { GroupNode } from "./GroupNode"
 import { ItemNode } from "./ItemNode"
@@ -7,9 +8,9 @@ import { NodeVisitor } from "./NodeVisitor"
 
 export class ExplorerReconciler<T extends Explorer<K>, K> extends NodeVisitor {
   @unobservable private readonly explorer: T
+  @unobservable private readonly disposer = new DelayedDisposer()
   private oldNodes = new Map<string, Node>()
   private newNodes = new Map<string, Node>()
-  private nodesToDispose: Node[] = []
 
   constructor(explorer: T) {
     super()
@@ -23,7 +24,7 @@ export class ExplorerReconciler<T extends Explorer<K>, K> extends NodeVisitor {
     for (const node of this.oldNodes.values()) {
       if (node === this.explorer.selectedNode)
         this.explorer.setSelectedNode(null)
-      this.addToNodesToDispose(node)
+      this.disposer.enqueue(node)
     }
     this.oldNodes = this.newNodes
     this.newNodes = new Map()
@@ -35,7 +36,7 @@ export class ExplorerReconciler<T extends Explorer<K>, K> extends NodeVisitor {
       const oldNodes = this.oldNodes.toMutable()
       oldNodes.delete(result.key)
       this.oldNodes = oldNodes
-      this.addToNodesToDispose(node)
+      this.disposer.enqueue(node)
     }
     const newNodes = this.newNodes.toMutable()
     newNodes.set(result.key, result)
@@ -67,22 +68,8 @@ export class ExplorerReconciler<T extends Explorer<K>, K> extends NodeVisitor {
     Transaction.run(() => {
       for (const node of this.oldNodes.values())
         node.dispose()
+      this.disposer.dispose()
       super.dispose()
     })
-  }
-
-  @reaction
-  private nodesToDispose_disposed(): void {
-    if (this.nodesToDispose.length > 0)
-      standalone(Transaction.run, () => {
-        this.nodesToDispose.forEach(n => n.dispose())
-        this.nodesToDispose = []
-      })
-  }
-
-  private addToNodesToDispose(node: Node): void {
-    const nodesToDispose = this.nodesToDispose.toMutable()
-    nodesToDispose.push(node)
-    this.nodesToDispose = nodesToDispose
   }
 }

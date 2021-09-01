@@ -6,12 +6,12 @@ import { MonacoEditor } from "../MonacoEditor"
 import { SidePanel } from "../SidePanel"
 import { SubViewBar } from "../SubViewBar"
 import { ViewGroup } from "../ViewGroup"
+import styles from "./TasksView.module.scss"
 import { TaskEditor } from "./TaskEditor"
 import { TasksExplorer } from "./TasksExplorer"
-import styles from "./MainView.module.scss"
 
 interface TasksViewProps {
-  model: models.MainView
+  model: models.TasksView
 }
 
 function tasksView(view: models.TasksView, pulsing: boolean): JSX.Element {
@@ -22,7 +22,7 @@ function tasksView(view: models.TasksView, pulsing: boolean): JSX.Element {
       </SidePanel>
       <div className={styles.mainPanel}>
         <div className={styles.description}>
-          {view.tasksExplorer.selectedTask?.description ?? "No task"}
+          {view.explorer.selectedTask?.description ?? "No task"}
         </div>
       </div>
     </div>
@@ -42,14 +42,14 @@ function taskEditorView(view: models.TaskEditorView, pulsing: boolean): JSX.Elem
   )
 }
 
-export function MainView({ model }: TasksViewProps): JSX.Element {
+export function TasksView({ model }: TasksViewProps): JSX.Element {
   function onToggleClick(view: View): void {
     switch (view) {
-      case model.tasksView:
-        model.tasksView.sidePanel.isOpened ? model.tasksView.sidePanel.close() : model.tasksView.sidePanel.open()
+      case model:
+        model.sidePanel.toggle()
         break
       case model.taskEditorView:
-        model.taskEditorView?.sidePanel.isOpened ? model.taskEditorView?.sidePanel.close() : model.taskEditorView?.sidePanel.open()
+        model.taskEditorView?.sidePanel.toggle()
         break
     }
   }
@@ -60,8 +60,8 @@ export function MainView({ model }: TasksViewProps): JSX.Element {
 
   function viewContent(viewGroup: models.ViewGroup): JSX.Element | undefined {
     switch (viewGroup.activeView) {
-      case model.tasksView:
-        return tasksView(model.tasksView, model.monitor.isActive)
+      case model:
+        return tasksView(model, model.monitor.isActive)
       case model.taskEditorView:
         return taskEditorView(model.taskEditorView as TaskEditorView, model.monitor.isActive)
     }
