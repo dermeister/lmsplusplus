@@ -1,14 +1,14 @@
 import React from "react"
 import * as models from "../../models"
-import { TaskEditorView, View } from "../../models"
 import { autorender } from "../autorender"
 import { MonacoEditor } from "../MonacoEditor"
 import { SidePanel } from "../SidePanel"
 import { SubViewBar } from "../SubViewBar"
 import { ViewGroup } from "../ViewGroup"
-import styles from "./TasksView.module.scss"
+import { DemoView } from "./DemoView"
 import { TaskEditor } from "./TaskEditor"
 import { TasksExplorer } from "./TasksExplorer"
+import styles from "./TasksView.module.scss"
 
 interface TasksViewProps {
   model: models.TasksView
@@ -42,14 +42,21 @@ function taskEditorView(view: models.TaskEditorView, pulsing: boolean): JSX.Elem
   )
 }
 
+function demoView(view: models.DemoView): JSX.Element {
+  return <DemoView model={view} />
+}
+
 export function TasksView({ model }: TasksViewProps): JSX.Element {
-  function onToggleClick(view: View): void {
+  function onToggleClick(view: models.View): void {
     switch (view) {
       case model:
         model.sidePanel.toggle()
         break
       case model.taskEditorView:
         model.taskEditorView?.sidePanel.toggle()
+        break
+      case model.demoView:
+        model.demoView?.sidePanel.toggle()
         break
     }
   }
@@ -63,7 +70,9 @@ export function TasksView({ model }: TasksViewProps): JSX.Element {
       case model:
         return tasksView(model, model.monitor.isActive)
       case model.taskEditorView:
-        return taskEditorView(model.taskEditorView as TaskEditorView, model.monitor.isActive)
+        return taskEditorView(model.taskEditorView as models.TaskEditorView, model.monitor.isActive)
+      case model.demoView:
+        return demoView(model.demoView as models.DemoView)
     }
   }
 

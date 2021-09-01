@@ -8,7 +8,7 @@ export class DemoNode extends GroupNode {
   }
 
   constructor(demo: Demo) {
-    super(demo.solution.name, `demo-${demo.id}`, false, DemoNode.createServiceNodes(demo))
+    super(demo.solution.name, `demo-${demo.id}`, true, DemoNode.createServiceNodes(demo))
   }
 
   private static createServiceNodes(demo: Demo): ItemNode<Service>[] {

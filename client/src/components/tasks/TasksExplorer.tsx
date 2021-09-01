@@ -15,6 +15,11 @@ export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
   ), [model])
 }
 
+function onRunDemo(model: models.TasksView, task: models.ItemNode<Task>): void {
+  task.contextMenu?.close()
+  model.runDemo(task.item)
+}
+
 function onCreateTask(model: models.TasksView, course: models.CourseNode): void {
   course.contextMenu?.close()
   model.createTask(course.item)
@@ -59,6 +64,7 @@ function tasks(model: models.TasksView, tasks: readonly models.ItemNode<Task>[])
     if (task.contextMenu)
       contextMenu = (
         <ContextMenu model={task.contextMenu}>
+          <ContextMenu.Button onClick={() => onRunDemo(model, task)}>Run Demo</ContextMenu.Button>
           <ContextMenu.Button onClick={() => onEditTask(model, task)}>Edit Task</ContextMenu.Button>
           <ContextMenu.Button onClick={() => onDeleteTask(model, task)}>Delete Task</ContextMenu.Button>
         </ContextMenu>

@@ -6,6 +6,7 @@ import { DelayedDisposer } from "../DelayedDisposer"
 import { SidePanel } from "../SidePanel"
 import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
+import { DemoView } from "./DemoView"
 import { TaskEditorView } from "./TaskEditorView"
 import { TasksExplorer } from "./TasksExplorer"
 
@@ -19,12 +20,14 @@ export class TasksView extends View {
   private _createdTask: Task | null = null
   private _updatedTask: Task | null = null
   private _deletedTask: Task | null = null
+  private _demoView: DemoView | null = null
 
   get taskEditorView(): TaskEditorView | null { return this._taskEditorView }
   get monitor(): Monitor { return this.database.monitor }
   get createdTask(): Task | null { return this._createdTask }
   get updatedTask(): Task | null { return this._updatedTask }
   get deletedTask(): Task | null { return this._deletedTask }
+  get demoView(): DemoView | null { return this._demoView }
 
   constructor(database: ReadOnlyDatabase) {
     super("Tasks")
@@ -41,6 +44,11 @@ export class TasksView extends View {
       this._taskEditorView?.dispose()
       super.dispose()
     })
+  }
+
+  @transaction
+  runDemo(task: Task): void {
+    this.createDemoView(task)
   }
 
   @transaction
@@ -68,6 +76,15 @@ export class TasksView extends View {
   }
 
   @transaction
+  private createDemoView(task: Task): void {
+    const demos = this.database.getDemos(task)
+    if (demos.length > 0) {
+      this._demoView = new DemoView(demos[0])
+      this.subViews.replace(this, this._demoView)
+    }
+  }
+
+  @transaction
   private createTaskEditorView(task: Task): void {
     this._taskEditorView = new TaskEditorView(task)
     this.subViews.replace(this, this._taskEditorView)
@@ -89,21 +106,36 @@ export class TasksView extends View {
     const createdTask = this._taskEditorView?.createdTask
     const updatedTask = this._taskEditorView?.updatedTask
     if ((createdTask || updatedTask) && !this.monitor.isActive)
-      standalone(() => this.removeTaskEditorViewSubViewsAndDispose())
+      standalone(() => this.destroyTaskEditorView())
   }
 
   @reaction
   private taskEditorView_destroyed_on_editingCanceled(): void {
-    if (this.taskEditorView?.editingCanceled)
-      standalone(() => this.removeTaskEditorViewSubViewsAndDispose())
+    if (this._taskEditorView?.editingCanceled)
+      standalone(() => this.destroyTaskEditorView())
   }
 
   @transaction
-  private removeTaskEditorViewSubViewsAndDispose(): void {
+  private destroyTaskEditorView(): void {
     if (!this._taskEditorView)
       throw new Error("_taskEditorView is null")
-    this.subViews.replace(this._taskEditorView, this)
-    this.disposer.enqueue(this._taskEditorView)
+    this.subViews.replace(this._taskEditorView as View, this)
+    this.disposer.enqueue(this._taskEditorView as View)
     this._taskEditorView = null
+  }
+
+  @reaction
+  private demoView_destroyed_on_demoStopped(): void {
+    if (this._demoView?.isDemoStopped)
+      standalone(() => this.destroyDemoView())
+  }
+
+  @transaction
+  private destroyDemoView(): void {
+    if (!this._demoView)
+      throw new Error("_demoView is null")
+    this.subViews.replace(this._demoView as View, this)
+    this.disposer.enqueue(this._demoView as View)
+    this._demoView = null
   }
 }
