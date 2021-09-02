@@ -2,7 +2,7 @@ import { Monitor, reaction, standalone, throttling, transaction, Transaction, un
 import { ReadOnlyDatabase } from "../../database"
 import { Course } from "../../domain/Course"
 import { Task } from "../../domain/Task"
-import { DelayedDisposer } from "../DelayedDisposer"
+import { Disposer } from "../../Disposer"
 import { SidePanel } from "../SidePanel"
 import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
@@ -14,7 +14,7 @@ export class TasksView extends View {
   @unobservable readonly subViews = new ViewGroup([this], this)
   @unobservable readonly explorer: TasksExplorer
   @unobservable readonly sidePanel = new SidePanel("Tasks")
-  @unobservable private readonly disposer = new DelayedDisposer()
+  @unobservable private readonly disposer = new Disposer()
   @unobservable private readonly database: ReadOnlyDatabase
   private _taskEditorView: TaskEditorView | null = null
   private _createdTask: Task | null = null
@@ -47,8 +47,13 @@ export class TasksView extends View {
   }
 
   @transaction
-  runDemo(task: Task): void {
+  openDemos(task: Task): void {
     this.createDemoView(task)
+  }
+
+  hasDemos(task: Task): boolean {
+    const demos = this.database.getDemos(task)
+    return demos.length > 0
   }
 
   @transaction
@@ -77,9 +82,8 @@ export class TasksView extends View {
 
   @transaction
   private createDemoView(task: Task): void {
-    const demos = this.database.getDemos(task)
-    if (demos.length > 0) {
-      this._demoView = new DemoView(demos[0])
+    if (this.hasDemos(task)) {
+      this._demoView = new DemoView(this.database.getDemos(task))
       this.subViews.replace(this, this._demoView)
     }
   }
@@ -125,8 +129,8 @@ export class TasksView extends View {
   }
 
   @reaction
-  private demoView_destroyed_on_demoStopped(): void {
-    if (this._demoView?.isDemoStopped)
+  private demoView_destroyed_on_viewClosed(): void {
+    if (this._demoView?.isViewClosed)
       standalone(() => this.destroyDemoView())
   }
 

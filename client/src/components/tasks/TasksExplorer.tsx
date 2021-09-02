@@ -15,9 +15,9 @@ export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
   ), [model])
 }
 
-function onRunDemo(model: models.TasksView, task: models.ItemNode<Task>): void {
+function onOpenDemos(model: models.TasksView, task: models.ItemNode<Task>): void {
   task.contextMenu?.close()
-  model.runDemo(task.item)
+  model.openDemos(task.item)
 }
 
 function onCreateTask(model: models.TasksView, course: models.CourseNode): void {
@@ -42,8 +42,6 @@ function courses(model: models.TasksView, courses: readonly models.CourseNode[])
       contextMenu = (
         <ContextMenu model={course.contextMenu}>
           <ContextMenu.Button onClick={() => onCreateTask(model, course)}>New Task</ContextMenu.Button>
-          <ContextMenu.Button>Edit Course</ContextMenu.Button>
-          <ContextMenu.Button>Delete Course</ContextMenu.Button>
         </ContextMenu>
       )
     return (
@@ -64,7 +62,7 @@ function tasks(model: models.TasksView, tasks: readonly models.ItemNode<Task>[])
     if (task.contextMenu)
       contextMenu = (
         <ContextMenu model={task.contextMenu}>
-          <ContextMenu.Button onClick={() => onRunDemo(model, task)}>Run Demo</ContextMenu.Button>
+          <ContextMenu.Button onClick={() => onOpenDemos(model, task)}>Open Demo</ContextMenu.Button>
           <ContextMenu.Button onClick={() => onEditTask(model, task)}>Edit Task</ContextMenu.Button>
           <ContextMenu.Button onClick={() => onDeleteTask(model, task)}>Delete Task</ContextMenu.Button>
         </ContextMenu>

@@ -1,5 +1,5 @@
 import { Transaction, transaction, unobservable } from "reactronic"
-import { DelayedDisposer } from "../DelayedDisposer"
+import { Disposer } from "../../Disposer"
 import { Explorer } from "./Explorer"
 import { GroupNode } from "./GroupNode"
 import { ItemNode } from "./ItemNode"
@@ -8,7 +8,7 @@ import { NodeVisitor } from "./NodeVisitor"
 
 export class ExplorerReconciler<T extends Explorer<K>, K> extends NodeVisitor {
   @unobservable private readonly explorer: T
-  @unobservable private readonly disposer = new DelayedDisposer()
+  @unobservable private readonly disposer = new Disposer()
   private oldNodes = new Map<string, Node>()
   private newNodes = new Map<string, Node>()
 

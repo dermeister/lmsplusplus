@@ -1,4 +1,5 @@
 import { reaction, transaction, Transaction, unobservable } from "reactronic"
+import { Disposer } from "../Disposer"
 import { ObservableObject } from "../ObservableObject"
 import { Auth } from "../services"
 import { App } from "./App"
@@ -9,6 +10,7 @@ export class Root extends ObservableObject {
   @unobservable readonly auth = new Auth("user")
   @unobservable readonly signIn = new SignIn(this.auth)
   @unobservable readonly windowManager = new WindowManager()
+  @unobservable private readonly disposer = new Disposer()
   private _app: App | null = null
 
   get app(): App | null { return this._app }
@@ -17,6 +19,7 @@ export class Root extends ObservableObject {
     Transaction.run(() => {
       this.auth.dispose()
       this.signIn.dispose()
+      this.disposer.dispose()
       this.app?.dispose()
       super.dispose()
     })
@@ -29,8 +32,10 @@ export class Root extends ObservableObject {
 
   @transaction
   private disposeApp(): void {
-    this._app?.dispose()
-    this._app = null
+    if (this._app) {
+      this.disposer.enqueue(this._app)
+      this._app = null
+    }
   }
 
   @reaction

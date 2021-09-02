@@ -1,34 +1,37 @@
-import { Terminal } from "xterm"
+import { ITheme, Terminal } from "xterm"
 import { FitAddon } from "xterm-addon-fit"
 import { Service } from "../domain/Demo"
 import { Renderer } from "./Renderer"
 
-const theme = () => ({
-  background: getComputedStyle(document.documentElement)
-    .getPropertyValue('--app-primary-background-color')
-})
-
 export class ConsoleRenderer implements Renderer {
-  private terminal = new Terminal({ theme: theme() })
-  private fitAddon = new FitAddon()
-  private terminalContainer = document.createElement("div")
-  private resizeObserver = new ResizeObserver(() => this.resizeTerminalContainer())
+  private readonly terminal = new Terminal({ theme: ConsoleRenderer.terminalTheme })
+  private readonly fitAddon = new FitAddon()
+  private readonly terminalContainer = document.createElement("div")
+  private readonly resizeObserver = new ResizeObserver(() => this.resizeTerminalContainer())
   private mountContainer: HTMLElement | null = null
+
+  private static get terminalTheme(): ITheme {
+    const style = getComputedStyle(document.documentElement)
+    return {
+      background: style.getPropertyValue("--app-primary-background-color"),
+      foreground: style.getPropertyValue("--app-primary-text-color"),
+    }
+  }
 
   constructor(service: Service) {
     this.terminal.loadAddon(this.fitAddon)
     this.terminal.write(service.name)
-    this.terminalContainer.style.width = "100%"
-    this.terminalContainer.style.height = "100%"
-    this.terminalContainer.style.backgroundColor = this.terminal.getOption("theme").background
+    this.styleTerminalContainer()
   }
 
   mount(element: HTMLElement): void {
     this.resizeObserver.observe(this.terminalContainer)
     this.mountContainer = element
     element.appendChild(this.terminalContainer)
-    if (!this.terminal.element)
+    if (!this.terminal.element) {
       this.terminal.open(this.terminalContainer)
+      this.styleTerminalElement()
+    }
   }
 
   unmount(): void {
@@ -48,5 +51,17 @@ export class ConsoleRenderer implements Renderer {
       if (this.terminalContainer.isConnected)
         this.fitAddon.fit()
     }, 0)
+  }
+
+  private styleTerminalContainer(): void {
+    this.terminalContainer.style.width = "100%"
+    this.terminalContainer.style.height = "100%"
+    this.terminalContainer.style.backgroundColor = ConsoleRenderer.terminalTheme.background ?? "black"
+  }
+
+  private styleTerminalElement(): void {
+    const terminalElement = this.terminalContainer.querySelector(".terminal")
+    if (terminalElement instanceof HTMLElement)
+      terminalElement.style.padding = "14px"
   }
 }

@@ -10,17 +10,19 @@ interface DemoExplorerProps {
 }
 
 export function DemoExplorer({ model }: DemoExplorerProps): JSX.Element {
-  return autorender(() => (
-    <Explorer model={model.explorer}>{courses(model, model.explorer.children)}</Explorer>
-  ), [model])
+  return autorender(() => {
+    if (model.explorer instanceof models.MultipleDemosExplorer)
+      return <Explorer model={model.explorer}>{demos(model, model.explorer.children)}</Explorer>
+    return <Explorer model={model.explorer}>{services(model, model.explorer.children)}</Explorer>
+  }, [model])
 }
 
 function onStopDemo(model: models.DemoView, demo: models.DemoNode): void {
   demo.contextMenu?.close()
-  model.stop()
+  model.stop(demo.item)
 }
 
-function courses(model: models.DemoView, demos: readonly models.DemoNode[]): JSX.Element[] {
+function demos(model: models.DemoView, demos: readonly models.DemoNode[]): JSX.Element[] {
   return demos.map(demo => {
     let contextMenu
     if (demo.contextMenu)

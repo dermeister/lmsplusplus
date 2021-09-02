@@ -125,9 +125,10 @@ export class Database extends ObservableObject implements ReadOnlyDatabase {
     this._solutions = await Promise.resolve([solution])
 
     // demos
-    const consoleService = new Service(Database.nextId++, "Console App", ServiceType.Console)
-    const webService = new Service(Database.nextId++, "Web App", ServiceType.Web)
-    const demo = new Demo(Database.nextId++, this._solutions[0], [consoleService, webService])
+    const demo = new Demo(Database.nextId++, this._solutions[0])
+    const consoleService = new Service(Database.nextId++, demo, "Console App", ServiceType.Console)
+    const webService = new Service(Database.nextId++, demo, "Web App", ServiceType.Web)
+    demo.services = [consoleService, webService]
     this._demos = await Promise.resolve([demo])
 
     // preferences

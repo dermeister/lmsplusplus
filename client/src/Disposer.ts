@@ -1,8 +1,8 @@
 import { reaction, throttling, Transaction, transaction } from "reactronic"
-import { Disposable } from "../Disposable"
-import { ObservableObject } from "../ObservableObject"
+import { Disposable } from "./Disposable"
+import { ObservableObject } from "./ObservableObject"
 
-export class DelayedDisposer extends ObservableObject {
+export class Disposer extends ObservableObject {
   private disposables: Disposable[] = []
 
   @transaction

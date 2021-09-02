@@ -1,7 +1,7 @@
 import { Renderer } from "./Renderer"
 
 export class WebRenderer implements Renderer {
-  private iframe = document.createElement("iframe")
+  private readonly iframe = document.createElement("iframe")
   private mountElement: HTMLElement | null = null
 
   constructor() {
