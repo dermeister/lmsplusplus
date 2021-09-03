@@ -13,10 +13,14 @@ export class SidePanel extends ObservableObject {
   }
 
   @transaction
-  close(): void { this._isOpened = false }
+  close(): void {
+    this._isOpened = false
+  }
 
   @transaction
-  open(): void { this._isOpened = true }
+  open(): void {
+    this._isOpened = true
+  }
 
   @transaction
   toggle(): void {

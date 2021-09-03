@@ -1,13 +1,13 @@
 import { Monitor, reaction, standalone, throttling, transaction, Transaction, unobservable } from "reactronic"
 import { ReadOnlyDatabase } from "../../database"
+import { Disposer } from "../../Disposer"
 import { Course } from "../../domain/Course"
 import { Task } from "../../domain/Task"
-import { Disposer } from "../../Disposer"
+import { DemoView } from "../demo"
 import { SidePanel } from "../SidePanel"
+import { TaskEditorView } from "../task-editor"
 import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
-import { DemoView } from "./DemoView"
-import { TaskEditorView } from "./TaskEditorView"
 import { TasksExplorer } from "./TasksExplorer"
 
 export class TasksView extends View {
@@ -29,8 +29,8 @@ export class TasksView extends View {
   get deletedTask(): Task | null { return this._deletedTask }
   get demoView(): DemoView | null { return this._demoView }
 
-  constructor(database: ReadOnlyDatabase) {
-    super("Tasks")
+  constructor(database: ReadOnlyDatabase, key: string) {
+    super("Tasks", key)
     this.database = database
     this.explorer = new TasksExplorer(this.database.courses)
   }
@@ -83,14 +83,14 @@ export class TasksView extends View {
   @transaction
   private createDemoView(task: Task): void {
     if (this.hasDemos(task)) {
-      this._demoView = new DemoView(this.database.getDemos(task))
+      this._demoView = new DemoView(this.database.getDemos(task), "Demo")
       this.subViews.replace(this, this._demoView)
     }
   }
 
   @transaction
   private createTaskEditorView(task: Task): void {
-    this._taskEditorView = new TaskEditorView(task)
+    this._taskEditorView = new TaskEditorView(task, this.monitor, "Editor")
     this.subViews.replace(this, this._taskEditorView)
   }
 
@@ -114,8 +114,8 @@ export class TasksView extends View {
   }
 
   @reaction
-  private taskEditorView_destroyed_on_editingCanceled(): void {
-    if (this._taskEditorView?.editingCanceled)
+  private taskEditorView_destroyed_on_viewClosed(): void {
+    if (this._taskEditorView?.isViewClosed)
       standalone(() => this.destroyTaskEditorView())
   }
 
@@ -123,8 +123,8 @@ export class TasksView extends View {
   private destroyTaskEditorView(): void {
     if (!this._taskEditorView)
       throw new Error("_taskEditorView is null")
-    this.subViews.replace(this._taskEditorView as View, this)
-    this.disposer.enqueue(this._taskEditorView as View)
+    this.subViews.replace(this._taskEditorView, this)
+    this.disposer.enqueue(this._taskEditorView)
     this._taskEditorView = null
   }
 
@@ -138,8 +138,8 @@ export class TasksView extends View {
   private destroyDemoView(): void {
     if (!this._demoView)
       throw new Error("_demoView is null")
-    this.subViews.replace(this._demoView as View, this)
-    this.disposer.enqueue(this._demoView as View)
+    this.subViews.replace(this._demoView, this)
+    this.disposer.enqueue(this._demoView)
     this._demoView = null
   }
 }

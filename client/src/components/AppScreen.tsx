@@ -4,8 +4,8 @@ import { View } from "../models"
 import styles from "./AppScreen.module.scss"
 import { autorender } from "./autorender"
 import { Button } from "./Button"
-import { TasksView } from "./tasks/TasksView"
 import { OptionsView } from "./options/OptionsView"
+import { TasksView } from "./tasks/TasksView"
 import { combineClassNames, maybeValue } from "./utils"
 import { ViewGroup } from "./ViewGroup"
 
@@ -14,49 +14,53 @@ interface AppScreenProps {
 }
 
 export function AppScreen({ model }: AppScreenProps): JSX.Element {
-  function viewSwitch(viewGroup: models.ViewGroup): JSX.Element {
-    function getViewToggleClassName(view: View): string | undefined {
-      switch (view) {
-        case model.tasksView:
-          return styles.tasks
-        case model.optionsView:
-          return styles.options
-      }
-    }
-
-    function button(viewGroup: models.ViewGroup, view: View): JSX.Element {
-      const className = combineClassNames(styles.viewButton,
-                                          getViewToggleClassName(view),
-                                          maybeValue(styles.selected, viewGroup.activeView === view))
-      return (
-        <Button
-          variant={viewGroup.activeView === view ? "primary" : "secondary"}
-          onClick={() => viewGroup.setActive(view)}
-          className={className}
-        />
-      )
-    }
-
-    return (
-      <div className={styles.viewBar}>
-        {button(viewGroup, model.tasksView)}
-        {button(viewGroup, model.optionsView)}
-      </div>
-    )
-  }
-
-  function viewContent(viewGroup: models.ViewGroup): JSX.Element {
-    switch (viewGroup.activeView) {
-      case model.tasksView:
-        return <TasksView model={model.tasksView} />
-      case model.optionsView:
-        return <OptionsView model={model.optionsView} />
-      default:
-        throw new Error("Invalid view")
-    }
-  }
-
   return autorender(() => (
-    <ViewGroup model={model.views} renderViewSwitch={viewSwitch} renderViewContent={viewContent} />
+    <ViewGroup
+      model={model.views}
+      renderViewSwitch={() => viewSwitch(model)}
+      renderViewContent={() => viewContent(model)}
+    />
   ), [model])
+}
+
+function viewSwitch(model: models.App): JSX.Element {
+  return (
+    <div className={styles.viewBar}>
+      {button(model, model.tasksView)}
+      {button(model, model.optionsView)}
+    </div>
+  )
+}
+
+function button(model: models.App, view: View): JSX.Element {
+  const className = combineClassNames(styles.viewButton,
+                                      getViewToggleClassName(model, view),
+                                      maybeValue(styles.selected, model.views.activeView === view))
+  return (
+    <Button
+      variant={model.views.activeView === view ? "primary" : "secondary"}
+      onClick={() => model.views.setActive(view)}
+      className={className}
+    />
+  )
+}
+
+function getViewToggleClassName(model: models.App, view: View): string | undefined {
+  switch (view) {
+    case model.tasksView:
+      return styles.tasks
+    case model.optionsView:
+      return styles.options
+  }
+}
+
+function viewContent(model: models.App): JSX.Element {
+  switch (model.views.activeView) {
+    case model.tasksView:
+      return <TasksView model={model.tasksView} />
+    case model.optionsView:
+      return <OptionsView model={model.optionsView} />
+    default:
+      throw new Error("Invalid view")
+  }
 }

@@ -1,7 +1,2 @@
-export * from "./TaskEditor"
 export * from "./TasksExplorer"
 export * from "./TasksView"
-export * from "./MultipleDemosExplorer"
-export * from "./SingleDemoExplorer"
-export * from "./DemoView"
-export * from "./TaskEditorView"

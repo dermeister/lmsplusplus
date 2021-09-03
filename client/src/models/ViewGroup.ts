@@ -26,8 +26,7 @@ export class ViewGroup extends ObservableObject {
   remove(view: View): void {
     if (this._activeView === view)
       throw new Error("Cannot remove active view")
-    const views = this._views.toMutable()
-    this._views = views.filter(p => p !== view)
+    this._views = this._views.filter(p => p !== view)
   }
 
   @transaction

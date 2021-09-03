@@ -15,8 +15,8 @@ export class DemoView extends View {
 
   get isViewClosed(): boolean { return this._isViewClosed }
 
-  constructor(demos: readonly Demo[]) {
-    super("Demo")
+  constructor(demos: readonly Demo[], key: string) {
+    super("Demo", key)
     this.demos = demos
     this.explorer = this.createExplorer(this.demos)
     demos.forEach(demo => this.services.set(demo, new services.DemoService(demo)))

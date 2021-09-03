@@ -1,3 +1,13 @@
+.view-content {
+  display: flex;
+
+  height: 100%;
+}
+
+.main-panel {
+  flex-grow: 1;
+}
+
 .container {
   padding: 0 16px;
 }

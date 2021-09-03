@@ -25,7 +25,7 @@ export function SubViewBar({ model, onToggleClick }: SubViewBarProps): JSX.Eleme
           <button
             onClick={() => onClick(view)}
             className={className}
-            key={view.title}
+            key={view.key}
           >
             <span>{view.title}</span>
           </button>

@@ -4,14 +4,29 @@ import { autorender } from "../autorender"
 import { Button } from "../Button"
 import { Field } from "../Field"
 import { Input } from "../Input"
-import styles from "./TaskEditor.module.scss"
+import { MonacoEditor } from "../MonacoEditor"
+import { SidePanel } from "../SidePanel"
+import styles from "./TaskEditorView.module.scss"
 
-interface TaskEditorProps {
-  model: models.TaskEditor
+interface TaskEditorViewProps {
+  model: models.TaskEditorView
 }
 
-export function TaskEditor({ model }: TaskEditorProps): JSX.Element {
+export function TaskEditorView({ model }: TaskEditorViewProps): JSX.Element {
   return autorender(() => (
+    <div className={styles.viewContent}>
+      <SidePanel model={model.sidePanel} pulsing={model.monitor.isActive}>
+        {fields(model)}
+      </SidePanel>
+      <div className={styles.mainPanel}>
+        <MonacoEditor model={model.taskDescription} />
+      </div>
+    </div>
+  ), [model])
+}
+
+function fields(model: models.TaskEditorView): JSX.Element {
+  return (
     <div className={styles.container}>
       <div>
         <Field label="Title">
@@ -19,8 +34,8 @@ export function TaskEditor({ model }: TaskEditorProps): JSX.Element {
             id="task-title"
             variant="secondary"
             className={styles.input}
-            value={model.title}
-            onChange={e => model.setTitle(e.target.value)}
+            value={model.taskTitle}
+            onChange={e => model.setTaskTitle(e.target.value)}
           />
         </Field>
       </div>
@@ -42,5 +57,5 @@ export function TaskEditor({ model }: TaskEditorProps): JSX.Element {
         </Button>
       </div>
     </div>
-  ), [model])
+  )
 }
