@@ -1,62 +1,47 @@
+@use "library";
+
 .screen {
-  position: relative;
-
-  display: flex;
-  flex-direction: column;
-
-  height: 100%;
-  width: 100%;
+  @include library.full-size;
+  @include library.center-children;
+  @include library.position-child(".screen-title", $left: 20px, $top: 20px);
 }
 
 .screen-title {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-
-  margin: 0;
-
-  color: var(--app-primary-text-color);
   font-size: 40px;
 }
 
 .form {
-  margin: auto;
+  @include library.stretch-children("horizontal");
+  @include library.rounded-corners;
+  @include library.shadow;
+
   padding: 20px;
   width: 400px;
-
-  background-color: var(--app-primary-background-color);
-  border-radius: var(--app-border-radius);
-  box-shadow: 0 0 var(--shadow-size) var(--shadow-primary-color);
 }
 
 .form-heading {
-  margin-top: 0;
   margin-bottom: 28px;
 
-  color: var(--app-primary-text-color);
-  font-size: 20px;
+  font-size: library.$text-size-large;
   font-weight: 500;
   text-align: center;
 }
 
 .label {
   display: block;
-
   margin-bottom: 4px;
 
-  font-size: var(--app-font-size-large);
+  font-size: library.$text-size-large;
 }
 
 .input {
   margin-bottom: 12px;
   padding: 7px;
-  width: 100%;
 
-  font-size: var(--app-font-size-large);
+  font-size: library.$text-size-large;
 }
 
 .submit {
   margin-top: 10px;
   padding: 5px;
-  width: 100%;
 }

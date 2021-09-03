@@ -3,7 +3,7 @@ import ReactDOM from "react-dom"
 import { Transaction } from "reactronic"
 import "xterm/css/xterm.css"
 import { Root } from "./components/Root"
-import "./index.css"
+import "./components/index.scss"
 import * as models from "./models"
 
 const model = Transaction.run(() => new models.Root())

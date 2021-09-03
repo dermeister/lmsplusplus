@@ -3,7 +3,6 @@ import * as models from "../models"
 import { AppScreen } from "./AppScreen"
 import { Auth } from "./auth"
 import { autorender } from "./autorender"
-import styles from "./Root.module.scss"
 import { SignInScreen } from "./SignInScreen"
 import { WindowManager } from "./WindowManager"
 
@@ -15,7 +14,7 @@ export function Root({ model }: RootProps): JSX.Element {
   return autorender(() => (
     <WindowManager model={model.windowManager}>
       <Auth auth={model.auth}>
-        <div className={styles.root}>{content(model)}</div>
+        {content(model)}
       </Auth>
     </WindowManager>
   ), [model])

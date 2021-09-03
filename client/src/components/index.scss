@@ -1,3 +1,7 @@
+@use "library";
+
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
+
 :root {
   /* App general */
   --app-font-size-large: 1rem;
@@ -61,15 +65,29 @@
   --minus-danger-hovered-icon-url: url("../assets/trash-danger-hovered.svg");
 }
 
-.root {
-  display: flex;
+* {
+  box-sizing: border-box;
+}
 
+body {
+  margin: 0;
   width: 100vw;
   height: 100vh;
 
-  color: var(--app-primary-text-color);
-  font-size: var(--app-font-size-regular);
-  user-select: none;
+  overflow: hidden;
+}
 
-  background-color: var(--app-primary-background-color);
+h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+}
+
+#root {
+  @include library.full-size;
+  @include library.theme("primary");
+
+  display: flex;
+
+  font-size: var(--app-font-size-regular);
+  font-family: "Roboto", sans-serif;
+  user-select: none;
 }

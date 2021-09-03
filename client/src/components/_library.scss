@@ -1,0 +1,71 @@
+@mixin full-width {
+  width: 100%;
+}
+
+@mixin full-height {
+  height: 100%;
+}
+
+@mixin full-size {
+  @include full-width;
+  @include full-height;
+}
+
+@mixin position-child($child, $left, $top) {
+  position: relative;
+
+  #{$child} {
+    position: absolute;
+    left: $left;
+    top: $top;
+  }
+}
+
+@mixin center-children {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin stretch-children($direction) {
+  & > * {
+    @if $direction == "horizontal" {
+      @include full-width;
+    } @else if ($direction == "vertical") {
+      @include full-height;
+    } @else {
+      @error "Invlaid stretch direction"
+    }
+  }
+}
+
+$background-primary: var(--app-primary-background-color);
+$background-secondary: var(--app-secondary-background-color);
+
+$text-color-primary: var(--app-primary-text-color);
+$text-color-secondary: var(--app-secondary-text-color);
+
+$text-size-small: var(--app-font-size-small);
+$text-size-regular: var(--app-font-size-regular);
+$text-size-large: var(--app-font-size-large);
+
+@mixin theme($variant) {
+  @if $variant == "primary" {
+    background-color: $background-primary;
+    color: $text-color-primary;
+  } @else if $variant == "secondary" {
+    background-color: $background-secondary;
+    color: $text-color-secondary;
+  } @else {
+    @error "Invalid theme variant"
+  }
+}
+
+@mixin rounded-corners {
+  border-radius: var(--app-border-radius);
+}
+
+@mixin shadow {
+  box-shadow: 0 0 var(--shadow-size) var(--shadow-primary-color);
+}

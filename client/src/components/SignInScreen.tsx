@@ -1,5 +1,5 @@
 import React from "react"
-import * as models from "../models/SignIn"
+import * as models from "../models"
 import { autorender } from "./autorender"
 import { Button } from "./Button"
 import { Input } from "./Input"
@@ -24,37 +24,33 @@ export function SignInScreen({ model }: SignInScreenProps): JSX.Element {
   }
 
   return autorender(() => (
-    <div className={styles.screen}>
+    <section className={styles.screen}>
       <h1 className={styles.screenTitle}>LMS++</h1>
 
       <form className={styles.form} onSubmit={onSubmit}>
         <p className={styles.formHeading}>Welcome back!</p>
 
-        <div>
-          <label className={styles.label} htmlFor="sign-in-login">Login</label>
-          <Input
-            id="sign-in-login"
-            variant="primary"
-            value={model.login}
-            onChange={onLogin}
-            className={styles.input}
-          />
-        </div>
+        <label className={styles.label} htmlFor="sign-in-login">Login</label>
+        <Input
+          id="sign-in-login"
+          variant="primary"
+          value={model.login}
+          onChange={onLogin}
+          className={styles.input}
+        />
 
-        <div>
-          <label className={styles.label} htmlFor="sign-in-password">Password</label>
-          <Input
-            id="sign-in-password"
-            variant="primary"
-            value={model.password}
-            onChange={onPassword}
-            type="password"
-            className={styles.input}
-          />
-        </div>
+        <label className={styles.label} htmlFor="sign-in-password">Password</label>
+        <Input
+          id="sign-in-password"
+          variant="primary"
+          value={model.password}
+          onChange={onPassword}
+          type="password"
+          className={styles.input}
+        />
 
         <Button className={styles.submit} variant="primary">Sign in</Button>
       </form>
-    </div>
+    </section>
   ), [model])
 }
