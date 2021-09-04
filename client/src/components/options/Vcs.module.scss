@@ -1,19 +1,22 @@
-.no-vcs-providers {
-  margin: 0 0 8px;
+@use "../library";
+@use "../theme";
 
-  font-size: var(--app-font-size-large);
-  font-weight: normal;
+.no-vcs-providers {
+  margin-bottom: 8px;
+
+  font-size: theme.$text-large;
 }
 
-.selected-account-field {
+.current-account-field {
   margin-bottom: 14px;
 }
 
 .provider {
-  margin: 0 0 14px;
-  padding: 0;
+  margin-bottom: 14px;
 
-  list-style: none;
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .provider-heading {
@@ -26,10 +29,6 @@
 }
 
 .provider-name {
-  margin: 0;
-
-  font-size: var(--app-font-size-regular);
-  font-weight: normal;
   text-transform: uppercase;
 }
 
@@ -37,19 +36,14 @@
   margin-right: 6px;
 }
 
-.add-account, .delete-account {
+%button {
   display: flex;
   justify-content: center;
   align-items: center;
 
-  padding: 0;
   width: 20px;
 
   background-color: transparent;
-  border: none;
-  outline: none;
-
-  cursor: pointer;
 
   &::before {
     content: "";
@@ -60,24 +54,30 @@
     background: no-repeat center;
   }
 
+  &:hover::before {
+    @include library.hover;
+  }
+
   &:hover:active::before {
     transform: scale(0.9);
   }
 }
 
-.add-account::before {
-  background-image: var(--plus-icon-url);
+.add-account {
+  @extend %button;
+
+  &::before {
+    background-image: var(--plus-icon-url);
+  }
 }
 
 .delete-account {
+  @extend %button;
+
   margin-bottom: -4px;
 
   &::before {
     background-image: var(--minus-danger-icon-url);
-  }
-
-  &:hover::before {
-    background-image: var(--minus-danger-hovered-icon-url);
   }
 }
 
@@ -88,12 +88,10 @@
 
   margin-top: 12px;
   margin-left: 17px;
-
-  &:first-of-type {
-    margin-top: 12px;
-  }
 }
 
 .delete-account:hover + .account-name {
+  @include library.hover;
+
   color: var(--button-danger-background-color-hover);
 }

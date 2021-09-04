@@ -14,36 +14,36 @@ interface TaskEditorViewProps {
 
 export function TaskEditorView({ model }: TaskEditorViewProps): JSX.Element {
   return autorender(() => (
-    <div className={styles.viewContent}>
-      <SidePanel model={model.sidePanel} pulsing={model.monitor.isActive}>
-        {fields(model)}
-      </SidePanel>
-      <div className={styles.mainPanel}>
+    <section className={styles.taskEditor}>
+      <div className={styles.sidePanel}>
+        <SidePanel model={model.sidePanel} pulsing={model.monitor.isActive}>
+          {form(model)}
+        </SidePanel>
+      </div>
+      <div className={styles.content}>
         <MonacoEditor model={model.taskDescription} />
       </div>
-    </div>
+    </section>
   ), [model])
 }
 
-function fields(model: models.TaskEditorView): JSX.Element {
+function form(model: models.TaskEditorView): JSX.Element {
   return (
-    <div className={styles.container}>
-      <div>
-        <Field label="Title">
-          <Input
-            id="task-title"
-            variant="secondary"
-            className={styles.input}
-            value={model.taskTitle}
-            onChange={e => model.setTaskTitle(e.target.value)}
-          />
-        </Field>
-      </div>
+    <div className={styles.form}>
+      <Field label="Title" className={styles.taskTitle}>
+        <Input
+          id="task-title"
+          variant="secondary"
+          className={styles.input}
+          value={model.taskTitle}
+          onChange={e => model.setTaskTitle(e.target.value)}
+        />
+      </Field>
       <div className={styles.buttons}>
         <Button
           variant="primary"
           onClick={() => model.save()}
-          className={`${styles.button} ${styles.primary}`}
+          className={styles.primary}
         >
           Save
         </Button>
@@ -51,7 +51,7 @@ function fields(model: models.TaskEditorView): JSX.Element {
         <Button
           variant="danger"
           onClick={() => model.cancel()}
-          className={`${styles.button} ${styles.danger}`}
+          className={styles.danger}
         >
           Cancel
         </Button>

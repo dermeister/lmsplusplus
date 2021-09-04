@@ -1,48 +1,33 @@
+@use "library";
+
 .button {
+  @include library.rounded-corners("all");
+  @include library.shadow("all");
+
   font-weight: bold;
-
-  border: none;
-  border-radius: var(--app-border-radius);
-  box-shadow: 0 0 var(--shadow-size) var(--shadow-primary-color);
-
-  cursor: pointer;
-  outline: none;
 
   &:hover:active {
     transform: scale(0.99);
   }
 }
 
-@mixin button-variant($background-color, $background-color-hover, $text-color) {
+@mixin button-variant($background-color, $text-color) {
   color: $text-color;
-
   background-color: $background-color;
 
   &:hover, &:focus-visible {
-    background-color: $background-color-hover;
+    @include library.hover;
   }
 }
 
 .primary {
-  @include button-variant(
-          var(--button-primary-background-color),
-          var(--button-primary-background-color-hover),
-          var(--button-primary-text-color)
-  );
+  @include button-variant(var(--button-primary-background-color), var(--button-primary-text-color));
 }
 
 .secondary {
-  @include button-variant(
-          var(--button-secondary-background-color),
-          var(--button-secondary-background-color-hover),
-          var(--button-secondary-text-color)
-  );
+  @include button-variant(var(--button-secondary-background-color), var(--button-secondary-text-color));
 }
 
 .danger {
-  @include button-variant(
-          var(--button-danger-background-color),
-          var(--button-danger-background-color-hover),
-          var(--button-danger-text-color)
-  );
+  @include button-variant(var(--button-danger-background-color), var(--button-danger-text-color));
 }

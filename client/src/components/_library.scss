@@ -1,71 +1,59 @@
-@mixin full-width {
+@mixin full-size {
   width: 100%;
-}
-
-@mixin full-height {
   height: 100%;
 }
 
-@mixin full-size {
-  @include full-width;
-  @include full-height;
-}
-
-@mixin position-child($child, $left, $top) {
-  position: relative;
-
-  #{$child} {
+@mixin center-self($container-type: "relative-block") {
+  @if $container-type == "relative-block" {
     position: absolute;
-    left: $left;
-    top: $top;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  } @else if $container-type == "flex" {
+    place-self: center center;
+  } @else {
+    @error "Invalid container type";
   }
 }
-
-@mixin center-children {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-@mixin stretch-children($direction) {
-  & > * {
-    @if $direction == "horizontal" {
-      @include full-width;
-    } @else if ($direction == "vertical") {
-      @include full-height;
-    } @else {
-      @error "Invlaid stretch direction"
-    }
-  }
-}
-
-$background-primary: var(--app-primary-background-color);
-$background-secondary: var(--app-secondary-background-color);
-
-$text-color-primary: var(--app-primary-text-color);
-$text-color-secondary: var(--app-secondary-text-color);
-
-$text-size-small: var(--app-font-size-small);
-$text-size-regular: var(--app-font-size-regular);
-$text-size-large: var(--app-font-size-large);
 
 @mixin theme($variant) {
   @if $variant == "primary" {
-    background-color: $background-primary;
-    color: $text-color-primary;
+    background-color: var(--app-primary-background-color);
+    color: var(--app-primary-text-color);
   } @else if $variant == "secondary" {
-    background-color: $background-secondary;
-    color: $text-color-secondary;
+    background-color: var(--app-secondary-background-color);
+    color: var(--app-secondary-text-color);
   } @else {
-    @error "Invalid theme variant"
+    @error "Invalid theme variant"ж
   }
 }
 
-@mixin rounded-corners {
-  border-radius: var(--app-border-radius);
+@mixin rounded-corners($side) {
+  @if $side == "bottom-left" {
+    border-bottom-left-radius: 2px;
+  } @else if $side == "bottom-right" {
+    border-bottom-right-radius: 2px;
+  } @else if $side == "all" {
+    border-radius: 2px;
+  }
 }
 
-@mixin shadow {
-  box-shadow: 0 0 var(--shadow-size) var(--shadow-primary-color);
+@mixin shadow($side) {
+  @if $side == "all" {
+    box-shadow: 0 0 var(--shadow-size) var(--shadow-primary-color);
+  } @else if $side == "right" {
+    box-shadow: 1px 0 var(--shadow-size) -1px var(--shadow-primary-color);
+  } @else if $side == "bottom" {
+    box-shadow: 0 2px 4px -1px var(--shadow-primary-color);
+  } @else {
+    @error "Invalid side";
+  }
+}
+
+@mixin hover {
+  filter: brightness(1.2);
+}
+
+@mixin focus {
+  filter: brightness(1.2);
 }

@@ -1,13 +1,37 @@
-.view-content {
-  display: flex;
+@use "../library";
 
-  height: 100%;
+.tasks-view {
+  @include library.full-size;
+
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "subview-switch content";
 }
 
-.main-panel {
-  flex-grow: 1;
+.subview-switch {
+  grid-area: subview-switch;
+  z-index: 101;
+}
+
+.content {
+  grid-area: content;
+}
+
+.tasks-content {
+  @include library.full-size;
+
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "side-panel description";
+}
+
+.side-panel {
+  grid-area: side-panel;
+  z-index: 100;
 }
 
 .description {
+  grid-area: description;
   padding: 10px;
+  z-index: 99;
 }

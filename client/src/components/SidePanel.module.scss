@@ -10,6 +10,8 @@
 
   background-color: var(--app-secondary-background-color);
   box-shadow: var(--shadow-primary-right);
+
+  overflow: scroll;
 }
 
 .header {
@@ -63,5 +65,9 @@
 }
 
 .children {
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
+
+  overflow: auto;
 }

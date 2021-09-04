@@ -1,14 +1,10 @@
+@use "../library";
+
 .list {
-  margin: 0;
-  padding: 0;
-
   overflow: hidden;
-
-  list-style: none;
 }
 
 .node {
-  margin: 0;
   padding: 3px;
 
   white-space: nowrap;
@@ -18,16 +14,19 @@
   overflow: hidden;
 
   &:hover {
-    background-color: var(--app-secondary-background-color-hover);
+    @include library.hover;
+    background-color: var(--app-secondary-background-color);
   }
 }
 
 .selected {
-  background-color: var(--app-secondary-background-color-hover);
+  @include library.hover;
+  background-color: var(--app-secondary-background-color);
 }
 
 .context-menu-opened {
-  background-color: var(--app-secondary-background-color-hover);
+  @include library.hover;
+  background-color: var(--app-secondary-background-color);
 }
 
 .group {
@@ -37,9 +36,7 @@
     content: "";
 
     display: block;
-    margin-left: 2px;
-    margin-right: 6px;
-    margin-top: 3px;
+    margin: 3px 6px 0 2px;
     width: 5px;
     height: 9px;
 
@@ -50,7 +47,7 @@
   }
 }
 
-.group-opened::before {
+.opened::before {
   transform: rotate(90deg);
 }
 

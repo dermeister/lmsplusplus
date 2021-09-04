@@ -23,7 +23,7 @@ export function Group({ group, children }: GroupProps): JSX.Element {
   return autorender(() => {
     const className = combineClassNames(buildNodeClassName(group),
                                         styles.group,
-                                        maybeValue(styles.groupOpened, group.isOpened))
+                                        maybeValue(styles.opened, group.isOpened))
     return (
       <p
         onClick={onClick}

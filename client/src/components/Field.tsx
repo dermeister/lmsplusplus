@@ -11,7 +11,7 @@ interface FieldProps {
 export function Field({ label, children, className }: FieldProps): JSX.Element {
   return (
     <label className={combineClassNames(styles.container, className)}>
-      <p className={styles.label}>{label}</p>
+      <p className={styles.labelText}>{label}</p>
       {children}
     </label>
   )

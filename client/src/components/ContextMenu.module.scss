@@ -18,10 +18,10 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 
-  background-color: transparent;
   overflow: hidden;
 
   &:not(:hover) {
+    background-color: transparent;
     box-shadow: none;
   }
 }

@@ -10,6 +10,36 @@ interface DemoViewProps {
   model: models.DemoView
 }
 
+export function DemoView({ model }: DemoViewProps): JSX.Element {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const service = model.explorer?.selectedService
+    if (ref.current && service)
+      model.getDemoService(service).mount(service, ref.current)
+    return () => {
+      if (service)
+        model.getDemoService(service).unmount(service)
+    }
+  }, [model.explorer.selectedService])
+
+  return autorender(() => {
+    model.explorer.selectedService // subscribe for changes to rerun useEffect
+    return (
+      <div className={styles.demoView}>
+        <div className={styles.sidePanel}>
+          <SidePanel model={model.sidePanel}>
+            {explorer(model)}
+          </SidePanel>
+        </div>
+        <div className={styles.content}>
+          <div ref={ref} className={styles.container} />
+        </div>
+      </div>
+    )
+  }, [model])
+}
+
 function explorer(model: models.DemoView): JSX.Element {
   if (model.explorer instanceof models.SingleDemoExplorer)
     return (
@@ -53,30 +83,3 @@ function startOrStopButton(model: models.DemoView): JSX.Element {
   )
 }
 
-export function DemoView({ model }: DemoViewProps): JSX.Element {
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const service = model.explorer?.selectedService
-    if (ref.current && service)
-      model.getDemoService(service).mount(service, ref.current)
-    return () => {
-      if (service)
-        model.getDemoService(service).unmount(service)
-    }
-  }, [model.explorer.selectedService])
-
-  return autorender(() => {
-    model.explorer.selectedService // subscribe for changes to rerun useEffect
-    return (
-      <div className={styles.viewContent}>
-        <SidePanel model={model.sidePanel}>
-          {explorer(model)}
-        </SidePanel>
-        <div className={styles.mainPanel}>
-          <div ref={ref} className={styles.demoContainer} />
-        </div>
-      </div>
-    )
-  }, [model])
-}

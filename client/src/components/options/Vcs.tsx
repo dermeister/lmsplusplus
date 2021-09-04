@@ -12,17 +12,19 @@ interface VcsProps {
 
 export function Vcs({ model }: VcsProps): JSX.Element {
   return autorender(() => {
+    let content
     if (model.vcsProviders.length === 0)
-      return <h2 className={styles.noVcsProviders}>There are no available VCS providers</h2>
-
-    return (
-      <>
-        <Field label="Current account" className={styles.selectedAccountField}>
-          {accountDropdown(model)}
-        </Field>
-        {providerList(model)}
-      </>
-    )
+      content = <h2 className={styles.noVcsProviders}>There are no available VCS providers</h2>
+    else
+      content = (
+        <>
+          <Field label="Current account" className={styles.currentAccountField}>
+            {accountDropdown(model)}
+          </Field>
+          {providerList(model)}
+        </>
+      )
+    return <section>{content}</section>
   }, [model])
 }
 
@@ -42,32 +44,40 @@ function createAccountDropdownItem(account: Account): DropdownItem<Account> {
   return { value: account, title: `${account.username} (${account.provider.name})`, key: account.id }
 }
 
-function providerList(options: models.Options): JSX.Element[] {
-  return options.vcsProviders.map(provider => (
-    <ul key={provider.id} className={styles.provider}>
-      <div className={styles.providerHeading}>
-        <h2 className={styles.providerName}>
-          <img
-            src={provider.iconUrl}
-            alt={provider.name}
-            width={11}
-            height={11}
-            className={styles.providerIcon}
-          />
-          {provider.name}
-        </h2>
-        <button className={styles.addAccount} />
-      </div>
-      {accountList(options, provider)}
+function providerList(options: models.Options): JSX.Element {
+  return (
+    <ul>
+      {options.vcsProviders.map(provider => (
+        <li key={provider.id} className={styles.provider}>
+          <div className={styles.providerHeading}>
+            <h2 className={styles.providerName}>
+              <img
+                src={provider.iconUrl}
+                alt={provider.name}
+                width={11}
+                height={11}
+                className={styles.providerIcon}
+              />
+              {provider.name}
+            </h2>
+            <button className={styles.addAccount} />
+          </div>
+          {accountList(options, provider)}
+        </li>
+      ))}
     </ul>
-  ))
+  )
 }
 
-function accountList(options: models.Options, provider: Provider): JSX.Element[] {
-  return options.vcsAccounts.filter(account => account.provider === provider).map(account => (
-    <li key={account.id} className={styles.account}>
-      <button onClick={() => options.deleteAccount(account)} className={styles.deleteAccount} />
-      <span className={styles.accountName}>{account.username}</span>
-    </li>
-  ))
+function accountList(options: models.Options, provider: Provider): JSX.Element {
+  return (
+    <ul>
+      {options.vcsAccounts.filter(account => account.provider === provider).map(account => (
+        <li key={account.id} className={styles.account}>
+          <button onClick={() => options.deleteAccount(account)} className={styles.deleteAccount} />
+          <span className={styles.accountName}>{account.username}</span>
+        </li>
+      ))}
+    </ul>
+  )
 }

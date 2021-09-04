@@ -1,15 +1,22 @@
-.view-bar {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
+@use "library";
 
-  width: 74px;
-  padding: 14px;
+.screen {
+  @include library.full-size;
 
-  box-shadow: var(--shadow-primary-right);
+  display: grid;
+  grid-template-areas: "switch content";
+  grid-template-columns: 74px 1fr;
 }
 
-.view-button {
+.view-switch {
+  @include library.shadow("right");
+
+  grid-area: switch;
+  padding: 14px;
+  z-index: 101;
+}
+
+%view-button {
   margin-bottom: 14px;
   width: 46px;
   height: 46px;
@@ -27,26 +34,16 @@
 }
 
 .tasks {
+  @extend %view-button;
   @include view-button-image(var(--tasks-icon-url));
 }
 
 .options {
+  @extend %view-button;
   @include view-button-image(var(--options-icon-url));
 }
 
-.selected {
-  transform-origin: center center;
-  animation: rotate 0.3s ease-in-out;
-}
-
-@keyframes rotate {
-  0% {
-    transform: rotate(0deg);
-  }
-  50% {
-    transform: rotate(10deg);
-  }
-  100% {
-    transform: rotate(0deg);
-  }
+.view-content {
+  grid-area: content;
+  z-index: 100;
 }

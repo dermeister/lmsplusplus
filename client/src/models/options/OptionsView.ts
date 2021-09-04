@@ -8,7 +8,7 @@ import { Options } from "./Options"
 export class OptionsView extends View {
   @unobservable readonly categories = new OptionCategories()
   @unobservable readonly options: Options
-  @unobservable readonly views = new ViewGroup([this], this)
+  @unobservable readonly viewGroup = new ViewGroup([this], this)
   @unobservable readonly sidePanel = new SidePanel("Options")
 
   constructor(options: Options, key: string) {
@@ -19,7 +19,7 @@ export class OptionsView extends View {
   override dispose(): void {
     Transaction.run(() => {
       this.categories.dispose()
-      this.views.dispose()
+      this.viewGroup.dispose()
       this.sidePanel.dispose()
       super.dispose()
     })

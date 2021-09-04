@@ -6,8 +6,7 @@ import { autorender } from "./autorender"
 import { Button } from "./Button"
 import { OptionsView } from "./options/OptionsView"
 import { TasksView } from "./tasks/TasksView"
-import { combineClassNames, maybeValue } from "./utils"
-import { ViewGroup } from "./ViewGroup"
+import { combineClassNames } from "./utils"
 
 interface AppScreenProps {
   model: models.App
@@ -15,32 +14,23 @@ interface AppScreenProps {
 
 export function AppScreen({ model }: AppScreenProps): JSX.Element {
   return autorender(() => (
-    <ViewGroup
-      model={model.views}
-      renderViewSwitch={() => viewSwitch(model)}
-      renderViewContent={() => viewContent(model)}
-    />
+    <div className={styles.screen}>
+      <div className={styles.viewSwitch}>
+        {button(model, model.tasksView)}
+        {button(model, model.optionsView)}
+      </div>
+      <div className={styles.viewContent}>{viewContent(model)}</div>
+    </div>
   ), [model])
 }
 
-function viewSwitch(model: models.App): JSX.Element {
-  return (
-    <div className={styles.viewBar}>
-      {button(model, model.tasksView)}
-      {button(model, model.optionsView)}
-    </div>
-  )
-}
-
 function button(model: models.App, view: View): JSX.Element {
-  const className = combineClassNames(styles.viewButton,
-                                      getViewToggleClassName(model, view),
-                                      maybeValue(styles.selected, model.views.activeView === view))
+  const variant = model.viewGroup.activeView === view ? "primary" : "secondary"
   return (
     <Button
-      variant={model.views.activeView === view ? "primary" : "secondary"}
-      onClick={() => model.views.setActive(view)}
-      className={className}
+      variant={variant}
+      onClick={() => model.viewGroup.setActive(view)}
+      className={combineClassNames(getViewToggleClassName(model, view))}
     />
   )
 }
@@ -55,7 +45,7 @@ function getViewToggleClassName(model: models.App, view: View): string | undefin
 }
 
 function viewContent(model: models.App): JSX.Element {
-  switch (model.views.activeView) {
+  switch (model.viewGroup.activeView) {
     case model.tasksView:
       return <TasksView model={model.tasksView} />
     case model.optionsView:

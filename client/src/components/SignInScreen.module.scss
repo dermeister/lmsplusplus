@@ -1,19 +1,24 @@
 @use "library";
+@use "theme";
 
 .screen {
   @include library.full-size;
-  @include library.center-children;
-  @include library.position-child(".screen-title", $left: 20px, $top: 20px);
+
+  position: relative;
 }
 
 .screen-title {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+
   font-size: 40px;
 }
 
 .form {
-  @include library.stretch-children("horizontal");
-  @include library.rounded-corners;
-  @include library.shadow;
+  @include library.center-self($container-type: "relative-block");
+  @include library.rounded-corners("all");
+  @include library.shadow("all");
 
   padding: 20px;
   width: 400px;
@@ -22,26 +27,29 @@
 .form-heading {
   margin-bottom: 28px;
 
-  font-size: library.$text-size-large;
+  font-size: theme.$text-large;
   font-weight: 500;
   text-align: center;
 }
 
-.label {
+.label-text {
   display: block;
   margin-bottom: 4px;
+  width: 100%;
 
-  font-size: library.$text-size-large;
+  font-size: theme.$text-large;
 }
 
 .input {
   margin-bottom: 12px;
   padding: 7px;
+  width: 100%;
 
-  font-size: library.$text-size-large;
+  font-size: theme.$text-large;
 }
 
 .submit {
   margin-top: 10px;
   padding: 5px;
+  width: 100%;
 }

@@ -1,0 +1,43 @@
+@use "library";
+@use "theme";
+
+.switch {
+  @include library.shadow("right");
+
+  padding-top: 14px;
+  height: 100%;
+}
+
+.toggle {
+  display: block;
+  margin-bottom: 16px;
+  padding: 0 6px;
+
+  color: var(--app-primary-text-color);
+  font-size: theme.$text-small;
+  font-weight: 500;
+  text-transform: uppercase;
+
+  background-color: transparent;
+
+  &:hover {
+    @include library.hover;
+  }
+
+  &:hover:active {
+    transform: scale(0.98);
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.toggle span {
+  display: inline-block;
+  writing-mode: vertical-rl;
+}
+
+.active {
+  color: var(--app-primary-highlight);
+}

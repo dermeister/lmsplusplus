@@ -1,23 +1,35 @@
-.view-content {
-  display: flex;
+@use "../library";
 
-  height: 100%;
+.task-editor {
+  @include library.full-size;
+
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "side-panel content";
 }
 
-.main-panel {
-  flex-grow: 1;
+.side-panel {
+  grid-area: side-panel;
+  z-index: 100;
 }
 
-.container {
-  padding: 0 16px;
+.form {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.task-title {
+  margin-bottom: 10px;
+}
+
+.content {
+  grid-area: content;
+  z-index: 99;
 }
 
 .input {
-  margin-bottom: 10px;
   padding: 6px;
   width: 100%;
-
-  box-shadow: 0 0 var(--shadow-size) var(--shadow-secondary-color);
 }
 
 .buttons {
@@ -26,17 +38,19 @@
   gap: 8px;
 }
 
-.button {
+%button {
+  @include library.shadow("all");
+
   padding-top: 4px;
   padding-bottom: 4px;
-
-  box-shadow: 0 0 6px var(--shadow-secondary-color);
 }
 
 .primary {
+  @extend %button;
   flex-grow: 9;
 }
 
 .danger {
+  @extend %button;
   flex-grow: 1;
 }

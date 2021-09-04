@@ -5,8 +5,7 @@ import { useAuth } from "../auth"
 import { autorender } from "../autorender"
 import { Button } from "../Button"
 import { SidePanel } from "../SidePanel"
-import { SubViewBar } from "../SubViewBar"
-import { ViewGroup } from "../ViewGroup"
+import { SubviewSwitch } from "../SubviewSwitch"
 import { OptionCategories } from "./OptionCategories"
 import styles from "./OptionsView.module.scss"
 import { Preferences } from "./Preferences"
@@ -20,20 +19,21 @@ export function OptionsView({ model }: OptionsViewProps): JSX.Element {
   const auth = useAuth()
 
   return autorender(() => (
-    <ViewGroup
-      model={model.views}
-      renderViewSwitch={() => viewSwitch(model)}
-      renderViewContent={() => viewContent(model, auth)}
-    />
+    <section className={styles.options}>
+      {viewSwitch(model)}
+      {viewContent(model, auth)}
+    </section>
   ), [model])
 }
 
 function viewSwitch(model: models.OptionsView): JSX.Element {
   return (
-    <SubViewBar
-      model={model.views}
-      onToggleClick={() => model.sidePanel.toggle()}
-    />
+    <div className={styles.subviewSwitch}>
+      <SubviewSwitch
+        model={model.viewGroup}
+        onToggleClick={() => model.sidePanel.toggle()}
+      />
+    </div>
   )
 }
 
@@ -48,20 +48,16 @@ function viewContent(model: models.OptionsView, auth: services.Auth): JSX.Elemen
       break
   }
   return (
-    <div className={styles.viewContent}>
-      <SidePanel model={model.sidePanel}>
-        <div className={styles.leftPanelContent}>
+    <>
+      <div className={styles.sidePanel}>
+        <SidePanel model={model.sidePanel}>
           <OptionCategories model={model.categories} />
           <Button variant="danger" onClick={() => auth.signOut()} className={styles.signOut}>
             Sign out
           </Button>
-        </div>
-      </SidePanel>
-      <div className={styles.contentWrapper}>
-        <div className={styles.content}>{body}</div>
+        </SidePanel>
       </div>
-    </div>
+      <div className={styles.content}>{body}</div>
+    </>
   )
 }
-
-

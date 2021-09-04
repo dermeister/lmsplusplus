@@ -3,9 +3,8 @@ import * as models from "../../models"
 import { autorender } from "../autorender"
 import { DemoView } from "../demo/DemoView"
 import { SidePanel } from "../SidePanel"
-import { SubViewBar } from "../SubViewBar"
+import { SubviewSwitch } from "../SubviewSwitch"
 import { TaskEditorView } from "../task-editor/TaskEditorView"
-import { ViewGroup } from "../ViewGroup"
 import { TasksExplorer } from "./TasksExplorer"
 import styles from "./TasksView.module.scss"
 
@@ -15,11 +14,10 @@ interface TasksViewProps {
 
 export function TasksView({ model }: TasksViewProps): JSX.Element {
   return autorender(() => (
-    <ViewGroup
-      model={model.subViews}
-      renderViewSwitch={() => viewSwitch(model)}
-      renderViewContent={() => viewContent(model)}
-    />
+    <section className={styles.tasksView}>
+      {viewSwitch(model)}
+      {viewContent(model)}
+    </section>
   ), [model])
 }
 
@@ -38,31 +36,42 @@ function viewSwitch(model: models.TasksView): JSX.Element {
     }
   }
 
-  return <SubViewBar model={model.subViews} onToggleClick={onToggleClick} />
+  return (
+    <div className={styles.subviewSwitch}>
+      <SubviewSwitch
+        model={model.viewGroup}
+        onToggleClick={onToggleClick}
+      />
+    </div>
+  )
 }
 
 function viewContent(model: models.TasksView): JSX.Element | undefined {
-  switch (model.subViews.activeView) {
+  let content
+  switch (model.viewGroup.activeView) {
     case model:
-      return tasksView(model, model.monitor.isActive)
+      content = tasksView(model, model.monitor.isActive)
+      break
     case model.taskEditorView:
-      return <TaskEditorView model={model.taskEditorView as models.TaskEditorView} />
+      content = <TaskEditorView model={model.taskEditorView as models.TaskEditorView} />
+      break
     case model.demoView:
-      return <DemoView model={model.demoView as models.DemoView} />
+      content = <DemoView model={model.demoView as models.DemoView} />
+      break
   }
+  if (content)
+    return <div className={styles.content}>{content}</div>
 }
 
 function tasksView(view: models.TasksView, pulsing: boolean): JSX.Element {
   return (
-    <div className={styles.viewContent}>
+    <section className={styles.tasksContent}>
       <SidePanel model={view.sidePanel} pulsing={pulsing}>
         <TasksExplorer model={view} />
       </SidePanel>
-      <div className={styles.mainPanel}>
-        <div className={styles.description}>
-          {view.explorer.selectedTask?.description ?? "No task"}
-        </div>
+      <div className={styles.description}>
+        {view.explorer.selectedTask?.description ?? "No task"}
       </div>
-    </div>
+    </section>
   )
 }

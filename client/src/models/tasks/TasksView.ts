@@ -11,7 +11,7 @@ import { ViewGroup } from "../ViewGroup"
 import { TasksExplorer } from "./TasksExplorer"
 
 export class TasksView extends View {
-  @unobservable readonly subViews = new ViewGroup([this], this)
+  @unobservable readonly viewGroup = new ViewGroup([this], this)
   @unobservable readonly explorer: TasksExplorer
   @unobservable readonly sidePanel = new SidePanel("Tasks")
   @unobservable private readonly disposer = new Disposer()
@@ -37,7 +37,7 @@ export class TasksView extends View {
 
   override dispose(): void {
     Transaction.run(() => {
-      this.subViews.dispose()
+      this.viewGroup.dispose()
       this.explorer.dispose()
       this.sidePanel.dispose()
       this.disposer.dispose()
@@ -84,14 +84,14 @@ export class TasksView extends View {
   private createDemoView(task: Task): void {
     if (this.hasDemos(task)) {
       this._demoView = new DemoView(this.database.getDemos(task), "Demo")
-      this.subViews.replace(this, this._demoView)
+      this.viewGroup.replace(this, this._demoView)
     }
   }
 
   @transaction
   private createTaskEditorView(task: Task): void {
     this._taskEditorView = new TaskEditorView(task, this.monitor, "Editor")
-    this.subViews.replace(this, this._taskEditorView)
+    this.viewGroup.replace(this, this._taskEditorView)
   }
 
   @reaction
@@ -123,7 +123,7 @@ export class TasksView extends View {
   private destroyTaskEditorView(): void {
     if (!this._taskEditorView)
       throw new Error("_taskEditorView is null")
-    this.subViews.replace(this._taskEditorView, this)
+    this.viewGroup.replace(this._taskEditorView, this)
     this.disposer.enqueue(this._taskEditorView)
     this._taskEditorView = null
   }
@@ -138,7 +138,7 @@ export class TasksView extends View {
   private destroyDemoView(): void {
     if (!this._demoView)
       throw new Error("_demoView is null")
-    this.subViews.replace(this._demoView, this)
+    this.viewGroup.replace(this._demoView, this)
     this.disposer.enqueue(this._demoView)
     this._demoView = null
   }

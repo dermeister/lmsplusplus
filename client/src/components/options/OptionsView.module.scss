@@ -1,38 +1,34 @@
-.categories {
-  margin-bottom: 24px;
+@use "../library";
+@use "../sizes";
+
+.options {
+  @include library.full-size;
+
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  grid-template-areas: "subview-switch side-panel content";
 }
 
-.left-panel-content {
-  display: flex;
-  flex-direction: column;
-
-  height: 100%;
+.subview-switch {
+  grid-area: subview-switch;
+  z-index: 101;
 }
 
-.sign-out {
-  margin: auto 14px 16px;
-  padding: 4px;
-  width: calc(100% - 28px);
-
-  box-shadow: 0 0 var(--shadow-size) var(--shadow-secondary-color);
-}
-
-.content-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-grow: 1;
-
-  margin-top: 14px;
+.side-panel {
+  grid-area: side-panel;
+  z-index: 100;
 }
 
 .content {
-  min-width: 320px;
-  width: 60%;
+  grid-area: content;
+  padding: 14px 20% 0;
+  z-index: 99;
 }
 
-.view-content {
-  display: flex;
+.sign-out {
+  @include library.shadow("all");
 
-  height: 100%;
+  margin: auto 14px 16px;
+  padding: 4px;
 }
+

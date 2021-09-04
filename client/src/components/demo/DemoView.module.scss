@@ -1,20 +1,23 @@
-.view-content {
-  display: flex;
+@use "../library";
 
-  height: 100%;
+.demo-view {
+  @include library.full-size;
+
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "side-panel content";
 }
 
-.main-panel {
-  flex-grow: 1;
+.side-panel {
+  grid-area: side-panel;
 }
 
-.demo-container {
-  width: 100%;
-  height: 100%;
+.content {
+  grid-area: content;
 }
 
-.button-group {
-  display: flex;
+.container {
+  @include library.full-size;
 }
 
 .start-button, .stop-button, .close-button {

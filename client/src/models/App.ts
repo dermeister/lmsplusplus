@@ -6,7 +6,7 @@ import { TasksView } from "./tasks"
 import { ViewGroup } from "./ViewGroup"
 
 export class App extends ObservableObject {
-  @unobservable readonly views: ViewGroup
+  @unobservable readonly viewGroup: ViewGroup
   @unobservable readonly tasksView: TasksView
   @unobservable readonly optionsView: OptionsView
   @unobservable readonly options: Options
@@ -17,12 +17,12 @@ export class App extends ObservableObject {
     this.tasksView = new TasksView(this.database, "Tasks")
     this.options = new Options(this.database)
     this.optionsView = new OptionsView(this.options, "Options")
-    this.views = new ViewGroup([this.tasksView, this.optionsView], this.tasksView)
+    this.viewGroup = new ViewGroup([this.tasksView, this.optionsView], this.tasksView)
   }
 
   override dispose(): void {
     Transaction.run(() => {
-      this.views.dispose()
+      this.viewGroup.dispose()
       this.tasksView.dispose()
       this.optionsView.dispose()
       this.options.dispose()
