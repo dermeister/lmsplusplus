@@ -1,57 +1,24 @@
 @use "library";
-@use "theme";
 
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
 
 :root {
-  /* App general */
-  --app-font-size-large: 1rem;
-  --app-font-size-regular: 0.85rem;
-  --app-font-size-small: 0.75rem;
-  --app-border-radius: 2px;
-  /* App primary */
-  --app-primary-background-color: #212121;
-  --app-primary-text-color: #e0e0e0;
-  --app-primary-text-color-hover: #eeeeee;
-  --app-primary-highlight: #1976d2;
-  --app-primary-highlight-hover: #1e88e5;
-  /* App secondary */
-  --app-secondary-background-color: #424242;
-  --app-secondary-background-color-hover: #616161;
-  --app-secondary-text-color: #e0e0e0;
-  --app-secondary-text-color-hover: #eeeeee;
-
-  /* Input primary */
-  --input-primary-background-color: #616161;
-  --input-primary-background-color-focus: #757575;
-  --input-primary-text-color: #e0e0e0;
-  /* Input secondary */
-  --input-secondary-background-color: #212121;
-  --input-secondary-background-color-focus: #757575;
-  --input-secondary-text-color: #e0e0e0;
-
-  /* Button primary */
-  --button-primary-background-color: #1976d2; /* 700 */
-  --button-primary-background-color-hover: #1e88e5; /* 600 */
-  --button-primary-text-color: #e0e0e0;
-  /* Button secondary */
-  --button-secondary-background-color: #616161;
-  --button-secondary-background-color-hover: #757575;
-  --button-secondary-text-color: #e0e0e0;
-  /* Button danger */
-  --button-danger-background-color: #d32f2f;
-  --button-danger-background-color-hover: #e53935;
-  --button-danger-text-color: #e0e0e0;
-
-  /* Shadow */
-  --shadow-primary-color: #000000;
-  --shadow-secondary-color: #212121;
-  --shadow-size: 4px;
-  --shadow-primary-right: 1px 0 var(--shadow-size) -1px var(--shadow-primary-color);
-  --shadow-primary-left: -1px 0 var(--shadow-size) -1px var(--shadow-primary-color);
-
-  /* Dropdown */
-  --dropdown-border-color: #1976d2;
+  /* Colors */
+  --background-primary: #212529;
+  --background-secondary: #2e3338;
+  --background-secondary-hover: #40474f;
+  --text-primary: #e9ecef;
+  --text-primary-hover: #ffffff;
+  --text-secondary: #e9ecef;
+  --text-secondary-hover: #ffffff;
+  --primary: #167cca;
+  --primary-hover: #1887dc;
+  --secondary: #495057;
+  --secondary-hover: #545c64;
+  --danger: #cb1b16;
+  --danger-hover: #dc1f18;
+  --shadow-primary: #090a0b;
+  --shadow-secondary: #1c1f22;
 
   /* Icons */
   --tasks-icon-url: url("../assets/tasks.svg");
@@ -62,8 +29,8 @@
   --arrow-right-icon-url: url("../assets/chevron-right.svg");
   --plus-icon-url: url("../assets/plus.svg");
   --plus-hovered-icon-url: url("../assets/plus-hovered.svg");
-  --minus-danger-icon-url: url("../assets/trash-danger.svg");
-  --minus-danger-hovered-icon-url: url("../assets/trash-danger-hovered.svg");
+  --tarsh-danger-icon-url: url("../assets/trash-danger.svg");
+  --tarsh-danger-hovered-icon-url: url("../assets/trash-danger-hovered.svg");
 }
 
 * {
@@ -109,9 +76,9 @@ input {
 
 #root {
   @include library.full-size;
-  @include library.theme("primary");
+  @include library.apply-theme("primary");
 
-  font-size: theme.$text-regular;
+  font-size: library.$text-regular;
   font-family: "Roboto", sans-serif;
   user-select: none;
 }

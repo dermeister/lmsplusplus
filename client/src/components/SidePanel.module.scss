@@ -1,4 +1,8 @@
+@use "library";
+
 .side-panel {
+  @include library.shadow("right");
+
   display: flex;
   flex-direction: column;
 
@@ -6,10 +10,9 @@
   width: 280px;
   height: 100%;
 
-  color: var(--app-secondary-text-color);
+  color: library.$text-secondary;
 
-  background-color: var(--app-secondary-background-color);
-  box-shadow: var(--shadow-primary-right);
+  background-color: library.$background-secondary;
 
   overflow: scroll;
 }
@@ -23,7 +26,7 @@
   margin: 0 16px 10px;
   padding-bottom: 2px;
 
-  border-bottom: 1px solid var(--app-secondary-text-color);
+  border-bottom: 1px solid library.$text-secondary;
 }
 
 .header-pulsing::before {
@@ -36,7 +39,7 @@
   width: 100%;
   height: 1px;
 
-  background-color: var(--app-primary-highlight);
+  background-color: library.$primary;
 
   animation: header-pulsing 1s linear infinite normal none running;
 }
@@ -57,10 +60,6 @@
 }
 
 .title {
-  margin: 0;
-
-  font-size: var(--app-font-size-regular);
-  font-weight: normal;
   text-transform: uppercase;
 }
 

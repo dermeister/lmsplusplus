@@ -33,7 +33,6 @@ function form(model: models.TaskEditorView): JSX.Element {
       <Field label="Title" className={styles.taskTitle}>
         <Input
           id="task-title"
-          variant="secondary"
           className={styles.input}
           value={model.taskTitle}
           onChange={e => model.setTaskTitle(e.target.value)}

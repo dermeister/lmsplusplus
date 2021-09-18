@@ -10,9 +10,11 @@
 
 .side-panel {
   grid-area: side-panel;
+  z-index: 100;
 }
 
 .content {
+  z-index: 99;
   grid-area: content;
 }
 
@@ -24,8 +26,6 @@
   margin: 0 14px 8px;
   padding: 4px;
   width: calc(100% - 28px);
-
-  box-shadow: 0 0 var(--shadow-size) var(--shadow-secondary-color);
 }
 
 .no-demos {

@@ -2,6 +2,7 @@ import React from "react"
 import * as models from "../models"
 import { autorender } from "./autorender"
 import { Button } from "./Button"
+import { Field } from "./Field"
 import { Input } from "./Input"
 import styles from "./SignInScreen.module.scss"
 
@@ -30,24 +31,24 @@ export function SignInScreen({ model }: SignInScreenProps): JSX.Element {
       <form className={styles.form} onSubmit={onSubmit}>
         <p className={styles.formHeading}>Welcome back!</p>
 
-        <label className={styles.label} htmlFor="sign-in-login">Login</label>
-        <Input
-          id="sign-in-login"
-          variant="primary"
-          value={model.login}
-          onChange={onLogin}
-          className={styles.input}
-        />
+        <Field label="Login">
+          <Input
+            id="sign-in-login"
+            value={model.login}
+            onChange={onLogin}
+            className={styles.input}
+          />
+        </Field>
 
-        <label className={styles.label} htmlFor="sign-in-password">Password</label>
-        <Input
-          id="sign-in-password"
-          variant="primary"
-          value={model.password}
-          onChange={onPassword}
-          type="password"
-          className={styles.input}
-        />
+        <Field label="Password">
+          <Input
+            id="sign-in-password"
+            value={model.password}
+            onChange={onPassword}
+            type="password"
+            className={styles.input}
+          />
+        </Field>
 
         <Button className={styles.submit} variant="primary">Sign in</Button>
       </form>

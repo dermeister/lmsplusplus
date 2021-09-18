@@ -11,23 +11,23 @@
   }
 }
 
-@mixin button-variant($background-color, $text-color) {
+@mixin button-variant($background-color, $background-color-hover, $text-color) {
   color: $text-color;
   background-color: $background-color;
 
   &:hover, &:focus-visible {
-    @include library.hover;
+    background-color: $background-color-hover;
   }
 }
 
 .primary {
-  @include button-variant(var(--button-primary-background-color), var(--button-primary-text-color));
+  @include button-variant(library.$primary, library.$primary-hover, library.$text-primary);
 }
 
 .secondary {
-  @include button-variant(var(--button-secondary-background-color), var(--button-secondary-text-color));
+  @include button-variant(library.$secondary, library.$secondary-hover, library.$text-primary);
 }
 
 .danger {
-  @include button-variant(var(--button-danger-background-color), var(--button-danger-text-color));
+  @include button-variant(library.$danger, library.$danger-hover, library.$text-primary);
 }

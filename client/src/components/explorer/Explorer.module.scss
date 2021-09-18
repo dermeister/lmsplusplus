@@ -14,19 +14,16 @@
   overflow: hidden;
 
   &:hover {
-    @include library.hover;
-    background-color: var(--app-secondary-background-color);
+    background-color: library.$background-secondary-hover;
   }
 }
 
 .selected {
-  @include library.hover;
-  background-color: var(--app-secondary-background-color);
+  background-color: library.$background-secondary-hover;
 }
 
 .context-menu-opened {
-  @include library.hover;
-  background-color: var(--app-secondary-background-color);
+  background-color: library.$background-secondary-hover;
 }
 
 .group {

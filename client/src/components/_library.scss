@@ -1,30 +1,38 @@
+// Colors
+$background-primary: var(--background-primary);
+$background-secondary: var(--background-secondary);
+$background-secondary-hover: var(--background-secondary-hover);
+$text-primary: var(--text-primary);
+$text-primary-hover: var(--text-primary-hover);
+$text-secondary: var(--text-secondary);
+$text-secondary-hover: var(--text-secondary-hover);
+$primary: var(--primary);
+$primary-hover: var(--primary-hover);
+$secondary: var(--secondary);
+$secondary-hover: var(--secondary-hover);
+$danger: var(--danger);
+$danger-hover: var(--danger-hover);
+
+// Sizes
+$text-large: 1rem;
+$text-regular: 0.85rem;
+$text-small: 0.75rem;
+
+// Mixins
 @mixin full-size {
   width: 100%;
   height: 100%;
 }
 
-@mixin center-self($container-type: "relative-block") {
-  @if $container-type == "relative-block" {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  } @else if $container-type == "flex" {
-    place-self: center center;
-  } @else {
-    @error "Invalid container type";
-  }
-}
-
-@mixin theme($variant) {
+@mixin apply-theme($variant) {
   @if $variant == "primary" {
-    background-color: var(--app-primary-background-color);
-    color: var(--app-primary-text-color);
+    background-color: $background-primary;
+    color: $text-primary;
   } @else if $variant == "secondary" {
-    background-color: var(--app-secondary-background-color);
-    color: var(--app-secondary-text-color);
+    background-color: $background-secondary;
+    color: $text-secondary;
   } @else {
-    @error "Invalid theme variant"ж
+    @error "Invalid theme variant";
   }
 }
 
@@ -40,20 +48,12 @@
 
 @mixin shadow($side) {
   @if $side == "all" {
-    box-shadow: 0 0 var(--shadow-size) var(--shadow-primary-color);
+    box-shadow: 0 0 4px var(--shadow-primary);
   } @else if $side == "right" {
-    box-shadow: 1px 0 var(--shadow-size) -1px var(--shadow-primary-color);
+    box-shadow: 1px 0 4px -1px var(--shadow-primary);
   } @else if $side == "bottom" {
-    box-shadow: 0 2px 4px -1px var(--shadow-primary-color);
+    box-shadow: 0 1px 4px -1px var(--shadow-primary);
   } @else {
     @error "Invalid side";
   }
-}
-
-@mixin hover {
-  filter: brightness(1.2);
-}
-
-@mixin focus {
-  filter: brightness(1.2);
 }

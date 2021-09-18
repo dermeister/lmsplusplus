@@ -3,21 +3,11 @@
 .input {
   @include library.rounded-corners("all");
   @include library.shadow("all");
-}
 
-@mixin input-variant($background-color, $text-color) {
-  color: $text-color;
-  background-color: $background-color;
+  color: library.$text-secondary;
+  background-color: library.$secondary;
 
   &:focus {
-    @include library.focus;
+    background-color: library.$secondary-hover;
   }
-}
-
-.primary {
-  @include input-variant(var(--input-primary-background-color), var(--input-primary-text-color));
-}
-
-.secondary {
-  @include input-variant(var(--input-secondary-background-color), var(--input-secondary-text-color));
 }

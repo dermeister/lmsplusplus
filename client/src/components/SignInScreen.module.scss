@@ -1,5 +1,4 @@
 @use "library";
-@use "theme";
 
 .screen {
   @include library.full-size;
@@ -16,9 +15,13 @@
 }
 
 .form {
-  @include library.center-self($container-type: "relative-block");
   @include library.rounded-corners("all");
   @include library.shadow("all");
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 
   padding: 20px;
   width: 400px;
@@ -27,17 +30,9 @@
 .form-heading {
   margin-bottom: 28px;
 
-  font-size: theme.$text-large;
+  font-size: library.$text-large;
   font-weight: 500;
   text-align: center;
-}
-
-.label-text {
-  display: block;
-  margin-bottom: 4px;
-  width: 100%;
-
-  font-size: theme.$text-large;
 }
 
 .input {
@@ -45,7 +40,7 @@
   padding: 7px;
   width: 100%;
 
-  font-size: theme.$text-large;
+  font-size: library.$text-large;
 }
 
 .submit {

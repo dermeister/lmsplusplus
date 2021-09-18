@@ -1,16 +1,16 @@
 @use "library";
 
 %base-item {
-  color: var(--app-primary-text-color);
+  color: library.$text-secondary;
   white-space: nowrap;
   text-overflow: ellipsis;
 
-  background-color: var(--app-secondary-background-color);
+  background-color: library.$background-secondary;
   overflow: hidden;
   cursor: pointer;
 
   &:hover {
-    @include library.hover;
+    background-color: library.$background-secondary-hover;
   }
 }
 
@@ -29,7 +29,7 @@
 .opened {
   padding: 2px 15px 2px 2px;
 
-  border: 1px solid var(--dropdown-border-color);
+  border: 1px solid library.$primary;
   background-position: calc(100% - 3px) 5px;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
@@ -49,7 +49,7 @@
 
   padding: 2px;
 
-  $border: 1px solid var(--dropdown-border-color);
+  $border: 1px solid library.$primary;
   border-right: $border;
   border-left: $border;
 

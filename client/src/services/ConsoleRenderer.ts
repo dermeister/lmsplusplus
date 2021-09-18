@@ -13,8 +13,8 @@ export class ConsoleRenderer implements Renderer {
   private static get terminalTheme(): ITheme {
     const style = getComputedStyle(document.documentElement)
     return {
-      background: style.getPropertyValue("--app-primary-background-color"),
-      foreground: style.getPropertyValue("--app-primary-text-color"),
+      background: style.getPropertyValue("--background-primary"),
+      foreground: style.getPropertyValue("--text-primary"),
     }
   }
 
