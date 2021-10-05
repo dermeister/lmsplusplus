@@ -1,4 +1,4 @@
-import { transaction, Transaction, unobservable } from "reactronic"
+import { reaction, transaction, Transaction, unobservable } from "reactronic"
 import { Demo, Service } from "../../domain/Demo"
 import * as services from "../../services"
 import { SidePanel } from "../SidePanel"
@@ -10,8 +10,10 @@ export class DemoView extends View {
   @unobservable readonly sidePanel = new SidePanel("Demo")
   @unobservable readonly explorer: SingleDemoExplorer | MultipleDemosExplorer
   @unobservable readonly demos: readonly Demo[]
-  @unobservable private readonly services = new Map<Demo, services.DemoService>()
+  @unobservable private readonly demoServices = new Map<Demo, services.DemoService>()
   private _isViewClosed = false
+  private mountContainer: HTMLElement | null = null
+  private shownService: Service | null = null
 
   get isViewClosed(): boolean { return this._isViewClosed }
 
@@ -19,49 +21,59 @@ export class DemoView extends View {
     super("Demo", key)
     this.demos = demos
     this.explorer = this.createExplorer(this.demos)
-    demos.forEach(demo => this.services.set(demo, new services.DemoService(demo)))
+    demos.forEach(demo => this.demoServices.set(demo, new services.DemoService(demo)))
   }
 
   override dispose(): void {
     Transaction.run(() => {
       this.sidePanel.dispose()
       this.explorer?.dispose()
-      for (const service of this.services.values())
-        service.dispose()
+      for (const demoService of this.demoServices.values())
+        demoService.dispose()
       super.dispose()
     })
   }
 
   @transaction
-  start(demo: Demo): void {
-    this.ensureDemoServiceRegisteredForDemo(demo)
-    const service = this.services.get(demo) as services.DemoService
-    service.start()
+  mount(element: HTMLElement): void {
+    this.mountContainer = element
   }
 
-  isDemoRunning(demo: Demo): boolean {
+  @transaction
+  unmount(): void {
+    this.mountContainer = null
+  }
+
+  @transaction
+  start(demo: Demo): void {
     this.ensureDemoServiceRegisteredForDemo(demo)
-    const service = this.services.get(demo) as services.DemoService
-    return service.isRunning
+    const demoService = this.demoServices.get(demo) as services.DemoService
+    demoService.start()
   }
 
   @transaction
   stop(demo: Demo): void {
     this.ensureDemoServiceRegisteredForDemo(demo)
-    const service = this.services.get(demo) as services.DemoService
-    service.stop()
+    const demoService = this.demoServices.get(demo) as services.DemoService
+    demoService.stop()
+  }
+
+  isDemoRunning(demo: Demo): boolean {
+    this.ensureDemoServiceRegisteredForDemo(demo)
+    const demoService = this.demoServices.get(demo) as services.DemoService
+    return demoService.isRunning
   }
 
   @transaction
   close(): void {
-    for (const service of this.services.values())
+    for (const service of this.demoServices.values())
       service.stop()
     this._isViewClosed = true
   }
 
   getDemoService(service: Service): services.DemoService {
     this.ensureDemoServiceRegisteredForDemo(service.demo)
-    return this.services.get(service.demo) as services.DemoService
+    return this.demoServices.get(service.demo) as services.DemoService
   }
 
   @transaction
@@ -73,7 +85,27 @@ export class DemoView extends View {
 
   @transaction
   private ensureDemoServiceRegisteredForDemo(demo: Demo): void {
-    if (!this.services.has(demo))
+    if (!this.demoServices.has(demo))
       throw new Error("DemoService has not been registered for Demo")
+  }
+
+  @reaction
+  private selectedService_is_shown(): void {
+    const service = this.explorer.selectedService
+    if (service && this.mountContainer) {
+      this.ensureDemoServiceRegisteredForDemo(service.demo)
+      const demoService = this.getDemoService(service)
+      if (demoService.isRunning) {
+        if (this.shownService)
+          demoService.hide(this.shownService)
+        demoService.show(service, this.mountContainer)
+        this.shownService = service
+      }
+    } else if (service) {
+      this.ensureDemoServiceRegisteredForDemo(service.demo)
+      const demoService = this.getDemoService(service)
+      if (demoService.isRunning)
+        demoService.hide(service)
+    }
   }
 }

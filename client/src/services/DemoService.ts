@@ -1,4 +1,4 @@
-import { transaction, Transaction } from "reactronic"
+import { transaction, Transaction, unobservable } from "reactronic"
 import { Demo, Service, ServiceType } from "../domain/Demo"
 import { ObservableObject } from "../ObservableObject"
 import { ConsoleRenderer } from "./ConsoleRenderer"
@@ -6,15 +6,15 @@ import { Renderer } from "./Renderer"
 import { WebRenderer } from "./WebRenderer"
 
 export class DemoService extends ObservableObject {
-  private readonly renderers = new Map<Service, Renderer>()
+  @unobservable private readonly demo: Demo
+  private renderers = new Map<Service, Renderer>()
   private _isRunning = false
 
   get isRunning(): boolean { return this._isRunning }
 
   constructor(demo: Demo) {
     super()
-    for (const service of demo.services)
-      this.renderers.set(service, DemoService.createRenderer(service))
+    this.demo = demo
   }
 
   override dispose(): void {
@@ -28,25 +28,34 @@ export class DemoService extends ObservableObject {
   @transaction
   start(): void {
     this._isRunning = true
+    const renderers = this.renderers.toMutable()
+    for (const service of this.demo.services)
+      renderers.set(service, DemoService.createRenderer(service))
+    this.renderers = renderers
   }
 
   @transaction
   stop(): void {
     this._isRunning = false
+    const renderers = this.renderers.toMutable()
+    for (const renderer of renderers.values())
+      renderer.dispose()
+    renderers.clear()
+    this.renderers = renderers
   }
 
   @transaction
-  mount(service: Service, element: HTMLElement): void {
+  show(service: Service, element: HTMLElement): void {
     this.ensureRendererExistsForService(service)
     const renderer = this.renderers.get(service) as Renderer
-    renderer.mount(element)
+    renderer.show(element)
   }
 
   @transaction
-  unmount(service: Service): void {
+  hide(service: Service): void {
     this.ensureRendererExistsForService(service)
     const renderer = this.renderers.get(service) as Renderer
-    renderer.unmount()
+    renderer.hide()
   }
 
   private static createRenderer(service: Service): Renderer {

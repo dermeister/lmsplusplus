@@ -6,7 +6,7 @@ import { autorender } from "./autorender"
 import { Button } from "./Button"
 import { OptionsView } from "./options/OptionsView"
 import { TasksView } from "./tasks/TasksView"
-import { combineClassNames } from "./utils"
+import { combineClassNames, maybeValue } from "./utils"
 
 interface AppScreenProps {
   model: models.App
@@ -45,12 +45,18 @@ function getViewToggleClassName(model: models.App, view: View): string | undefin
 }
 
 function viewContent(model: models.App): JSX.Element {
-  switch (model.viewGroup.activeView) {
-    case model.tasksView:
-      return <TasksView model={model.tasksView} />
-    case model.optionsView:
-      return <OptionsView model={model.optionsView} />
-    default:
-      throw new Error("Invalid view")
-  }
+  const tasksViewClassName = combineClassNames(maybeValue(styles.viewContentHidden,
+                                                          isViewHidden(model, model.tasksView)))
+  const optionsViewClassName = combineClassNames(maybeValue(styles.viewContentHidden,
+                                                            isViewHidden(model, model.optionsView)))
+  return (
+    <>
+      <div className={tasksViewClassName}><TasksView model={model.tasksView} /></div>
+      <div className={optionsViewClassName}><OptionsView model={model.optionsView} /></div>
+    </>
+  )
+}
+
+function isViewHidden(model: models.App, view: models.View): boolean {
+  return model.viewGroup.activeView !== view
 }

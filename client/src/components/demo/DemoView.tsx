@@ -14,33 +14,24 @@ export function DemoView({ model }: DemoViewProps): JSX.Element {
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const service = model.explorer?.selectedService
-    if (ref.current && service)
-      model.getDemoService(service).mount(service, ref.current)
-    return () => {
-      if (service)
-        model.getDemoService(service).unmount(service)
-    }
-  }, [model.explorer.selectedService])
+    if (ref.current)
+      model.mount(ref.current)
+    return () => model.unmount()
+  }, [model, ref])
 
-  return autorender(() => {
-    model.explorer.selectedService // subscribe for changes to rerun useEffect
-    return (
-      <div className={styles.demoView}>
-        <div className={styles.sidePanel}>
-          <SidePanel model={model.sidePanel}>
-            {explorer(model)}
-          </SidePanel>
-        </div>
-        <div className={styles.content}>
-          <div ref={ref} className={styles.container} />
-        </div>
+  return autorender(() => (
+    <div className={styles.demoView}>
+      <div className={styles.sidePanel}>
+        <SidePanel model={model.sidePanel}>
+          {sidePanelContent(model)}
+        </SidePanel>
       </div>
-    )
-  }, [model])
+      <div className={styles.content}>{content(model, ref)}</div>
+    </div>
+  ), [model, ref])
 }
 
-function explorer(model: models.DemoView): JSX.Element {
+function sidePanelContent(model: models.DemoView): JSX.Element {
   if (model.explorer instanceof models.SingleDemoExplorer)
     return (
       <>
@@ -83,3 +74,13 @@ function startOrStopButton(model: models.DemoView): JSX.Element {
   )
 }
 
+function content(model: models.DemoView, ref: React.RefObject<HTMLDivElement>): JSX.Element {
+  let body
+  if (!model.explorer.selectedService)
+    body = <div className={styles.serviceNotSelected}>Service is not selected</div>
+  else if (!model.isDemoRunning(model.explorer.selectedService.demo))
+    body = <div className={styles.demoNotRunning}>Demo is not running</div>
+  else
+    body = <></>
+  return <div ref={ref} className={styles.container}>{body}</div>
+}

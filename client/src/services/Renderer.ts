@@ -1,9 +1,7 @@
 import { Disposable } from "../Disposable"
 
 export interface Renderer extends Disposable {
-  mount(element: HTMLElement): void
+  show(element: HTMLElement): void;
 
-  unmount(): void
-
-  dispose(): void
+  hide(): void;
 }

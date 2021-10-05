@@ -42,6 +42,7 @@ export class TasksView extends View {
       this.sidePanel.dispose()
       this.disposer.dispose()
       this._taskEditorView?.dispose()
+      this._demoView?.dispose()
       super.dispose()
     })
   }

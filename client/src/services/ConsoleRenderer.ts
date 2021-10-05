@@ -24,7 +24,7 @@ export class ConsoleRenderer implements Renderer {
     this.styleTerminalContainer()
   }
 
-  mount(element: HTMLElement): void {
+  show(element: HTMLElement): void {
     this.resizeObserver.observe(this.terminalContainer)
     this.mountContainer = element
     element.appendChild(this.terminalContainer)
@@ -34,13 +34,15 @@ export class ConsoleRenderer implements Renderer {
     }
   }
 
-  unmount(): void {
+  hide(): void {
     this.mountContainer?.removeChild(this.terminalContainer)
     this.mountContainer = null
     this.resizeObserver.unobserve(this.terminalContainer)
   }
 
   dispose(): void {
+    if (this.mountContainer?.contains(this.terminalContainer))
+      this.mountContainer?.removeChild(this.terminalContainer)
     this.terminal.dispose()
     this.fitAddon.dispose()
     this.resizeObserver.disconnect()

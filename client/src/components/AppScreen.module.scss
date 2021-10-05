@@ -13,7 +13,7 @@
 
   grid-area: switch;
   padding: 14px;
-  z-index: 101;
+  z-index: 100;
 }
 
 %view-button {
@@ -45,5 +45,14 @@
 
 .view-content {
   grid-area: content;
-  z-index: 100;
+  z-index: 99;
+
+  & > div {
+    @include library.full-size;
+  }
+}
+
+.view-content-hidden {
+  position: absolute;
+  clip: rect(0, 0, 0, 0);
 }
