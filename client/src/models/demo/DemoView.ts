@@ -1,5 +1,5 @@
 import { reaction, transaction, Transaction, unobservable } from "reactronic"
-import { Demo, Service } from "../../domain/Demo"
+import * as domain from "../../domain"
 import * as services from "../../services"
 import { SidePanel } from "../SidePanel"
 import { View } from "../View"
@@ -9,15 +9,15 @@ import { SingleDemoExplorer } from "./SingleDemoExplorer"
 export class DemoView extends View {
   @unobservable readonly sidePanel = new SidePanel("Demo")
   @unobservable readonly explorer: SingleDemoExplorer | MultipleDemosExplorer
-  @unobservable readonly demos: readonly Demo[]
-  @unobservable private readonly demoServices = new Map<Demo, services.DemoService>()
+  @unobservable readonly demos: readonly domain.Demo[]
+  @unobservable private readonly demoServices = new Map<domain.Demo, services.DemoService>()
   private _isViewClosed = false
   private mountContainer: HTMLElement | null = null
-  private shownService: Service | null = null
+  private shownService: domain.Service | null = null
 
   get isViewClosed(): boolean { return this._isViewClosed }
 
-  constructor(demos: readonly Demo[], key: string) {
+  constructor(demos: readonly domain.Demo[], key: string) {
     super("Demo", key)
     this.demos = demos
     this.explorer = this.createExplorer(this.demos)
@@ -45,20 +45,20 @@ export class DemoView extends View {
   }
 
   @transaction
-  start(demo: Demo): void {
+  start(demo: domain.Demo): void {
     this.ensureDemoServiceRegisteredForDemo(demo)
     const demoService = this.demoServices.get(demo) as services.DemoService
     demoService.start()
   }
 
   @transaction
-  stop(demo: Demo): void {
+  stop(demo: domain.Demo): void {
     this.ensureDemoServiceRegisteredForDemo(demo)
     const demoService = this.demoServices.get(demo) as services.DemoService
     demoService.stop()
   }
 
-  isDemoRunning(demo: Demo): boolean {
+  isDemoRunning(demo: domain.Demo): boolean {
     this.ensureDemoServiceRegisteredForDemo(demo)
     const demoService = this.demoServices.get(demo) as services.DemoService
     return demoService.isRunning
@@ -71,20 +71,20 @@ export class DemoView extends View {
     this._isViewClosed = true
   }
 
-  getDemoService(service: Service): services.DemoService {
+  getDemoService(service: domain.Service): services.DemoService {
     this.ensureDemoServiceRegisteredForDemo(service.demo)
     return this.demoServices.get(service.demo) as services.DemoService
   }
 
   @transaction
-  private createExplorer(demos: readonly Demo[]): SingleDemoExplorer | MultipleDemosExplorer {
+  private createExplorer(demos: readonly domain.Demo[]): SingleDemoExplorer | MultipleDemosExplorer {
     if (demos.length === 1)
       return new SingleDemoExplorer(demos[0])
     return new MultipleDemosExplorer(this.demos)
   }
 
   @transaction
-  private ensureDemoServiceRegisteredForDemo(demo: Demo): void {
+  private ensureDemoServiceRegisteredForDemo(demo: domain.Demo): void {
     if (!this.demoServices.has(demo))
       throw new Error("DemoService has not been registered for Demo")
   }

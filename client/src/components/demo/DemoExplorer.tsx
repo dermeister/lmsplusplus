@@ -1,5 +1,5 @@
 import React from "react"
-import { Service } from "../../domain/Demo"
+import * as domain from "../../domain"
 import * as models from "../../models"
 import { autorender } from "../autorender"
 import { ContextMenu } from "../ContextMenu"
@@ -43,7 +43,8 @@ function demos(model: models.DemoView, demos: readonly models.DemoNode[]): JSX.E
   })
 }
 
-function services(model: models.DemoView, services: readonly models.ItemNode<Service>[]): JSX.Element[] {
+function services(model: models.DemoView,
+                  services: readonly models.ItemNode<domain.Service>[]): JSX.Element[] {
   return services.map(service => (
     <Explorer.Item key={service.key} item={service}>
       {service.title}

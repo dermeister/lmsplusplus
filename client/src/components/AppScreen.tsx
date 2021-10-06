@@ -5,6 +5,7 @@ import styles from "./AppScreen.module.scss"
 import { autorender } from "./autorender"
 import { Button } from "./Button"
 import { OptionsView } from "./options/OptionsView"
+import { Permissions } from "./permissions"
 import { TasksView } from "./tasks/TasksView"
 import { combineClassNames, maybeValue } from "./utils"
 
@@ -14,13 +15,15 @@ interface AppScreenProps {
 
 export function AppScreen({ model }: AppScreenProps): JSX.Element {
   return autorender(() => (
-    <div className={styles.screen}>
-      <div className={styles.viewSwitch}>
-        {button(model, model.tasksView)}
-        {button(model, model.optionsView)}
+    <Permissions permissions={model.database.permissions}>
+      <div className={styles.screen}>
+        <div className={styles.viewSwitch}>
+          {button(model, model.tasksView)}
+          {button(model, model.optionsView)}
+        </div>
+        <div className={styles.viewContent}>{viewContent(model)}</div>
       </div>
-      <div className={styles.viewContent}>{viewContent(model)}</div>
-    </div>
+    </Permissions>
   ), [model])
 }
 

@@ -1,4 +1,5 @@
-import { Transaction } from "reactronic"
+import { transaction, Transaction } from "reactronic"
+import * as domain from "../../domain"
 import { Explorer, ItemNode } from "../explorer"
 
 export enum OptionCategory {
@@ -7,8 +8,8 @@ export enum OptionCategory {
 }
 
 export class OptionCategories extends Explorer<OptionCategory> {
-  constructor() {
-    super(OptionCategories.createNodes())
+  constructor(permissions: domain.Permissions) {
+    super(OptionCategories.createNodes(permissions))
     this.setSelectedNode(this.children[0])
   }
 
@@ -21,11 +22,20 @@ export class OptionCategories extends Explorer<OptionCategory> {
     super.setSelectedNode(node)
   }
 
-  private static createNodes(): ItemNode<OptionCategory>[] {
+  @transaction
+  updatePermissions(permissions: domain.Permissions): void {
+    this.updateExplorer(OptionCategories.createNodes(permissions))
+  }
+
+  private static createNodes(permissions: domain.Permissions): ItemNode<OptionCategory>[] {
     return Transaction.run(() => {
-      const vcs = new ItemNode("VCS", "0", false, OptionCategory.Vsc)
-      const preferences = new ItemNode("Preferences", "1", false, OptionCategory.Preferences)
-      return [vcs, preferences]
+      const preferences = new ItemNode("Preferences", "1", OptionCategory.Preferences)
+      const nodes = [preferences]
+      if (permissions.canUpdateVcsConfiguration) {
+        const vcs = new ItemNode("VCS", "0", OptionCategory.Vsc)
+        nodes.push(vcs)
+      }
+      return nodes
     })
   }
 }

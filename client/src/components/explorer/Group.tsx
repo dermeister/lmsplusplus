@@ -8,10 +8,11 @@ import styles from "./Explorer.module.scss"
 
 interface GroupProps {
   group: models.GroupNode
+  contextMenu?: React.ReactNode
   children?: React.ReactNode
 }
 
-export function Group({ group, children }: GroupProps): JSX.Element {
+export function Group({ group, children, contextMenu }: GroupProps): JSX.Element {
   const offset = useOffset()
   const onContextMenu = useContextMenu(group.contextMenu)
 
@@ -27,12 +28,13 @@ export function Group({ group, children }: GroupProps): JSX.Element {
     return (
       <p
         onClick={onClick}
-        onContextMenu={onContextMenu ?? undefined}
+        onContextMenu={contextMenu ? onContextMenu : undefined}
         className={className}
         style={{ paddingLeft: offset }}
       >
         {children}
+        {contextMenu}
       </p>
     )
-  }, [group, children])
+  }, [group, children, contextMenu])
 }

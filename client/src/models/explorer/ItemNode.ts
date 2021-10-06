@@ -7,8 +7,8 @@ export class ItemNode<T> extends Node {
 
   get item(): T { return this._item }
 
-  constructor(title: string, key: string, hasContextMenu: boolean, value: T) {
-    super(title, key, hasContextMenu)
+  constructor(title: string, key: string, value: T) {
+    super(title, key)
     this._item = value
   }
 

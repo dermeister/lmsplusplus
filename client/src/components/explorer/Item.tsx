@@ -8,10 +8,11 @@ import styles from "./Explorer.module.scss"
 
 interface ItemProps<T> {
   item: models.ItemNode<T>
+  contextMenu?: React.ReactNode
   children?: React.ReactNode
 }
 
-export function Item<T>({ item, children }: ItemProps<T>): JSX.Element {
+export function Item<T>({ item, children, contextMenu }: ItemProps<T>): JSX.Element {
   const model = useExplorerModel<models.Explorer<T>>()
   const offset = useOffset()
   const onContextMenu = useContextMenu(item.contextMenu)
@@ -28,13 +29,14 @@ export function Item<T>({ item, children }: ItemProps<T>): JSX.Element {
       <li key={item.key}>
         <p
           onClick={onClick}
-          onContextMenu={onContextMenu ?? undefined}
+          onContextMenu={contextMenu ? onContextMenu : undefined}
           className={className}
           style={{ paddingLeft: offset }}
         >
           {children}
+          {contextMenu}
         </p>
       </li>
     )
-  }, [item, children])
+  }, [item, children, contextMenu])
 }

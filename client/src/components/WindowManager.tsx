@@ -6,7 +6,7 @@ interface WindowManagerProps {
   children: React.ReactNode
 }
 
-type OnContextMenuHandler = ((e: React.MouseEvent) => void) | null
+type OnContextMenuHandler = ((e: React.MouseEvent) => void)
 
 const WindowManagerContext = React.createContext<models.WindowManager | null>(null)
 
@@ -14,10 +14,8 @@ export function WindowManager({ model, children }: WindowManagerProps): JSX.Elem
   return <WindowManagerContext.Provider value={model}>{children}</WindowManagerContext.Provider>
 }
 
-export function useContextMenu(contextMenu: models.ContextMenu | null): OnContextMenuHandler {
+export function useContextMenu(contextMenu: models.ContextMenu): OnContextMenuHandler {
   const windowManager = useContext(WindowManagerContext)
-  if (!contextMenu)
-    return null
   return e => {
     e.preventDefault()
     windowManager?.openContextMenu(contextMenu, e.clientX, e.clientY)

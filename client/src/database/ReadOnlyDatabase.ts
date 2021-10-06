@@ -1,24 +1,20 @@
 import { Monitor } from "reactronic"
-import { Course } from "../domain/Course"
-import { Demo } from "../domain/Demo"
-import { Preferences } from "../domain/Preferences"
-import { Solution } from "../domain/Solution"
-import { Task } from "../domain/Task"
-import { User } from "../domain/User"
-import { VcsConfiguration } from "../domain/VcsConfiguration"
+import * as domain from "../domain"
 
 export interface ReadOnlyDatabase {
   get monitor(): Monitor
 
-  get courses(): readonly Course[];
+  get courses(): readonly domain.Course[];
 
-  get vcsConfiguration(): VcsConfiguration;
+  get vcsConfiguration(): domain.VcsConfiguration;
 
-  get preferences(): Preferences;
+  get preferences(): domain.Preferences;
 
-  get user(): User;
+  get user(): domain.User;
 
-  getSolutions(task: Task): readonly Solution[];
+  get permissions(): domain.Permissions;
 
-  getDemos(task: Task): readonly Demo[];
+  getSolutions(task: domain.Task): readonly domain.Solution[];
+
+  getDemos(task: domain.Task): readonly domain.Demo[];
 }

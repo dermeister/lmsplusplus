@@ -9,8 +9,8 @@ export class GroupNode extends Node {
   get children(): readonly Node[] { return this._children }
   get isOpened(): boolean { return this._isOpened }
 
-  constructor(title: string, key: string, hasContextMenu: boolean, children: readonly Node[]) {
-    super(title, key, hasContextMenu)
+  constructor(title: string, key: string, children: readonly Node[]) {
+    super(title, key)
     this._children = children
   }
 

@@ -1,18 +1,19 @@
 import { transaction, Transaction, unobservable } from "reactronic"
-import { Demo, Service, ServiceType } from "../domain/Demo"
+import * as domain from "../domain"
+import { ServiceType } from "../domain"
 import { ObservableObject } from "../ObservableObject"
 import { ConsoleRenderer } from "./ConsoleRenderer"
 import { Renderer } from "./Renderer"
 import { WebRenderer } from "./WebRenderer"
 
 export class DemoService extends ObservableObject {
-  @unobservable private readonly demo: Demo
-  private renderers = new Map<Service, Renderer>()
+  @unobservable private readonly demo: domain.Demo
+  private renderers = new Map<domain.Service, Renderer>()
   private _isRunning = false
 
   get isRunning(): boolean { return this._isRunning }
 
-  constructor(demo: Demo) {
+  constructor(demo: domain.Demo) {
     super()
     this.demo = demo
   }
@@ -45,20 +46,20 @@ export class DemoService extends ObservableObject {
   }
 
   @transaction
-  show(service: Service, element: HTMLElement): void {
+  show(service: domain.Service, element: HTMLElement): void {
     this.ensureRendererExistsForService(service)
     const renderer = this.renderers.get(service) as Renderer
     renderer.show(element)
   }
 
   @transaction
-  hide(service: Service): void {
+  hide(service: domain.Service): void {
     this.ensureRendererExistsForService(service)
     const renderer = this.renderers.get(service) as Renderer
     renderer.hide()
   }
 
-  private static createRenderer(service: Service): Renderer {
+  private static createRenderer(service: domain.Service): Renderer {
     switch (service.type) {
       case ServiceType.Console:
         return new ConsoleRenderer(service)
@@ -67,7 +68,7 @@ export class DemoService extends ObservableObject {
     }
   }
 
-  private ensureRendererExistsForService(service: Service): void {
+  private ensureRendererExistsForService(service: domain.Service): void {
     if (!this.renderers.has(service))
       throw new Error("Renderer is not registered for service")
   }

@@ -1,5 +1,5 @@
 import React from "react"
-import { Account, Provider } from "../../domain/VcsConfiguration"
+import * as domain from "../../domain"
 import * as models from "../../models"
 import { autorender } from "../autorender"
 import { Dropdown, DropdownItem } from "../Dropdown"
@@ -40,7 +40,7 @@ function accountDropdown(options: models.Options): JSX.Element {
   return <Dropdown selectedItemIndex={selectedAccountIndex} items={accounts} onChange={onChange} />
 }
 
-function createAccountDropdownItem(account: Account): DropdownItem<Account> {
+function createAccountDropdownItem(account: domain.Account): DropdownItem<domain.Account> {
   return { value: account, title: `${account.username} (${account.provider.name})`, key: account.id }
 }
 
@@ -69,7 +69,7 @@ function providerList(options: models.Options): JSX.Element {
   )
 }
 
-function accountList(options: models.Options, provider: Provider): JSX.Element {
+function accountList(options: models.Options, provider: domain.Provider): JSX.Element {
   return (
     <ul>
       {options.vcsAccounts.filter(account => account.provider === provider).map(account => (

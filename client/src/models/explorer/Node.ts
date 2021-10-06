@@ -5,16 +5,15 @@ import { NodeVisitor } from "./NodeVisitor"
 
 export abstract class Node extends ObservableObject {
   @unobservable readonly key: string
-  @unobservable readonly contextMenu: ContextMenu | null
+  @unobservable readonly contextMenu = new ContextMenu()
   private _title: string
 
   get title(): string { return this._title }
 
-  protected constructor(title: string, key: string, hasContextMenu: boolean) {
+  protected constructor(title: string, key: string) {
     super()
     this._title = title
     this.key = key
-    this.contextMenu = hasContextMenu ? new ContextMenu() : null
   }
 
   abstract accept(visitor: NodeVisitor): Node

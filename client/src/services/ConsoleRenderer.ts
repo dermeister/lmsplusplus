@@ -1,6 +1,6 @@
 import { ITheme, Terminal } from "xterm"
 import { FitAddon } from "xterm-addon-fit"
-import { Service } from "../domain/Demo"
+import * as domain from "../domain"
 import { Renderer } from "./Renderer"
 
 export class ConsoleRenderer implements Renderer {
@@ -18,7 +18,7 @@ export class ConsoleRenderer implements Renderer {
     }
   }
 
-  constructor(service: Service) {
+  constructor(service: domain.Service) {
     this.terminal.loadAddon(this.fitAddon)
     this.terminal.write(service.name)
     this.styleTerminalContainer()

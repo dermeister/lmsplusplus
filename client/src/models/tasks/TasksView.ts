@@ -1,8 +1,7 @@
 import { Monitor, reaction, standalone, throttling, transaction, Transaction, unobservable } from "reactronic"
 import { ReadOnlyDatabase } from "../../database"
 import { Disposer } from "../../Disposer"
-import { Course } from "../../domain/Course"
-import { Task } from "../../domain/Task"
+import * as domain from "../../domain"
 import { DemoView } from "../demo"
 import { SidePanel } from "../SidePanel"
 import { TaskEditorView } from "../task-editor"
@@ -17,16 +16,16 @@ export class TasksView extends View {
   @unobservable private readonly disposer = new Disposer()
   @unobservable private readonly database: ReadOnlyDatabase
   private _taskEditorView: TaskEditorView | null = null
-  private _createdTask: Task | null = null
-  private _updatedTask: Task | null = null
-  private _deletedTask: Task | null = null
+  private _createdTask: domain.Task | null = null
+  private _updatedTask: domain.Task | null = null
+  private _deletedTask: domain.Task | null = null
   private _demoView: DemoView | null = null
 
   get taskEditorView(): TaskEditorView | null { return this._taskEditorView }
   get monitor(): Monitor { return this.database.monitor }
-  get createdTask(): Task | null { return this._createdTask }
-  get updatedTask(): Task | null { return this._updatedTask }
-  get deletedTask(): Task | null { return this._deletedTask }
+  get createdTask(): domain.Task | null { return this._createdTask }
+  get updatedTask(): domain.Task | null { return this._updatedTask }
+  get deletedTask(): domain.Task | null { return this._deletedTask }
   get demoView(): DemoView | null { return this._demoView }
 
   constructor(database: ReadOnlyDatabase, key: string) {
@@ -48,30 +47,30 @@ export class TasksView extends View {
   }
 
   @transaction
-  openDemos(task: Task): void {
+  openDemos(task: domain.Task): void {
     this.createDemoView(task)
   }
 
-  hasDemos(task: Task): boolean {
+  hasDemos(task: domain.Task): boolean {
     const demos = this.database.getDemos(task)
     return demos.length > 0
   }
 
   @transaction
-  createTask(course: Course): void {
+  createTask(course: domain.Course): void {
     this.ensureNoTaskEdited()
-    const task = new Task(Task.NO_ID, course, "", "")
+    const task = new domain.Task(domain.Task.NO_ID, course, "", "")
     this.createTaskEditorView(task)
   }
 
   @transaction
-  updateTask(task: Task): void {
+  updateTask(task: domain.Task): void {
     this.ensureNoTaskEdited()
     this.createTaskEditorView(task)
   }
 
   @transaction
-  deleteTask(task: Task): void {
+  deleteTask(task: domain.Task): void {
     this.ensureNoTaskEdited()
     this._deletedTask = task
   }
@@ -82,7 +81,7 @@ export class TasksView extends View {
   }
 
   @transaction
-  private createDemoView(task: Task): void {
+  private createDemoView(task: domain.Task): void {
     if (this.hasDemos(task)) {
       this._demoView = new DemoView(this.database.getDemos(task), "Demo")
       this.viewGroup.replace(this, this._demoView)
@@ -90,7 +89,7 @@ export class TasksView extends View {
   }
 
   @transaction
-  private createTaskEditorView(task: Task): void {
+  private createTaskEditorView(task: domain.Task): void {
     this._taskEditorView = new TaskEditorView(task, this.monitor, "Editor")
     this.viewGroup.replace(this, this._taskEditorView)
   }

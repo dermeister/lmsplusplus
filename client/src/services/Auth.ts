@@ -1,12 +1,12 @@
 import { reaction, standalone, transaction } from "reactronic"
-import { User } from "../domain/User"
+import * as domain from "../domain"
 import { ObservableObject } from "../ObservableObject"
 
 export class Auth extends ObservableObject {
-  private _user: User | null = null
+  private _user: domain.User | null = null
   private readonly localStorageKey: string
 
-  get user(): User | null { return this._user }
+  get user(): domain.User | null { return this._user }
 
   constructor(localStorageKey: string) {
     super()
@@ -19,7 +19,7 @@ export class Auth extends ObservableObject {
     if (this._user)
       standalone(() => this.signOut())
     try {
-      this._user = await Promise.resolve(new User())
+      this._user = await Promise.resolve(new domain.User())
     } catch (e) {
       if (e.message === "Bad Request")
         return false
@@ -41,10 +41,10 @@ export class Auth extends ObservableObject {
       localStorage.setItem(this.localStorageKey, JSON.stringify(this._user))
   }
 
-  private loadUserFromLocalStorage(): User | null {
+  private loadUserFromLocalStorage(): domain.User | null {
     const serializedUser = localStorage.getItem(this.localStorageKey)
     if (!serializedUser)
       return null
-    return User.deserialize(serializedUser)
+    return domain.User.deserialize(serializedUser)
   }
 }
