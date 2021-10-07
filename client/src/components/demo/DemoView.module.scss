@@ -22,8 +22,14 @@
   @include library.full-size;
 }
 
-.start-button, .stop-button, .close-button {
+.start-button, .stop-button {
   margin: 0 14px 8px;
+  padding: 4px;
+  width: calc(100% - 28px);
+}
+
+.close-button {
+  margin: auto 14px 16px;
   padding: 4px;
   width: calc(100% - 28px);
 }

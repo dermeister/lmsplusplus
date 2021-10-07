@@ -32,21 +32,29 @@ export function DemoView({ model }: DemoViewProps): JSX.Element {
 }
 
 function sidePanelContent(model: models.DemoView): JSX.Element {
+  let body
   if (model.explorer instanceof models.SingleDemoExplorer)
-    return (
+    body = (
       <>
         {startOrStopButton(model)}
         <DemoExplorer model={model} />
       </>
     )
-  if (model.explorer.children.length === 0)
-    return (
+  else if (model.explorer.children.length === 0)
+    body = (
       <>
         <p className={styles.noDemos}>There are no services available</p>
         <Button variant="primary" onClick={() => model.close()} className={styles.closeButton}>Close</Button>
       </>
     )
-  return <DemoExplorer model={model} />
+  else
+    body = <DemoExplorer model={model} />
+  return (
+    <>
+      {body}
+      <Button className={styles.closeButton} variant="secondary" onClick={() => model.close()}>Close</Button>
+    </>
+  )
 }
 
 function startOrStopButton(model: models.DemoView): JSX.Element {
