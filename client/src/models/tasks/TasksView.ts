@@ -8,6 +8,7 @@ import { TaskEditorView } from "../task-editor"
 import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
 import { TasksExplorer } from "./TasksExplorer"
+import MarkdownIt from "markdown-it"
 
 export class TasksView extends View {
   @unobservable readonly viewGroup = new ViewGroup([this], this)
@@ -15,11 +16,13 @@ export class TasksView extends View {
   @unobservable readonly sidePanel = new SidePanel("Tasks")
   @unobservable private readonly disposer = new Disposer()
   @unobservable private readonly database: ReadOnlyDatabase
+  private static markdown = new MarkdownIt()
   private _taskEditorView: TaskEditorView | null = null
   private _createdTask: domain.Task | null = null
   private _updatedTask: domain.Task | null = null
   private _deletedTask: domain.Task | null = null
   private _demoView: DemoView | null = null
+  private _descriptionHtml: string | null = null
 
   get taskEditorView(): TaskEditorView | null { return this._taskEditorView }
   get monitor(): Monitor { return this.database.monitor }
@@ -27,6 +30,7 @@ export class TasksView extends View {
   get updatedTask(): domain.Task | null { return this._updatedTask }
   get deletedTask(): domain.Task | null { return this._deletedTask }
   get demoView(): DemoView | null { return this._demoView }
+  get descriptionHtml(): string | null { return this._descriptionHtml }
 
   constructor(database: ReadOnlyDatabase, key: string) {
     super("Tasks", key)
@@ -141,5 +145,14 @@ export class TasksView extends View {
     this.viewGroup.replace(this._demoView, this)
     this.disposer.enqueue(this._demoView)
     this._demoView = null
+  }
+
+  @reaction
+  private descriptionHtml_synchronized_with_selectedTask_description(): void {
+    const description = this.explorer.selectedTask?.description
+    if (description)
+      this._descriptionHtml = TasksView.markdown.render(description)
+    else
+      this._descriptionHtml = null
   }
 }

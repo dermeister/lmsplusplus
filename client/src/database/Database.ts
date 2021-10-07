@@ -171,6 +171,6 @@ export class Database extends ObservableObject implements ReadOnlyDatabase {
     this._user = await Promise.resolve(new domain.User())
 
     // permissions
-    this._permissions = await Promise.resolve(domain.Permissions.student)
+    this._permissions = await Promise.resolve(domain.Permissions.teacher)
   }
 }

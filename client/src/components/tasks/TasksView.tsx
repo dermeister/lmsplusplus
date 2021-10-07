@@ -69,9 +69,13 @@ function tasksView(view: models.TasksView, pulsing: boolean): JSX.Element {
       <SidePanel model={view.sidePanel} pulsing={pulsing}>
         <TasksExplorer model={view} />
       </SidePanel>
-      <div className={styles.description}>
-        {view.explorer.selectedTask?.description ?? "No task"}
-      </div>
+      {description(view)}
     </section>
   )
+}
+
+function description(view: models.TasksView): JSX.Element {
+  if (!view.descriptionHtml)
+    return <div className={styles.description}>No task</div>
+  return <div className={styles.description} dangerouslySetInnerHTML={{ __html: view.descriptionHtml }} />
 }
