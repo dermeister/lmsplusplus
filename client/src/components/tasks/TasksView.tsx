@@ -76,6 +76,6 @@ function tasksView(view: models.TasksView, pulsing: boolean): JSX.Element {
 
 function description(view: models.TasksView): JSX.Element {
   if (!view.descriptionHtml)
-    return <div className={styles.description}>No task</div>
+    return <p className={styles.noTask}>No task selected</p>
   return <div className={styles.description} dangerouslySetInnerHTML={{ __html: view.descriptionHtml }} />
 }

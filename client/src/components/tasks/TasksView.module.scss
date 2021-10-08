@@ -52,3 +52,17 @@
     list-style: revert;
   }
 }
+
+.no-task {
+  @include library.full-size;
+
+  grid-area: description;
+  z-index: 99;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 32px;
+}

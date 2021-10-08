@@ -41,5 +41,12 @@
 }
 
 .service-not-selected, .demo-not-running {
-  padding: 14px;
+  @include library.full-size;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 32px;
 }
