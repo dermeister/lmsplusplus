@@ -13,17 +13,17 @@
 
   overflow: hidden;
 
-  &:hover {
-    background-color: library.$background-secondary-hover;
+  &:hover:not(.selected) {
+    background-color: library.$secondary-hover;
   }
 }
 
 .selected {
-  background-color: library.$background-secondary-hover;
+  background-color: library.$secondary;
 }
 
 .context-menu-opened {
-  background-color: library.$background-secondary-hover;
+  background-color: library.$secondary-hover;
 }
 
 .group {

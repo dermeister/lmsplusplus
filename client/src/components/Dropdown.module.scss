@@ -5,12 +5,12 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 
-  background-color: library.$background-secondary;
+  background-color: library.$secondary;
   overflow: hidden;
   cursor: pointer;
 
   &:hover {
-    background-color: library.$background-secondary-hover;
+    background-color: library.$secondary-hover;
   }
 }
 
