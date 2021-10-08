@@ -25,7 +25,7 @@ export function SignInScreen({ model }: SignInScreenProps): JSX.Element {
   }
 
   return autorender(() => (
-    <section className={styles.screen}>
+    <div className={styles.screen}>
       <h1 className={styles.screenTitle}>LMS++</h1>
 
       <form className={styles.form} onSubmit={onSubmit}>
@@ -52,6 +52,6 @@ export function SignInScreen({ model }: SignInScreenProps): JSX.Element {
 
         <Button className={styles.submit} variant="primary">Sign in</Button>
       </form>
-    </section>
+    </div>
   ), [model])
 }

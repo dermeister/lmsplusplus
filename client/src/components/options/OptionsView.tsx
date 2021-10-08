@@ -19,10 +19,10 @@ export function OptionsView({ model }: OptionsViewProps): JSX.Element {
   const auth = useAuth()
 
   return autorender(() => (
-    <section className={styles.options}>
+    <div className={styles.options}>
       {viewSwitch(model)}
       {viewContent(model, auth)}
-    </section>
+    </div>
   ), [model])
 }
 

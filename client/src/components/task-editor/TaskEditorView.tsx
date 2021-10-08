@@ -14,7 +14,7 @@ interface TaskEditorViewProps {
 
 export function TaskEditorView({ model }: TaskEditorViewProps): JSX.Element {
   return autorender(() => (
-    <section className={styles.taskEditor}>
+    <div className={styles.taskEditor}>
       <div className={styles.sidePanel}>
         <SidePanel model={model.sidePanel} pulsing={model.monitor.isActive}>
           {form(model)}
@@ -23,7 +23,7 @@ export function TaskEditorView({ model }: TaskEditorViewProps): JSX.Element {
       <div className={styles.content}>
         <MonacoEditor model={model.taskDescription} />
       </div>
-    </section>
+    </div>
   ), [model])
 }
 

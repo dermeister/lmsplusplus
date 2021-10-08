@@ -125,14 +125,14 @@ export class Database extends ObservableObject implements ReadOnlyDatabase {
     // courses
     const course1 = new domain.Course(Database.nextId++, "СПП")
     course1.tasks = [
-      new domain.Task(Database.nextId++, course1, "Task 1", "Task 1"),
-      new domain.Task(Database.nextId++, course1, "Task 2", "Task 2")
+      new domain.Task(Database.nextId++, course1, "Task 1", "# Task 1"),
+      new domain.Task(Database.nextId++, course1, "Task 2", "# Task 2")
     ]
     const course2 = new domain.Course(Database.nextId++, "ЯП")
     course2.tasks = [
-      new domain.Task(Database.nextId++, course2, "Task 1", "Task 1"),
-      new domain.Task(Database.nextId++, course2, "Task 2", "Task 2"),
-      new domain.Task(Database.nextId++, course2, "Task 3", "Task 3")
+      new domain.Task(Database.nextId++, course2, "Task 1", "# Task 1"),
+      new domain.Task(Database.nextId++, course2, "Task 2", "# Task 2"),
+      new domain.Task(Database.nextId++, course2, "Task 3", "# Task 3")
     ]
     this._courses = await Promise.resolve([course1, course2])
 

@@ -14,10 +14,10 @@ interface TasksViewProps {
 
 export function TasksView({ model }: TasksViewProps): JSX.Element {
   return autorender(() => (
-    <section className={styles.tasksView}>
+    <div className={styles.tasksView}>
       {viewSwitch(model)}
       {viewContent(model)}
-    </section>
+    </div>
   ), [model])
 }
 
@@ -65,12 +65,12 @@ function viewContent(model: models.TasksView): JSX.Element | undefined {
 
 function tasksView(view: models.TasksView, pulsing: boolean): JSX.Element {
   return (
-    <section className={styles.tasksContent}>
+    <div className={styles.tasksContent}>
       <SidePanel model={view.sidePanel} pulsing={pulsing}>
         <TasksExplorer model={view} />
       </SidePanel>
       {description(view)}
-    </section>
+    </div>
   )
 }
 

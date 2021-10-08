@@ -12,19 +12,17 @@ interface VcsProps {
 
 export function Vcs({ model }: VcsProps): JSX.Element {
   return autorender(() => {
-    let content
     if (model.vcsProviders.length === 0)
-      content = <h2 className={styles.noVcsProviders}>There are no available VCS providers</h2>
+      return <h2 className={styles.noVcsProviders}>There are no available VCS providers</h2>
     else
-      content = (
-        <>
+      return (
+        <div>
           <Field label="Current account" className={styles.currentAccountField}>
             {accountDropdown(model)}
           </Field>
           {providerList(model)}
-        </>
+        </div>
       )
-    return <section>{content}</section>
   }, [model])
 }
 
