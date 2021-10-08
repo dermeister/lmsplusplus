@@ -51,10 +51,7 @@ function courses(model: models.TasksView,
       )
     return (
       <li key={course.key}>
-        <Explorer.Group group={course}>
-          {course.title}
-          {contextMenu}
-        </Explorer.Group>
+        <Explorer.Group group={course} contextMenu={contextMenu}>{course.title}</Explorer.Group>
         <Explorer.Children group={course}>{tasks(model, course.children, permissions)}</Explorer.Children>
       </li>
     )
@@ -89,10 +86,6 @@ function tasks(model: models.TasksView,
         {contextMenuBody}
       </ContextMenu>
     )
-    return (
-      <Explorer.Item key={task.key} item={task} contextMenu={contextMenu}>
-        {task.title}
-      </Explorer.Item>
-    )
+    return <Explorer.Item key={task.key} item={task} contextMenu={contextMenu}>{task.title}</Explorer.Item>
   })
 }
