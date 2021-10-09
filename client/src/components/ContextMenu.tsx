@@ -47,14 +47,31 @@ function onContextMenu(e: React.MouseEvent): void {
 }
 
 interface ContextMenuButtonProps {
+  variant: "primary" | "danger"
   children?: React.ReactNode
   onClick?(): void
 }
 
 ContextMenu.Button = function ContextMenuButton(props: ContextMenuButtonProps): JSX.Element {
   return (
-    <Button variant="secondary" onClick={props.onClick} tabIndex={-1} className={styles.contextMenuButton}>
+    <Button
+      variant={convertButtonVariant(props.variant)}
+      onClick={props.onClick}
+      tabIndex={-1}
+      className={variants[props.variant]}
+    >
       {props.children}
     </Button>
   )
+}
+
+function convertButtonVariant(variant: "primary" | "danger"): "secondary" | "danger" {
+  if (variant === "primary")
+    return "secondary"
+  return variant
+}
+
+const variants = {
+  primary: styles.primary,
+  danger: styles.danger,
 }

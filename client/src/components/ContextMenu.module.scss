@@ -12,7 +12,7 @@
   background-color: library.$background-primary;
 }
 
-.context-menu-button {
+%context-menu-button {
   padding: 6px;
   width: 100%;
 
@@ -26,5 +26,17 @@
   &:not(:hover) {
     background-color: transparent;
     box-shadow: none;
+  }
+}
+
+.primary {
+  @extend %context-menu-button;
+}
+
+.danger {
+  @extend %context-menu-button;
+
+  &:not(:hover) {
+    color: library.$danger;
   }
 }

@@ -14,9 +14,9 @@ export class TasksView extends View {
   @unobservable readonly viewGroup = new ViewGroup([this], this)
   @unobservable readonly explorer: TasksExplorer
   @unobservable readonly sidePanel = new SidePanel("Tasks")
+  private static readonly markdown = new MarkdownIt()
   @unobservable private readonly disposer = new Disposer()
   @unobservable private readonly database: ReadOnlyDatabase
-  private static markdown = new MarkdownIt()
   private _taskEditorView: TaskEditorView | null = null
   private _createdTask: domain.Task | null = null
   private _updatedTask: domain.Task | null = null
@@ -56,7 +56,7 @@ export class TasksView extends View {
   }
 
   hasDemos(task: domain.Task): boolean {
-    const demos = this.database.getDemos(task)
+    const demos = task.solutions.map(s => s.demo)
     return demos.length > 0
   }
 
@@ -79,6 +79,16 @@ export class TasksView extends View {
     this._deletedTask = task
   }
 
+  @transaction
+  createSolution(task: domain.Task): void {
+
+  }
+
+  @transaction
+  deleteSolution(task: domain.Task): void {
+
+  }
+
   private ensureNoTaskEdited(): void {
     if (this._taskEditorView)
       throw new Error("Task already being edited")
@@ -87,7 +97,7 @@ export class TasksView extends View {
   @transaction
   private createDemoView(task: domain.Task): void {
     if (this.hasDemos(task)) {
-      this._demoView = new DemoView(this.database.getDemos(task), "Demo")
+      this._demoView = new DemoView(task.solutions.map(s => s.demo), "Demo")
       this.viewGroup.replace(this, this._demoView)
     }
   }

@@ -13,8 +13,4 @@ export interface ReadOnlyDatabase {
   get user(): domain.User;
 
   get permissions(): domain.Permissions;
-
-  getSolutions(task: domain.Task): readonly domain.Solution[];
-
-  getDemos(task: domain.Task): readonly domain.Demo[];
 }

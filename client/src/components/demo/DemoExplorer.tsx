@@ -28,7 +28,9 @@ function demos(model: models.DemoView, demos: readonly models.DemoNode[]): JSX.E
     if (demo.contextMenu)
       contextMenu = (
         <ContextMenu model={demo.contextMenu}>
-          <ContextMenu.Button onClick={() => onStopDemo(model, demo)}>Stop Demo</ContextMenu.Button>
+          <ContextMenu.Button variant="primary" onClick={() => onStopDemo(model, demo)}>
+            Stop Demo
+          </ContextMenu.Button>
         </ContextMenu>
       )
     return (

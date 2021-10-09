@@ -10,8 +10,6 @@ export class Database extends ObservableObject implements ReadOnlyDatabase {
   private static readonly _monitor = Monitor.create("Database", 0, 0)
   private static nextId = 1
   private _courses: domain.Course[] = []
-  private _solutions: domain.Solution[] = []
-  private _demos: domain.Demo[] = []
   private _vcsConfiguration = domain.VcsConfiguration.default
   private _preferences = domain.Preferences.default
   private _user = domain.User.default
@@ -23,14 +21,6 @@ export class Database extends ObservableObject implements ReadOnlyDatabase {
   get preferences(): domain.Preferences { return this._preferences }
   get user(): domain.User { return this._user }
   get permissions(): domain.Permissions { return this._permissions }
-
-  getSolutions(task: domain.Task): readonly domain.Solution[] {
-    return this._solutions.filter(s => s.task === task)
-  }
-
-  getDemos(task: domain.Task): readonly domain.Demo[] {
-    return this._demos.filter(d => d.solution.task === task)
-  }
 
   @transaction @monitor(Database._monitor)
   async createTask(task: domain.Task): Promise<void> {
@@ -138,17 +128,22 @@ export class Database extends ObservableObject implements ReadOnlyDatabase {
 
     // solutions
     const solution = new domain.Solution(Database.nextId++, this._courses[0].tasks[0], "Solution for task 1")
-    this._solutions = await Promise.resolve([solution])
+    this._courses[0].tasks[0].solutions = [solution]
+    this._courses[0].tasks[1].solutions = []
+    this._courses[1].tasks[0].solutions = []
+    this._courses[1].tasks[1].solutions = []
+    this._courses[1].tasks[2].solutions = []
+    // this._solutions = await Promise.resolve([solution])
 
     // demos
-    const demo = new domain.Demo(Database.nextId++, this._solutions[0])
+    const demo = new domain.Demo(Database.nextId++, this._courses[0].tasks[0].solutions[0])
+    this._courses[0].tasks[0].solutions[0].demo = demo
     const consoleService = new domain.Service(Database.nextId++,
                                               demo,
                                               "Console App",
                                               domain.ServiceType.Console)
     const webService = new domain.Service(Database.nextId++, demo, "Web App", domain.ServiceType.Web)
     demo.services = [consoleService, webService]
-    this._demos = await Promise.resolve([demo])
 
     // preferences
     this._preferences = await Promise.resolve(new domain.Preferences(true))
@@ -171,6 +166,6 @@ export class Database extends ObservableObject implements ReadOnlyDatabase {
     this._user = await Promise.resolve(new domain.User())
 
     // permissions
-    this._permissions = await Promise.resolve(domain.Permissions.teacher)
+    this._permissions = await Promise.resolve(domain.Permissions.student)
   }
 }

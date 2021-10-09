@@ -38,6 +38,16 @@ function onDeleteTask(model: models.TasksView, task: models.ItemNode<domain.Task
   model.deleteTask(task.item)
 }
 
+function onCreateSolution(model: models.TasksView, task: models.ItemNode<domain.Task>): void {
+  task.contextMenu?.close()
+  model.createSolution(task.item)
+}
+
+function onDeleteSolution(model: models.TasksView, task: models.ItemNode<domain.Task>): void {
+  task.contextMenu?.close()
+  model.deleteSolution(task.item)
+}
+
 function courses(model: models.TasksView,
                  courses: readonly models.CourseNode[],
                  permissions: domain.Permissions): JSX.Element[] {
@@ -46,7 +56,9 @@ function courses(model: models.TasksView,
     if (permissions.canCreateTask)
       contextMenu = (
         <ContextMenu model={course.contextMenu}>
-          <ContextMenu.Button onClick={() => onCreateTask(model, course)}>New Task</ContextMenu.Button>
+          <ContextMenu.Button variant="primary" onClick={() => onCreateTask(model, course)}>
+            New Task
+          </ContextMenu.Button>
         </ContextMenu>
       )
     return (
@@ -64,21 +76,45 @@ function tasks(model: models.TasksView,
   return tasks.map(task => {
     let contextMenuBody = (
       <>
-        <ContextMenu.Button onClick={() => onOpenDemos(model, task)}>Open Demo</ContextMenu.Button>
+        <ContextMenu.Button variant="primary" onClick={() => onOpenDemos(model, task)}>
+          Open Demo
+        </ContextMenu.Button>
       </>
     )
     if (permissions.canUpdateTask)
       contextMenuBody = (
         <>
           {contextMenuBody}
-          <ContextMenu.Button onClick={() => onUpdate(model, task)}>Edit Task</ContextMenu.Button>
+          <ContextMenu.Button variant="primary" onClick={() => onUpdate(model, task)}>
+            Edit Task
+          </ContextMenu.Button>
         </>
       )
     if (permissions.canDeleteTask)
       contextMenuBody = (
         <>
           {contextMenuBody}
-          <ContextMenu.Button onClick={() => onDeleteTask(model, task)}>Delete Task</ContextMenu.Button>
+          <ContextMenu.Button variant="danger" onClick={() => onDeleteTask(model, task)}>
+            Delete Task
+          </ContextMenu.Button>
+        </>
+      )
+    if (permissions.canCreateSolution && task.item.solutions.length === 0)
+      contextMenuBody = (
+        <>
+          {contextMenuBody}
+          <ContextMenu.Button variant="primary" onClick={() => onCreateSolution(model, task)}>
+            New Solution
+          </ContextMenu.Button>
+        </>
+      )
+    if (permissions.canDeleteSolution && task.item.solutions.length > 0)
+      contextMenuBody = (
+        <>
+          {contextMenuBody}
+          <ContextMenu.Button variant="danger" onClick={() => onDeleteSolution(model, task)}>
+            Delete Solution
+          </ContextMenu.Button>
         </>
       )
     const contextMenu = (

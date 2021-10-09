@@ -23,7 +23,7 @@ export function OptionsView({ model }: OptionsViewProps): JSX.Element {
       {viewSwitch(model)}
       {viewContent(model, auth)}
     </div>
-  ), [model])
+  ), [model, auth])
 }
 
 function viewSwitch(model: models.OptionsView): JSX.Element {
