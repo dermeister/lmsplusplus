@@ -105,6 +105,55 @@ export class Database extends ObservableObject implements ReadOnlyDatabase {
     this._vcsConfiguration = vcsConfiguration
   }
 
+  @transaction @monitor(Database._monitor)
+  async createSolution(solution: domain.Solution): Promise<void> {
+    if (!this._permissions.canCreateSolution)
+      throw this.permissionError()
+
+    await new Promise(r => setTimeout(r, 1000))
+
+    const services = solution.demo.services
+    solution = new domain.Solution(Database.nextId++, solution.task, solution.name)
+    const demo = new domain.Demo(Database.nextId++, solution)
+    demo.services = services
+    solution.demo = demo
+    const courses = this._courses.toMutable()
+    const course = courses.find(c => c.id === solution.task.course.id)
+    if (course) {
+      const oldTask = course.tasks.find(t => t.id === solution.task.id)
+      if (oldTask) {
+        const updatedTask = new domain.Task(oldTask.id, oldTask.course, oldTask.title, oldTask.description)
+        updatedTask.solutions = oldTask.solutions.concat(solution)
+        const updatedCourse = new domain.Course(course.id, course.name)
+        updatedCourse.tasks = course.tasks.map(t => t === oldTask ? updatedTask : t)
+        courses.splice(courses.indexOf(course), 1, updatedCourse)
+      }
+    }
+    this._courses = courses
+  }
+
+  @transaction @monitor(Database._monitor)
+  async deleteSolution(solution: domain.Solution): Promise<void> {
+    if (!this._permissions.canDeleteSolution)
+      throw this.permissionError()
+
+    await new Promise(r => setTimeout(r, 1000))
+
+    const courses = this._courses.toMutable()
+    const course = courses.find(c => c.id === solution.task.course.id)
+    if (course) {
+      const oldTask = course.tasks.find(t => t.id === solution.task.id)
+      if (oldTask) {
+        const updatedTask = new domain.Task(oldTask.id, oldTask.course, oldTask.title, oldTask.description)
+        updatedTask.solutions = oldTask.solutions.filter(s => s.id !== solution.id)
+        const updatedCourse = new domain.Course(course.id, course.name)
+        updatedCourse.tasks = course.tasks.map(t => t === oldTask ? updatedTask : t)
+        courses.splice(courses.indexOf(course), 1, updatedCourse)
+      }
+    }
+    this._courses = courses
+  }
+
   @transaction
   private permissionError(): Error {
     return new Error("Permission error")
@@ -139,9 +188,9 @@ export class Database extends ObservableObject implements ReadOnlyDatabase {
     const demo = new domain.Demo(Database.nextId++, this._courses[0].tasks[0].solutions[0])
     this._courses[0].tasks[0].solutions[0].demo = demo
     const consoleService = new domain.Service(Database.nextId++,
-                                              demo,
-                                              "Console App",
-                                              domain.ServiceType.Console)
+      demo,
+      "Console App",
+      domain.ServiceType.Console)
     const webService = new domain.Service(Database.nextId++, demo, "Web App", domain.ServiceType.Web)
     demo.services = [consoleService, webService]
 

@@ -9,6 +9,7 @@ import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
 import { TasksExplorer } from "./TasksExplorer"
 import MarkdownIt from "markdown-it"
+import { SolutionEditorView } from "../solution-editor"
 
 export class TasksView extends View {
   @unobservable readonly viewGroup = new ViewGroup([this], this)
@@ -23,6 +24,9 @@ export class TasksView extends View {
   private _deletedTask: domain.Task | null = null
   private _demoView: DemoView | null = null
   private _descriptionHtml: string | null = null
+  private _solutionEditorView: SolutionEditorView | null = null
+  private _createdSolution: domain.Solution | null = null
+  private _deletedSolution: domain.Solution | null = null
 
   get taskEditorView(): TaskEditorView | null { return this._taskEditorView }
   get monitor(): Monitor { return this.database.monitor }
@@ -31,6 +35,9 @@ export class TasksView extends View {
   get deletedTask(): domain.Task | null { return this._deletedTask }
   get demoView(): DemoView | null { return this._demoView }
   get descriptionHtml(): string | null { return this._descriptionHtml }
+  get solutionEditorView(): SolutionEditorView | null { return this._solutionEditorView }
+  get createdSolution(): domain.Solution | null { return this._createdSolution }
+  get deletedSolution(): domain.Solution | null { return this._deletedSolution }
 
   constructor(database: ReadOnlyDatabase, key: string) {
     super("Tasks", key)
@@ -46,6 +53,7 @@ export class TasksView extends View {
       this.disposer.dispose()
       this._taskEditorView?.dispose()
       this._demoView?.dispose()
+      this._solutionEditorView?.dispose()
       super.dispose()
     })
   }
@@ -81,12 +89,18 @@ export class TasksView extends View {
 
   @transaction
   createSolution(task: domain.Task): void {
-
+    this.ensureNoTaskEdited()
+    const solution = new domain.Solution(domain.Solution.NO_ID, task, "")
+    solution.demo = new domain.Demo(domain.Demo.NO_ID, solution)
+    solution.demo.services = []
+    this._solutionEditorView = new SolutionEditorView(solution, this.monitor, "Solution editor")
+    this.viewGroup.replace(this, this._solutionEditorView)
   }
 
   @transaction
-  deleteSolution(task: domain.Task): void {
-
+  deleteSolution(solution: domain.Solution): void {
+    this.ensureNoSolutionEdited()
+    this._deletedSolution = solution
   }
 
   private ensureNoTaskEdited(): void {
@@ -104,7 +118,7 @@ export class TasksView extends View {
 
   @transaction
   private createTaskEditorView(task: domain.Task): void {
-    this._taskEditorView = new TaskEditorView(task, this.monitor, "Editor")
+    this._taskEditorView = new TaskEditorView(task, this.monitor, "Task editor")
     this.viewGroup.replace(this, this._taskEditorView)
   }
 
@@ -164,5 +178,39 @@ export class TasksView extends View {
       this._descriptionHtml = TasksView.markdown.render(description)
     else
       this._descriptionHtml = null
+  }
+
+  @transaction
+  private ensureNoSolutionEdited(): void {
+    if (this._solutionEditorView)
+      throw new Error("Solution already being edited")
+  }
+
+  @reaction
+  private solutionEditorView_edited_solution_propagated(): void {
+    this._createdSolution = this._solutionEditorView?.createdSolution ?? null
+  }
+
+  @reaction @throttling(0)
+  private solutionEditorView_destroyed_when_edited_solution_propagated_and_monitor_is_not_active(): void {
+    const createdSolution = this._solutionEditorView?.createdSolution
+    const updatedSolution = this._solutionEditorView?.updatedSolution
+    if ((createdSolution || updatedSolution) && !this.monitor.isActive)
+      standalone(() => this.destroySolutionEditorView())
+  }
+
+  @reaction
+  private solutionEditorView_destroyed_on_viewClosed(): void {
+    if (this._solutionEditorView?.isViewClosed)
+      standalone(() => this.destroySolutionEditorView())
+  }
+
+  @transaction
+  private destroySolutionEditorView(): void {
+    if (!this._solutionEditorView)
+      throw new Error("_solutionEditorView is null")
+    this.viewGroup.replace(this._solutionEditorView, this)
+    this.disposer.enqueue(this._solutionEditorView)
+    this._solutionEditorView = null
   }
 }

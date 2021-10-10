@@ -20,6 +20,7 @@ export class Service {
 }
 
 export class Demo {
+  static readonly NO_ID = -1
   readonly id: number
   readonly solution: Solution
   private _services: readonly Service[] = []

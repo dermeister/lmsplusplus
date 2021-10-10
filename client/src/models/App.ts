@@ -62,4 +62,16 @@ export class App extends ObservableObject {
     if (this.options.updatedVcsConfiguration)
       await this._database.updateVcsConfiguration(this.options.updatedVcsConfiguration)
   }
+
+  @reaction
+  private async createdSolution_created_in_database(): Promise<void> {
+    if (this.tasksView.createdSolution)
+      await this._database.createSolution(this.tasksView.createdSolution)
+  }
+
+  @reaction
+  private async deletedSolution_deleted_from_database(): Promise<void> {
+    if (this.tasksView.deletedSolution)
+      await this._database.deleteSolution(this.tasksView.deletedSolution)
+  }
 }

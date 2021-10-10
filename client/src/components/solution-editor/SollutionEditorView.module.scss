@@ -25,6 +25,15 @@
 .content {
   grid-area: content;
   z-index: 99;
+
+  @include library.full-size;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 32px;
 }
 
 .input {

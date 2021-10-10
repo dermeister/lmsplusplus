@@ -1,1 +1,1 @@
-export * from "./SolutionEditor"
+export * from "./SolutionEditorView"

@@ -2,6 +2,7 @@ import { Demo } from "./Demo"
 import { Task } from "./Task"
 
 export class Solution {
+  static readonly NO_ID = -1
   readonly id: number
   readonly task: Task
   readonly name: string

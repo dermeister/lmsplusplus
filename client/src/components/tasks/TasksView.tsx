@@ -7,6 +7,7 @@ import { SubviewSwitch } from "../SubviewSwitch"
 import { TaskEditorView } from "../task-editor/TaskEditorView"
 import { TasksExplorer } from "./TasksExplorer"
 import styles from "./TasksView.module.scss"
+import { SolutionEditorView } from "../solution-editor/SolutionEditorView"
 
 interface TasksViewProps {
   model: models.TasksView
@@ -33,6 +34,9 @@ function viewSwitch(model: models.TasksView): JSX.Element {
       case model.demoView:
         model.demoView?.sidePanel.toggle()
         break
+      case model.solutionEditorView:
+        model.solutionEditorView?.sidePanel.toggle()
+        break
     }
   }
 
@@ -58,6 +62,8 @@ function viewContent(model: models.TasksView): JSX.Element | undefined {
     case model.demoView:
       content = <DemoView model={model.demoView as models.DemoView} />
       break
+    case model.solutionEditorView:
+      content = <SolutionEditorView model={model.solutionEditorView as models.SolutionEditorView} />
   }
   if (content)
     return <div className={styles.content}>{content}</div>

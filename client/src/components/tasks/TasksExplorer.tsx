@@ -10,7 +10,7 @@ interface TasksExplorerProps {
   model: models.TasksView
 }
 
-export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
+export function TasksExplorer({model}: TasksExplorerProps): JSX.Element {
   const permissions = usePermissions()
 
   return autorender(() => (
@@ -45,7 +45,7 @@ function onCreateSolution(model: models.TasksView, task: models.ItemNode<domain.
 
 function onDeleteSolution(model: models.TasksView, task: models.ItemNode<domain.Task>): void {
   task.contextMenu?.close()
-  model.deleteSolution(task.item)
+  model.deleteSolution(task.item.solutions[0])
 }
 
 function courses(model: models.TasksView,
@@ -74,21 +74,12 @@ function tasks(model: models.TasksView,
                tasks: readonly models.ItemNode<domain.Task>[],
                permissions: domain.Permissions): JSX.Element[] {
   return tasks.map(task => {
-    let contextMenuBody = (
-      <>
-        <ContextMenu.Button variant="primary" onClick={() => onOpenDemos(model, task)}>
-          Open Demo
-        </ContextMenu.Button>
-      </>
-    )
+    let contextMenuBody
     if (permissions.canUpdateTask)
       contextMenuBody = (
-        <>
-          {contextMenuBody}
-          <ContextMenu.Button variant="primary" onClick={() => onUpdate(model, task)}>
-            Edit Task
-          </ContextMenu.Button>
-        </>
+        <ContextMenu.Button variant="primary" onClick={() => onUpdate(model, task)}>
+          Edit Task
+        </ContextMenu.Button>
       )
     if (permissions.canDeleteTask)
       contextMenuBody = (
@@ -112,6 +103,9 @@ function tasks(model: models.TasksView,
       contextMenuBody = (
         <>
           {contextMenuBody}
+          <ContextMenu.Button variant="primary" onClick={() => onOpenDemos(model, task)}>
+            Open Demo
+          </ContextMenu.Button>
           <ContextMenu.Button variant="danger" onClick={() => onDeleteSolution(model, task)}>
             Delete Solution
           </ContextMenu.Button>
