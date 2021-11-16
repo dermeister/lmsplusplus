@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LmsPlusPlus.Api", "LmsPlusPlus.Api\LmsPlusPlus.Api.csproj", "{A2A75094-9F75-4DEB-9BF1-CCFF35223E22}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LmsPlusPlus.Runtime", "LmsPlusPlus.Runtime\LmsPlusPlus.Runtime.csproj", "{88942D48-C88F-48B1-BB65-DE5A1126C79F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A2A75094-9F75-4DEB-9BF1-CCFF35223E22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2A75094-9F75-4DEB-9BF1-CCFF35223E22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2A75094-9F75-4DEB-9BF1-CCFF35223E22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2A75094-9F75-4DEB-9BF1-CCFF35223E22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88942D48-C88F-48B1-BB65-DE5A1126C79F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88942D48-C88F-48B1-BB65-DE5A1126C79F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88942D48-C88F-48B1-BB65-DE5A1126C79F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88942D48-C88F-48B1-BB65-DE5A1126C79F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
