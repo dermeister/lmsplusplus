@@ -19,7 +19,9 @@ export abstract class Node extends ObservableObject {
   abstract accept(visitor: NodeVisitor): Node
 
   @transaction
-  updateNode(title: string): void { this._title = title }
+  updateNode(title: string): void {
+    this._title = title
+  }
 
   override dispose(): void {
     Transaction.run(() => {

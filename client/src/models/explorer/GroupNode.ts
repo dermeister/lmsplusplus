@@ -15,7 +15,9 @@ export class GroupNode extends Node {
   }
 
   @transaction
-  toggle(): void { this._isOpened = !this._isOpened }
+  toggle(): void {
+    this._isOpened = !this._isOpened
+  }
 
   @transaction
   updateGroupNode(title: string, children: readonly Node[]): void {
@@ -23,5 +25,7 @@ export class GroupNode extends Node {
     this._children = children
   }
 
-  override accept(visitor: NodeVisitor): Node { return visitor.visitGroupNode(this) }
+  override accept(visitor: NodeVisitor): Node {
+    return visitor.visitGroupNode(this)
+  }
 }

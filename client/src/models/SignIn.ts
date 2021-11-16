@@ -18,14 +18,22 @@ export class SignIn extends ObservableObject {
   }
 
   @transaction
-  setLogin(login: string): void { this._login = login }
+  setLogin(login: string): void {
+    this._login = login
+  }
 
   @transaction
-  setPassword(password: string): void { this._password = password }
+  setPassword(password: string): void {
+    this._password = password
+  }
 
   @transaction
   async signIn(): Promise<void> {
     const success = await this.auth.signIn(this._login, this._password)
     this._error = !success
+    if (!this._error) {
+      this._login = ""
+      this._password = ""
+    }
   }
 }

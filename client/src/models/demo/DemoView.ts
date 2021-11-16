@@ -78,9 +78,7 @@ export class DemoView extends View {
 
   @transaction
   private createExplorer(demos: readonly domain.Demo[]): SingleDemoExplorer | MultipleDemosExplorer {
-    if (demos.length === 1)
-      return new SingleDemoExplorer(demos[0])
-    return new MultipleDemosExplorer(this.demos)
+    return demos.length === 1 ? new SingleDemoExplorer(demos[0]) : new MultipleDemosExplorer(this.demos)
   }
 
   @transaction
@@ -92,20 +90,22 @@ export class DemoView extends View {
   @reaction
   private selectedService_is_shown(): void {
     const service = this.explorer.selectedService
-    if (service && this.mountContainer) {
-      this.ensureDemoServiceRegisteredForDemo(service.demo)
-      const demoService = this.getDemoService(service)
-      if (demoService.isRunning) {
-        if (this.shownService)
-          demoService.hide(this.shownService)
-        demoService.show(service, this.mountContainer)
-        this.shownService = service
+    if (service) {
+      if (this.mountContainer) {
+        this.ensureDemoServiceRegisteredForDemo(service.demo)
+        const demoService = this.getDemoService(service)
+        if (demoService.isRunning) {
+          if (this.shownService)
+            demoService.hide(this.shownService)
+          demoService.show(service, this.mountContainer)
+          this.shownService = service
+        }
+      } else {
+        this.ensureDemoServiceRegisteredForDemo(service.demo)
+        const demoService = this.getDemoService(service)
+        if (demoService.isRunning)
+          demoService.hide(service)
       }
-    } else if (service) {
-      this.ensureDemoServiceRegisteredForDemo(service.demo)
-      const demoService = this.getDemoService(service)
-      if (demoService.isRunning)
-        demoService.hide(service)
     }
   }
 }

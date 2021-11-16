@@ -20,7 +20,7 @@ export class Root extends ObservableObject {
       this.auth.dispose()
       this.signIn.dispose()
       this.disposer.dispose()
-      this.app?.dispose()
+      this._app?.dispose()
       super.dispose()
     })
   }

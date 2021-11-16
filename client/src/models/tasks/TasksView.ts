@@ -89,7 +89,7 @@ export class TasksView extends View {
 
   @transaction
   createSolution(task: domain.Task): void {
-    this.ensureNoTaskEdited()
+    this.ensureNoSolutionEdited()
     const solution = new domain.Solution(domain.Solution.NO_ID, task, "")
     solution.demo = new domain.Demo(domain.Demo.NO_ID, solution)
     solution.demo.services = []
@@ -159,25 +159,19 @@ export class TasksView extends View {
   @reaction
   private demoView_destroyed_on_viewClosed(): void {
     if (this._demoView?.isViewClosed)
-      standalone(() => this.destroyDemoView())
-  }
-
-  @transaction
-  private destroyDemoView(): void {
-    if (!this._demoView)
-      throw new Error("_demoView is null")
-    this.viewGroup.replace(this._demoView, this)
-    this.disposer.enqueue(this._demoView)
-    this._demoView = null
+      Transaction.runAs({ standalone: true }, () => {
+        if (!this._demoView)
+          throw new Error("_demoView is null")
+        this.viewGroup.replace(this._demoView, this)
+        this.disposer.enqueue(this._demoView)
+        this._demoView = null
+      })
   }
 
   @reaction
   private descriptionHtml_synchronized_with_selectedTask_description(): void {
     const description = this.explorer.selectedTask?.description
-    if (description)
-      this._descriptionHtml = TasksView.markdown.render(description)
-    else
-      this._descriptionHtml = null
+    this._descriptionHtml = description ? TasksView.markdown.render(description) : null
   }
 
   @transaction

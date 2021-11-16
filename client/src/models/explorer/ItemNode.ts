@@ -18,5 +18,7 @@ export class ItemNode<T> extends Node {
     this._item = item
   }
 
-  override accept(visitor: NodeVisitor): Node { return visitor.visitItemNode(this) }
+  override accept(visitor: NodeVisitor): Node {
+    return visitor.visitItemNode(this)
+  }
 }

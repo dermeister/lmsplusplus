@@ -3,8 +3,8 @@ import * as domain from "../../domain"
 import { Explorer, ItemNode } from "../explorer"
 
 export enum OptionCategory {
-  Vsc,
-  Preferences
+  Preferences,
+  Vsc
 }
 
 export class OptionCategories extends Explorer<OptionCategory> {
@@ -29,10 +29,10 @@ export class OptionCategories extends Explorer<OptionCategory> {
 
   private static createNodes(permissions: domain.Permissions): ItemNode<OptionCategory>[] {
     return Transaction.run(() => {
-      const preferences = new ItemNode("Preferences", "1", OptionCategory.Preferences)
+      const preferences = new ItemNode("Preferences", "0", OptionCategory.Preferences)
       const nodes = [preferences]
       if (permissions.canUpdateVcsConfiguration) {
-        const vcs = new ItemNode("VCS", "0", OptionCategory.Vsc)
+        const vcs = new ItemNode("VCS", "1", OptionCategory.Vsc)
         nodes.push(vcs)
       }
       return nodes
