@@ -182,7 +182,6 @@ export class Database extends ObservableObject implements ReadOnlyDatabase {
     this._courses[1].tasks[0].solutions = []
     this._courses[1].tasks[1].solutions = []
     this._courses[1].tasks[2].solutions = []
-    // this._solutions = await Promise.resolve([solution])
 
     // demos
     const demo = new domain.Demo(Database.nextId++, this._courses[0].tasks[0].solutions[0])
