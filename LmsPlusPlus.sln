@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LmsPlusPlus.Api", "LmsPlusP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LmsPlusPlus.Runtime", "LmsPlusPlus.Runtime\LmsPlusPlus.Runtime.csproj", "{88942D48-C88F-48B1-BB65-DE5A1126C79F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LmsPlusPlus.Runtime.Tests", "LmsPlusPlus.Runtime.Tests\LmsPlusPlus.Runtime.Tests.csproj", "{4A4F46E0-4C6C-4923-81FF-5972853E3685}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{88942D48-C88F-48B1-BB65-DE5A1126C79F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88942D48-C88F-48B1-BB65-DE5A1126C79F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88942D48-C88F-48B1-BB65-DE5A1126C79F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A4F46E0-4C6C-4923-81FF-5972853E3685}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A4F46E0-4C6C-4923-81FF-5972853E3685}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A4F46E0-4C6C-4923-81FF-5972853E3685}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A4F46E0-4C6C-4923-81FF-5972853E3685}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

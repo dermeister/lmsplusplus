@@ -7,4 +7,7 @@ public class DemosController
 {
     [HttpGet("")]
     public string GetAll() => "All demos";
+
+    [HttpGet("{id:int}")]
+    public string GetById(int id) => "Demo";
 }
