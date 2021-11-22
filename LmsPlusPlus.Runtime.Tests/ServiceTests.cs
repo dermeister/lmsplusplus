@@ -17,7 +17,7 @@ public class ServiceTests
     public async Task Test()
     {
         // Arrange
-        Service service = new(new ServiceConfiguration("", tcpPorts: null, stdin: false));
+        Service service = new(new ServiceConfiguration(contextPath: "", tcpPorts: null, stdin: false));
 
         // Act
         ServiceOutput? output1 = await service.ReadAsync();
