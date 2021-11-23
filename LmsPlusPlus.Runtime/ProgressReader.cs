@@ -4,11 +4,9 @@ namespace LmsPlusPlus.Runtime;
 
 class ProgressReader<T> : IDisposable
 {
-    const int LockTimeout = 5000;
-
     readonly ConcurrentQueue<T> _queuedValues = new();
     readonly ConcurrentQueue<TaskCompletionSource<T?>> _queuedTaskCompletionSources = new();
-    readonly ReaderWriterLock _lock = new();
+    readonly ReaderWriterLockSlim _lock = new();
     bool _isDisposed;
 
     internal ProgressReader(Progress<T> progress) => progress.ProgressChanged += ProgressChanged;
@@ -17,7 +15,7 @@ class ProgressReader<T> : IDisposable
     {
         try
         {
-            _lock.AcquireWriterLock(LockTimeout);
+            _lock.EnterWriteLock();
             if (!_isDisposed)
             {
                 _isDisposed = true;
@@ -27,8 +25,7 @@ class ProgressReader<T> : IDisposable
         }
         finally
         {
-            if (_lock.IsWriterLockHeld)
-                _lock.ReleaseWriterLock();
+            _lock.ExitWriteLock();
         }
     }
 
@@ -38,7 +35,7 @@ class ProgressReader<T> : IDisposable
             return Task.FromResult<T?>(value);
         try
         {
-            _lock.AcquireReaderLock(LockTimeout);
+            _lock.EnterReadLock();
             if (_isDisposed)
                 return Task.FromResult(result: default(T?));
             TaskCompletionSource<T?> taskCompletionSource = new();
@@ -47,8 +44,7 @@ class ProgressReader<T> : IDisposable
         }
         finally
         {
-            if (_lock.IsReaderLockHeld)
-                _lock.ReleaseReaderLock();
+            _lock.ExitReadLock();
         }
     }
 
@@ -56,7 +52,7 @@ class ProgressReader<T> : IDisposable
     {
         try
         {
-            _lock.AcquireReaderLock(LockTimeout);
+            _lock.EnterReadLock();
             if (!_isDisposed)
                 if (_queuedTaskCompletionSources.TryDequeue(out TaskCompletionSource<T?>? taskCompletionSource))
                     taskCompletionSource.SetResult(value);
@@ -65,8 +61,7 @@ class ProgressReader<T> : IDisposable
         }
         finally
         {
-            if (_lock.IsReaderLockHeld)
-                _lock.ReleaseReaderLock();
+            _lock.ExitReadLock();
         }
     }
 }
