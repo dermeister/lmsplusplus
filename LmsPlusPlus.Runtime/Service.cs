@@ -1,18 +1,22 @@
 using System.Text;
 using Docker.DotNet;
 using Docker.DotNet.Models;
+using ICSharpCode.SharpZipLib.Tar;
 
 namespace LmsPlusPlus.Runtime;
 
 public sealed class Service : IAsyncDisposable
 {
     static int s_nextId;
+    string? _containerId;
+    int _isDisposed;
     readonly DockerClient _dockerClient = new DockerClientConfiguration().CreateClient();
     readonly ServiceConfiguration _configuration;
     readonly Task<MultiplexedStream> _buildImageAndStartContainerTask;
     readonly Progress<JSONMessage> _buildImageProgress;
     readonly ProgressReader<JSONMessage> _buildImageProgressReader;
     readonly SemaphoreSlim _containerStreamSemaphore = new(initialCount: 1);
+    readonly CancellationTokenSource _cancellationTokenSource = new();
 
     public int Id { get; }
 
@@ -25,13 +29,37 @@ public sealed class Service : IAsyncDisposable
         _buildImageAndStartContainerTask = BuildImageAndStartContainer();
     }
 
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    public async ValueTask DisposeAsync()
+    {
+        if (Interlocked.Exchange(ref _isDisposed, value: 1) == 0)
+        {
+            _cancellationTokenSource.Cancel();
+            try
+            {
+                await _buildImageAndStartContainerTask;
+            }
+            catch (TaskCanceledException)
+            {
+            }
+            try
+            {
+                await RemoveContainer();
+                await RemoveImage();
+                _dockerClient.Dispose();
+            }
+            catch (DockerApiException)
+            {
+                throw new ServiceException("Unable to dispose service");
+            }
+        }
+    }
 
     public async Task<ServiceOutput?> ReadAsync()
     {
+        EnsureNotDisposed();
         JSONMessage? message = await _buildImageProgressReader.ReadAsync();
         if (message is not null)
-            return new ServiceOutput(ServiceOutputStage.Build, message.ToString()!);
+            return new ServiceOutput(ServiceOutputStage.Build, message.Stream);
         try
         {
             await _containerStreamSemaphore.WaitAsync();
@@ -52,6 +80,7 @@ public sealed class Service : IAsyncDisposable
 
     public async Task WriteAsync(string input)
     {
+        EnsureNotDisposed();
         try
         {
             await _containerStreamSemaphore.WaitAsync();
@@ -74,38 +103,104 @@ public sealed class Service : IAsyncDisposable
 
     async Task<MultiplexedStream> BuildImageAndStartContainer()
     {
+        Stream? contents = null;
         try
         {
-            await _dockerClient.Images.BuildImageFromDockerfileAsync(new ImageBuildParameters(), contents: null, authConfigs: null,
-                headers: null, _buildImageProgress, CancellationToken.None);
+            contents = CreateTarArchive();
+            ImageBuildParameters imageBuildParameters = new()
+            {
+                Tags = new[] { _configuration.Name }
+            };
+            await _dockerClient.Images.BuildImageFromDockerfileAsync(imageBuildParameters, contents, authConfigs: null, headers: null,
+                _buildImageProgress);
         }
         finally
         {
             _buildImageProgressReader.Dispose();
+            if (contents is not null)
+                await contents.DisposeAsync();
         }
         CreateContainerParameters createContainerParameters = new()
         {
-            Image = "ubuntu",
+            Image = _configuration.Name,
             AttachStdout = true,
             AttachStdin = _configuration.Stdin,
             OpenStdin = _configuration.Stdin,
-            Cmd = new[] { "date" }
         };
-        CreateContainerResponse createContainerResponse =
-            await _dockerClient.Containers.CreateContainerAsync(createContainerParameters);
+        CreateContainerResponse createContainerResponse = await _dockerClient.Containers.CreateContainerAsync(createContainerParameters,
+            _cancellationTokenSource.Token);
+        _containerId = createContainerResponse.ID;
         ContainerAttachParameters containerAttachParameters = new()
         {
             Stream = true,
             Stdout = true,
             Stdin = _configuration.Stdin
         };
-        MultiplexedStream containerStream =
-            await _dockerClient.Containers.AttachContainerAsync(createContainerResponse.ID, tty: false, containerAttachParameters);
-        bool containerStarted =
-            await _dockerClient.Containers.StartContainerAsync(createContainerResponse.ID, new ContainerStartParameters());
+        MultiplexedStream containerStream = await _dockerClient.Containers.AttachContainerAsync(createContainerResponse.ID, tty: false,
+            containerAttachParameters, _cancellationTokenSource.Token);
+        bool containerStarted = await _dockerClient.Containers.StartContainerAsync(createContainerResponse.ID,
+            new ContainerStartParameters(), _cancellationTokenSource.Token);
         if (!containerStarted)
             throw new ServiceException("Unable to start container");
         return containerStream;
+    }
+
+    Stream CreateTarArchive()
+    {
+        MemoryStream output = new();
+        var archive = TarArchive.CreateOutputTarArchive(output);
+        archive.IsStreamOwner = false;
+        archive.RootPath = _configuration.ContextPath;
+        foreach (string file in Directory.EnumerateFiles(_configuration.ContextPath))
+        {
+            var entry = TarEntry.CreateEntryFromFile(file);
+            archive.WriteEntry(entry, recurse: false);
+        }
+        archive.Close();
+        output.Position = 0;
+        return output;
+    }
+
+    void EnsureNotDisposed()
+    {
+        if (_isDisposed == 1)
+            throw new ObjectDisposedException(nameof(Service));
+    }
+
+    async Task RemoveContainer()
+    {
+        if (_containerId is not null)
+        {
+            ContainerRemoveParameters containerRemoveParameters = new()
+            {
+                Force = true
+            };
+            await _dockerClient.Containers.RemoveContainerAsync(_containerId, containerRemoveParameters);
+        }
+    }
+
+    async Task RemoveImage()
+    {
+        Dictionary<string, IDictionary<string, bool>> filters = new()
+        {
+            ["reference"] = new Dictionary<string, bool>
+            {
+                [_configuration.Name] = true
+            }
+        };
+        ImagesListParameters imagesListParameters = new()
+        {
+            Filters = filters
+        };
+        IList<ImagesListResponse> images = await _dockerClient.Images.ListImagesAsync(imagesListParameters);
+        if (images.Count > 0)
+        {
+            ImageDeleteParameters imageDeleteParameters = new()
+            {
+                Force = true
+            };
+            await _dockerClient.Images.DeleteImageAsync(_configuration.Name, imageDeleteParameters);
+        }
     }
 }
 
@@ -129,14 +224,15 @@ public class ServiceOutput
 
 class ServiceConfiguration
 {
+    internal string Name { get; }
     internal string ContextPath { get; }
-    internal ushort[]? TcpPorts { get; }
-    internal bool Stdin { get; }
+    internal ushort[]? TcpPorts { get; init; }
+    internal bool Stdin { get; init; }
+    internal string? NetworkName { get; init; }
 
-    public ServiceConfiguration(string contextPath, ushort[]? tcpPorts, bool stdin)
+    public ServiceConfiguration(string name, string contextPath)
     {
+        Name = name;
         ContextPath = contextPath;
-        TcpPorts = tcpPorts;
-        Stdin = stdin;
     }
 }
