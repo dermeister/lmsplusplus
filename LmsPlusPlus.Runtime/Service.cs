@@ -38,7 +38,7 @@ public sealed class Service : IAsyncDisposable
             {
                 await _buildImageAndStartContainerTask;
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
             }
             try
@@ -54,15 +54,17 @@ public sealed class Service : IAsyncDisposable
         }
     }
 
-    public async Task<ServiceOutput?> ReadAsync()
+    public async Task<ServiceOutput?> ReadAsync(CancellationToken cancellationToken = default)
     {
         EnsureNotDisposed();
         JSONMessage? message = await _buildImageProgressReader.ReadAsync();
         if (message is not null)
             return new ServiceOutput(ServiceOutputStage.Build, message.Stream);
+        var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_cancellationTokenSource.Token,
+            cancellationToken);
         try
         {
-            await _containerStreamSemaphore.WaitAsync();
+            await _containerStreamSemaphore.WaitAsync(linkedCancellationTokenSource.Token);
             MultiplexedStream containerStream = await _buildImageAndStartContainerTask;
             var buffer = new byte[1 << 16];
             MultiplexedStream.ReadResult readResult = await containerStream.ReadOutputAsync(buffer, offset: 0, buffer.Length,
@@ -72,25 +74,40 @@ public sealed class Service : IAsyncDisposable
             string content = Encoding.Default.GetString(buffer.AsSpan(start: 0, readResult.Count));
             return new ServiceOutput(ServiceOutputStage.Run, content);
         }
+        catch (OperationCanceledException exception)
+        {
+            if (exception.CancellationToken == cancellationToken)
+                throw;
+            return null;
+        }
         finally
         {
             _containerStreamSemaphore.Release();
+            linkedCancellationTokenSource.Dispose();
         }
     }
 
-    public async Task WriteAsync(string input)
+    public async Task WriteAsync(string input, CancellationToken cancellationToken = default)
     {
         EnsureNotDisposed();
+        var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_cancellationTokenSource.Token,
+            cancellationToken);
         try
         {
-            await _containerStreamSemaphore.WaitAsync();
+            await _containerStreamSemaphore.WaitAsync(linkedCancellationTokenSource.Token);
             MultiplexedStream containerStream = await _buildImageAndStartContainerTask;
             byte[] buffer = Encoding.Default.GetBytes(input);
             await containerStream.WriteAsync(buffer, offset: 0, buffer.Length, CancellationToken.None);
         }
+        catch (OperationCanceledException exception)
+        {
+            if (exception.CancellationToken == cancellationToken)
+                throw;
+        }
         finally
         {
             _containerStreamSemaphore.Release();
+            linkedCancellationTokenSource.Dispose();
         }
     }
 
