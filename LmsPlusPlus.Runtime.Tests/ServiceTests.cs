@@ -50,21 +50,6 @@ public class ServiceTests
         await Assert.ThrowsAsync<ObjectDisposedException>(Read);
     }
 
-    [Fact]
-    public async Task ConcurrentDisposeDoesNotThrowException()
-    {
-        // Arrange
-        Service service = CreateService("EchoService");
-
-        // Act
-        Task t1 = service.DisposeAsync().AsTask();
-        Task t2 = service.DisposeAsync().AsTask();
-        await Task.WhenAll(t1, t2);
-
-        // Assert
-        Assert.True(condition: true, userMessage: "No exception has been thrown");
-    }
-
     static async Task<string?> ReadServiceRunOutput(Service service)
     {
         ServiceOutput? output;

@@ -18,7 +18,7 @@ public class ProgressReaderTests
         string? text1 = await progressReader.ReadAsync();
         await ReportAndWait(progress, value: "text2");
         string? text2 = await progressReader.ReadAsync();
-        progressReader.Dispose();
+        progressReader.StopListeningToProgressChanges();
 
         // Assert
         Assert.Equal(expected: "text1", text1);
@@ -37,7 +37,7 @@ public class ProgressReaderTests
         await ReportAndWait(progress, value: "text2");
         string? text1 = await progressReader.ReadAsync();
         string? text2 = await progressReader.ReadAsync();
-        progressReader.Dispose();
+        progressReader.StopListeningToProgressChanges();
 
         // Assert
         Assert.Equal(expected: "text1", text1);
@@ -54,7 +54,7 @@ public class ProgressReaderTests
         // Act
         await ReportAndWait(progress, value: "text1");
         await ReportAndWait(progress, value: "text2");
-        progressReader.Dispose();
+        progressReader.StopListeningToProgressChanges();
         string? text1 = await progressReader.ReadAsync();
         string? text2 = await progressReader.ReadAsync();
         string? text3 = await progressReader.ReadAsync();
@@ -80,7 +80,7 @@ public class ProgressReaderTests
         Task<string?> textTask1 = progressReader.ReadAsync();
         Task<string?> textTask2 = progressReader.ReadAsync();
         Task<string?> textTask3 = progressReader.ReadAsync();
-        progressReader.Dispose();
+        progressReader.StopListeningToProgressChanges();
         string?[] texts = await Task.WhenAll(textTask1, textTask2, textTask3);
 
         // Assert
@@ -100,7 +100,7 @@ public class ProgressReaderTests
         Task<string?> textTask1 = progressReader.ReadAsync();
         Task<string?> textTask2 = progressReader.ReadAsync();
         Task<string?> textTask3 = progressReader.ReadAsync();
-        progressReader.Dispose();
+        progressReader.StopListeningToProgressChanges();
         string?[] texts = await Task.WhenAll(textTask1, textTask2, textTask3);
 
         // Assert
