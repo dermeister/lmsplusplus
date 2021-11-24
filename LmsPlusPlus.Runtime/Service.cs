@@ -16,6 +16,7 @@ public sealed class Service : IAsyncDisposable
     readonly string _imageName;
     string? _containerId;
     bool _isDisposed;
+    ushort[]? _tcpPorts;
 
     public string Name => _configuration.Name;
 
@@ -30,16 +31,16 @@ public sealed class Service : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        if (_isDisposed)
-            return;
-        _isDisposed = true;
-        _cancellationTokenSource.Cancel();
-        Task buildImageAndStartContainerCompletedTask = await _buildImageAndStartContainerTask.ContinueWith(Task.FromResult);
-        await RemoveContainer();
-        await RemoveImage();
-        _dockerClient.Dispose();
-        if (buildImageAndStartContainerCompletedTask is { IsFaulted: true, Exception: not null })
-            throw buildImageAndStartContainerCompletedTask.Exception;
+        if (!_isDisposed)
+        {
+            _isDisposed = true;
+            _cancellationTokenSource.Cancel();
+            await _buildImageAndStartContainerTask.ContinueWith(Task.FromResult);
+            await RemoveContainer();
+            await RemoveImage();
+            _dockerClient.Dispose();
+            _cancellationTokenSource.Dispose();
+        }
     }
 
     public async Task<ServiceOutput?> ReadAsync(CancellationToken cancellationToken = default)
@@ -66,6 +67,21 @@ public sealed class Service : IAsyncDisposable
         await containerStream.WriteAsync(buffer, offset: 0, buffer.Length, cancellationToken);
     }
 
+    public async Task<ushort[]?> GetTcpPorts(CancellationToken cancellationToken = default)
+    {
+        if (_configuration.TcpPorts is null)
+            return null;
+        if (_tcpPorts is not null)
+            return _tcpPorts;
+        await _buildImageAndStartContainerTask;
+        ContainerInspectResponse containerInspectResponse = await _dockerClient.Containers.InspectContainerAsync(_containerId!,
+            cancellationToken);
+        _tcpPorts = (from portBindings in containerInspectResponse.NetworkSettings.Ports.Values
+                     let hostPort = portBindings[0].HostPort
+                     select ushort.Parse(hostPort)).ToArray();
+        return _tcpPorts;
+    }
+
     async Task<MultiplexedStream> BuildImageAndStartContainer()
     {
         await using Stream contents = CreateTarArchive();
@@ -85,6 +101,8 @@ public sealed class Service : IAsyncDisposable
             AttachStdout = true,
             AttachStdin = _configuration.Stdin,
             OpenStdin = _configuration.Stdin,
+            ExposedPorts = CreateExposedPorts(),
+            HostConfig = CreatHostConfig()
         };
         CreateContainerResponse createContainerResponse = await _dockerClient.Containers.CreateContainerAsync(createContainerParameters,
             _cancellationTokenSource.Token);
@@ -95,10 +113,9 @@ public sealed class Service : IAsyncDisposable
             Stdout = true,
             Stdin = _configuration.Stdin
         };
-        MultiplexedStream containerStream = await _dockerClient.Containers.AttachContainerAsync(createContainerResponse.ID, tty: false,
+        MultiplexedStream containerStream = await _dockerClient.Containers.AttachContainerAsync(_containerId, tty: false,
             containerAttachParameters, _cancellationTokenSource.Token);
-        await _dockerClient.Containers.StartContainerAsync(createContainerResponse.ID, new ContainerStartParameters(),
-            _cancellationTokenSource.Token);
+        await _dockerClient.Containers.StartContainerAsync(_containerId, new ContainerStartParameters(), _cancellationTokenSource.Token);
         return containerStream;
     }
 
@@ -116,6 +133,37 @@ public sealed class Service : IAsyncDisposable
         archive.Close();
         output.Position = 0;
         return output;
+    }
+
+    Dictionary<string, EmptyStruct>? CreateExposedPorts()
+    {
+        Dictionary<string, EmptyStruct>? exposedPorts = null;
+        if (_configuration.TcpPorts is not null)
+        {
+            exposedPorts = new Dictionary<string, EmptyStruct>();
+            foreach (ushort port in _configuration.TcpPorts)
+                exposedPorts[$"{port}/tcp"] = new EmptyStruct();
+        }
+        return exposedPorts;
+    }
+
+    HostConfig? CreatHostConfig()
+    {
+        HostConfig? config = null;
+        if (_configuration.TcpPorts is not null)
+        {
+            config ??= new HostConfig();
+            var portBindings = new Dictionary<string, IList<PortBinding>>();
+            foreach (ushort port in _configuration.TcpPorts)
+                portBindings[$"{port}/tcp"] = new PortBinding[] { new() { HostPort = "0", HostIP = "0.0.0.0" } };
+            config.PortBindings = portBindings;
+        }
+        if (_configuration.NetworkName is not null)
+        {
+            config ??= new HostConfig();
+            config.NetworkMode = _configuration.NetworkName;
+        }
+        return config;
     }
 
     void EnsureNotDisposed()
