@@ -14,9 +14,9 @@ public class ProgressReaderTests
         ProgressReader<string> progressReader = new((Progress<string>)progress);
 
         // Act
-        await ReportAndWait(progress, value: "text1");
+        await TestUtils.ReportAndWait(progress, value: "text1");
         string? text1 = await progressReader.ReadAsync();
-        await ReportAndWait(progress, value: "text2");
+        await TestUtils.ReportAndWait(progress, value: "text2");
         string? text2 = await progressReader.ReadAsync();
         progressReader.StopListeningToProgressChanges();
 
@@ -33,8 +33,8 @@ public class ProgressReaderTests
         ProgressReader<string> progressReader = new((Progress<string>)progress);
 
         // Act
-        await ReportAndWait(progress, value: "text1");
-        await ReportAndWait(progress, value: "text2");
+        await TestUtils.ReportAndWait(progress, value: "text1");
+        await TestUtils.ReportAndWait(progress, value: "text2");
         string? text1 = await progressReader.ReadAsync();
         string? text2 = await progressReader.ReadAsync();
         progressReader.StopListeningToProgressChanges();
@@ -52,8 +52,8 @@ public class ProgressReaderTests
         ProgressReader<string> progressReader = new((Progress<string>)progress);
 
         // Act
-        await ReportAndWait(progress, value: "text1");
-        await ReportAndWait(progress, value: "text2");
+        await TestUtils.ReportAndWait(progress, value: "text1");
+        await TestUtils.ReportAndWait(progress, value: "text2");
         progressReader.StopListeningToProgressChanges();
         string? text1 = await progressReader.ReadAsync();
         string? text2 = await progressReader.ReadAsync();
@@ -75,8 +75,8 @@ public class ProgressReaderTests
         ProgressReader<string> progressReader = new((Progress<string>)progress);
 
         // Act
-        await ReportAndWait(progress, value: "text1");
-        await ReportAndWait(progress, value: "text2");
+        await TestUtils.ReportAndWait(progress, value: "text1");
+        await TestUtils.ReportAndWait(progress, value: "text2");
         Task<string?> textTask1 = progressReader.ReadAsync();
         Task<string?> textTask2 = progressReader.ReadAsync();
         Task<string?> textTask3 = progressReader.ReadAsync();
@@ -90,7 +90,7 @@ public class ProgressReaderTests
     }
 
     [Fact]
-    public async Task MultipleTasksResolveToNullWhenProgressReaderDisposed()
+    public async Task MultipleTasksResolveToNullWhenProgressReaderStopsListeningToProgress()
     {
         // Arrange
         IProgress<string> progress = new Progress<string>();
@@ -107,11 +107,5 @@ public class ProgressReaderTests
         Assert.Null(texts[0]);
         Assert.Null(texts[1]);
         Assert.Null(texts[2]);
-    }
-
-    static async Task ReportAndWait<T>(IProgress<T> progress, T value)
-    {
-        progress.Report(value);
-        await Task.Delay(millisecondsDelay: 100);
     }
 }
