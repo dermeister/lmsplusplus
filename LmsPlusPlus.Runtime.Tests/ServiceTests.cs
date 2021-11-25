@@ -46,10 +46,12 @@ public class ServiceTests
         await service.DisposeAsync();
         Task Write() => service.WriteAsync("input");
         Task Read() => service.ReadAsync();
+        Task GetPorts() => service.GetTcpPortsAsync();
 
         // Assert
         await Assert.ThrowsAsync<ObjectDisposedException>(Write);
         await Assert.ThrowsAsync<ObjectDisposedException>(Read);
+        await Assert.ThrowsAsync<ObjectDisposedException>(GetPorts);
     }
 
     [Fact]

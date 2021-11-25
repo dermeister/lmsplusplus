@@ -1,4 +1,5 @@
 using System.Text;
+using System.Threading.Channels;
 using Docker.DotNet;
 using Docker.DotNet.Models;
 using ICSharpCode.SharpZipLib.Tar;
@@ -10,9 +11,8 @@ public sealed class Service : IAsyncDisposable
     readonly DockerClient _dockerClient = new DockerClientConfiguration().CreateClient();
     readonly ServiceConfiguration _configuration;
     readonly Task<MultiplexedStream> _buildImageAndStartContainerTask;
-    readonly Progress<JSONMessage> _buildImageProgress;
-    readonly ProgressReader<JSONMessage> _buildImageProgressReader;
     readonly CancellationTokenSource _cancellationTokenSource = new();
+    readonly Channel<JSONMessage> _buildImageProgressChannel = Channel.CreateUnbounded<JSONMessage>();
     readonly string _imageName;
     string? _containerId;
     bool _isDisposed;
@@ -23,8 +23,6 @@ public sealed class Service : IAsyncDisposable
     internal Service(ServiceConfiguration configuration)
     {
         _configuration = configuration;
-        _buildImageProgress = new Progress<JSONMessage>();
-        _buildImageProgressReader = new ProgressReader<JSONMessage>(_buildImageProgress);
         _imageName = $"{_configuration.Name.ToLower()}-{Guid.NewGuid()}";
         _buildImageAndStartContainerTask = BuildImageAndStartContainer();
     }
@@ -46,9 +44,12 @@ public sealed class Service : IAsyncDisposable
     public async Task<ServiceOutput?> ReadAsync(CancellationToken cancellationToken = default)
     {
         EnsureNotDisposed();
-        JSONMessage? message = await _buildImageProgressReader.ReadAsync();
-        if (message is not null)
+        bool canReadBuildImageProgress = await _buildImageProgressChannel.Reader.WaitToReadAsync(cancellationToken);
+        if (canReadBuildImageProgress)
+        {
+            JSONMessage message = await _buildImageProgressChannel.Reader.ReadAsync(cancellationToken);
             return new ServiceOutput(ServiceOutputStage.Build, message.Stream);
+        }
         MultiplexedStream containerStream = await _buildImageAndStartContainerTask;
         var buffer = new byte[1 << 16];
         MultiplexedStream.ReadResult readResult = await containerStream.ReadOutputAsync(buffer, offset: 0, buffer.Length,
@@ -67,8 +68,9 @@ public sealed class Service : IAsyncDisposable
         await containerStream.WriteAsync(buffer, offset: 0, buffer.Length, cancellationToken);
     }
 
-    public async Task<ushort[]?> GetTcpPorts(CancellationToken cancellationToken = default)
+    public async Task<ushort[]?> GetTcpPortsAsync(CancellationToken cancellationToken = default)
     {
+        EnsureNotDisposed();
         if (_configuration.TcpPorts is null)
             return null;
         if (_tcpPorts is not null)
@@ -84,16 +86,17 @@ public sealed class Service : IAsyncDisposable
 
     async Task<MultiplexedStream> BuildImageAndStartContainer()
     {
-        await using Stream contents = CreateTarArchive();
         ImageBuildParameters imageBuildParameters = new() { Tags = new[] { _imageName } };
+        await using Stream contents = CreateTarArchive();
+        Progress<JSONMessage> progress = new(value => _buildImageProgressChannel.Writer.TryWrite(value));
         try
         {
             await _dockerClient.Images.BuildImageFromDockerfileAsync(imageBuildParameters, contents, authConfigs: null, headers: null,
-                _buildImageProgress);
+                progress);
         }
         finally
         {
-            _buildImageProgressReader.StopListeningToProgressChanges();
+            _buildImageProgressChannel.Writer.Complete();
         }
         CreateContainerParameters createContainerParameters = new()
         {
@@ -172,7 +175,7 @@ public sealed class Service : IAsyncDisposable
             throw new ObjectDisposedException(nameof(Service));
     }
 
-    async Task RemoveContainer()
+    async ValueTask RemoveContainer()
     {
         if (_containerId is not null)
         {
@@ -181,7 +184,7 @@ public sealed class Service : IAsyncDisposable
         }
     }
 
-    async Task RemoveImage()
+    async ValueTask RemoveImage()
     {
         Dictionary<string, IDictionary<string, bool>> filters = new()
         {
