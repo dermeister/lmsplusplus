@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.Net;
 using System.Text;
 using System.Threading.Channels;
 using Docker.DotNet;
@@ -18,7 +19,7 @@ public sealed class Service : IAsyncDisposable
     readonly string _imageName;
     string? _containerId;
     bool _isDisposed;
-    ushort[]? _tcpPorts;
+    RealPortMapping[]? _realTcpPortMappings;
 
     public string Name => _configuration.Name;
 
@@ -79,20 +80,44 @@ public sealed class Service : IAsyncDisposable
         await containerStream.WriteAsync(buffer, offset: 0, buffer.Length, cancellationToken);
     }
 
-    public async Task<ushort[]?> GetTcpPortsAsync(CancellationToken cancellationToken = default)
+    public async Task<RealPortMapping[]?> GetPortMappingsAsync(CancellationToken cancellationToken = default)
     {
         EnsureNotDisposed();
-        if (_configuration.TcpPorts is null)
+        if (_configuration.PortMappings is null)
             return null;
-        if (_tcpPorts is not null)
-            return _tcpPorts;
+        if (_realTcpPortMappings is not null)
+            return _realTcpPortMappings;
         await _buildImageAndStartContainerTask;
         ContainerInspectResponse containerInspectResponse = await _dockerClient.Containers.InspectContainerAsync(_containerId!,
             cancellationToken);
-        _tcpPorts = (from portBindings in containerInspectResponse.NetworkSettings.Ports.Values
-                     let hostPort = portBindings[0].HostPort
-                     select ushort.Parse(hostPort)).ToArray();
-        return _tcpPorts;
+        _realTcpPortMappings = (from pair in containerInspectResponse.NetworkSettings.Ports
+                                select CreateRealPortMapping(pair.Key, pair.Value[0])).ToArray();
+        return _realTcpPortMappings;
+    }
+
+    static string ConvertContainerPortToDockerFormat(ushort containerPort, PortType portType)
+    {
+        var containerPortInDockerFormat = containerPort.ToString();
+        string portTypeInDockerFormat = portType switch
+        {
+            PortType.Tcp => "tcp",
+            PortType.Udp => "udp",
+            _ => throw new Exception("Error")
+        };
+        return $"{containerPortInDockerFormat}/{portTypeInDockerFormat}";
+    }
+
+    static (ushort ContainerPort, PortType PortType) ConvertContainerPortFromDockerFormat(string containerPortInDockerFormat)
+    {
+        string[] containerPortAndPortType = containerPortInDockerFormat.Split('/');
+        var containerPort = ushort.Parse(containerPortAndPortType[0]);
+        PortType portType = containerPortAndPortType[1] switch
+        {
+            "tcp" => PortType.Tcp,
+            "udp" => PortType.Udp,
+            _ => throw new Exception("Error")
+        };
+        return (containerPort, portType);
     }
 
     async Task<MultiplexedStream> BuildImageAndStartContainer()
@@ -152,11 +177,14 @@ public sealed class Service : IAsyncDisposable
     Dictionary<string, EmptyStruct>? CreateExposedPorts()
     {
         Dictionary<string, EmptyStruct>? exposedPorts = null;
-        if (_configuration.TcpPorts is not null)
+        if (_configuration.PortMappings is not null)
         {
             exposedPorts = new Dictionary<string, EmptyStruct>();
-            foreach (ushort port in _configuration.TcpPorts)
-                exposedPorts[$"{port}/tcp"] = new EmptyStruct();
+            foreach (VirtualPortMapping portMapping in _configuration.PortMappings)
+            {
+                string containerPortInDockerFormat = ConvertContainerPortToDockerFormat(portMapping.ContainerPort, portMapping.PortType);
+                exposedPorts[containerPortInDockerFormat] = new EmptyStruct();
+            }
         }
         return exposedPorts;
     }
@@ -164,12 +192,15 @@ public sealed class Service : IAsyncDisposable
     HostConfig? CreatHostConfig()
     {
         HostConfig? config = null;
-        if (_configuration.TcpPorts is not null)
+        if (_configuration.PortMappings is not null)
         {
             config ??= new HostConfig();
             var portBindings = new Dictionary<string, IList<PortBinding>>();
-            foreach (ushort port in _configuration.TcpPorts)
-                portBindings[$"{port}/tcp"] = new PortBinding[] { new() { HostPort = "0", HostIP = "0.0.0.0" } };
+            foreach (VirtualPortMapping portMapping in _configuration.PortMappings)
+            {
+                string containerPortInDockerFormat = ConvertContainerPortToDockerFormat(portMapping.ContainerPort, portMapping.PortType);
+                portBindings[containerPortInDockerFormat] = new PortBinding[] { new() { HostPort = "0", HostIP = "0.0.0.0" } };
+            }
             config.PortBindings = portBindings;
         }
         if (_configuration.NetworkName is not null)
@@ -178,6 +209,18 @@ public sealed class Service : IAsyncDisposable
             config.NetworkMode = _configuration.NetworkName;
         }
         return config;
+    }
+
+    RealPortMapping CreateRealPortMapping(string containerPortInDockerFormat, PortBinding portBinding)
+    {
+        if (_configuration.PortMappings is null)
+            throw new Exception("Error");
+        (ushort containerPort, PortType portType) = ConvertContainerPortFromDockerFormat(containerPortInDockerFormat);
+        bool Match(VirtualPortMapping virtualPortMapping) => virtualPortMapping.ContainerPort == containerPort;
+        ushort correspondingVirtualHostPort = Array.Find(_configuration.PortMappings, Match).VirtualHostPort;
+        var realHostPort = ushort.Parse(portBinding.HostPort);
+        var realHostIpAddress = IPAddress.Parse(portBinding.HostIP);
+        return new RealPortMapping(portType, containerPort, correspondingVirtualHostPort, realHostPort, realHostIpAddress);
     }
 
     void EnsureNotDisposed()
@@ -211,6 +254,21 @@ public sealed class Service : IAsyncDisposable
     }
 }
 
+class ServiceConfiguration
+{
+    internal string Name { get; }
+    internal string ContextPath { get; }
+    internal VirtualPortMapping[]? PortMappings { get; init; }
+    internal bool Stdin { get; init; }
+    internal string? NetworkName { get; init; }
+
+    public ServiceConfiguration(string name, string contextPath)
+    {
+        Name = name;
+        ContextPath = contextPath;
+    }
+}
+
 public enum ServiceOutputStage
 {
     Build,
@@ -229,17 +287,41 @@ public class ServiceOutput
     }
 }
 
-class ServiceConfiguration
+public enum PortType
 {
-    internal string Name { get; }
-    internal string ContextPath { get; }
-    internal ushort[]? TcpPorts { get; init; }
-    internal bool Stdin { get; init; }
-    internal string? NetworkName { get; init; }
+    Tcp,
+    Udp
+}
 
-    public ServiceConfiguration(string name, string contextPath)
+readonly struct VirtualPortMapping
+{
+    internal PortType PortType { get; }
+    internal ushort ContainerPort { get; }
+    internal ushort VirtualHostPort { get; }
+
+    internal VirtualPortMapping(PortType portType, ushort containerPort, ushort virtualHostPort)
     {
-        Name = name;
-        ContextPath = contextPath;
+        PortType = portType;
+        ContainerPort = containerPort;
+        VirtualHostPort = virtualHostPort;
+    }
+}
+
+public readonly struct RealPortMapping
+{
+    public PortType PortType { get; }
+    public ushort ContainerPort { get; }
+    public ushort VirtualHostPort { get; }
+    public ushort RealHostPort { get; }
+    public IPAddress RealHostIpAddress { get; }
+
+    internal RealPortMapping(PortType portType, ushort containerPort, ushort virtualHostPort, ushort realHostPort,
+        IPAddress realHostIpAddress)
+    {
+        ContainerPort = containerPort;
+        VirtualHostPort = virtualHostPort;
+        RealHostPort = realHostPort;
+        RealHostIpAddress = realHostIpAddress;
+        PortType = portType;
     }
 }
