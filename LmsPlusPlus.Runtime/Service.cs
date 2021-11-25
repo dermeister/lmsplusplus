@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Text;
 using System.Threading.Channels;
 using Docker.DotNet;
@@ -8,6 +9,7 @@ namespace LmsPlusPlus.Runtime;
 
 public sealed class Service : IAsyncDisposable
 {
+    static readonly ArrayPool<byte> s_buffers = ArrayPool<byte>.Create();
     readonly DockerClient _dockerClient = new DockerClientConfiguration().CreateClient();
     readonly ServiceConfiguration _configuration;
     readonly Task<MultiplexedStream> _buildImageAndStartContainerTask;
@@ -51,13 +53,22 @@ public sealed class Service : IAsyncDisposable
             return new ServiceOutput(ServiceOutputStage.Build, message.Stream);
         }
         MultiplexedStream containerStream = await _buildImageAndStartContainerTask;
-        var buffer = new byte[1 << 16];
-        MultiplexedStream.ReadResult readResult = await containerStream.ReadOutputAsync(buffer, offset: 0, buffer.Length,
-            cancellationToken);
-        if (readResult.EOF)
-            return null;
-        string content = Encoding.Default.GetString(buffer.AsSpan(start: 0, readResult.Count));
-        return new ServiceOutput(ServiceOutputStage.Run, content);
+        byte[]? buffer = null;
+        try
+        {
+            buffer = s_buffers.Rent(1 << 16);
+            MultiplexedStream.ReadResult readResult = await containerStream.ReadOutputAsync(buffer, offset: 0, buffer.Length,
+                cancellationToken);
+            if (readResult.EOF)
+                return null;
+            string content = Encoding.Default.GetString(buffer.AsSpan(start: 0, readResult.Count));
+            return new ServiceOutput(ServiceOutputStage.Run, content);
+        }
+        finally
+        {
+            if (buffer is not null)
+                s_buffers.Return(buffer);
+        }
     }
 
     public async Task WriteAsync(string input, CancellationToken cancellationToken = default)
