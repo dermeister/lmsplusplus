@@ -81,7 +81,7 @@ public sealed class Service : IAsyncDisposable
         await containerStream.WriteAsync(buffer, offset: 0, buffer.Length, cancellationToken);
     }
 
-    public async Task<ReadOnlyCollection<PortMapping>?> GetPortMappingsAsync(CancellationToken cancellationToken = default)
+    public async Task<ReadOnlyCollection<PortMapping>?> GetOpenedPortsAsync(CancellationToken cancellationToken = default)
     {
         EnsureNotDisposed();
         if (_configuration.VirtualPortMappings is null)
@@ -92,7 +92,7 @@ public sealed class Service : IAsyncDisposable
         ContainerInspectResponse containerInspectResponse = await _dockerClient.Containers.InspectContainerAsync(_containerId!,
             cancellationToken);
         IEnumerable<PortMapping> portMappings = from pair in containerInspectResponse.NetworkSettings.Ports
-                                                select CreateRealPortMapping(pair.Key, pair.Value[0]);
+                                                select CreatePortMapping(pair.Key, pair.Value[0]);
         _portMappings = Array.AsReadOnly(portMappings.ToArray());
         return _portMappings;
     }
@@ -213,7 +213,7 @@ public sealed class Service : IAsyncDisposable
         return config;
     }
 
-    PortMapping CreateRealPortMapping(string containerPortInDockerFormat, PortBinding portBinding)
+    PortMapping CreatePortMapping(string containerPortInDockerFormat, PortBinding portBinding)
     {
         if (_configuration.VirtualPortMappings is null)
             throw new InvalidOperationException("Virtual port mappings has not been initialized");

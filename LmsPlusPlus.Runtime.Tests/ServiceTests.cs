@@ -46,7 +46,7 @@ public class ServiceTests
         await service.DisposeAsync();
         Task Write() => service.WriteAsync("input");
         Task Read() => service.ReadAsync();
-        Task GetPorts() => service.GetPortMappingsAsync();
+        Task GetPorts() => service.GetOpenedPortsAsync();
 
         // Assert
         await Assert.ThrowsAsync<ObjectDisposedException>(Write);
