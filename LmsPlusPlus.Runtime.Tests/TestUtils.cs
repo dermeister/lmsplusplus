@@ -1,5 +1,8 @@
 using System;
 using System.IO;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace LmsPlusPlus.Runtime.Tests;
@@ -17,9 +20,23 @@ static class TestUtils
 
     internal static string GetContextPath(string serviceName) => Path.Combine(path1: "Services", serviceName);
 
-    internal static async Task ReportAndWait<T>(IProgress<T> progress, T value)
+    internal static TcpClient ConnectToTcpSocket(ushort port)
     {
-        progress.Report(value);
-        await Task.Delay(millisecondsDelay: 100);
+        TcpClient client = new();
+        client.Connect(IPAddress.Loopback, port);
+        return client;
+    }
+
+    internal static void WriteToTcpClient(TcpClient client, string message)
+    {
+        byte[] buffer = Encoding.Default.GetBytes(message);
+        client.GetStream().Write(buffer, offset: 0, buffer.Length);
+    }
+
+    internal static string ReadFromTcpClient(TcpClient client)
+    {
+        var buffer = new byte[1 << 16];
+        int receivedBytesCount = client.GetStream().Read(buffer, offset: 0, buffer.Length);
+        return Encoding.Default.GetString(buffer.AsSpan(start: 0, receivedBytesCount));
     }
 }

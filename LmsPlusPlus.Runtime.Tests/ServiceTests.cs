@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -73,5 +76,31 @@ public class ServiceTests
         // Assert
         Assert.Equal(expected: "hello", output1);
         Assert.Equal(expected: "world", output2);
+    }
+
+    [Fact]
+    public async Task AccessServiceViaSocket()
+    {
+        // Arrange
+        VirtualPortMapping virtualPortMapping = new(PortType.Tcp, containerPort: 10_000, virtualHostPort: 10_000);
+        ServiceConfiguration configuration = new(name: "SocketService", TestUtils.GetContextPath("SocketService"))
+        {
+            VirtualPortMappings = new List<VirtualPortMapping> { virtualPortMapping }.AsReadOnly()
+        };
+        await using Service service = new(configuration);
+
+        // Act
+        ReadOnlyCollection<PortMapping>? openedPorts = await service.GetOpenedPortsAsync();
+        PortMapping portMapping = openedPorts![0];
+        await Task.Delay(500); // Wait for process in container to open socket
+        using TcpClient client = TestUtils.ConnectToTcpSocket(portMapping.HostPort);
+        TestUtils.WriteToTcpClient(client, message: "hello world");
+        string output = TestUtils.ReadFromTcpClient(client);
+
+        // Assert
+        Assert.Single(openedPorts);
+        Assert.Equal(expected: 10_000, portMapping.ContainerPort);
+        Assert.Equal(expected: 10_000, portMapping.VirtualHostPort);
+        Assert.Equal(expected: "hello world", output);
     }
 }
