@@ -11,6 +11,7 @@ namespace LmsPlusPlus.Runtime;
 
 public sealed class Service : IAsyncDisposable
 {
+    static readonly int s_dockerizedFileMode = Convert.ToInt32(value: "755", fromBase: 8);
     static readonly ArrayPool<byte> s_buffers = ArrayPool<byte>.Create();
     readonly DockerClient _dockerClient = new DockerClientConfiguration().CreateClient();
     readonly ServiceConfiguration _configuration;
@@ -169,6 +170,7 @@ public sealed class Service : IAsyncDisposable
         foreach (string file in Directory.EnumerateFiles(_configuration.ContextPath))
         {
             var entry = TarEntry.CreateEntryFromFile(file);
+            entry.TarHeader.Mode = s_dockerizedFileMode;
             archive.WriteEntry(entry, recurse: false);
         }
         archive.Close();
