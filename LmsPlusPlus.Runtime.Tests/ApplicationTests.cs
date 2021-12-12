@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using LibGit2Sharp;
 using Xunit;
@@ -19,15 +20,72 @@ public class ApplicationTests : IClassFixture<ApplicationFixture>
     public async Task GetApplicationServiceConfigurations()
     {
         // Arrange
-        string repositoryUrl = _applicationFixture.GetApplicationRepositoryUrl("EchoApplication");
-        ApplicationConfiguration configuration = new(repositoryUrl, s_applicationWorkingDirectory);
-        await using Application application = new(configuration);
+        ApplicationConfiguration applicationConfiguration = CreateApplicationConfiguration("EchoApplication");
+        await using Application application = new(applicationConfiguration);
 
         // Act
         ReadOnlyCollection<ServiceConfiguration> serviceConfigurations = await application.GetServiceConfigurations();
 
         // Assert
         Assert.Single(serviceConfigurations);
+    }
+
+    [Fact]
+    public async Task ReadServiceBuildOutput()
+    {
+        // Arrange
+        ApplicationConfiguration applicationConfiguration = CreateApplicationConfiguration("EchoApplication");
+        await using Application application = new(applicationConfiguration);
+
+        // Act
+        ServiceConfiguration serviceConfiguration = (await application.GetServiceConfigurations()).First();
+        string serviceName = serviceConfiguration.Name;
+        string? output = await application.ReadServiceBuildOutputAsync(serviceName);
+
+        // Assert
+        Assert.NotNull(output);
+    }
+
+    [Fact]
+    public async Task ReadServiceOutput()
+    {
+        // Arrange
+        ApplicationConfiguration applicationConfiguration = CreateApplicationConfiguration("EchoApplication");
+        await using Application application = new(applicationConfiguration);
+
+        // Act
+        ServiceConfiguration serviceConfiguration = (await application.GetServiceConfigurations()).First();
+        string serviceName = serviceConfiguration.Name;
+        string? output = await application.ReadServiceOutputAsync(serviceName);
+
+        // Assert
+        Assert.Equal(expected: "Hello from service!\n", output);
+    }
+
+    [Fact]
+    public async Task WriteServiceInputAndReadOutput()
+    {
+        // Arrange
+        ApplicationConfiguration applicationConfiguration = CreateApplicationConfiguration("CatApplication");
+        await using Application application = new(applicationConfiguration);
+
+        // Act
+        ServiceConfiguration serviceConfiguration = (await application.GetServiceConfigurations()).First();
+        string serviceName = serviceConfiguration.Name;
+        await application.WriteServiceInputAsync(serviceName, input: "hello");
+        string? output1 = await application.ReadServiceOutputAsync(serviceName);
+        await application.WriteServiceInputAsync(serviceName, input: "world");
+        string? output2 = await application.ReadServiceOutputAsync(serviceName);
+
+        // Assert
+        Assert.Equal(expected: "hello", output1);
+        Assert.Equal(expected: "world", output2);
+    }
+
+    ApplicationConfiguration CreateApplicationConfiguration(string applicationName)
+    {
+        string repositoryUrl = _applicationFixture.GetApplicationRepositoryUrl(applicationName);
+        return new ApplicationConfiguration(repositoryUrl, s_applicationWorkingDirectory);
     }
 }
 
