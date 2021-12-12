@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Xunit;
@@ -13,65 +14,91 @@ public class ServiceTests
     public async Task ReadServiceBuildOutput()
     {
         // Arrange
-        ServiceConfiguration configuration = new(name: "EchoService", TestUtils.GetContextPath("EchoService"));
+        ServiceConfiguration configuration = new(name: "EchoService", GetServiceContextPath("EchoService"));
         await using Service service = new(configuration);
 
         // Act
-        ServiceOutput? output = await service.ReadAsync();
+        string? output = await service.ReadBuildOutputAsync();
 
         // Assert
         Assert.NotNull(output);
-        Assert.Contains(expectedSubstring: "FROM alpine", output!.Content);
+        Assert.Contains(expectedSubstring: "FROM alpine", output);
     }
 
     [Fact]
     public async Task ReadServiceRunOutput()
     {
         // Arrange
-        ServiceConfiguration configuration = new(name: "EchoService", TestUtils.GetContextPath("EchoService"));
+        ServiceConfiguration configuration = new(name: "EchoService", GetServiceContextPath("EchoService"));
         await using Service service = new(configuration);
+        await service.Start();
 
         // Act
-        string? output = await TestUtils.ReadServiceRunOutput(service);
+        string? output1 = await service.ReadOutputAsync();
+        string? output2 = await service.ReadOutputAsync();
+        string? output3 = await service.ReadOutputAsync();
 
         // Assert
-        Assert.Equal(expected: "Hello from service!\n", output);
+        Assert.Equal(expected: "Hello from service!\n", output1);
+        Assert.Null(output2);
+        Assert.Null(output3);
     }
 
     [Fact]
     public async Task ServiceMethodsThrowObjectDisposedException()
     {
         // Arrange
-        ServiceConfiguration configuration = new(name: "EchoService", TestUtils.GetContextPath("EchoService"));
+        ServiceConfiguration configuration = new(name: "EchoService", GetServiceContextPath("EchoService"));
         Service service = new(configuration);
 
         // Act
         await service.DisposeAsync();
-        Task Write() => service.WriteAsync("input");
-        Task Read() => service.ReadAsync();
-        Task GetPorts() => service.GetOpenedPortsAsync();
+        Task ReadBuildOutput() => service.ReadBuildOutputAsync();
+        Task WriteInput() => service.WriteInputAsync("input");
+        Task ReadOutput() => service.ReadOutputAsync();
+        Task GetOpenedPorts() => service.GetOpenedPortsAsync();
 
         // Assert
-        await Assert.ThrowsAsync<ObjectDisposedException>(Write);
-        await Assert.ThrowsAsync<ObjectDisposedException>(Read);
-        await Assert.ThrowsAsync<ObjectDisposedException>(GetPorts);
+        await Assert.ThrowsAsync<ObjectDisposedException>(ReadBuildOutput);
+        await Assert.ThrowsAsync<ObjectDisposedException>(WriteInput);
+        await Assert.ThrowsAsync<ObjectDisposedException>(ReadOutput);
+        await Assert.ThrowsAsync<ObjectDisposedException>(GetOpenedPorts);
+    }
+
+    [Fact]
+    public async Task ServiceMethodsThrowInvalidOperationException()
+    {
+        // Arrange
+        ServiceConfiguration configuration = new(name: "EchoService", GetServiceContextPath("EchoService"));
+        await using Service service = new(configuration);
+
+        // Act
+        Task WriteInput() => service.WriteInputAsync("input");
+        Task ReadOutput() => service.ReadOutputAsync();
+        Task GetOpenedPorts() => service.GetOpenedPortsAsync();
+
+        // Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(WriteInput);
+        await Assert.ThrowsAsync<InvalidOperationException>(ReadOutput);
+        await Assert.ThrowsAsync<InvalidOperationException>(GetOpenedPorts);
     }
 
     [Fact]
     public async Task WriteToServiceStdinAndReadFromStdout()
     {
         // Arrange
-        ServiceConfiguration configuration = new(name: "CatService", TestUtils.GetContextPath("CatService"))
+        ServiceConfiguration configuration = new(name: "CatService", GetServiceContextPath("CatService"))
         {
             Stdin = true
         };
         await using Service service = new(configuration);
+        await service.Start();
 
         // Act
-        await service.WriteAsync("hello");
-        string? output1 = await TestUtils.ReadServiceRunOutput(service);
-        await service.WriteAsync("world");
-        string? output2 = await TestUtils.ReadServiceRunOutput(service);
+        await service.WriteInputAsync("hello");
+        string? output1 = await service.ReadOutputAsync();
+        await service.WriteInputAsync("world");
+        string? output2 = await service.ReadOutputAsync();
 
         // Assert
         Assert.Equal(expected: "hello", output1);
@@ -83,15 +110,16 @@ public class ServiceTests
     {
         // Arrange
         VirtualPortMapping virtualPortMapping = new(PortType.Tcp, containerPort: 10_000, virtualHostPort: 10_000);
-        ServiceConfiguration configuration = new(name: "SocketService", TestUtils.GetContextPath("SocketService"))
+        ServiceConfiguration configuration = new(name: "SocketService", GetServiceContextPath("SocketService"))
         {
             VirtualPortMappings = new List<VirtualPortMapping> { virtualPortMapping }.AsReadOnly()
         };
         await using Service service = new(configuration);
+        await service.Start();
 
         // Act
-        ReadOnlyCollection<PortMapping>? openedPorts = await service.GetOpenedPortsAsync();
-        PortMapping portMapping = openedPorts![0];
+        ReadOnlyCollection<PortMapping> openedPorts = await service.GetOpenedPortsAsync();
+        PortMapping portMapping = openedPorts[0];
         await Task.Delay(500); // Wait for process in container to open socket
         using TcpClient client = TestUtils.ConnectToTcpSocket(portMapping.HostPort);
         TestUtils.WriteToTcpClient(client, message: "hello world");
@@ -103,4 +131,6 @@ public class ServiceTests
         Assert.Equal(expected: 10_000, portMapping.VirtualHostPort);
         Assert.Equal(expected: "hello world", output);
     }
+
+    internal static string GetServiceContextPath(string serviceName) => Path.GetFullPath(Path.Combine(path1: "Services", serviceName));
 }

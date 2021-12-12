@@ -9,27 +9,28 @@ using ICSharpCode.SharpZipLib.Tar;
 
 namespace LmsPlusPlus.Runtime;
 
-public sealed class Service : IAsyncDisposable
+sealed class Service : IAsyncDisposable
 {
-    static readonly int s_dockerizedFileMode = Convert.ToInt32(value: "755", fromBase: 8);
+    static readonly int s_fileModeInContainer = Convert.ToInt32(value: "755", fromBase: 8);
     static readonly ArrayPool<byte> s_buffers = ArrayPool<byte>.Create();
     readonly DockerClient _dockerClient = new DockerClientConfiguration().CreateClient();
     readonly ServiceConfiguration _configuration;
-    readonly Task<MultiplexedStream> _buildImageAndStartContainerTask;
-    readonly CancellationTokenSource _cancellationTokenSource = new();
+    readonly Task _buildImageAndCreateContainerTask;
     readonly Channel<JSONMessage> _buildImageProgressChannel = Channel.CreateUnbounded<JSONMessage>();
     readonly string _imageName;
+    MultiplexedStream? _containerStream;
+    bool _isEndOfStream;
     string? _containerId;
     bool _isDisposed;
     ReadOnlyCollection<PortMapping>? _portMappings;
 
-    public string Name => _configuration.Name;
+    bool IsStarted => _containerStream is not null;
 
     internal Service(ServiceConfiguration configuration)
     {
         _configuration = configuration;
         _imageName = $"{_configuration.Name.ToLower()}-{Guid.NewGuid()}";
-        _buildImageAndStartContainerTask = BuildImageAndStartContainer();
+        _buildImageAndCreateContainerTask = BuildImageAndCreateContainer();
     }
 
     public async ValueTask DisposeAsync()
@@ -37,35 +38,61 @@ public sealed class Service : IAsyncDisposable
         if (!_isDisposed)
         {
             _isDisposed = true;
-            _cancellationTokenSource.Cancel();
-            await _buildImageAndStartContainerTask.ContinueWith(Task.FromResult);
+            await _buildImageAndCreateContainerTask;
             await RemoveContainer();
             await RemoveImage();
             _dockerClient.Dispose();
-            _cancellationTokenSource.Dispose();
         }
     }
 
-    public async Task<ServiceOutput?> ReadAsync(CancellationToken cancellationToken = default)
+    internal async Task<string?> ReadBuildOutputAsync(CancellationToken cancellationToken = default)
     {
         EnsureNotDisposed();
         bool canReadBuildImageProgress = await _buildImageProgressChannel.Reader.WaitToReadAsync(cancellationToken);
-        if (canReadBuildImageProgress)
+        if (!canReadBuildImageProgress)
+            return null;
+        JSONMessage message = await _buildImageProgressChannel.Reader.ReadAsync(cancellationToken);
+        return message.Stream;
+    }
+
+    internal async Task Start(CancellationToken cancellationToken = default)
+    {
+        if (!IsStarted)
         {
-            JSONMessage message = await _buildImageProgressChannel.Reader.ReadAsync(cancellationToken);
-            return new ServiceOutput(ServiceOutputStage.Build, message.Stream);
+            await _buildImageAndCreateContainerTask;
+            ContainerAttachParameters containerAttachParameters = new()
+            {
+                Stream = true,
+                Stdout = true,
+                Stderr = true,
+                Stdin = _configuration.Stdin
+            };
+            MultiplexedStream containerStream = await _dockerClient.Containers.AttachContainerAsync(_containerId, tty: false,
+                containerAttachParameters, cancellationToken);
+            await _dockerClient.Containers.StartContainerAsync(_containerId, new ContainerStartParameters(), cancellationToken);
+            _containerStream = containerStream;
         }
-        MultiplexedStream containerStream = await _buildImageAndStartContainerTask;
+    }
+
+    internal async Task<string?> ReadOutputAsync(CancellationToken cancellationToken = default)
+    {
+        EnsureNotDisposed();
+        EnsureStarted();
+        if (_isEndOfStream)
+            return null;
         byte[]? buffer = null;
         try
         {
             buffer = s_buffers.Rent(1 << 16);
-            MultiplexedStream.ReadResult readResult = await containerStream.ReadOutputAsync(buffer, offset: 0, buffer.Length,
+            MultiplexedStream.ReadResult readResult = await _containerStream!.ReadOutputAsync(buffer, offset: 0, buffer.Length,
                 cancellationToken);
             if (readResult.EOF)
+            {
+                _isEndOfStream = true;
                 return null;
+            }
             string content = Encoding.Default.GetString(buffer.AsSpan(start: 0, readResult.Count));
-            return new ServiceOutput(ServiceOutputStage.Run, content);
+            return content;
         }
         finally
         {
@@ -74,27 +101,33 @@ public sealed class Service : IAsyncDisposable
         }
     }
 
-    public async Task WriteAsync(string input, CancellationToken cancellationToken = default)
+    internal async Task WriteInputAsync(string input, CancellationToken cancellationToken = default)
     {
         EnsureNotDisposed();
-        MultiplexedStream containerStream = await _buildImageAndStartContainerTask;
-        byte[] buffer = Encoding.Default.GetBytes(input);
-        await containerStream.WriteAsync(buffer, offset: 0, buffer.Length, cancellationToken);
+        EnsureStarted();
+        if (!_isEndOfStream)
+        {
+            byte[] buffer = Encoding.Default.GetBytes(input);
+            await _containerStream!.WriteAsync(buffer, offset: 0, buffer.Length, cancellationToken);
+        }
     }
 
-    public async Task<ReadOnlyCollection<PortMapping>?> GetOpenedPortsAsync(CancellationToken cancellationToken = default)
+    internal async Task<ReadOnlyCollection<PortMapping>> GetOpenedPortsAsync(CancellationToken cancellationToken = default)
     {
         EnsureNotDisposed();
-        if (_configuration.VirtualPortMappings is null)
-            return null;
+        EnsureStarted();
         if (_portMappings is not null)
             return _portMappings;
-        await _buildImageAndStartContainerTask;
-        ContainerInspectResponse containerInspectResponse = await _dockerClient.Containers.InspectContainerAsync(_containerId!,
-            cancellationToken);
-        IEnumerable<PortMapping> portMappings = from pair in containerInspectResponse.NetworkSettings.Ports
-                                                select CreatePortMapping(pair.Key, pair.Value[0]);
-        _portMappings = Array.AsReadOnly(portMappings.ToArray());
+        if (_configuration.VirtualPortMappings is { Count: 0 })
+            _portMappings = Array.AsReadOnly(Array.Empty<PortMapping>());
+        else
+        {
+            ContainerInspectResponse containerInspectResponse = await _dockerClient.Containers.InspectContainerAsync(_containerId!,
+                cancellationToken);
+            IEnumerable<PortMapping> portMappings = from pair in containerInspectResponse.NetworkSettings.Ports
+                                                    select CreatePortMapping(pair.Key, pair.Value[0]);
+            _portMappings = Array.AsReadOnly(portMappings.ToArray());
+        }
         return _portMappings;
     }
 
@@ -123,10 +156,10 @@ public sealed class Service : IAsyncDisposable
         return (containerPort, portType);
     }
 
-    async Task<MultiplexedStream> BuildImageAndStartContainer()
+    async Task BuildImageAndCreateContainer()
     {
         ImageBuildParameters imageBuildParameters = new() { Tags = new[] { _imageName } };
-        await using Stream contents = CreateTarArchive();
+        await using Stream contents = CreateTarArchiveFromContext();
         Progress<JSONMessage> progress = new(value => _buildImageProgressChannel.Writer.TryWrite(value));
         try
         {
@@ -141,77 +174,62 @@ public sealed class Service : IAsyncDisposable
         {
             Image = _imageName,
             AttachStdout = true,
+            AttachStderr = true,
             AttachStdin = _configuration.Stdin,
             OpenStdin = _configuration.Stdin,
             ExposedPorts = CreateExposedPorts(),
             HostConfig = CreatHostConfig()
         };
-        CreateContainerResponse createContainerResponse = await _dockerClient.Containers.CreateContainerAsync(createContainerParameters,
-            _cancellationTokenSource.Token);
+        CreateContainerResponse createContainerResponse = await _dockerClient.Containers.CreateContainerAsync(createContainerParameters);
         _containerId = createContainerResponse.ID;
-        ContainerAttachParameters containerAttachParameters = new()
-        {
-            Stream = true,
-            Stdout = true,
-            Stdin = _configuration.Stdin
-        };
-        MultiplexedStream containerStream = await _dockerClient.Containers.AttachContainerAsync(_containerId, tty: false,
-            containerAttachParameters, _cancellationTokenSource.Token);
-        await _dockerClient.Containers.StartContainerAsync(_containerId, new ContainerStartParameters(), _cancellationTokenSource.Token);
-        return containerStream;
     }
 
-    Stream CreateTarArchive()
+    Stream CreateTarArchiveFromContext()
     {
         MemoryStream output = new();
         var archive = TarArchive.CreateOutputTarArchive(output);
         archive.IsStreamOwner = false;
-        archive.RootPath = _configuration.ContextPath;
-        foreach (string file in Directory.EnumerateFiles(_configuration.ContextPath))
+        string contextPath = _configuration.ContextPath;
+        string currentDirectory = Directory.GetCurrentDirectory();
+        if (contextPath.StartsWith(currentDirectory))
+            contextPath = Path.GetRelativePath(currentDirectory, contextPath);
+        archive.RootPath = contextPath;
+        IEnumerable<string> files = Directory.EnumerateFiles(contextPath);
+        IEnumerable<string> subdirectories = Directory.EnumerateDirectories(contextPath);
+        foreach (string file in files.Concat(subdirectories))
         {
             var entry = TarEntry.CreateEntryFromFile(file);
-            entry.TarHeader.Mode = s_dockerizedFileMode;
-            archive.WriteEntry(entry, recurse: false);
+            entry.TarHeader.Mode = s_fileModeInContainer;
+            archive.WriteEntry(entry, recurse: true);
         }
         archive.Close();
         output.Position = 0;
         return output;
     }
 
-    Dictionary<string, EmptyStruct>? CreateExposedPorts()
+    Dictionary<string, EmptyStruct> CreateExposedPorts()
     {
-        Dictionary<string, EmptyStruct>? exposedPorts = null;
-        if (_configuration.VirtualPortMappings is not null)
+        Dictionary<string, EmptyStruct> exposedPorts = new();
+        foreach (VirtualPortMapping portMapping in _configuration.VirtualPortMappings)
         {
-            exposedPorts = new Dictionary<string, EmptyStruct>();
-            foreach (VirtualPortMapping portMapping in _configuration.VirtualPortMappings)
-            {
-                string containerPortInDockerFormat = ConvertContainerPortToDockerFormat(portMapping.ContainerPort, portMapping.PortType);
-                exposedPorts[containerPortInDockerFormat] = new EmptyStruct();
-            }
+            string containerPortInDockerFormat = ConvertContainerPortToDockerFormat(portMapping.ContainerPort, portMapping.PortType);
+            exposedPorts[containerPortInDockerFormat] = new EmptyStruct();
         }
         return exposedPorts;
     }
 
-    HostConfig? CreatHostConfig()
+    HostConfig CreatHostConfig()
     {
         HostConfig? config = null;
-        if (_configuration.VirtualPortMappings is not null)
+        config ??= new HostConfig();
+        var portBindings = new Dictionary<string, IList<PortBinding>>();
+        foreach (VirtualPortMapping portMapping in _configuration.VirtualPortMappings)
         {
-            config ??= new HostConfig();
-            var portBindings = new Dictionary<string, IList<PortBinding>>();
-            foreach (VirtualPortMapping portMapping in _configuration.VirtualPortMappings)
-            {
-                string containerPortInDockerFormat = ConvertContainerPortToDockerFormat(portMapping.ContainerPort, portMapping.PortType);
-                portBindings[containerPortInDockerFormat] = new PortBinding[] { new() { HostPort = "0", HostIP = "0.0.0.0" } };
-            }
-            config.PortBindings = portBindings;
+            string containerPortInDockerFormat = ConvertContainerPortToDockerFormat(portMapping.ContainerPort, portMapping.PortType);
+            portBindings[containerPortInDockerFormat] = new PortBinding[] { new() { HostPort = "0", HostIP = "0.0.0.0" } };
         }
-        if (_configuration.NetworkName is not null)
-        {
-            config ??= new HostConfig();
-            config.NetworkMode = _configuration.NetworkName;
-        }
+        config.PortBindings = portBindings;
+        config.NetworkMode = _configuration.NetworkName;
         return config;
     }
 
@@ -231,6 +249,12 @@ public sealed class Service : IAsyncDisposable
     {
         if (_isDisposed)
             throw new ObjectDisposedException(nameof(Service));
+    }
+
+    void EnsureStarted()
+    {
+        if (!IsStarted)
+            throw new InvalidOperationException("Container is not started");
     }
 
     async ValueTask RemoveContainer()
@@ -258,36 +282,7 @@ public sealed class Service : IAsyncDisposable
     }
 }
 
-class ServiceConfiguration
-{
-    internal string Name { get; }
-    internal string ContextPath { get; }
-    internal ReadOnlyCollection<VirtualPortMapping>? VirtualPortMappings { get; init; }
-    internal bool Stdin { get; init; }
-    internal string? NetworkName { get; init; }
-
-    internal ServiceConfiguration(string name, string contextPath)
-    {
-        Name = name;
-        ContextPath = contextPath;
-    }
-}
-
-readonly struct VirtualPortMapping
-{
-    internal PortType PortType { get; }
-    internal ushort ContainerPort { get; }
-    internal ushort VirtualHostPort { get; }
-
-    internal VirtualPortMapping(PortType portType, ushort containerPort, ushort virtualHostPort)
-    {
-        PortType = portType;
-        ContainerPort = containerPort;
-        VirtualHostPort = virtualHostPort;
-    }
-}
-
-public readonly struct PortMapping
+public class PortMapping
 {
     public PortType PortType { get; }
     public ushort ContainerPort { get; }
@@ -303,28 +298,4 @@ public readonly struct PortMapping
         HostIpAddress = hostIpAddress;
         PortType = portType;
     }
-}
-
-public enum PortType
-{
-    Tcp,
-    Udp
-}
-
-public class ServiceOutput
-{
-    public ServiceOutputStage Stage { get; }
-    public string Content { get; }
-
-    internal ServiceOutput(ServiceOutputStage stage, string content)
-    {
-        Stage = stage;
-        Content = content;
-    }
-}
-
-public enum ServiceOutputStage
-{
-    Build,
-    Run
 }

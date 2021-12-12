@@ -1,26 +1,13 @@
 using System;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace LmsPlusPlus.Runtime.Tests;
 
 static class TestUtils
 {
-    internal static async Task<string?> ReadServiceRunOutput(Service service)
-    {
-        ServiceOutput? output;
-        do
-            output = await service.ReadAsync();
-        while (output?.Stage is ServiceOutputStage.Build);
-        return output?.Content;
-    }
-
-    internal static string GetContextPath(string serviceName) => Path.Combine(path1: "Services", serviceName);
-
-    internal static TcpClient ConnectToTcpSocket(ushort port)
+   internal static TcpClient ConnectToTcpSocket(ushort port)
     {
         TcpClient client = new();
         client.Connect(IPAddress.Loopback, port);

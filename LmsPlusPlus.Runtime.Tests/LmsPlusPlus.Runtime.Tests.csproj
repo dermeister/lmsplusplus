@@ -8,8 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0"/>
-        <PackageReference Include="xunit" Version="2.4.1"/>
+        <PackageReference Include="LibGit2Sharp" Version="0.27.0-preview-0158" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+        <PackageReference Include="xunit" Version="2.4.1" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
@@ -21,13 +22,15 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\LmsPlusPlus.Runtime\LmsPlusPlus.Runtime.csproj"/>
+        <ProjectReference Include="..\LmsPlusPlus.Runtime\LmsPlusPlus.Runtime.csproj" />
     </ItemGroup>
 
     <ItemGroup>
         <Content Include="Services\**">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
+        <Content Include="Applications\**">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
-
 </Project>
