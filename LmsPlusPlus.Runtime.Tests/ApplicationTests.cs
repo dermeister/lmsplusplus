@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using LibGit2Sharp;
 using Xunit;
@@ -38,8 +39,7 @@ public class ApplicationTests : IClassFixture<ApplicationFixture>
         await using Application application = new(applicationConfiguration);
 
         // Act
-        ServiceConfiguration serviceConfiguration = (await application.GetServiceConfigurations()).First();
-        string serviceName = serviceConfiguration.Name;
+        string serviceName = (await application.GetServiceConfigurations()).First().Name;
         string? output = await application.ReadServiceBuildOutputAsync(serviceName);
 
         // Assert
@@ -54,8 +54,7 @@ public class ApplicationTests : IClassFixture<ApplicationFixture>
         await using Application application = new(applicationConfiguration);
 
         // Act
-        ServiceConfiguration serviceConfiguration = (await application.GetServiceConfigurations()).First();
-        string serviceName = serviceConfiguration.Name;
+        string serviceName = (await application.GetServiceConfigurations()).First().Name;
         string? output = await application.ReadServiceOutputAsync(serviceName);
 
         // Assert
@@ -70,8 +69,7 @@ public class ApplicationTests : IClassFixture<ApplicationFixture>
         await using Application application = new(applicationConfiguration);
 
         // Act
-        ServiceConfiguration serviceConfiguration = (await application.GetServiceConfigurations()).First();
-        string serviceName = serviceConfiguration.Name;
+        string serviceName = (await application.GetServiceConfigurations()).First().Name;
         await application.WriteServiceInputAsync(serviceName, input: "hello");
         string? output1 = await application.ReadServiceOutputAsync(serviceName);
         await application.WriteServiceInputAsync(serviceName, input: "world");
@@ -80,6 +78,26 @@ public class ApplicationTests : IClassFixture<ApplicationFixture>
         // Assert
         Assert.Equal(expected: "hello", output1);
         Assert.Equal(expected: "world", output2);
+    }
+
+    [Fact]
+    public async Task AccessApplicationServiceViaSocket()
+    {
+        // Arrange
+        ApplicationConfiguration applicationConfiguration = CreateApplicationConfiguration("SocketApplication");
+        await using Application application = new(applicationConfiguration);
+
+        // Act
+        string serviceName = (await application.GetServiceConfigurations()).First().Name;
+        ReadOnlyCollection<PortMapping> openedPorts = await application.GetOpenedPortsAsync(serviceName);
+        PortMapping portMapping = openedPorts[0];
+        await Task.Delay(500);
+        TcpClient client = TestUtils.ConnectToTcpSocket(portMapping.HostPort);
+        TestUtils.WriteToTcpClient(client, message: "hello world");
+        string output = TestUtils.ReadFromTcpClient(client);
+
+        // Assert
+        Assert.Equal(expected: "hello world", output);
     }
 
     ApplicationConfiguration CreateApplicationConfiguration(string applicationName)
@@ -100,10 +118,12 @@ public sealed class ApplicationFixture : IDisposable
         foreach (string directory in Directory.EnumerateDirectories(applicationsDirectory))
         {
             Repository repository = new(Repository.Init(directory));
-            EnumerationOptions options = new() { RecurseSubdirectories = true };
+            EnumerationOptions options = new() { RecurseSubdirectories = true, AttributesToSkip = 0 };
             foreach (string file in Directory.EnumerateFiles(directory, searchPattern: "*", options))
             {
                 string relativeFilePath = Path.GetRelativePath(directory, file);
+                if (relativeFilePath.StartsWith(".git"))
+                    continue;
                 repository.Index.Add(relativeFilePath);
             }
             repository.Index.Write();

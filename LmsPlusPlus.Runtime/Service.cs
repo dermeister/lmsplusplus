@@ -196,9 +196,9 @@ sealed class Service : IAsyncDisposable
         archive.RootPath = contextPath;
         IEnumerable<string> files = Directory.EnumerateFiles(contextPath);
         IEnumerable<string> subdirectories = Directory.EnumerateDirectories(contextPath);
-        foreach (string file in files.Concat(subdirectories))
+        foreach (string path in files.Concat(subdirectories))
         {
-            var entry = TarEntry.CreateEntryFromFile(file);
+            var entry = TarEntry.CreateEntryFromFile(path);
             entry.TarHeader.Mode = s_fileModeInContainer;
             archive.WriteEntry(entry, recurse: true);
         }

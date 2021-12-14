@@ -1,0 +1,6 @@
+﻿version: "3"
+services:
+  sockets:
+    build: ..
+    ports:
+      - "10000:10000"

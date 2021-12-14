@@ -104,6 +104,19 @@ public sealed class Application : IAsyncDisposable
     {
         if (compose.Services.Values.Any(service => service.Build is null))
             throw new Exception("Invalid docker-compose file");
+        // TODO: Validate ports
+    }
+
+    static ReadOnlyCollection<VirtualPortMapping> CreateVirtualPortMappings(IEnumerable<string>? portMappingsInDockerComposeFormat)
+    {
+        if (portMappingsInDockerComposeFormat is null)
+            return new ReadOnlyCollection<VirtualPortMapping>(Array.Empty<VirtualPortMapping>());
+        IEnumerable<VirtualPortMapping> portMappings = from portMappingInDockerComposeFormat in portMappingsInDockerComposeFormat
+                                                       let parts = portMappingInDockerComposeFormat.Split(':')
+                                                       let hostPort = ushort.Parse(parts[0])
+                                                       let containerPort = ushort.Parse(parts[1])
+                                                       select new VirtualPortMapping(PortType.Tcp, containerPort, hostPort);
+        return new ReadOnlyCollection<VirtualPortMapping>(portMappings.ToArray());
     }
 
     async Task<Dictionary<string, ServiceConfiguration>> CloneRepositoryAndCreateServiceConfigurations()
@@ -118,7 +131,13 @@ public sealed class Application : IAsyncDisposable
         return (from pair in compose.Services
                 let name = pair.Key
                 let contextPath = Path.GetFullPath(Path.Combine(configurationDirectoryPath, pair.Value.Build))
-                let serviceConfiguration = new ServiceConfiguration(name, contextPath) { Stdin = pair.Value.StdinOpen }
+                let stdin = pair.Value.StdinOpen
+                let virtualPortMappings = CreateVirtualPortMappings(pair.Value.Ports)
+                let serviceConfiguration = new ServiceConfiguration(name, contextPath)
+                {
+                    Stdin = stdin,
+                    VirtualPortMappings = virtualPortMappings
+                }
                 select serviceConfiguration).ToDictionary(x => x.Name, x => x);
     }
 

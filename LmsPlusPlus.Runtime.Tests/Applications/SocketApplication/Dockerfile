@@ -1,0 +1,10 @@
+﻿FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine
+
+WORKDIR /usr/SocketService
+
+COPY SocketService.csproj .
+COPY Program.cs .
+
+RUN dotnet build -c Release
+
+CMD dotnet bin/Release/net6.0/SocketService.dll
