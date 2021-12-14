@@ -109,16 +109,19 @@ public class ApplicationTests : IClassFixture<ApplicationFixture>
 
 public sealed class ApplicationFixture : IDisposable
 {
-    static readonly string s_applicationDirectory = Path.GetFullPath("Applications");
+    static readonly string s_applicationsDirectory = Path.GetFullPath("Applications");
     readonly Dictionary<string, string> _applicationRepositories = new();
 
     public ApplicationFixture()
     {
-        string applicationsDirectory = s_applicationDirectory;
-        foreach (string directory in Directory.EnumerateDirectories(applicationsDirectory))
+        foreach (string directory in Directory.EnumerateDirectories(s_applicationsDirectory))
         {
             Repository repository = new(Repository.Init(directory));
-            EnumerationOptions options = new() { RecurseSubdirectories = true, AttributesToSkip = 0 };
+            EnumerationOptions options = new()
+            {
+                RecurseSubdirectories = true,
+                AttributesToSkip = 0
+            };
             foreach (string file in Directory.EnumerateFiles(directory, searchPattern: "*", options))
             {
                 string relativeFilePath = Path.GetRelativePath(directory, file);

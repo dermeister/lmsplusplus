@@ -53,35 +53,36 @@ public sealed class Application : IAsyncDisposable
         return new ReadOnlyCollection<ServiceConfiguration>(configurations.Values.ToArray());
     }
 
-    public async Task<string?> ReadServiceBuildOutputAsync(string serviceName)
+    public async Task<string?> ReadServiceBuildOutputAsync(string serviceName, CancellationToken cancellationToken = default)
     {
         EnsureNotDisposed();
         Service service = await GetServiceByName(serviceName);
-        return await service.ReadBuildOutputAsync();
+        return await service.ReadBuildOutputAsync(cancellationToken);
     }
 
-    public async Task<string?> ReadServiceOutputAsync(string serviceName)
+    public async Task<string?> ReadServiceOutputAsync(string serviceName, CancellationToken cancellationToken = default)
     {
         EnsureNotDisposed();
         await _startServicesTask;
         Service service = await GetServiceByName(serviceName);
-        return await service.ReadOutputAsync();
+        return await service.ReadOutputAsync(cancellationToken);
     }
 
-    public async Task WriteServiceInputAsync(string serviceName, string input)
+    public async Task WriteServiceInputAsync(string serviceName, string input, CancellationToken cancellationToken = default)
     {
         EnsureNotDisposed();
         await _startServicesTask;
         Service service = await GetServiceByName(serviceName);
-        await service.WriteInputAsync(input);
+        await service.WriteInputAsync(input, cancellationToken);
     }
 
-    public async Task<ReadOnlyCollection<PortMapping>> GetOpenedPortsAsync(string serviceName)
+    public async Task<ReadOnlyCollection<PortMapping>> GetOpenedPortsAsync(string serviceName,
+        CancellationToken cancellationToken = default)
     {
         EnsureNotDisposed();
         await _startServicesTask;
         Service service = await GetServiceByName(serviceName);
-        return await service.GetOpenedPortsAsync();
+        return await service.GetOpenedPortsAsync(cancellationToken);
     }
 
     static void DeleteRepositoryDirectory(string path)
