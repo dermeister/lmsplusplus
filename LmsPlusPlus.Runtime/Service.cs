@@ -178,7 +178,8 @@ sealed class Service : IAsyncDisposable
             AttachStdin = _configuration.Stdin,
             OpenStdin = _configuration.Stdin,
             ExposedPorts = CreateExposedPorts(),
-            HostConfig = CreatHostConfig()
+            HostConfig = CreatHostConfig(),
+            NetworkingConfig = CreateNetworkingConfig()
         };
         CreateContainerResponse createContainerResponse = await _dockerClient.Containers.CreateContainerAsync(createContainerParameters);
         _containerId = createContainerResponse.ID;
@@ -243,6 +244,17 @@ sealed class Service : IAsyncDisposable
         var hostPort = ushort.Parse(portBinding.HostPort);
         var hostIpAddress = IPAddress.Parse(portBinding.HostIP);
         return new PortMapping(portType, containerPort, correspondingVirtualHostPort, hostPort, hostIpAddress);
+    }
+
+    NetworkingConfig CreateNetworkingConfig()
+    {
+        NetworkingConfig config = new();
+        if (_configuration.NetworkName is not null)
+            config.EndpointsConfig = new Dictionary<string, EndpointSettings>
+            {
+                [_configuration.NetworkName] = new() { Aliases = new[] { _configuration.Name } }
+            };
+        return config;
     }
 
     void EnsureNotDisposed()

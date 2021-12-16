@@ -1,4 +1,6 @@
 ﻿using System.Collections.ObjectModel;
+using Docker.DotNet;
+using Docker.DotNet.Models;
 using LibGit2Sharp;
 using LmsPlusPlus.Runtime.DockerCompose;
 using YamlDotNet.Serialization;
@@ -14,6 +16,9 @@ public sealed class Application : IAsyncDisposable
     readonly Task<Dictionary<string, ServiceConfiguration>> _createServiceConfigurations;
     readonly Task<Dictionary<ServiceConfiguration, Service>> _createServicesTask;
     readonly Task _startServicesTask;
+    readonly DockerClient _dockerClient = new DockerClientConfiguration().CreateClient();
+    readonly string _networkName = $"network-{Guid.NewGuid()}";
+    string? _networkId;
     bool _isDisposed;
 
     static Application()
@@ -42,6 +47,8 @@ public sealed class Application : IAsyncDisposable
             IEnumerable<ValueTask> disposeServiceTasks = services.Values.Select(s => s.DisposeAsync());
             foreach (ValueTask disposeServiceTask in disposeServiceTasks)
                 await disposeServiceTask;
+            await RemoveServiceNetwork();
+            _dockerClient.Dispose();
             DeleteRepositoryDirectory(_repositoryDirectory);
         }
     }
@@ -129,6 +136,7 @@ public sealed class Application : IAsyncDisposable
         string dockerComposeFileContent = await File.ReadAllTextAsync(dockerComposeFilePath);
         Compose compose = s_yamlDeserializer.Deserialize<Compose>(dockerComposeFileContent);
         ValidateCompose(compose);
+        await CreateServiceNetwork();
         return (from pair in compose.Services
                 let name = pair.Key
                 let contextPath = Path.GetFullPath(Path.Combine(configurationDirectoryPath, pair.Value.Build))
@@ -137,9 +145,23 @@ public sealed class Application : IAsyncDisposable
                 let serviceConfiguration = new ServiceConfiguration(name, contextPath)
                 {
                     Stdin = stdin,
-                    VirtualPortMappings = virtualPortMappings
+                    VirtualPortMappings = virtualPortMappings,
+                    NetworkName = _networkName
                 }
                 select serviceConfiguration).ToDictionary(x => x.Name, x => x);
+    }
+
+    async ValueTask CreateServiceNetwork()
+    {
+        NetworksCreateParameters networksCreateParameters = new() { Name = _networkName };
+        NetworksCreateResponse response = await _dockerClient.Networks.CreateNetworkAsync(networksCreateParameters);
+        _networkId = response.ID;
+    }
+
+    async ValueTask RemoveServiceNetwork()
+    {
+        if (_networkId is not null)
+            await _dockerClient.Networks.DeleteNetworkAsync(_networkId);
     }
 
     async Task<Dictionary<ServiceConfiguration, Service>> CreateServices()

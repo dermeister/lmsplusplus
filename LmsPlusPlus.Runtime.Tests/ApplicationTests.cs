@@ -100,6 +100,21 @@ public class ApplicationTests : IClassFixture<ApplicationFixture>
         Assert.Equal(expected: "hello world", output);
     }
 
+    [Fact]
+    public async Task AccessMultiServiceApplication()
+    {
+        // Arrange
+        ApplicationConfiguration applicationConfiguration = CreateApplicationConfiguration("MultiServiceApplication");
+        await using Application application = new(applicationConfiguration);
+
+        // Act
+        await application.WriteServiceInputAsync(serviceName: "backend", input: "hello world");
+        string? output = await application.ReadServiceOutputAsync("frontend");
+
+        // Assert
+        Assert.Equal(expected: "hello world", output);
+    }
+
     ApplicationConfiguration CreateApplicationConfiguration(string applicationName)
     {
         string repositoryUrl = _applicationFixture.GetApplicationRepositoryUrl(applicationName);
