@@ -2,7 +2,7 @@
 
 namespace LmsPlusPlus.Runtime;
 
-public class ServiceConfiguration
+public record ServiceConfiguration
 {
     public string Name { get; }
     public bool Stdin { get; internal init; }
@@ -18,7 +18,7 @@ public class ServiceConfiguration
     }
 }
 
-public class VirtualPortMapping
+public record VirtualPortMapping
 {
     public PortType PortType { get; }
     public ushort ContainerPort { get; }

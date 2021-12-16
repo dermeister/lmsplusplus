@@ -1,13 +1,7 @@
 ﻿namespace LmsPlusPlus.Runtime;
 
-public class ApplicationConfiguration
+public record ApplicationConfiguration(string RepositoryUrl, string WorkingDirectory)
 {
-    internal string RepositoryUrl { get; }
-    internal string WorkingDirectory { get; }
-
-    public ApplicationConfiguration(string repositoryUrl, string workingDirectory)
-    {
-        RepositoryUrl = repositoryUrl;
-        WorkingDirectory = workingDirectory;
-    }
+    internal string RepositoryUrl { get; } = RepositoryUrl;
+    internal string WorkingDirectory { get; } = WorkingDirectory;
 }
