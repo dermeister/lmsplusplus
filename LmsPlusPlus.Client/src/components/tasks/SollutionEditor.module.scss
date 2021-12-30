@@ -1,16 +1,13 @@
 @use "../library";
 
-.solution-editor {
+.main-panel-content {
   @include library.full-size;
-
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-areas: "side-panel content";
-}
-
-.side-panel {
-  grid-area: side-panel;
-  z-index: 100;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  font-size: 32px;
 }
 
 .form {
@@ -20,20 +17,6 @@
 
 .solution-name {
   margin-bottom: 10px;
-}
-
-.content {
-  grid-area: content;
-  z-index: 99;
-
-  @include library.full-size;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  font-size: 32px;
 }
 
 .input {

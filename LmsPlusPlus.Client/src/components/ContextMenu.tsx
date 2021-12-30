@@ -7,71 +7,72 @@ import styles from "./ContextMenu.module.scss"
 import { Overlay } from "./Overlay"
 
 interface ContextMenuProps {
-  model: models.ContextMenu
-  children: React.ReactNode
+    model: models.ContextMenu
+    children: React.ReactNode
 }
 
 export function ContextMenu({ model, children }: ContextMenuProps): JSX.Element {
-  function positionMenu(menu: HTMLElement | null): void {
-    if (menu) {
-      const offset = 10
-      if (model.x + menu.clientWidth + offset > window.innerWidth)
-        menu.style.right = `${offset}px`
-      else
-        menu.style.left = `${model.x}px`
-      if (model.y + menu.clientHeight + offset > window.innerHeight)
-        menu.style.bottom = `${offset}px`
-      else
-        menu.style.top = `${model.y}px`
+    function positionMenu(menu: HTMLElement | null): void {
+        if (menu) {
+            const offset = 10
+            if (model.x + menu.clientWidth + offset > window.innerWidth)
+                menu.style.right = `${offset}px`
+            else
+                menu.style.left = `${model.x}px`
+            if (model.y + menu.clientHeight + offset > window.innerHeight)
+                menu.style.bottom = `${offset}px`
+            else
+                menu.style.top = `${model.y}px`
+        }
     }
-  }
 
-  return autorender(() => {
-    if (!model.isOpened)
-      return <></>
-    else
-      return ReactDOM.createPortal(
-        <Overlay onClick={() => model.close()} trapFocus>
-          <menu ref={positionMenu} onContextMenu={onContextMenu} className={styles.contextMenu}>
-            {children}
-          </menu>
-        </Overlay>,
-        document.getElementById("context-menu") as Element
-      )
-  }, [model, children])
+    return autorender(() => {
+        if (!model.isOpened)
+            return <></>
+        else
+            return ReactDOM.createPortal(
+                <Overlay onClick={() => model.close()} trapFocus>
+                    <menu ref={positionMenu} onContextMenu={onContextMenu} className={styles.contextMenu}>
+                        {children}
+                    </menu>
+                </Overlay>,
+                document.getElementById("context-menu") as Element
+            )
+    }, [model, children])
 }
 
 function onContextMenu(e: React.MouseEvent): void {
-  e.preventDefault()
-  e.stopPropagation()
+    e.preventDefault()
+    e.stopPropagation()
 }
 
 interface ContextMenuButtonProps {
-  variant: "primary" | "danger"
-  children?: React.ReactNode
-  onClick?(): void
+    variant: "primary" | "danger"
+    children?: React.ReactNode
+
+    onClick?(): void
 }
 
 ContextMenu.Button = function ContextMenuButton(props: ContextMenuButtonProps): JSX.Element {
-  return (
-    <Button
-      variant={convertButtonVariant(props.variant)}
-      onClick={props.onClick}
-      tabIndex={-1}
-      className={variants[props.variant]}
-    >
-      {props.children}
-    </Button>
-  )
+    return (
+        <Button
+            variant={convertButtonVariant(props.variant)}
+            onClick={props.onClick}
+            tabIndex={-1}
+            className={variants[props.variant]}
+        >
+            {props.children}
+        </Button>
+    )
 }
 
 function convertButtonVariant(variant: "primary" | "danger"): "secondary" | "danger" {
-  if (variant === "primary")
-    return "secondary"
-  return variant
+    if (variant === "primary")
+        return "secondary"
+    return variant
 }
 
 const variants = {
-  primary: styles.primary,
-  danger: styles.danger,
+    primary: styles.primary,
+    danger: styles.danger
 }

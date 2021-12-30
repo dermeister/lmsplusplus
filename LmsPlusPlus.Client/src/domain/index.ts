@@ -1,6 +1,5 @@
 export * from "./Task"
 export * from "./Solution"
-export * from "./Demo"
 export * from "./User"
 export * from "./Course"
 export * from "./VcsConfiguration"

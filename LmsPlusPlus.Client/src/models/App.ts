@@ -1,77 +1,22 @@
-import { reaction, Transaction, unobservable } from "reactronic"
-import { Database, ReadOnlyDatabase } from "../database"
+import { Transaction, unobservable } from "reactronic"
+import { Database } from "../database"
 import { ObservableObject } from "../ObservableObject"
-import { Options, OptionsView } from "./options"
-import { TasksView } from "./tasks"
-import { ViewGroup } from "./ViewGroup"
+import { WindowManager } from "./WindowManager"
+import { Screen } from "./Screen"
+import { MainScreen } from "./MainScreen"
 
 export class App extends ObservableObject {
-  @unobservable readonly viewGroup: ViewGroup
-  @unobservable readonly tasksView: TasksView
-  @unobservable readonly optionsView: OptionsView
-  @unobservable readonly options: Options
-  @unobservable private readonly _database = new Database()
+  @unobservable readonly windowManager = new WindowManager()
+  @unobservable private readonly database = new Database()
+  private readonly _screen: Screen = new MainScreen(this.database)
 
-  constructor() {
-    super()
-    this.tasksView = new TasksView(this._database, "Tasks")
-    this.options = new Options(this._database)
-    this.optionsView = new OptionsView(this.options, "Options", this._database)
-    this.viewGroup = new ViewGroup([this.tasksView, this.optionsView], this.tasksView)
-  }
-
-  get database(): ReadOnlyDatabase { return this._database }
+  get screen(): Screen { return this._screen }
 
   override dispose(): void {
     Transaction.run(() => {
-      this.viewGroup.dispose()
-      this.tasksView.dispose()
-      this.optionsView.dispose()
-      this.options.dispose()
-      this._database.dispose()
+      this._screen.dispose()
+      this.database.dispose()
       super.dispose()
     })
-  }
-
-  @reaction
-  private async createdTask_created_in_database(): Promise<void> {
-    if (this.tasksView.createdTask)
-      await this._database.createTask(this.tasksView.createdTask)
-  }
-
-  @reaction
-  private async updatedTask_updated_in_database(): Promise<void> {
-    if (this.tasksView.updatedTask)
-      await this._database.updateTask(this.tasksView.updatedTask)
-  }
-
-  @reaction
-  private async deletedTask_deleted_from_database(): Promise<void> {
-    if (this.tasksView.deletedTask)
-      await this._database.deleteTask(this.tasksView.deletedTask)
-  }
-
-  @reaction
-  private async updatedPreferences_updated_in_database(): Promise<void> {
-    if (this.options.updatedPreferences)
-      await this._database.updatePreferences(this.options.updatedPreferences)
-  }
-
-  @reaction
-  private async updatedVcsConfiguration_updated_in_database(): Promise<void> {
-    if (this.options.updatedVcsConfiguration)
-      await this._database.updateVcsConfiguration(this.options.updatedVcsConfiguration)
-  }
-
-  @reaction
-  private async createdSolution_created_in_database(): Promise<void> {
-    if (this.tasksView.createdSolution)
-      await this._database.createSolution(this.tasksView.createdSolution)
-  }
-
-  @reaction
-  private async deletedSolution_deleted_from_database(): Promise<void> {
-    if (this.tasksView.deletedSolution)
-      await this._database.deleteSolution(this.tasksView.deletedSolution)
   }
 }

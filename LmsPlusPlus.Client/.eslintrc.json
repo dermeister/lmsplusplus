@@ -7,7 +7,7 @@
     "eol-last": ["error", "always"],
     "arrow-parens": ["error", "as-needed"],
     "no-multiple-empty-lines": ["error", { "max": 1 }],
-    "max-len": ["error", { "code": 110 }],
+    "max-len": ["error", { "code": 130 }],
     "@typescript-eslint/semi": ["error", "never"],
     "@typescript-eslint/quotes": ["error", "double"],
     "@typescript-eslint/no-explicit-any": "error",

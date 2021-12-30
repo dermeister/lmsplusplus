@@ -1,39 +1,7 @@
 @use "../library";
 
-.tasks-view {
-  @include library.full-size;
-
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-areas: "subview-switch content";
-}
-
-.subview-switch {
-  grid-area: subview-switch;
-  z-index: 101;
-}
-
-.content {
-  grid-area: content;
-}
-
-.tasks-content {
-  @include library.full-size;
-
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-areas: "side-panel description";
-}
-
-.side-panel {
-  grid-area: side-panel;
-  z-index: 100;
-}
-
 .description {
-  grid-area: description;
   padding: 14px;
-  z-index: 99;
 
   user-select: text;
 
@@ -55,9 +23,6 @@
 
 .no-task {
   @include library.full-size;
-
-  grid-area: description;
-  z-index: 99;
 
   display: flex;
   flex-direction: column;

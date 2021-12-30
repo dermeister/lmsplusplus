@@ -1,27 +1,14 @@
 @use "../library";
 
-.options {
+.side-panel-content {
   @include library.full-size;
-
-  display: grid;
-  grid-template-columns: auto auto 1fr;
-  grid-template-areas: "subview-switch side-panel content";
+ 
+  display: flex;
+  flex-direction: column;
 }
 
-.subview-switch {
-  grid-area: subview-switch;
-  z-index: 101;
-}
-
-.side-panel {
-  grid-area: side-panel;
-  z-index: 100;
-}
-
-.content {
-  grid-area: content;
+.main-panel-content {
   padding: 14px 20% 0;
-  z-index: 99;
 }
 
 .sign-out {

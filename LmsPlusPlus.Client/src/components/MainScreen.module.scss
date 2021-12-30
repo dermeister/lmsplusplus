@@ -4,8 +4,8 @@
   @include library.full-size;
 
   display: grid;
-  grid-template-areas: "switch content";
-  grid-template-columns: 74px 1fr;
+  grid-template-areas: "switch side-panel content";
+  grid-template-columns: 74px auto 1fr;
 }
 
 .view-switch {
@@ -43,9 +43,14 @@
   @include view-button-image(var(--options-icon-url));
 }
 
+.view-side-panel {
+  grid-area: side-panel;
+  z-index: 99;
+}
+
 .view-content {
   grid-area: content;
-  z-index: 99;
+  z-index: 98;
 
   & > div {
     @include library.full-size;

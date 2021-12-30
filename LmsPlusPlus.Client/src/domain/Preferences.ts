@@ -1,8 +1,8 @@
 export class Preferences {
-  static readonly default = Preferences.createDefaultPreferences()
-  readonly darkMode: boolean
+    static readonly default = Preferences.createDefaultPreferences()
+    readonly darkMode: boolean
 
-  constructor(darkMode: boolean) { this.darkMode = darkMode }
+    constructor(darkMode: boolean) { this.darkMode = darkMode }
 
-  private static createDefaultPreferences(): Preferences { return new Preferences(false) }
+    private static createDefaultPreferences(): Preferences { return new Preferences(false) }
 }

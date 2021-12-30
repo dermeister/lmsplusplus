@@ -4,7 +4,7 @@ import { autorender } from "../autorender"
 import { Explorer } from "../explorer"
 
 interface OptionCategoriesProps {
-  model: models.OptionCategories
+  model: models.OptionCategoriesExplorer
 }
 
 export function OptionCategories({ model }: OptionCategoriesProps): JSX.Element {

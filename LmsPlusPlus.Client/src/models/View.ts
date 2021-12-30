@@ -1,13 +1,14 @@
-import { unobservable } from "reactronic"
+import { Monitor, unobservable } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
 
-export class View extends ObservableObject {
-  @unobservable readonly title: string
-  @unobservable readonly key: string
+export abstract class View extends ObservableObject {
+    @unobservable readonly id: string
 
-  constructor(title: string, key: string) {
-    super()
-    this.title = title
-    this.key = key
-  }
+    abstract get sidePanelTitle(): string
+    abstract get monitor(): Monitor | null
+
+    protected constructor(id: string) {
+        super()
+        this.id = id
+    }
 }

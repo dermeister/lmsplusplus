@@ -7,18 +7,18 @@ import { Group } from "./Group"
 import { Item } from "./Item"
 
 interface ExplorerProps<T> {
-  model: models.Explorer<T>
-  children?: React.ReactNode
+    model: models.Explorer<T>
+    children?: React.ReactNode
 }
 
 export function Explorer<T>({ model, children }: ExplorerProps<T>): JSX.Element {
-  return (
-    <ExplorerModel value={model}>
-      <Offset value={Number(styles.offsetBase)}>
-        <ul className={styles.list}>{children}</ul>
-      </Offset>
-    </ExplorerModel>
-  )
+    return (
+        <ExplorerModel value={model}>
+            <Offset value={Number(styles.offsetBase)}>
+                <ul className={styles.list}>{children}</ul>
+            </Offset>
+        </ExplorerModel>
+    )
 }
 
 Explorer.Group = Group

@@ -1,2 +1,5 @@
 export * from "./TasksExplorer"
 export * from "./TasksView"
+export * from "./SolutionEditor"
+export * from "./DemoViewer"
+export * from "./TaskEditor"

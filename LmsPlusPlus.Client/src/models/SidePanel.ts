@@ -1,29 +1,40 @@
-import { transaction, unobservable } from "reactronic"
+import { Ref, Rx, Transaction, transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
 
 export class SidePanel extends ObservableObject {
-  @unobservable readonly title: string
-  private _isOpened = true
+    @unobservable private readonly _title: Ref<string>
+    private _isOpened = true
+    private readonly _isPulsing: Ref<boolean>
 
-  get isOpened(): boolean { return this._isOpened }
+    get title(): string { return this._title.observe() }
+    get isOpened(): boolean { return this._isOpened }
+    get isPulsing(): boolean { return this._isPulsing.observe() }
+    
+    constructor(title: Ref<string>, isPulsing: Ref<boolean>) {
+        super()
+        this._title = title
+        this._isPulsing = isPulsing
+    }
 
-  constructor(title: string) {
-    super()
-    this.title = title
-  }
+    override dispose(): void {
+        Transaction.run(() => {
+            Rx.dispose(this._title)
+            super.dispose()
+        })
+    }
 
-  @transaction
-  close(): void {
-    this._isOpened = false
-  }
+    @transaction
+    close(): void {
+        this._isOpened = false
+    }
 
-  @transaction
-  open(): void {
-    this._isOpened = true
-  }
+    @transaction
+    open(): void {
+        this._isOpened = true
+    }
 
-  @transaction
-  toggle(): void {
-    this._isOpened = !this._isOpened
-  }
+    @transaction
+    toggle(): void {
+        this._isOpened = !this._isOpened
+    }
 }
