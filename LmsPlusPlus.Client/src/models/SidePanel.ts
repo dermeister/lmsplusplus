@@ -3,8 +3,8 @@ import { ObservableObject } from "../ObservableObject"
 
 export class SidePanel extends ObservableObject {
     @unobservable private readonly _title: Ref<string>
+    @unobservable private readonly _isPulsing: Ref<boolean>
     private _isOpened = true
-    private readonly _isPulsing: Ref<boolean>
 
     get title(): string { return this._title.observe() }
     get isOpened(): boolean { return this._isOpened }
@@ -19,6 +19,7 @@ export class SidePanel extends ObservableObject {
     override dispose(): void {
         Transaction.run(() => {
             Rx.dispose(this._title)
+            Rx.dispose(this._isPulsing)
             super.dispose()
         })
     }

@@ -40,7 +40,7 @@ export class MainScreen extends Screen {
     override dispose(): void {
         Transaction.run(() => {
             this.views.forEach(v => v.dispose())
-            this.views.clear()
+            this.views.toMutable().clear()
             this.options.dispose()
             this.sidePanel.dispose()
             super.dispose()

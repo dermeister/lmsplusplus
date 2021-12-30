@@ -44,6 +44,6 @@ export function SolutionEditorMainPanelContent(_: SolutionEditorProps): JSX.Elem
 
 function getSolutionEditor(model: models.TasksView): models.SolutionEditor {
     if (!model.solutionEditor)
-        throw new Error()
+        throw new Error("solution editor is not created")
     return model.solutionEditor
 }

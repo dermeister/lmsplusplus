@@ -26,12 +26,12 @@ export class TasksView extends View {
             return "View demonstrations"
         return "Tasks"
     }
+    override get monitor(): Monitor { return TasksView.monitor }
     get taskEditor(): TaskEditor | null { return this._taskEditor }
     get solutionEditor(): SolutionEditor | null { return this._solutionEditor }
     get demoViewer(): DemoViewer | null { return this._demoViewer }
-    get monitor(): Monitor { return TasksView.monitor }
     @cached get taskDescriptionHtml(): string | null {
-        const description = this.tasksExplorer.selectedTask?.description
+        const description = this.tasksExplorer.selectedNode?.item.description
         if (!description)
             return null
         return TasksView.markdown.render(description)

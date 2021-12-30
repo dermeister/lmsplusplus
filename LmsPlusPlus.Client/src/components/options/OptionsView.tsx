@@ -25,7 +25,7 @@ export function OptionsViewSidePanelContent({ model }: OptionsViewProps): JSX.El
 export function OptionsViewMainPanelContent({ model }: OptionsViewProps): JSX.Element {
     return autorender(() => {
         let body: JSX.Element = <></>
-        switch (model.optionCategoriesExplorer.selectedCategory) {
+        switch (model.optionCategoriesExplorer.selectedNode?.item) {
             case models.OptionCategory.Vsc:
                 body = <Vcs model={model.options} />
                 break

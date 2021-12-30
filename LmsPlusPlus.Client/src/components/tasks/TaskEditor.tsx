@@ -53,6 +53,6 @@ export function TaskEditorMainPanelContent({ model }: TaskEditorProps): JSX.Elem
 function getTaskEditor(model: models.TasksView): models.TaskEditor {
     const { taskEditor } = model
     if (!taskEditor)
-        throw new Error()
+        throw new Error("task editor is not created")
     return taskEditor
 }
