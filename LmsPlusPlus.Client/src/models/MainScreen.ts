@@ -24,7 +24,7 @@ export class MainScreen extends Screen {
     }
     get permissions(): domain.Permissions { return this.database.permissions }
     private get openedViewSidePanelTitle(): string { return this.openedView.sidePanelTitle }
-    private get openedViewMonitorActive(): boolean { return this.openedView.monitor?.isActive ?? false }
+    private get openedViewIsPerformingOperation(): boolean { return this.openedView.isPerformingOperation }
 
     constructor(database: Database) {
         super()
@@ -34,7 +34,9 @@ export class MainScreen extends Screen {
         const optionsView = new OptionsView(MainScreen.OPTIONS_VIEW_ID, this.options, new Ref(this.database, "permissions"))
         this.views = MainScreen.createViewMap([tasksView, optionsView])
         this.openedViewId = tasksView.id
-        this.sidePanel = new SidePanel(new Ref(this, "openedViewSidePanelTitle"), new Ref(this, "openedViewMonitorActive"))
+        const title = new Ref(this, "openedViewSidePanelTitle")
+        const isPulsing = new Ref(this, "openedViewIsPerformingOperation")
+        this.sidePanel = new SidePanel(title, isPulsing)
     }
 
     override dispose(): void {

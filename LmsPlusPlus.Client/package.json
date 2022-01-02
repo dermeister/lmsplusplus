@@ -9,13 +9,13 @@
     "lint": "eslint src --ext .ts,.tsx"
   },
   "dependencies": {
+    "@microsoft/signalr": "^6.0.1",
     "markdown-it": "^12.2.0",
     "monaco-editor": "^0.26.1",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "reactronic": "^0.21.602",
     "xterm": "^4.13.0",
-    "xterm-addon-attach": "^0.6.0",
     "xterm-addon-fit": "^0.5.0"
   },
   "devDependencies": {

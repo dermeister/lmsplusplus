@@ -1,9 +1,10 @@
 import { ITheme, Terminal } from "xterm"
 import { FitAddon } from "xterm-addon-fit"
 import { Renderer } from "./Renderer"
+import { Disposable } from "../Disposable"
 
-export class ConsoleRenderer implements Renderer {
-    private readonly terminal = new Terminal({ theme: ConsoleRenderer.terminalTheme })
+export class ConsoleRenderer implements Renderer, Disposable {
+    private readonly terminal: Terminal
     private readonly fitAddon = new FitAddon()
     private readonly terminalContainer = document.createElement("div")
     private readonly resizeObserver = new ResizeObserver(() => this.resizeTerminalContainer())
@@ -17,9 +18,9 @@ export class ConsoleRenderer implements Renderer {
         }
     }
 
-    constructor(serviceName: string) {
+    constructor() {
+        this.terminal = new Terminal({ theme: ConsoleRenderer.terminalTheme })
         this.terminal.loadAddon(this.fitAddon)
-        this.terminal.write(serviceName)
         this.styleTerminalContainer()
     }
 
@@ -37,6 +38,10 @@ export class ConsoleRenderer implements Renderer {
         this.mountContainer?.removeChild(this.terminalContainer)
         this.mountContainer = null
         this.resizeObserver.unobserve(this.terminalContainer)
+    }
+
+    write(text: string): void {
+        this.terminal.write(text)
     }
 
     dispose(): void {

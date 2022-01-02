@@ -5,6 +5,7 @@ import { TaskEditorMainPanelContent, TaskEditorSidePanelContent } from "./TaskEd
 import { TasksExplorer } from "./TasksExplorer"
 import styles from "./TasksView.module.scss"
 import { SolutionEditorMainPanelContent, SolutionEditorSidePanelContent } from "./SolutionEditor"
+import { SolutionRunnerMainPanelContent, SolutionRunnerSidePanelContent } from "./SolutionRunner"
 
 interface TasksViewProps {
     model: models.TasksView
@@ -16,8 +17,8 @@ export function TasksViewSidePanelContent({ model }: TasksViewProps): JSX.Elemen
             return <TaskEditorSidePanelContent model={model} />
         if (model.solutionEditor)
             return <SolutionEditorSidePanelContent model={model} />
-        if (model.demoViewer)
-            return <div>demo viewer</div>
+        if (model.solutionRunner)
+            return <SolutionRunnerSidePanelContent model={model} />
         return <TasksExplorer model={model} />
     }, [model])
 }
@@ -28,8 +29,8 @@ export function TasksViewMainPanelContent({ model }: TasksViewProps): JSX.Elemen
             return <TaskEditorMainPanelContent model={model} />
         if (model.solutionEditor)
             return <SolutionEditorMainPanelContent model={model} />
-        if (model.demoViewer)
-            return <div>demo viewer</div>
+        if (model.solutionRunner)
+            return <SolutionRunnerMainPanelContent model={model} />
         return taskDescription(model)
     }, [model])
 }

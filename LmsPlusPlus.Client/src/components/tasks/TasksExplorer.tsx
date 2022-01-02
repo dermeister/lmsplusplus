@@ -18,9 +18,9 @@ export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
     ), [model, permissions])
 }
 
-function onOpenDemos(model: models.TasksView, task: models.ItemNode<domain.Task>): void {
+function onRunSolution(model: models.TasksView, task: models.ItemNode<domain.Task>): void {
     task.contextMenu?.close()
-    model.viewDemos(task.item)
+    model.runSolution(task.item.solutions[0])
 }
 
 function onCreateTask(model: models.TasksView, course: models.CourseNode): void {
@@ -99,12 +99,12 @@ function tasks(model: models.TasksView,
                     </ContextMenu.Button>
                 </>
             )
-        if (task.item.solutions.length > 0) {
+        if (task.item.solutions.length === 1) {
             contextMenuBody = (
                 <>
                     {contextMenuBody}
-                    <ContextMenu.Button variant="primary" onClick={() => onOpenDemos(model, task)}>
-                        Open Demo
+                    <ContextMenu.Button variant="primary" onClick={() => onRunSolution(model, task)}>
+                        Run solution
                     </ContextMenu.Button>
                 </>
             )

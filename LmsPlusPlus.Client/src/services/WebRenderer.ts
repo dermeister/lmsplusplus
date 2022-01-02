@@ -4,7 +4,7 @@ export class WebRenderer implements Renderer {
     private readonly iframe = document.createElement("iframe")
     private mountElement: HTMLElement | null = null
 
-    constructor() {
+    constructor(port: number) {
         this.iframe.src = "index.html"
         this.iframe.style.width = "100%"
         this.iframe.style.height = "100%"

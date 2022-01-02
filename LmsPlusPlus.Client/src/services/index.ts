@@ -1,2 +1,3 @@
 export * from "./Auth"
-export * from "./DemoService"
+export * from "./Service"
+export * from "./Application"

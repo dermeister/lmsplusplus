@@ -4,7 +4,7 @@ import { Database } from "../../database"
 import * as domain from "../../domain"
 import { TaskEditor } from "./TaskEditor"
 import { SolutionEditor } from "./SolutionEditor"
-import { DemoViewer } from "./DemoViewer"
+import { SolutionRunner } from "./SolutionRunner"
 import { TasksExplorer } from "../tasks"
 import MarkdownIt from "markdown-it"
 
@@ -15,21 +15,23 @@ export class TasksView extends View {
     @unobservable private readonly database: Database
     private _taskEditor: TaskEditor | null = null
     private _solutionEditor: SolutionEditor | null = null
-    private _demoViewer: DemoViewer | null = null
+    private _solutionRunner: SolutionRunner | null = null
 
     override get sidePanelTitle(): string {
         if (this._taskEditor)
             return "Edit task"
         if (this._solutionEditor)
             return "Edit solution"
-        if (this._demoViewer)
-            return "View demonstrations"
+        if (this._solutionRunner)
+            return "Run solution"
         return "Tasks"
     }
-    override get monitor(): Monitor { return TasksView.monitor }
+    override get isPerformingOperation(): boolean {
+        return TasksView.monitor.isActive || (this._solutionRunner?.isLoadingApplication ?? false)
+    }
     get taskEditor(): TaskEditor | null { return this._taskEditor }
     get solutionEditor(): SolutionEditor | null { return this._solutionEditor }
-    get demoViewer(): DemoViewer | null { return this._demoViewer }
+    get solutionRunner(): SolutionRunner | null { return this._solutionRunner }
     @cached get taskDescriptionHtml(): string | null {
         const description = this.tasksExplorer.selectedNode?.item.description
         if (!description)
@@ -45,7 +47,7 @@ export class TasksView extends View {
 
     override dispose(): void {
         Transaction.run(() => {
-            this._demoViewer?.dispose()
+            this._solutionRunner?.dispose()
             this._solutionEditor?.dispose()
             this._taskEditor?.dispose()
             this.tasksExplorer.dispose()
@@ -55,13 +57,13 @@ export class TasksView extends View {
 
     @transaction
     updateTask(task: domain.Task): void {
-        this.validateState()
+        this.ensureCanPerformOperation()
         this._taskEditor = new TaskEditor(task)
     }
 
     @transaction
     createTask(course: domain.Course): void {
-        this.validateState()
+        this.ensureCanPerformOperation()
         const task = new domain.Task(domain.Task.NO_ID, course, "", "")
         task.solutions = []
         this._taskEditor = new TaskEditor(task)
@@ -69,7 +71,7 @@ export class TasksView extends View {
 
     @transaction @options({ monitor: TasksView.monitor })
     async deleteTask(task: domain.Task): Promise<void> {
-        this.validateState()
+        this.ensureCanPerformOperation()
         await this.database.deleteTask(task)
     }
 
@@ -94,7 +96,7 @@ export class TasksView extends View {
 
     @transaction
     createSolution(task: domain.Task): void {
-        this.validateState()
+        this.ensureCanPerformOperation()
         const solution = new domain.Solution(domain.Solution.NO_ID, task, "")
         this._solutionEditor = new SolutionEditor(solution)
     }
@@ -122,23 +124,23 @@ export class TasksView extends View {
     }
 
     @transaction
-    viewDemos(task: domain.Task): void {
-        this.validateState()
-        this._demoViewer = new DemoViewer(task)
+    runSolution(solution: domain.Solution): void {
+        this.ensureCanPerformOperation()
+        this._solutionRunner = new SolutionRunner(solution)
     }
 
     @transaction
-    closeDemoViewer(): void {
-        this._demoViewer?.dispose()
-        this._demoViewer = null
+    stopSolution(): void {
+        this._solutionRunner?.dispose()
+        this._solutionRunner = null
     }
 
-    private validateState(): void {
+    private ensureCanPerformOperation(): void {
         if (this._taskEditor)
-            throw new Error("task being edited")
+            throw new Error("Task being edited")
         if (this._solutionEditor)
-            throw new Error("solution being viewed")
-        if (this._demoViewer)
-            throw new Error("demo being viewed")
+            throw new Error("Solution being viewed")
+        if (this._solutionRunner)
+            throw new Error("Demo being viewed")
     }
 }

@@ -4,7 +4,7 @@ import { autorender } from "../autorender"
 import { Button } from "../Button"
 import { Field } from "../Field"
 import { Input } from "../Input"
-import styles from "./SollutionEditor.module.scss"
+import styles from "./SolutionEditor.module.scss"
 
 interface SolutionEditorProps {
     model: models.TasksView
@@ -44,6 +44,6 @@ export function SolutionEditorMainPanelContent(_: SolutionEditorProps): JSX.Elem
 
 function getSolutionEditor(model: models.TasksView): models.SolutionEditor {
     if (!model.solutionEditor)
-        throw new Error("solution editor is not created")
+        throw new Error("Solution editor is not created")
     return model.solutionEditor
 }
