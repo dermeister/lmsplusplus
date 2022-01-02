@@ -2,7 +2,7 @@ import React from "react"
 import * as models from "../../models"
 import { autorender } from "../autorender"
 import { Button } from "../Button"
-import { OptionCategories } from "./OptionCategories"
+import { OptionCategoriesExplorer } from "./OptionCategoriesExplorer"
 import styles from "./OptionsView.module.scss"
 import { Preferences } from "./Preferences"
 import { Vcs } from "./Vcs"
@@ -14,7 +14,7 @@ interface OptionsViewProps {
 export function OptionsViewSidePanelContent({ model }: OptionsViewProps): JSX.Element {
     return autorender(() => (
         <div className={styles.sidePanelContent}>
-            <OptionCategories model={model.optionCategoriesExplorer} />
+            <OptionCategoriesExplorer model={model.optionCategoriesExplorer} />
             <Button variant="danger" className={styles.signOut}>
                 Sign out
             </Button>

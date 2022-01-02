@@ -7,7 +7,7 @@ interface OptionCategoriesProps {
   model: models.OptionCategoriesExplorer
 }
 
-export function OptionCategories({ model }: OptionCategoriesProps): JSX.Element {
+export function OptionCategoriesExplorer({ model }: OptionCategoriesProps): JSX.Element {
   return autorender(() => (
     <Explorer model={model}>
       {model.children.map(c => <Explorer.Item key={c.key} item={c}>{c.title}</Explorer.Item>)}

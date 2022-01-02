@@ -1,4 +1,4 @@
-import { Ref, Transaction, unobservable } from "reactronic"
+import { reaction, Ref, Transaction, unobservable } from "reactronic"
 import * as domain from "../../domain"
 import { Explorer, GroupNode, ItemNode } from "../explorer"
 
@@ -23,11 +23,17 @@ export class TasksExplorer extends Explorer<domain.Task, CourseNode> {
     @unobservable private readonly courses: Ref<readonly domain.Course[]>
 
     constructor(courses: Ref<readonly domain.Course[]>) {
-        super()
+        super(TasksExplorer.createChildren(courses.value))
         this.courses = courses
     }
-    
-    protected createChildren(): CourseNode[] {
-        return this.courses.observe().map(c => new CourseNode(c))
+
+    private static createChildren(courses: readonly domain.Course[]): CourseNode[] {
+        return courses.map(c => new CourseNode(c))
+    }
+
+    @reaction
+    private updateExplorer(): void {
+        const newChildren = TasksExplorer.createChildren(this.courses.observe())
+        this.updateChildren(newChildren)
     }
 }

@@ -8,12 +8,12 @@ export class OptionsView extends View {
     @unobservable readonly options: Options
     
     override get sidePanelTitle(): string { return "Options" }
-    get monitor(): Monitor | null { return null }
 
     constructor(id: string, options: Options, permissions: Ref<domain.Permissions>) {
         super(id)
         this.options = options
         this.optionCategoriesExplorer = new OptionCategoriesExplorer(permissions)
+        this.optionCategoriesExplorer.setSelectedNode(this.optionCategoriesExplorer.children[0])
     }
 
     override dispose(): void {

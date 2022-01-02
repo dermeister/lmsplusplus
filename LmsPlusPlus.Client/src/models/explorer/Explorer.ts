@@ -13,6 +13,11 @@ export abstract class Explorer<TItem, TChild extends Node = Node> extends NodeVi
     get children(): readonly TChild[] { return this._children }
     get selectedNode(): ItemNode<TItem> | null { return this._selectedNode }
 
+    protected constructor(children: TChild[]) {
+        super()
+        this._children = this.reconcileChildren(children)
+    }
+
     @transaction
     setSelectedNode(node: ItemNode<TItem> | null): void {
         this._selectedNode = node
@@ -60,11 +65,7 @@ export abstract class Explorer<TItem, TChild extends Node = Node> extends NodeVi
         })
     }
 
-    protected abstract createChildren(): readonly TChild[]
-
-    @reaction
-    private updateChildren(): void {
-        const newChildren = this.createChildren()
+    protected updateChildren(newChildren: TChild[]): void {
         this._children = this.reconcileChildren(newChildren)
     }
 
