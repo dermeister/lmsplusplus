@@ -1,9 +1,8 @@
 import { ITheme, Terminal } from "xterm"
 import { FitAddon } from "xterm-addon-fit"
 import { Renderer } from "./Renderer"
-import { Disposable } from "../Disposable"
 
-export class ConsoleRenderer implements Renderer, Disposable {
+export class ConsoleRenderer implements Renderer {
     private readonly terminal: Terminal
     private readonly fitAddon = new FitAddon()
     private readonly terminalContainer = document.createElement("div")

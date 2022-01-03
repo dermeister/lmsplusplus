@@ -1,4 +1,4 @@
-import { Disposable } from "../Disposable"
+import { Disposable } from "../../../Disposable"
 
 export interface Renderer extends Disposable {
     show(element: HTMLElement): void;
