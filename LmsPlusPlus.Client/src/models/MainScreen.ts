@@ -12,28 +12,28 @@ export class MainScreen extends Screen {
     static readonly TASKS_VIEW_ID = "tasks"
     static readonly OPTIONS_VIEW_ID = "options"
     @unobservable readonly sidePanel: SidePanel
-    @unobservable private readonly options: Options
-    @unobservable private readonly views: Map<string, View>
-    @unobservable private readonly database: Database
-    private openedViewId: string
+    @unobservable private readonly _options: Options
+    @unobservable private readonly _views: Map<string, View>
+    @unobservable private readonly _database: Database
+    private _openedViewId: string
 
     get openedView(): View {
-        if (!this.views.has(this.openedViewId))
+        if (!this._views.has(this._openedViewId))
             throw this.invalidViewIdError()
-        return this.views.get(this.openedViewId) as View
+        return this._views.get(this._openedViewId) as View
     }
-    get permissions(): domain.Permissions { return this.database.permissions }
+    get permissions(): domain.Permissions { return this._database.permissions }
     private get openedViewSidePanelTitle(): string { return this.openedView.sidePanelTitle }
     private get openedViewIsPerformingOperation(): boolean { return this.openedView.isPerformingOperation }
 
     constructor(database: Database) {
         super()
-        this.database = database
-        this.options = new Options(this.database)
-        const tasksView = new TasksView(MainScreen.TASKS_VIEW_ID, this.database)
-        const optionsView = new OptionsView(MainScreen.OPTIONS_VIEW_ID, this.options, new Ref(this.database, "permissions"))
-        this.views = MainScreen.createViewMap([tasksView, optionsView])
-        this.openedViewId = tasksView.id
+        this._database = database
+        this._options = new Options(this._database)
+        const tasksView = new TasksView(MainScreen.TASKS_VIEW_ID, this._database)
+        const optionsView = new OptionsView(MainScreen.OPTIONS_VIEW_ID, this._options, new Ref(this._database, "permissions"))
+        this._views = MainScreen.createViewMap([tasksView, optionsView])
+        this._openedViewId = tasksView.id
         const title = new Ref(this, "openedViewSidePanelTitle")
         const isPulsing = new Ref(this, "openedViewIsPerformingOperation")
         this.sidePanel = new SidePanel(title, isPulsing)
@@ -41,9 +41,9 @@ export class MainScreen extends Screen {
 
     override dispose(): void {
         Transaction.run(() => {
-            this.views.forEach(v => v.dispose())
-            this.views.toMutable().clear()
-            this.options.dispose()
+            this._views.forEach(v => v.dispose())
+            this._views.toMutable().clear()
+            this._options.dispose()
             this.sidePanel.dispose()
             super.dispose()
         })
@@ -51,10 +51,10 @@ export class MainScreen extends Screen {
 
     @transaction
     toggleView(id: string): void {
-        if (id !== this.openedViewId) {
-            if (!this.views.has(id))
+        if (id !== this._openedViewId) {
+            if (!this._views.has(id))
                 throw this.invalidViewIdError()
-            this.openedViewId = id
+            this._openedViewId = id
             this.sidePanel.open()
         } else
             this.sidePanel.toggle()
@@ -68,6 +68,6 @@ export class MainScreen extends Screen {
     }
 
     private invalidViewIdError(): Error {
-        return new Error(`Invalid option id: ${this.openedViewId}`)
+        return new Error(`Invalid option id: ${this._openedViewId}`)
     }
 }

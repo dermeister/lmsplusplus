@@ -7,15 +7,15 @@ import { MainScreen } from "./MainScreen"
 
 export class App extends ObservableObject {
   @unobservable readonly windowManager = new WindowManager()
-  @unobservable private readonly database = new Database()
-  private readonly _screen: Screen = new MainScreen(this.database)
+  @unobservable private readonly _database = new Database()
+  private readonly _screen: Screen = new MainScreen(this._database)
 
   get screen(): Screen { return this._screen }
 
   override dispose(): void {
     Transaction.run(() => {
       this._screen.dispose()
-      this.database.dispose()
+      this._database.dispose()
       super.dispose()
     })
   }

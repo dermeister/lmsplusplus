@@ -31,14 +31,14 @@ export function SolutionRunnerMainPanelContent({ model }: SolutionRunnerProps): 
 
     useEffect(() => {
         if (ref.current) {
-            let solutionRunner = getSolutionRunner(model)
+            const solutionRunner = getSolutionRunner(model)
             solutionRunner.mountApplication(ref.current)
         }
         return () => model.solutionRunner?.unmountApplication()
     }, [model])
 
     return autorender(() => {
-        const solutionRunner = getSolutionRunner(model)
+        model.solutionRunner // subscribe
         return <div ref={ref} />
     }, [model, ref])
 }

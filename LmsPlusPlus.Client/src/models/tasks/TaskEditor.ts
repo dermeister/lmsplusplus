@@ -5,20 +5,20 @@ import * as domain from "../../domain"
 
 export class TaskEditor extends ObservableObject {
     @unobservable readonly description: monaco.editor.ITextModel
-    @unobservable private readonly id: number
-    @unobservable private readonly course: domain.Course
-    @unobservable private readonly solutions: readonly domain.Solution[]
+    @unobservable private readonly _id: number
+    @unobservable private readonly _course: domain.Course
+    @unobservable private readonly _solutions: readonly domain.Solution[]
     private _title: string
 
     get title(): string { return this._title }
 
     constructor(task: domain.Task) {
         super()
-        this.id = task.id
-        this.course = task.course
+        this._id = task.id
+        this._course = task.course
         this._title = task.title
         this.description = standalone(() => monaco.editor.createModel(task.description, "markdown"))
-        this.solutions = task.solutions
+        this._solutions = task.solutions
     }
 
     override dispose(): void {
@@ -35,8 +35,8 @@ export class TaskEditor extends ObservableObject {
 
     @transaction
     getTask(): domain.Task {
-        const task = new domain.Task(this.id, this.course, this._title, this.description.getValue())
-        task.solutions = this.solutions
+        const task = new domain.Task(this._id, this._course, this._title, this.description.getValue())
+        task.solutions = this._solutions
         return task
     }
 }

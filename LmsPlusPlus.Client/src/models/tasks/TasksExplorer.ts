@@ -20,20 +20,20 @@ export class CourseNode extends GroupNode {
 }
 
 export class TasksExplorer extends Explorer<domain.Task, CourseNode> {
-    @unobservable private readonly courses: Ref<readonly domain.Course[]>
+    @unobservable private readonly _courses: Ref<readonly domain.Course[]>
 
     constructor(courses: Ref<readonly domain.Course[]>) {
         super(TasksExplorer.createChildren(courses.value))
-        this.courses = courses
+        this._courses = courses
     }
 
-    private static createChildren(courses: readonly domain.Course[]): CourseNode[] {
+    private static createChildren(courses: readonly domain.Course[]): readonly CourseNode[] {
         return courses.map(c => new CourseNode(c))
     }
 
     @reaction
     private updateExplorer(): void {
-        const newChildren = TasksExplorer.createChildren(this.courses.observe())
+        const newChildren = TasksExplorer.createChildren(this._courses.value)
         this.updateChildren(newChildren)
     }
 }

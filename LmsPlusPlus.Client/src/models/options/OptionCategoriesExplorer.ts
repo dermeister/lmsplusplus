@@ -8,21 +8,21 @@ export enum OptionCategory {
 }
 
 export class OptionCategoriesExplorer extends Explorer<OptionCategory, ItemNode<OptionCategory>> {
-    @unobservable private readonly permissions: Ref<domain.Permissions>
+    @unobservable private readonly _permissions: Ref<domain.Permissions>
 
     constructor(permissions: Ref<domain.Permissions>) {
         super(OptionCategoriesExplorer.createChildren(permissions.value))
-        this.permissions = permissions
+        this._permissions = permissions
     }
 
     override dispose(): void {
         Transaction.run(() => {
-            Rx.dispose(this.permissions)
+            Rx.dispose(this._permissions)
             super.dispose()
         })
     }
 
-    private static createChildren(permissions: domain.Permissions): ItemNode<OptionCategory>[] {
+    private static createChildren(permissions: domain.Permissions): readonly ItemNode<OptionCategory>[] {
         const preferences = new ItemNode("Preferences", "0", OptionCategory.Preferences)
         const nodes = [preferences]
         if (permissions.canUpdateVcsConfiguration) {
@@ -34,7 +34,7 @@ export class OptionCategoriesExplorer extends Explorer<OptionCategory, ItemNode<
 
     @reaction
     private updateExplorer(): void {
-        const newChildren = OptionCategoriesExplorer.createChildren(this.permissions.observe())
+        const newChildren = OptionCategoriesExplorer.createChildren(this._permissions.value)
         this.updateChildren(newChildren)
     }
 }

@@ -6,9 +6,9 @@ export class SidePanel extends ObservableObject {
     @unobservable private readonly _isPulsing: Ref<boolean>
     private _isOpened = true
 
-    get title(): string { return this._title.observe() }
+    get title(): string { return this._title.value }
     get isOpened(): boolean { return this._isOpened }
-    get isPulsing(): boolean { return this._isPulsing.observe() }
+    get isPulsing(): boolean { return this._isPulsing.value }
     
     constructor(title: Ref<string>, isPulsing: Ref<boolean>) {
         super()

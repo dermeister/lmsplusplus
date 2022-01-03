@@ -9,8 +9,8 @@ export class Service extends ObservableObject {
     @unobservable readonly name: string
     @unobservable readonly stdin: boolean
     @unobservable readonly virtualPorts: readonly number[]
-    @unobservable private readonly consoleRenderer: ConsoleRenderer
-    @unobservable private readonly webRenderers: Map<number, WebRenderer>
+    @unobservable private readonly _consoleRenderer: ConsoleRenderer
+    @unobservable private readonly _webRenderers: Map<number, WebRenderer>
     private _renderer: Renderer
 
     get renderer(): Renderer { return this._renderer }
@@ -20,29 +20,29 @@ export class Service extends ObservableObject {
         this.name = name
         this.stdin = stdin
         this.virtualPorts = virtualPorts
-        this.consoleRenderer = new ConsoleRenderer()
-        this.webRenderers = new Map(virtualPorts.map(p => [p, new WebRenderer(p)]))
-        this._renderer = this.consoleRenderer
+        this._consoleRenderer = new ConsoleRenderer()
+        this._webRenderers = new Map(virtualPorts.map(p => [p, new WebRenderer(p)]))
+        this._renderer = this._consoleRenderer
     }
 
     override dispose(): void {
         Transaction.run(() => {
-            this.consoleRenderer.dispose()
-            this.webRenderers.forEach(r => r.dispose())
-            this.webRenderers.toMutable().clear()
+            this._consoleRenderer.dispose()
+            this._webRenderers.forEach(r => r.dispose())
+            this._webRenderers.toMutable().clear()
         })
     }
 
     @transaction
     selectConsoleRenderer(): void {
-        this._renderer = this.consoleRenderer
+        this._renderer = this._consoleRenderer
     }
 
     @transaction
     selectWebRenderer(port: number): void {
-        if (!this.webRenderers.has(port))
+        if (!this._webRenderers.has(port))
             throw new Error(`Web renderer for port ${port} does not exist`)
-        this._renderer = this.webRenderers.get(port) as WebRenderer
+        this._renderer = this._webRenderers.get(port) as WebRenderer
     }
 }
 

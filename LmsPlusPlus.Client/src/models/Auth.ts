@@ -4,13 +4,13 @@ import { ObservableObject } from "../ObservableObject"
 
 export class Auth extends ObservableObject {
     private _user: domain.User | null = null
-    private readonly localStorageKey: string
+    private readonly _localStorageKey: string
 
     get user(): domain.User | null { return this._user }
 
     constructor(localStorageKey: string) {
         super()
-        this.localStorageKey = localStorageKey
+        this._localStorageKey = localStorageKey
         this._user = this.loadUserFromLocalStorage()
     }
 
@@ -36,13 +36,13 @@ export class Auth extends ObservableObject {
     @reaction
     private localStorage_contains_current_user(): void {
         if (!this._user)
-            localStorage.removeItem(this.localStorageKey)
-        else if (!localStorage.getItem(this.localStorageKey))
-            localStorage.setItem(this.localStorageKey, JSON.stringify(this._user))
+            localStorage.removeItem(this._localStorageKey)
+        else if (!localStorage.getItem(this._localStorageKey))
+            localStorage.setItem(this._localStorageKey, JSON.stringify(this._user))
     }
 
     private loadUserFromLocalStorage(): domain.User | null {
-        const serializedUser = localStorage.getItem(this.localStorageKey)
+        const serializedUser = localStorage.getItem(this._localStorageKey)
         if (!serializedUser)
             return null
         return domain.User.deserialize(serializedUser)

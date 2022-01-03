@@ -1,17 +1,17 @@
 import { ContextMenu } from "./ContextMenu"
 
 export class WindowManager {
-    private openedContextMenu: ContextMenu | null = null
+    private _openedContextMenu: ContextMenu | null = null
 
     openContextMenu(contextMenu: ContextMenu, x: number, y: number): void {
-        if (this.openedContextMenu)
+        if (this._openedContextMenu)
             this.closeContextMenu()
         contextMenu.open(x, y)
-        this.openedContextMenu = contextMenu
+        this._openedContextMenu = contextMenu
     }
 
     closeContextMenu(): void {
-        this.openedContextMenu?.close()
-        this.openedContextMenu = null
+        this._openedContextMenu?.close()
+        this._openedContextMenu = null
     }
 }

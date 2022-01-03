@@ -1,7 +1,5 @@
 import { ObservableObject } from "../../ObservableObject"
-import { GroupNode } from "./GroupNode"
-import { ItemNode } from "./ItemNode"
-import { Node } from "./Node"
+import { Node, ItemNode, GroupNode } from "./Node"
 
 export abstract class NodeVisitor extends ObservableObject {
     visitItemNode(node: ItemNode<Object>): ItemNode<Object> {

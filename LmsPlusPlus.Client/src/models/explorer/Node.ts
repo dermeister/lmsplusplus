@@ -30,3 +30,53 @@ export abstract class Node extends ObservableObject {
         })
     }
 }
+
+export class ItemNode<T> extends Node {
+    private _item: T
+
+    get item(): T { return this._item }
+
+    constructor(title: string, key: string, value: T) {
+        super(title, key)
+        this._item = value
+    }
+
+    @transaction
+    updateItemNode(title: string, item: T): void {
+        this.updateNode(title)
+        this._item = item
+    }
+
+    override accept(visitor: NodeVisitor): Node {
+        return visitor.visitItemNode(this)
+    }
+}
+
+export class GroupNode extends Node {
+    private _children: readonly Node[]
+    private _isOpened = false
+
+    get children(): readonly Node[] { return this._children }
+    get isOpened(): boolean { return this._isOpened }
+
+    constructor(title: string, key: string, children: readonly Node[]) {
+        super(title, key)
+        this._children = children
+    }
+
+    @transaction
+    toggle(): void {
+        this._isOpened = !this._isOpened
+    }
+
+    @transaction
+    updateGroupNode(title: string, children: readonly Node[]): void {
+        this.updateNode(title)
+        this._children = children
+    }
+
+    override accept(visitor: NodeVisitor): Node {
+        return visitor.visitGroupNode(this)
+    }
+}
+

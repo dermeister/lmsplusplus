@@ -6,7 +6,7 @@ import * as domain from "../domain"
 import { ObservableObject } from "../ObservableObject"
 
 export class Database extends ObservableObject {
-    private static nextId = 1
+    private static s_nextId = 1
     private _courses: domain.Course[] = []
     private _vcsConfiguration = domain.VcsConfiguration.default
     private _preferences = domain.Preferences.default
@@ -26,7 +26,7 @@ export class Database extends ObservableObject {
 
         await new Promise(r => setTimeout(r, 1000))
 
-        task = new domain.Task(Database.nextId++, task.course, task.title, task.description)
+        task = new domain.Task(Database.s_nextId++, task.course, task.title, task.description)
         const courses = this._courses.toMutable()
         const course = courses.find(c => c.id === task.course.id)
         if (course) {
@@ -110,7 +110,7 @@ export class Database extends ObservableObject {
 
         await new Promise(r => setTimeout(r, 1000))
 
-        solution = new domain.Solution(Database.nextId++, solution.task, solution.name)
+        solution = new domain.Solution(Database.s_nextId++, solution.task, solution.name)
         const courses = this._courses.toMutable()
         const course = courses.find(c => c.id === solution.task.course.id)
         if (course) {
@@ -156,21 +156,21 @@ export class Database extends ObservableObject {
     @reaction
     private async data_fetched_from_api(): Promise<void> {
         // courses
-        const course1 = new domain.Course(Database.nextId++, "СПП")
+        const course1 = new domain.Course(Database.s_nextId++, "СПП")
         course1.tasks = [
-            new domain.Task(Database.nextId++, course1, "Task 1", "# Task 1"),
-            new domain.Task(Database.nextId++, course1, "Task 2", "# Task 2")
+            new domain.Task(Database.s_nextId++, course1, "Task 1", "# Task 1"),
+            new domain.Task(Database.s_nextId++, course1, "Task 2", "# Task 2")
         ]
-        const course2 = new domain.Course(Database.nextId++, "ЯП")
+        const course2 = new domain.Course(Database.s_nextId++, "ЯП")
         course2.tasks = [
-            new domain.Task(Database.nextId++, course2, "Task 1", "# Task 1"),
-            new domain.Task(Database.nextId++, course2, "Task 2", "# Task 2"),
-            new domain.Task(Database.nextId++, course2, "Task 3", "# Task 3")
+            new domain.Task(Database.s_nextId++, course2, "Task 1", "# Task 1"),
+            new domain.Task(Database.s_nextId++, course2, "Task 2", "# Task 2"),
+            new domain.Task(Database.s_nextId++, course2, "Task 3", "# Task 3")
         ]
-        this._courses = await Promise.resolve([course1, course2])
+        this._courses = [course1, course2]
 
         // solutions
-        const solution = new domain.Solution(Database.nextId++, this._courses[0].tasks[0], "Solution for task 1")
+        const solution = new domain.Solution(Database.s_nextId++, this._courses[0].tasks[0], "Solution for task 1")
         this._courses[0].tasks[0].solutions = [solution]
         this._courses[0].tasks[1].solutions = []
         this._courses[1].tasks[0].solutions = []
@@ -181,23 +181,23 @@ export class Database extends ObservableObject {
         this._preferences = await Promise.resolve(new domain.Preferences(true))
 
         // vcs configuration
-        const github = new domain.Provider(Database.nextId++, "GitHub", githubIcon)
-        const bitbucket = new domain.Provider(Database.nextId++, "BitBucket", bitbucketIcon)
-        const gitlab = new domain.Provider(Database.nextId++, "GitLab", gitlabIcon)
-        const account1 = new domain.Account(Database.nextId++, github, "dermeister")
-        const account2 = new domain.Account(Database.nextId++, github, "denis.duzh")
-        const account3 = new domain.Account(Database.nextId++, bitbucket, "dermeister")
-        const account4 = new domain.Account(Database.nextId++, bitbucket, "denis.duzh")
-        const account5 = new domain.Account(Database.nextId++, gitlab, "dermeister")
-        const account6 = new domain.Account(Database.nextId++, gitlab, "denis.duzh")
+        const github = new domain.Provider(Database.s_nextId++, "GitHub", githubIcon)
+        const bitbucket = new domain.Provider(Database.s_nextId++, "BitBucket", bitbucketIcon)
+        const gitlab = new domain.Provider(Database.s_nextId++, "GitLab", gitlabIcon)
+        const account1 = new domain.Account(Database.s_nextId++, github, "dermeister")
+        const account2 = new domain.Account(Database.s_nextId++, github, "denis.duzh")
+        const account3 = new domain.Account(Database.s_nextId++, bitbucket, "dermeister")
+        const account4 = new domain.Account(Database.s_nextId++, bitbucket, "denis.duzh")
+        const account5 = new domain.Account(Database.s_nextId++, gitlab, "dermeister")
+        const account6 = new domain.Account(Database.s_nextId++, gitlab, "denis.duzh")
         const providers = [github, bitbucket, gitlab]
         const accounts = [account1, account2, account3, account4, account5, account6]
-        this._vcsConfiguration = await Promise.resolve(new domain.VcsConfiguration(providers, accounts, account1))
+        this._vcsConfiguration = await new domain.VcsConfiguration(providers, accounts, account1)
 
         // user
-        this._user = await Promise.resolve(new domain.User())
+        this._user = await new domain.User()
 
         // permissions
-        this._permissions = await Promise.resolve(domain.Permissions.student)
+        this._permissions = await domain.Permissions.student
     }
 }

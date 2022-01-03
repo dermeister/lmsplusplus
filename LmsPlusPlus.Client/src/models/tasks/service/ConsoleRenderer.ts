@@ -3,11 +3,11 @@ import { FitAddon } from "xterm-addon-fit"
 import { Renderer } from "./Renderer"
 
 export class ConsoleRenderer implements Renderer {
-    private readonly terminal: Terminal
-    private readonly fitAddon = new FitAddon()
-    private readonly terminalContainer = document.createElement("div")
-    private readonly resizeObserver = new ResizeObserver(() => this.resizeTerminalContainer())
-    private mountContainer: HTMLElement | null = null
+    private readonly _terminal: Terminal
+    private readonly _fitAddon = new FitAddon()
+    private readonly _terminalContainer = document.createElement("div")
+    private readonly _resizeObserver = new ResizeObserver(() => this.resizeTerminalContainer())
+    private _mountContainer: HTMLElement | null = null
 
     private static get terminalTheme(): ITheme {
         const style = getComputedStyle(document.documentElement)
@@ -18,54 +18,54 @@ export class ConsoleRenderer implements Renderer {
     }
 
     constructor() {
-        this.terminal = new Terminal({ theme: ConsoleRenderer.terminalTheme })
-        this.terminal.loadAddon(this.fitAddon)
+        this._terminal = new Terminal({ theme: ConsoleRenderer.terminalTheme })
+        this._terminal.loadAddon(this._fitAddon)
         this.styleTerminalContainer()
     }
 
     show(element: HTMLElement): void {
-        this.resizeObserver.observe(this.terminalContainer)
-        this.mountContainer = element
-        element.appendChild(this.terminalContainer)
-        if (!this.terminal.element) {
-            this.terminal.open(this.terminalContainer)
+        this._resizeObserver.observe(this._terminalContainer)
+        this._mountContainer = element
+        element.appendChild(this._terminalContainer)
+        if (!this._terminal.element) {
+            this._terminal.open(this._terminalContainer)
             this.styleTerminalElement()
         }
     }
 
     hide(): void {
-        this.mountContainer?.removeChild(this.terminalContainer)
-        this.mountContainer = null
-        this.resizeObserver.unobserve(this.terminalContainer)
+        this._mountContainer?.removeChild(this._terminalContainer)
+        this._mountContainer = null
+        this._resizeObserver.unobserve(this._terminalContainer)
     }
 
     write(text: string): void {
-        this.terminal.write(text)
+        this._terminal.write(text)
     }
 
     dispose(): void {
-        if (this.mountContainer?.contains(this.terminalContainer))
-            this.mountContainer?.removeChild(this.terminalContainer)
-        this.terminal.dispose()
-        this.fitAddon.dispose()
-        this.resizeObserver.disconnect()
+        if (this._mountContainer?.contains(this._terminalContainer))
+            this._mountContainer?.removeChild(this._terminalContainer)
+        this._terminal.dispose()
+        this._fitAddon.dispose()
+        this._resizeObserver.disconnect()
     }
 
     private resizeTerminalContainer(): void {
         setTimeout(() => {
-            if (this.terminalContainer.isConnected)
-                this.fitAddon.fit()
+            if (this._terminalContainer.isConnected)
+                this._fitAddon.fit()
         }, 0)
     }
 
     private styleTerminalContainer(): void {
-        this.terminalContainer.style.width = "100%"
-        this.terminalContainer.style.height = "100%"
-        this.terminalContainer.style.backgroundColor = ConsoleRenderer.terminalTheme.background ?? "black"
+        this._terminalContainer.style.width = "100%"
+        this._terminalContainer.style.height = "100%"
+        this._terminalContainer.style.backgroundColor = ConsoleRenderer.terminalTheme.background ?? "black"
     }
 
     private styleTerminalElement(): void {
-        const terminalElement = this.terminalContainer.querySelector(".terminal")
+        const terminalElement = this._terminalContainer.querySelector(".terminal")
         if (terminalElement instanceof HTMLElement)
             terminalElement.style.padding = "14px"
     }

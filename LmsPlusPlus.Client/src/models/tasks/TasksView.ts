@@ -10,9 +10,9 @@ import MarkdownIt from "markdown-it"
 
 export class TasksView extends View {
     @unobservable readonly tasksExplorer: TasksExplorer
-    private static readonly monitor = Monitor.create("tasks-monitor", 0, 0)
-    private static readonly markdown = new MarkdownIt()
-    @unobservable private readonly database: Database
+    private static readonly s_monitor = Monitor.create("tasks-monitor", 0, 0)
+    private static readonly s_markdown = new MarkdownIt()
+    @unobservable private readonly _database: Database
     private _taskEditor: TaskEditor | null = null
     private _solutionEditor: SolutionEditor | null = null
     private _solutionRunner: SolutionRunner | null = null
@@ -27,7 +27,7 @@ export class TasksView extends View {
         return "Tasks"
     }
     override get isPerformingOperation(): boolean {
-        return TasksView.monitor.isActive || (this._solutionRunner?.isLoadingApplication ?? false)
+        return TasksView.s_monitor.isActive || (this._solutionRunner?.isLoadingApplication ?? false)
     }
     get taskEditor(): TaskEditor | null { return this._taskEditor }
     get solutionEditor(): SolutionEditor | null { return this._solutionEditor }
@@ -36,13 +36,13 @@ export class TasksView extends View {
         const description = this.tasksExplorer.selectedNode?.item.description
         if (!description)
             return null
-        return TasksView.markdown.render(description)
+        return TasksView.s_markdown.render(description)
     }
 
     constructor(id: string, database: Database) {
         super(id)
-        this.database = database
-        this.tasksExplorer = new TasksExplorer(new Ref(this.database, "courses"))
+        this._database = database
+        this.tasksExplorer = new TasksExplorer(new Ref(this._database, "courses"))
     }
 
     override dispose(): void {
@@ -69,10 +69,10 @@ export class TasksView extends View {
         this._taskEditor = new TaskEditor(task)
     }
 
-    @transaction @options({ monitor: TasksView.monitor })
+    @transaction @options({ monitor: TasksView.s_monitor })
     async deleteTask(task: domain.Task): Promise<void> {
         this.ensureCanPerformOperation()
-        await this.database.deleteTask(task)
+        await this._database.deleteTask(task)
     }
 
     @transaction
@@ -81,14 +81,14 @@ export class TasksView extends View {
         this._taskEditor = null
     }
 
-    @transaction @options({ monitor: TasksView.monitor })
+    @transaction @options({ monitor: TasksView.s_monitor })
     async saveEditedTask(): Promise<void> {
         if (this._taskEditor) {
             const task = this._taskEditor.getTask()
             if (task.id === domain.Task.NO_ID)
-                await this.database.createTask(task)
+                await this._database.createTask(task)
             else
-                await this.database.updateTask(task)
+                await this._database.updateTask(task)
             this._taskEditor.dispose()
             this._taskEditor = null
         }
@@ -101,9 +101,9 @@ export class TasksView extends View {
         this._solutionEditor = new SolutionEditor(solution)
     }
 
-    @transaction @options({ monitor: TasksView.monitor, reentrance: Reentrance.WaitAndRestart })
+    @transaction @options({ monitor: TasksView.s_monitor, reentrance: Reentrance.WaitAndRestart })
     async deleteSolution(solution: domain.Solution): Promise<void> {
-        await this.database.deleteSolution(solution)
+        await this._database.deleteSolution(solution)
     }
 
     @transaction
@@ -112,12 +112,12 @@ export class TasksView extends View {
         this._solutionEditor = null
     }
 
-    @transaction @options({ monitor: TasksView.monitor })
+    @transaction @options({ monitor: TasksView.s_monitor })
     async saveEditedSolution(): Promise<void> {
         if (this._solutionEditor) {
             const solution = this._solutionEditor.getSolution()
             if (solution.id === domain.Solution.NO_ID)
-                await this.database.createSolution(solution)
+                await this._database.createSolution(solution)
             this._solutionEditor.dispose()
             this._solutionEditor = null
         }

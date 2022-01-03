@@ -5,17 +5,17 @@ export class Course {
     readonly id: number
     readonly name: string
     private _tasks: readonly Task[] = []
-    private tasksInitialized = false
+    private _tasksInitialized = false
 
     get tasks(): readonly Task[] {
-        if (!this.tasksInitialized)
+        if (!this._tasksInitialized)
             throw new Error("Course tasks have not been initialized")
         return this._tasks
     }
     set tasks(tasks: readonly Task[]) {
-        if (!this.tasksInitialized) {
+        if (!this._tasksInitialized) {
             this._tasks = tasks
-            this.tasksInitialized = true
+            this._tasksInitialized = true
         } else
             throw new Error("Course tasks have already been initialized")
     }

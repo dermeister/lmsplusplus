@@ -1,5 +1,3 @@
-import { Fields } from "./utils"
-
 export class Provider {
     readonly id: number
     readonly name: string
@@ -36,7 +34,7 @@ export class VcsConfiguration {
         this.currentAccount = selectedAccount
     }
 
-    update(values: Fields<VcsConfiguration>): VcsConfiguration {
+    update(values: Partial<VcsConfiguration>): VcsConfiguration {
         const providers = values.providers !== undefined ? values.providers : this.providers
         const accounts = values.accounts !== undefined ? values.accounts : this.accounts
         const currentAccount = values.currentAccount !== undefined ? values.currentAccount : this.currentAccount

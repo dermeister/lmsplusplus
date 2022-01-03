@@ -8,17 +8,17 @@ export class Task {
     readonly title: string
     readonly description: string
     private _solutions: readonly Solution[] = []
-    private solutionsInitialized = false
+    private _solutionsInitialized = false
 
     get solutions(): readonly Solution[] {
-        if (!this.solutionsInitialized)
+        if (!this._solutionsInitialized)
             throw new Error("Task solutions have not been initialized")
         return this._solutions
     }
     set solutions(solutions: readonly Solution[]) {
-        if (!this.solutionsInitialized) {
+        if (!this._solutionsInitialized) {
             this._solutions = solutions
-            this.solutionsInitialized = true
+            this._solutionsInitialized = true
         } else
             throw new Error("Task tasks have already been initialized")
     }
