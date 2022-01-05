@@ -4,11 +4,7 @@ import { ServiceConsole } from "./ConsoleRenderer"
 import { ObservableObject } from "../../../ObservableObject"
 import { WebRenderer } from "./WebRenderer"
 import { HubConnection, ISubscription } from "@microsoft/signalr"
-
-interface ServiceBuildOutput {
-    text: string;
-    anchor: string | null;
-}
+import { ServiceBuildOutput } from "./ServiceBuildOutput"
 
 export class Service extends ObservableObject {
     @unobservable readonly name: string
@@ -63,8 +59,8 @@ export class Service extends ObservableObject {
     }
 
     @transaction @options({ reentrance: Reentrance.WaitAndRestart })
-    private onBuildOutput(value: ServiceBuildOutput): void {
-        this._console.write(value.text, value.anchor)
+    private onBuildOutput(output: ServiceBuildOutput): void {
+        this._console.writeBuildOutput(output)
     }
 
     @transaction @options({ reentrance: Reentrance.WaitAndRestart })
@@ -75,6 +71,8 @@ export class Service extends ObservableObject {
     @transaction @options({ reentrance: Reentrance.WaitAndRestart })
     private onBuildComplete(): void {
         this._console.clear()
+        if (this.stdin)
+            this._console.enableStdin((input) => this.onInput(input))
         const stream = this._connection.stream("ReadServiceOutput", this.name)
         this._outputSubscription = stream.subscribe({
             next: (value) => this.onOutput(value),
@@ -85,7 +83,7 @@ export class Service extends ObservableObject {
 
     @transaction @options({ reentrance: Reentrance.WaitAndRestart })
     private onOutput(text: string): void {
-        this._console.write(text)
+        this._console.writeServiceOutput(text)
     }
 
     @transaction @options({ reentrance: Reentrance.WaitAndRestart })
@@ -95,6 +93,11 @@ export class Service extends ObservableObject {
 
     @transaction @options({ reentrance: Reentrance.WaitAndRestart })
     private onComplete(): void {
-        this._console.write("[INFO] Service stopped")
+        this._console.writeServiceOutput("\n\u001b[38;5;120m[INFO] Service stopped")
+    }
+
+    @transaction @options({ reentrance: Reentrance.WaitAndRestart })
+    private async onInput(text: string): Promise<void> {
+        await this._connection.invoke("WriteServiceInput", this.name, text)
     }
 }

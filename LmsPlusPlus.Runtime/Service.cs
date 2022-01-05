@@ -93,7 +93,7 @@ sealed class Service : IAsyncDisposable
                 Stderr = true,
                 Stdin = _configuration.Stdin
             };
-            MultiplexedStream containerStream = await _dockerClient.Containers.AttachContainerAsync(_containerId, tty: false,
+            MultiplexedStream containerStream = await _dockerClient.Containers.AttachContainerAsync(_containerId, _configuration.Stdin,
                 containerAttachParameters, cancellationToken);
             await _dockerClient.Containers.StartContainerAsync(_containerId, new ContainerStartParameters(), cancellationToken);
             _containerStream = containerStream;
@@ -203,6 +203,7 @@ sealed class Service : IAsyncDisposable
             AttachStderr = true,
             AttachStdin = _configuration.Stdin,
             OpenStdin = _configuration.Stdin,
+            Tty = _configuration.Stdin,
             ExposedPorts = CreateExposedPorts(),
             HostConfig = CreatHostConfig(),
             NetworkingConfig = CreateNetworkingConfig()
@@ -292,7 +293,7 @@ sealed class Service : IAsyncDisposable
     void EnsureStarted()
     {
         if (!IsStarted)
-            throw new InvalidOperationException("Container is not started");
+            throw new InvalidOperationException("Service is not started");
     }
 
     async ValueTask RemoveContainer()

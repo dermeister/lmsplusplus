@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using LmsPlusPlus.Api.Infrastructure;
 using LmsPlusPlus.Api.Models;
@@ -57,7 +58,7 @@ public class ApplicationHub : Hub
     public async IAsyncEnumerable<string> ReadServiceOutput(string serviceName,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        if (Context.Items.TryGetValue(ApplicationItemKey, out object? o) && o is Application application)
+        if (TryGetApplication(out Application? application))
         {
             string? serviceOutput;
             do
@@ -76,10 +77,24 @@ public class ApplicationHub : Hub
         }
     }
 
+    public async Task WriteServiceInput(string serviceName, string text)
+    {
+        if (TryGetApplication(out Application? application))
+            try
+            {
+                await _lock.WaitAsync();
+                await application.WriteServiceInputAsync(serviceName, text);
+            }
+            finally
+            {
+                _lock.Release();
+            }
+    }
+
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         await base.OnDisconnectedAsync(exception);
-        if (Context.Items.TryGetValue(ApplicationItemKey, out object? o) && o is Application application)
+        if (TryGetApplication(out Application? application))
             try
             {
                 await _lock.WaitAsync();
@@ -93,6 +108,20 @@ public class ApplicationHub : Hub
     }
 
     protected override void Dispose(bool disposing) => _lock.Dispose();
+
+    bool TryGetApplication([MaybeNullWhen(false)] out Application result)
+    {
+        if (Context.Items.TryGetValue(ApplicationItemKey, out object? o) && o is Application application)
+        {
+            result = application;
+            return true;
+        }
+        else
+        {
+            result = null;
+            return false;
+        }
+    }
 }
 
 public record struct ServiceConfiguration(string Name, bool Stdin, ReadOnlyCollection<ushort> VirtualPorts);
