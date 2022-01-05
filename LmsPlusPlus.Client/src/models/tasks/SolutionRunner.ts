@@ -47,7 +47,7 @@ export class SolutionRunner extends ObservableObject {
         await this._connection.start()
         const configurations = await this._connection.invoke<ServiceConfiguration[]>("StartApplication", 1)
         this._services = configurations.map(c => new Service(c.name, c.stdin, c.virtualPorts, this._connection!))
-        this._servicesExplorer = new ServicesExplorer(new Ref(this, "services"))
+        this._servicesExplorer = new ServicesExplorer(new Ref(this, "_services"))
         this._servicesExplorer.setSelectedNode(this._servicesExplorer.children[0])
     }
 

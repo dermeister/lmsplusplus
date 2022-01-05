@@ -45,14 +45,40 @@ sealed class Service : IAsyncDisposable
         }
     }
 
-    internal async Task<string?> ReadBuildOutputAsync(CancellationToken cancellationToken = default)
+    internal async Task<ServiceBuildOutput?> ReadBuildOutputAsync(CancellationToken cancellationToken = default)
     {
         EnsureNotDisposed();
-        bool canReadBuildImageProgress = await _buildImageProgressChannel.Reader.WaitToReadAsync(cancellationToken);
-        if (!canReadBuildImageProgress)
-            return null;
-        JSONMessage message = await _buildImageProgressChannel.Reader.ReadAsync(cancellationToken);
-        return message.Stream;
+        ServiceBuildOutput? output = null;
+        bool isAuxMessage;
+        do
+        {
+            isAuxMessage = false;
+            bool canReadBuildImageProgress = await _buildImageProgressChannel.Reader.WaitToReadAsync(cancellationToken);
+            if (canReadBuildImageProgress)
+            {
+                JSONMessage message = await _buildImageProgressChannel.Reader.ReadAsync(cancellationToken);
+                // TODO: handle build errors
+                if (message.Stream is not null)
+                    output = new ServiceBuildOutput(message.Stream, Anchor: null);
+                else if (message.Status is not null)
+                {
+                    string text;
+                    if (message.ProgressMessage is not null && message.ID is not null)
+                        text = $"{message.ID}: {message.Status} {message.ProgressMessage}\n";
+                    else
+                        text = $"{message.Status}\n";
+                    output = new ServiceBuildOutput(text, message.ID);
+                }
+                else if (message.Aux is not null)
+                    isAuxMessage = true;
+                else
+                    throw new Exception();
+            }
+            else
+                output = null;
+        }
+        while (isAuxMessage);
+        return output;
     }
 
     internal async Task Start(CancellationToken cancellationToken = default)
@@ -194,7 +220,7 @@ sealed class Service : IAsyncDisposable
         string currentDirectory = Directory.GetCurrentDirectory();
         if (contextPath.StartsWith(currentDirectory))
             contextPath = Path.GetRelativePath(currentDirectory, contextPath);
-        archive.RootPath = contextPath;
+        archive.RootPath = contextPath.TrimStart('/'); // SharpZipLib trims entry paths if they are absolute
         IEnumerable<string> files = Directory.EnumerateFiles(contextPath);
         IEnumerable<string> subdirectories = Directory.EnumerateDirectories(contextPath);
         foreach (string path in files.Concat(subdirectories))
@@ -274,7 +300,15 @@ sealed class Service : IAsyncDisposable
         if (_containerId is not null)
         {
             ContainerRemoveParameters containerRemoveParameters = new() { Force = true };
-            await _dockerClient.Containers.RemoveContainerAsync(_containerId, containerRemoveParameters);
+            try
+            {
+                await _dockerClient.Containers.RemoveContainerAsync(_containerId, containerRemoveParameters);
+            }
+            catch (DockerApiException e) when (e.StatusCode == HttpStatusCode.InternalServerError)
+            {
+                // retry if daemon fails to kill container
+                await _dockerClient.Containers.RemoveContainerAsync(_containerId, containerRemoveParameters);
+            }
         }
     }
 
@@ -294,7 +328,9 @@ sealed class Service : IAsyncDisposable
     }
 }
 
-public class PortMapping
+public record ServiceBuildOutput(string Text, string? Anchor);
+
+public record PortMapping
 {
     public PortType PortType { get; }
     public ushort ContainerPort { get; }

@@ -60,7 +60,7 @@ public sealed class Application : IAsyncDisposable
         return new ReadOnlyCollection<ServiceConfiguration>(configurations.Values.ToArray());
     }
 
-    public async Task<string?> ReadServiceBuildOutputAsync(string serviceName, CancellationToken cancellationToken = default)
+    public async Task<ServiceBuildOutput?> ReadServiceBuildOutputAsync(string serviceName, CancellationToken cancellationToken = default)
     {
         EnsureNotDisposed();
         Service service = await GetServiceByName(serviceName);
@@ -115,10 +115,8 @@ public sealed class Application : IAsyncDisposable
         // TODO: Validate ports
     }
 
-    static ReadOnlyCollection<VirtualPortMapping> CreateVirtualPortMappings(IEnumerable<string>? portMappingsInDockerComposeFormat)
+    static ReadOnlyCollection<VirtualPortMapping> CreateVirtualPortMappings(IEnumerable<string> portMappingsInDockerComposeFormat)
     {
-        if (portMappingsInDockerComposeFormat is null)
-            return new ReadOnlyCollection<VirtualPortMapping>(Array.Empty<VirtualPortMapping>());
         IEnumerable<VirtualPortMapping> portMappings = from portMappingInDockerComposeFormat in portMappingsInDockerComposeFormat
                                                        let parts = portMappingInDockerComposeFormat.Split(':')
                                                        let hostPort = ushort.Parse(parts[0])
@@ -139,7 +137,7 @@ public sealed class Application : IAsyncDisposable
         await CreateServiceNetwork();
         return (from pair in compose.Services
                 let name = pair.Key
-                let contextPath = Path.GetFullPath(Path.Combine(configurationDirectoryPath, pair.Value.Build))
+                let contextPath = Path.GetFullPath(Path.Combine(configurationDirectoryPath, pair.Value.Build!))
                 let stdin = pair.Value.StdinOpen
                 let virtualPortMappings = CreateVirtualPortMappings(pair.Value.Ports)
                 let serviceConfiguration = new ServiceConfiguration(name, contextPath)

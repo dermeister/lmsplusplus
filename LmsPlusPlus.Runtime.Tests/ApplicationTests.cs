@@ -40,7 +40,7 @@ public class ApplicationTests : IClassFixture<ApplicationFixture>
 
         // Act
         string serviceName = (await application.GetServiceConfigurations()).First().Name;
-        string? output = await application.ReadServiceBuildOutputAsync(serviceName);
+        ServiceBuildOutput? output = await application.ReadServiceBuildOutputAsync(serviceName);
 
         // Assert
         Assert.NotNull(output);
@@ -91,7 +91,7 @@ public class ApplicationTests : IClassFixture<ApplicationFixture>
         string serviceName = (await application.GetServiceConfigurations()).First().Name;
         ReadOnlyCollection<PortMapping> openedPorts = await application.GetOpenedPortsAsync(serviceName);
         PortMapping portMapping = openedPorts[0];
-        await Task.Delay(500);
+        await Task.Delay(1000);
         TcpClient client = TestUtils.ConnectToTcpSocket(portMapping.HostPort);
         TestUtils.WriteToTcpClient(client, message: "hello world");
         string output = TestUtils.ReadFromTcpClient(client);

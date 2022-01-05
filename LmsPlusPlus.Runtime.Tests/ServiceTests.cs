@@ -18,11 +18,11 @@ public class ServiceTests
         await using Service service = new(configuration);
 
         // Act
-        string? output = await service.ReadBuildOutputAsync();
+        ServiceBuildOutput? output = await service.ReadBuildOutputAsync();
 
         // Assert
         Assert.NotNull(output);
-        Assert.Contains(expectedSubstring: "FROM alpine", output);
+        Assert.Contains(expectedSubstring: "FROM alpine", output!.Text);
     }
 
     [Fact]
@@ -120,7 +120,7 @@ public class ServiceTests
         // Act
         ReadOnlyCollection<PortMapping> openedPorts = await service.GetOpenedPortsAsync();
         PortMapping portMapping = openedPorts[0];
-        await Task.Delay(500); // Wait for process in container to open socket
+        await Task.Delay(1000); // Wait for process in container to open socket
         using TcpClient client = TestUtils.ConnectToTcpSocket(portMapping.HostPort);
         TestUtils.WriteToTcpClient(client, message: "hello world");
         string output = TestUtils.ReadFromTcpClient(client);
