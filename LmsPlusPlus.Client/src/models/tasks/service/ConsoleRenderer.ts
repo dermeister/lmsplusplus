@@ -3,21 +3,13 @@ import { FitAddon } from "xterm-addon-fit"
 import { Renderer } from "./Renderer"
 import { ServiceBuildOutput } from "./ServiceBuildOutput"
 
-const RESET_CURSOR_AND_CLEAR_SCREEN = "\u001b[H\u001b[0J"
-const DELETE_LINE = "\u001b[K"
-
-interface Line {
-    text: string;
-    anchor: string | null;
-}
-
 export class ServiceConsole implements Renderer {
     private readonly _terminal: Terminal
     private readonly _fitAddon = new FitAddon()
     private readonly _terminalContainer = document.createElement("div")
     private readonly _resizeObserver = new ResizeObserver(() => this.resizeTerminalContainer())
+    private readonly _anchoredLineOffsets = new Map<string, number>()
     private _mountContainer: HTMLElement | null = null
-    private readonly _lines: Line[] = []
 
     private static get terminalTheme(): ITheme {
         const style = getComputedStyle(document.documentElement)
@@ -28,7 +20,12 @@ export class ServiceConsole implements Renderer {
     }
 
     constructor() {
-        this._terminal = new Terminal({ theme: ServiceConsole.terminalTheme, disableStdin: true, convertEol: true })
+        this._terminal = new Terminal({
+            theme: ServiceConsole.terminalTheme,
+            disableStdin: true,
+            convertEol: true,
+            fontSize: 14
+        })
         this._terminal.loadAddon(this._fitAddon)
         this.styleTerminalContainer()
     }
@@ -49,17 +46,30 @@ export class ServiceConsole implements Renderer {
         this._resizeObserver.unobserve(this._terminalContainer)
     }
 
-    writeBuildOutput(output: ServiceBuildOutput): void {
-        if (output.anchor) {
-            const line = this._lines.find(l => l.anchor === output.anchor)
-            if (line)
-                line.text = `${DELETE_LINE}${output.text}`
-            else
-                this._lines.push({ text: output.text, anchor: output.anchor })
-        } else
-            this._lines.push({ text: output.text, anchor: null })
-        this._terminal.write(RESET_CURSOR_AND_CLEAR_SCREEN)
-        this._lines.forEach(l => this._terminal.write(l.text))
+    writeBuildOutput({ anchor, text }: ServiceBuildOutput): void {
+        if (anchor) {
+            if (!this._anchoredLineOffsets.has(anchor)) {
+                /* 
+                   Offsets start from zero and each new offset is calculated as
+                   previous offset incremented by one, which is equal to current
+                   size of _anchoredLineOffsets 
+                */ 
+                const offset = this._anchoredLineOffsets.size
+                this._anchoredLineOffsets.set(anchor, offset)
+                this._terminal.write(text)
+            } else {
+                const offset = this._anchoredLineOffsets.get(anchor) as number
+                this._terminal.write("\u001b7") // save cursor
+                this._terminal.write(`\u001b[${this._anchoredLineOffsets.size - offset}A`) // move cursor up
+                this._terminal.write("\u001b[0K") // clear line
+                this._terminal.write(text)
+                this._terminal.write("\u001b8") // restore cursor   
+            }
+        } else {
+            this._terminal.write(text)
+            this._anchoredLineOffsets.clear()
+        }
+
     }
 
     enableStdin(onInput: (input: string) => void): void {
@@ -68,13 +78,13 @@ export class ServiceConsole implements Renderer {
     }
 
     writeServiceOutput(text: string): void {
-        this._terminal.setOption("convertEol", false)
         this._terminal.write(text)
     }
 
     clear(): void {
-        this._lines.splice(0, this._lines.length)
-        this._terminal.write(RESET_CURSOR_AND_CLEAR_SCREEN)
+        this._terminal.clear()
+        this._terminal.write("\u001b[2J") // clear screen
+        this._terminal.write("\u001b[H") // move cursor to beginning of screen
     }
 
     dispose(): void {

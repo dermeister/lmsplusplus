@@ -93,7 +93,7 @@ export class Service extends ObservableObject {
 
     @transaction @options({ reentrance: Reentrance.WaitAndRestart })
     private onComplete(): void {
-        this._console.writeServiceOutput("\n\u001b[38;5;120m[INFO] Service stopped")
+        this._console.writeServiceOutput("\r\n\u001b[38;5;120m[INFO] Service stopped\r\n")
     }
 
     @transaction @options({ reentrance: Reentrance.WaitAndRestart })
