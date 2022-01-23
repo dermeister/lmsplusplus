@@ -47,11 +47,9 @@ export function Dropdown<T>(props: DropdownProps<T>): JSX.Element {
         return (
             <ul className={styles.items}>
                 {itemsWithoutSelected.map(item => (
-                    <li
-                        key={item.key}
+                    <li key={item.key}
                         onClick={() => onChange(items.indexOf(item))}
-                        className={styles.item}
-                    >
+                        className={styles.item}>
                         {item.title}
                     </li>
                 ))}

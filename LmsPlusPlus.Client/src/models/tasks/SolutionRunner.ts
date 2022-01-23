@@ -4,6 +4,7 @@ import { Monitor, options, reaction, Ref, Transaction, transaction, unobservable
 import { Service } from "./service/Service"
 import { ServicesExplorer } from "./ServicesExplorer"
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr"
+import { Renderer } from "./service/Renderer"
 
 export class SolutionRunner extends ObservableObject {
     private static readonly s_monitor = Monitor.create("solution-runner", 0, 0)
@@ -11,7 +12,7 @@ export class SolutionRunner extends ObservableObject {
     private _servicesExplorer: ServicesExplorer | null = null
     private _connection: HubConnection | null = null
     private _services: readonly Service[] | null = null
-    private _renderedService: Service | null = null
+    private _renderer: Renderer | null = null
     private _container: HTMLElement | null = null
 
     get servicesExplorer(): ServicesExplorer | null { return this._servicesExplorer }
@@ -54,9 +55,9 @@ export class SolutionRunner extends ObservableObject {
     @reaction
     private renderSelectedService(): void {
         if (this._container && this._servicesExplorer?.selectedNode) {
-            this._renderedService?.renderer.hide()
-            this._renderedService = this._servicesExplorer.selectedNode.item
-            this._renderedService.renderer.show(this._container)
+            this._renderer?.unmount()
+            this._renderer = this._servicesExplorer.selectedNode.item.renderer
+            this._renderer.mount(this._container)
         }
     }
 }

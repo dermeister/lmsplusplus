@@ -1,8 +1,8 @@
 import { options, Reentrance, Transaction, transaction, unobservable } from "reactronic"
 import { Renderer } from "./Renderer"
-import { ServiceConsole } from "./ConsoleRenderer"
+import { ServiceConsole } from "./ServiceConsole"
 import { ObservableObject } from "../../../ObservableObject"
-import { WebRenderer } from "./WebRenderer"
+import { ServiceWebview } from "./ServiceWebview"
 import { HubConnection, ISubscription } from "@microsoft/signalr"
 import { ServiceBuildOutput } from "./ServiceBuildOutput"
 
@@ -11,7 +11,7 @@ export class Service extends ObservableObject {
     @unobservable readonly stdin: boolean
     @unobservable readonly virtualPorts: readonly number[]
     @unobservable private readonly _console: ServiceConsole
-    @unobservable private readonly _webRenderers: Map<number, WebRenderer>
+    @unobservable private readonly _webRenderers: Map<number, ServiceWebview>
     @unobservable private readonly _connection: HubConnection
     @unobservable private readonly _buildOutputSubscription: ISubscription<ServiceBuildOutput>
     private _outputSubscription: ISubscription<string> | null = null
@@ -26,7 +26,7 @@ export class Service extends ObservableObject {
         this.virtualPorts = virtualPorts
         this._connection = connection
         this._console = new ServiceConsole()
-        this._webRenderers = new Map(virtualPorts.map(p => [p, new WebRenderer(p)]))
+        this._webRenderers = new Map(virtualPorts.map(p => [p, new ServiceWebview()]))
         this._renderer = this._console
         const stream = this._connection.stream<ServiceBuildOutput>("ReadBuildOutput", this.name)
         this._buildOutputSubscription = stream.subscribe({
@@ -55,7 +55,7 @@ export class Service extends ObservableObject {
     selectWebRenderer(port: number): void {
         if (!this._webRenderers.has(port))
             throw new Error(`Web renderer for port ${port} does not exist`)
-        this._renderer = this._webRenderers.get(port) as WebRenderer
+        this._renderer = this._webRenderers.get(port) as ServiceWebview
     }
 
     @transaction @options({ reentrance: Reentrance.WaitAndRestart })
@@ -79,6 +79,8 @@ export class Service extends ObservableObject {
             error: (error) => this.onError(error),
             complete: () => this.onComplete()
         })
+        if (this.virtualPorts.length > 0)
+            this._renderer = this._webRenderers.get(this.virtualPorts[0]) as Renderer
     }
 
     @transaction @options({ reentrance: Reentrance.WaitAndRestart })

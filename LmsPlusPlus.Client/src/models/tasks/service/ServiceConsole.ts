@@ -2,8 +2,9 @@ import { ITheme, Terminal } from "xterm"
 import { FitAddon } from "xterm-addon-fit"
 import { Renderer } from "./Renderer"
 import { ServiceBuildOutput } from "./ServiceBuildOutput"
+import { Disposable } from "../../../Disposable"
 
-export class ServiceConsole implements Renderer {
+export class ServiceConsole implements Renderer, Disposable {
     private readonly _terminal: Terminal
     private readonly _fitAddon = new FitAddon()
     private readonly _terminalContainer = document.createElement("div")
@@ -30,7 +31,7 @@ export class ServiceConsole implements Renderer {
         this.styleTerminalContainer()
     }
 
-    show(element: HTMLElement): void {
+    mount(element: HTMLElement): void {
         this._resizeObserver.observe(this._terminalContainer)
         this._mountContainer = element
         element.appendChild(this._terminalContainer)
@@ -40,9 +41,11 @@ export class ServiceConsole implements Renderer {
         }
     }
 
-    hide(): void {
-        this._mountContainer?.removeChild(this._terminalContainer)
-        this._mountContainer = null
+    unmount(): void {
+        if (this._mountContainer?.contains(this._terminalContainer)) {
+            this._mountContainer?.removeChild(this._terminalContainer)
+            this._mountContainer = null
+        }
         this._resizeObserver.unobserve(this._terminalContainer)
     }
 
@@ -53,7 +56,7 @@ export class ServiceConsole implements Renderer {
                    Offsets start from zero and each new offset is calculated as
                    previous offset incremented by one, which is equal to current
                    size of _anchoredLineOffsets 
-                */ 
+                */
                 const offset = this._anchoredLineOffsets.size
                 this._anchoredLineOffsets.set(anchor, offset)
                 this._terminal.write(text)

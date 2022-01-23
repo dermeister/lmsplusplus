@@ -1,5 +1,8 @@
 import { defineConfig } from "vite"
 import reactRefresh from "@vitejs/plugin-react-refresh"
+import { readFileSync } from "fs"
+import { resolve } from "path"
+import { ServerOptions } from "https"
 
 export default defineConfig({
     build: { target: "es2015" },
@@ -7,6 +10,7 @@ export default defineConfig({
     css: { modules: { localsConvention: "camelCaseOnly" } },
     plugins: [reactRefresh()],
     server: {
+        https: getHTTPSConfiguration(),
         proxy: {
             "/api": {
                 target: "http://localhost:5044",
@@ -17,3 +21,13 @@ export default defineConfig({
         }
     }
 })
+
+function getHTTPSConfiguration(): ServerOptions {
+    const home = process.env.HOME ?? process.env.USERPRFILE
+    if (!home)
+        throw new Error("Cannot determine HTTPS certificate location")
+    return {
+        pfx: readFileSync(resolve(home, ".aspnet/https/certificate.pfx")),
+        passphrase: "development"
+    }
+}

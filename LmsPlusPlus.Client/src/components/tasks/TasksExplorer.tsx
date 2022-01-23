@@ -18,36 +18,6 @@ export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
     ), [model, permissions])
 }
 
-function onRunSolution(model: models.TasksView, task: models.ItemNode<domain.Task>): void {
-    task.contextMenu?.close()
-    model.runSolution(task.item.solutions[0])
-}
-
-function onCreateTask(model: models.TasksView, course: models.CourseNode): void {
-    course.contextMenu?.close()
-    model.createTask(course.item)
-}
-
-function onUpdate(model: models.TasksView, task: models.ItemNode<domain.Task>): void {
-    task.contextMenu?.close()
-    model.updateTask(task.item)
-}
-
-async function onDeleteTask(model: models.TasksView, task: models.ItemNode<domain.Task>): Promise<void> {
-    task.contextMenu?.close()
-    await model.deleteTask(task.item)
-}
-
-function onCreateSolution(model: models.TasksView, task: models.ItemNode<domain.Task>): void {
-    task.contextMenu?.close()
-    model.createSolution(task.item)
-}
-
-async function onDeleteSolution(model: models.TasksView, task: models.ItemNode<domain.Task>): Promise<void> {
-    task.contextMenu?.close()
-    await model.deleteSolution(task.item.solutions[0])
-}
-
 function courses(model: models.TasksView,
     courses: readonly models.CourseNode[],
     permissions: domain.Permissions): JSX.Element[] {
@@ -70,6 +40,11 @@ function courses(model: models.TasksView,
     })
 }
 
+function onCreateTask(model: models.TasksView, course: models.CourseNode): void {
+    course.contextMenu?.close()
+    model.createTask(course.item)
+}
+
 function tasks(model: models.TasksView,
     tasks: readonly models.ItemNode<domain.Task>[],
     permissions: domain.Permissions): JSX.Element[] {
@@ -77,7 +52,7 @@ function tasks(model: models.TasksView,
         let contextMenuBody
         if (permissions.canUpdateTask)
             contextMenuBody = (
-                <ContextMenu.Button variant="primary" onClick={() => onUpdate(model, task)}>
+                <ContextMenu.Button variant="primary" onClick={() => onUpdateTask(model, task)}>
                     Edit Task
                 </ContextMenu.Button>
             )
@@ -125,4 +100,29 @@ function tasks(model: models.TasksView,
         )
         return <Explorer.Item key={task.key} item={task} contextMenu={contextMenu}>{task.title}</Explorer.Item>
     })
+}
+
+function onRunSolution(model: models.TasksView, task: models.ItemNode<domain.Task>): void {
+    task.contextMenu?.close()
+    model.runSolution(task.item.solutions[0])
+}
+
+function onUpdateTask(model: models.TasksView, task: models.ItemNode<domain.Task>): void {
+    task.contextMenu?.close()
+    model.updateTask(task.item)
+}
+
+async function onDeleteTask(model: models.TasksView, task: models.ItemNode<domain.Task>): Promise<void> {
+    task.contextMenu?.close()
+    await model.deleteTask(task.item)
+}
+
+function onCreateSolution(model: models.TasksView, task: models.ItemNode<domain.Task>): void {
+    task.contextMenu?.close()
+    model.createSolution(task.item)
+}
+
+async function onDeleteSolution(model: models.TasksView, task: models.ItemNode<domain.Task>): Promise<void> {
+    task.contextMenu?.close()
+    await model.deleteSolution(task.item.solutions[0])
 }
