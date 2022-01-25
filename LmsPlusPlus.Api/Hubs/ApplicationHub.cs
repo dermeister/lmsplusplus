@@ -33,6 +33,15 @@ public class ApplicationHub : Hub
                select new ServiceConfiguration(name, stdin, Array.AsReadOnly(virtualPorts));
     }
 
+    public async Task<IEnumerable<PortMapping>> GetOpenedPorts(string serviceName)
+    {
+        if (!TryGetApplication(out Application? application))
+            throw new Exception();
+        ReadOnlyCollection<LmsPlusPlus.Runtime.PortMapping> portMappings = await application.GetOpenedPortsAsync(serviceName);
+        return from portMapping in portMappings
+               select new PortMapping(portMapping.VirtualHostPort, portMapping.HostPort);
+    }
+
     public async IAsyncEnumerable<ServiceBuildOutput> ReadBuildOutput(string serviceName,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
@@ -127,3 +136,5 @@ public class ApplicationHub : Hub
 public record struct ServiceConfiguration(string Name, bool Stdin, ReadOnlyCollection<ushort> VirtualPorts);
 
 public record struct ServiceBuildOutput(string Text, string? Anchor);
+
+public record struct PortMapping(ushort VirtualPort, ushort Port);

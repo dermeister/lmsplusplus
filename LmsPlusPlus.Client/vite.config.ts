@@ -23,7 +23,7 @@ export default defineConfig({
 })
 
 function getHTTPSConfiguration(): ServerOptions {
-    const home = process.env.HOME ?? process.env.USERPRFILE
+    const home = process.env.HOME ?? process.env.USERPROFILE
     if (!home)
         throw new Error("Cannot determine HTTPS certificate location")
     return {

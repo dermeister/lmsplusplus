@@ -5,6 +5,7 @@ import { Service } from "./service/Service"
 import { ServicesExplorer } from "./ServicesExplorer"
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr"
 import { Renderer } from "./service/Renderer"
+import serviceWorkerUrl from "../../../service-worker?url"
 
 export class SolutionRunner extends ObservableObject {
     private static readonly s_monitor = Monitor.create("solution-runner", 0, 0)
@@ -14,6 +15,8 @@ export class SolutionRunner extends ObservableObject {
     private _services: readonly Service[] | null = null
     private _renderer: Renderer | null = null
     private _container: HTMLElement | null = null
+    private _serviceWorkerRegistration: ServiceWorkerRegistration | null = null
+    private _areServicePortsBeingOpened = false
 
     get servicesExplorer(): ServicesExplorer | null { return this._servicesExplorer }
     get isLoadingApplication(): boolean { return SolutionRunner.s_monitor.isActive }
@@ -23,12 +26,13 @@ export class SolutionRunner extends ObservableObject {
         this._solution = solution
     }
 
-    override dispose(): void {
-        Transaction.run(() => {
+    override dispose(): Promise<void> {
+        return Transaction.run(() => {
             this._servicesExplorer?.dispose()
             this._services?.forEach(s => s.dispose())
             this._connection?.stop()
             super.dispose()
+            return this._serviceWorkerRegistration?.unregister().then() ?? Promise.resolve()
         })
     }
 
@@ -47,7 +51,9 @@ export class SolutionRunner extends ObservableObject {
         this._connection = new HubConnectionBuilder().withUrl("/api/application").build()
         await this._connection.start()
         const configurations = await this._connection.invoke<ServiceConfiguration[]>("StartApplication", 1)
-        this._services = configurations.map(c => new Service(c.name, c.stdin, c.virtualPorts, this._connection!))
+        this._areServicePortsBeingOpened = configurations.some(c => c.virtualPorts.length > 0)
+        this._services = configurations.map(c =>
+            new Service(c.name, c.stdin, c.virtualPorts, new Ref(this, "_areServicePortsBeingOpened"), this._connection!))
         this._servicesExplorer = new ServicesExplorer(new Ref(this, "_services"))
         this._servicesExplorer.setSelectedNode(this._servicesExplorer.children[0])
     }
@@ -60,10 +66,36 @@ export class SolutionRunner extends ObservableObject {
             this._renderer.mount(this._container)
         }
     }
+
+    @reaction
+    private async getOpenedPorts(): Promise<void> {
+        if (this._areServicePortsBeingOpened) {
+            const portMappingsPromises =
+                this._services!.map(s => this._connection!.invoke<PortMapping[]>("GetOpenedPorts", s.name))
+            const portMappings = (await Promise.all(portMappingsPromises)).flat()
+            if (navigator.serviceWorker) {
+                this._serviceWorkerRegistration = await navigator.serviceWorker.register(serviceWorkerUrl)
+                const { waiting, installing, active } = this._serviceWorkerRegistration
+                const worker = waiting || installing || active
+                worker?.addEventListener("statechange", ({ target }) => {
+                    const worker = target as ServiceWorker
+                    if (worker.state === "activated") {
+                        worker.postMessage(JSON.stringify(portMappings))
+                        Transaction.run(() => this._areServicePortsBeingOpened = false)
+                    }
+                })
+            }
+        }
+    }
 }
 
 interface ServiceConfiguration {
     name: string;
     stdin: boolean;
     virtualPorts: readonly number[];
+}
+
+interface PortMapping {
+    port: number;
+    virtualPort: number;
 }

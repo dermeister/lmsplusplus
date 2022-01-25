@@ -130,8 +130,8 @@ export class TasksView extends View {
     }
 
     @transaction
-    stopSolution(): void {
-        this._solutionRunner?.dispose()
+    async stopSolution(): Promise<void> {
+        await this._solutionRunner?.dispose()
         this._solutionRunner = null
     }
 
