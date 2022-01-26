@@ -45,7 +45,7 @@ public class ApplicationHub : Hub
     public async IAsyncEnumerable<ServiceBuildOutput> ReadBuildOutput(string serviceName,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        if (Context.Items.TryGetValue(ApplicationItemKey, out object? o) && o is Application application)
+        if (TryGetApplication(out Application? application))
         {
             LmsPlusPlus.Runtime.ServiceBuildOutput? buildOutput;
             do

@@ -11,7 +11,7 @@ const model = Transaction.run(() => new models.App())
 ReactDOM.render(<App model={model} />, document.getElementById("root"))
 
 window.onbeforeunload = () => {
-    ReactDOM.unmountComponentAtNode(document.getElementById("root") as HTMLElement)
     model.dispose()
+    ReactDOM.unmountComponentAtNode(document.getElementById("root") as HTMLElement)
 }
 

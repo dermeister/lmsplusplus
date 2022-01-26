@@ -24,6 +24,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseRouting();
+app.UseMiddleware<ProxyMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.UseEndpoints(endpoints => { endpoints.MapHub<ApplicationHub>("/application"); });
