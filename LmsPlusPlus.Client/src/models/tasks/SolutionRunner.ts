@@ -7,6 +7,17 @@ import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr"
 import { Renderer } from "./service/Renderer"
 import serviceWorkerUrl from "../../../service-worker?url"
 
+interface ServiceConfiguration {
+    name: string;
+    stdin: boolean;
+    virtualPorts: readonly number[];
+}
+
+interface PortMapping {
+    port: number;
+    virtualPort: number;
+}
+
 export class SolutionRunner extends ObservableObject {
     private static readonly s_monitor = Monitor.create("solution-runner", 0, 0)
     @unobservable private readonly _solution: domain.Solution
@@ -74,7 +85,7 @@ export class SolutionRunner extends ObservableObject {
                 this._services!.map(s => this._connection!.invoke<PortMapping[]>("GetOpenedPorts", s.name))
             const portMappings = (await Promise.all(portMappingsPromises)).flat()
             if (navigator.serviceWorker) {
-                this._serviceWorkerRegistration = await navigator.serviceWorker.register(serviceWorkerUrl)
+                this._serviceWorkerRegistration = await navigator.serviceWorker.register(serviceWorkerUrl, { type: "module" })
                 const { waiting, installing, active } = this._serviceWorkerRegistration
                 const worker = waiting || installing || active
                 worker?.addEventListener("statechange", ({ target }) => {
@@ -87,15 +98,4 @@ export class SolutionRunner extends ObservableObject {
             }
         }
     }
-}
-
-interface ServiceConfiguration {
-    name: string;
-    stdin: boolean;
-    virtualPorts: readonly number[];
-}
-
-interface PortMapping {
-    port: number;
-    virtualPort: number;
 }
