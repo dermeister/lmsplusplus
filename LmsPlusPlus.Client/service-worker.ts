@@ -8,7 +8,8 @@ interface PortMapping {
 const portMappingsPromise = new Promise<Map<number, number>>(resolve => {
     function onMessage(event: ExtendableMessageEvent) {
         const data = JSON.parse(event.data) as readonly PortMapping[]
-        resolve(new Map(data.map(d => [Number(d.virtualPort), Number(d.port)])))
+        const portMappings = new Map(data.map(d => [Number(d.virtualPort), Number(d.port)]))
+        resolve(portMappings)
         self.removeEventListener("message", onMessage)
     }
 

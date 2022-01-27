@@ -58,21 +58,25 @@ sealed class Service : IAsyncDisposable
             {
                 JSONMessage message = await _buildImageProgressChannel.Reader.ReadAsync(cancellationToken);
                 // TODO: handle build errors
-                if (message.Stream is not null)
-                    output = new ServiceBuildOutput(message.Stream, Anchor: null);
-                else if (message.Status is not null)
+                switch (message)
                 {
-                    string text;
-                    if (message.ProgressMessage is not null && message.ID is not null)
-                        text = $"{message.ID}: {message.Status} {message.ProgressMessage}\n";
-                    else
-                        text = $"{message.Status}\n";
-                    output = new ServiceBuildOutput(text, message.ID);
+                    case { Stream: not null }:
+                        output = new ServiceBuildOutput(message.Stream, Anchor: null);
+                        break;
+                    case { Status: not null }:
+                        string text;
+                        if (message is { ProgressMessage: not null, ID: not null })
+                            text = $"{message.ID}: {message.Status} {message.ProgressMessage}\n";
+                        else
+                            text = $"{message.Status}\n";
+                        output = new ServiceBuildOutput(text, message.ID);
+                        break;
+                    case { Aux: not null }:
+                        isAuxMessage = true;
+                        break;
+                    default:
+                        throw new Exception();
                 }
-                else if (message.Aux is not null)
-                    isAuxMessage = true;
-                else
-                    throw new Exception();
             }
             else
                 output = null;

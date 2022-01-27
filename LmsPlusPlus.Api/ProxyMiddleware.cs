@@ -2,10 +2,14 @@
 
 public class ProxyMiddleware
 {
-    readonly HttpClient _httpClient = new();
+    readonly HttpClient _httpClient;
     readonly RequestDelegate _requestDelegate;
 
-    public ProxyMiddleware(RequestDelegate requestDelegate) => _requestDelegate = requestDelegate;
+    public ProxyMiddleware(RequestDelegate requestDelegate, HttpClient httpClient)
+    {
+        _requestDelegate = requestDelegate;
+        _httpClient = httpClient;
+    }
 
     public async Task InvokeAsync(HttpContext context)
     {
