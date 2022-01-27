@@ -1,4 +1,4 @@
-declare const self: ServiceWorkerGlobalScope;
+declare const self: ServiceWorkerGlobalScope
 
 interface PortMapping {
     virtualPort: number;
@@ -21,7 +21,7 @@ self.addEventListener("fetch", event => {
     const { request } = event
     const url = new URL(request.url)
     const isRelativePath = url.host === location.host && url.port === location.port
-    const isLocalhost = url.host === location.host
+    const isLocalhost = url.host === "localhost"
     if (isRelativePath || isLocalhost)
         event.respondWith(portMappingsPromise.then(async portMappings => {
             const newHost = "localhost"

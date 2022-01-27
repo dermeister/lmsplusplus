@@ -6,7 +6,7 @@
     "build": "tsc && vite build",
     "serve": "vite preview",
     "tsc": "tsc -w",
-    "lint": "eslint src --ext .ts,.tsx"
+    "lint": "eslint . --ext .ts,.tsx"
   },
   "dependencies": {
     "@microsoft/signalr": "^6.0.1",
