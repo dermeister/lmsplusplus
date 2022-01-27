@@ -42,7 +42,19 @@ self.addEventListener("fetch", event => {
             if (request.method !== "GET" && request.method !== "OPTIONS")
                 body = await request.arrayBuffer()
             const newUrl = `/api/proxy${url.pathname}?${url.searchParams.toString()}`
-            const newRequest = new Request(newUrl, { headers, body })
+            const newRequest = new Request(newUrl, {
+                headers,
+                body,
+                method: request.method,
+                cache: request.cache,
+                credentials: request.credentials,
+                integrity: request.integrity,
+                keepalive: request.keepalive,
+                redirect: request.redirect,
+                referrer: request.referrer,
+                referrerPolicy: request.referrerPolicy,
+                signal: request.signal
+            })
             return await fetch(newRequest)
         }))
 })

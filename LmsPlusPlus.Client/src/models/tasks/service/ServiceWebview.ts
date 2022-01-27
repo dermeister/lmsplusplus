@@ -19,6 +19,15 @@ export class ServiceWebview extends ObservableObject implements Renderer {
         this._iframe.style.backgroundColor = "white"
     }
 
+    override dispose(): void {
+        Transaction.run(() => {
+            if (this._mountContainer?.contains(this._iframe))
+                this._mountContainer?.removeChild(this._iframe)
+            Rx.dispose(this._isBackendLoading)
+            super.dispose()
+        })
+    }
+
     mount(element: HTMLElement): void {
         if (!this._mountContainer) {
             this._mountContainer = element
@@ -33,18 +42,9 @@ export class ServiceWebview extends ObservableObject implements Renderer {
         }
     }
 
-    override dispose(): void {
-        Transaction.run(() => {
-            if (this._mountContainer?.contains(this._iframe))
-                this._mountContainer?.removeChild(this._iframe)
-            Rx.dispose(this._isBackendLoading)
-            super.dispose()
-        })
-    }
-
     @reaction
     private connectIframeToBackend(): void {
         if (!this._isBackendLoading.value)
-            this._iframe.contentWindow?.location.replace(`/?virtual-port=${this._virtualPort}`)
+            this._iframe.src = `/?virtual-port=${this._virtualPort}`
     }
 }
