@@ -71,10 +71,13 @@ export class SolutionRunner extends ObservableObject {
 
     @reaction
     private renderSelectedService(): void {
-        if (this._container && this._servicesExplorer?.selectedNode) {
-            this._renderer?.unmount()
-            this._renderer = this._servicesExplorer.selectedNode.item.renderer
-            this._renderer.mount(this._container)
+        if (this._container) {
+            if (this._container && this._servicesExplorer?.selectedNode) {
+                this._renderer?.unmount()
+                this._renderer = this._servicesExplorer.selectedNode.item.renderer
+                this._renderer.mount(this._container)
+            } else
+                this._renderer?.unmount()
         }
     }
 
