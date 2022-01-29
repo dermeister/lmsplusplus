@@ -1,10 +1,10 @@
 import { ITheme, Terminal } from "xterm"
 import { FitAddon } from "xterm-addon-fit"
-import { Renderer } from "./Renderer"
+import { ServiceView } from "./ServiceView"
 import { ServiceBuildOutput } from "./ServiceBuildOutput"
 import { Disposable } from "../../../Disposable"
 
-export class ServiceConsole implements Renderer, Disposable {
+export class ConsoleServiceView implements ServiceView, Disposable {
     private readonly _terminal: Terminal
     private readonly _fitAddon = new FitAddon()
     private readonly _terminalContainer = document.createElement("div")
@@ -22,7 +22,7 @@ export class ServiceConsole implements Renderer, Disposable {
 
     constructor() {
         this._terminal = new Terminal({
-            theme: ServiceConsole.terminalTheme,
+            theme: ConsoleServiceView.terminalTheme,
             disableStdin: true,
             convertEol: true,
             fontSize: 14
@@ -108,7 +108,7 @@ export class ServiceConsole implements Renderer, Disposable {
     private styleTerminalContainer(): void {
         this._terminalContainer.style.width = "100%"
         this._terminalContainer.style.height = "100%"
-        this._terminalContainer.style.backgroundColor = ServiceConsole.terminalTheme.background ?? "black"
+        this._terminalContainer.style.backgroundColor = ConsoleServiceView.terminalTheme.background ?? "black"
     }
 
     private styleTerminalElement(): void {

@@ -1,10 +1,10 @@
 import { ObservableObject } from "../../ObservableObject"
 import * as domain from "../../domain"
-import { Monitor, options, reaction, Ref, Transaction, transaction, unobservable } from "reactronic"
+import { Monitor, options, reaction, Ref, Transaction, unobservable } from "reactronic"
 import { Service } from "./service/Service"
 import { ServicesExplorer } from "./ServicesExplorer"
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr"
-import { Renderer } from "./service/Renderer"
+import { ServiceView } from "./service/ServiceView"
 import serviceWorkerUrl from "../../../service-worker?url"
 
 interface ServiceConfiguration {
@@ -24,13 +24,13 @@ export class SolutionRunner extends ObservableObject {
     private _servicesExplorer: ServicesExplorer | null = null
     private _connection: HubConnection | null = null
     private _services: readonly Service[] | null = null
-    private _renderer: Renderer | null = null
-    private _container: HTMLElement | null = null
+    private _serviceView: ServiceView | null = null
     private _serviceWorkerRegistration: ServiceWorkerRegistration | null = null
     private _areServicePortsBeingOpened = false
 
     get servicesExplorer(): ServicesExplorer | null { return this._servicesExplorer }
     get isLoadingApplication(): boolean { return SolutionRunner.s_monitor.isActive }
+    get serviceView(): ServiceView | null { return this._serviceView }
 
     constructor(solution: domain.Solution) {
         super()
@@ -47,16 +47,6 @@ export class SolutionRunner extends ObservableObject {
         })
     }
 
-    @transaction
-    mountApplication(container: HTMLElement): void {
-        this._container = container
-    }
-
-    @transaction
-    unmountApplication(): void {
-        this._container = null
-    }
-
     @reaction @options({ monitor: SolutionRunner.s_monitor })
     private async createServicesExplorer(): Promise<void> {
         this._connection = new HubConnectionBuilder().withUrl("/api/application").build()
@@ -70,15 +60,9 @@ export class SolutionRunner extends ObservableObject {
     }
 
     @reaction
-    private renderSelectedService(): void {
-        if (this._container) {
-            if (this._container && this._servicesExplorer?.selectedNode) {
-                this._renderer?.unmount()
-                this._renderer = this._servicesExplorer.selectedNode.item.renderer
-                this._renderer.mount(this._container)
-            } else
-                this._renderer?.unmount()
-        }
+    private updateServiceView(): void {
+        if (this._servicesExplorer?.selectedNode)
+            this._serviceView = this._servicesExplorer.selectedNode.item.renderer
     }
 
     @reaction

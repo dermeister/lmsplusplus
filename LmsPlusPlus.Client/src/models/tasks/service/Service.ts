@@ -1,8 +1,8 @@
 import { Ref, Transaction, transaction, unobservable } from "reactronic"
-import { Renderer } from "./Renderer"
-import { ServiceConsole } from "./ServiceConsole"
+import { ServiceView } from "./ServiceView"
+import { ConsoleServiceView } from "./ConsoleServiceView"
 import { ObservableObject } from "../../../ObservableObject"
-import { ServiceWebview } from "./ServiceWebview"
+import { WebServiceView } from "./WebServiceView"
 import { HubConnection, ISubscription } from "@microsoft/signalr"
 import { ServiceBuildOutput } from "./ServiceBuildOutput"
 
@@ -10,14 +10,14 @@ export class Service extends ObservableObject {
     @unobservable readonly name: string
     @unobservable readonly stdin: boolean
     @unobservable readonly virtualPorts: readonly number[]
-    @unobservable private readonly _console: ServiceConsole
-    @unobservable private readonly _webviews: Map<number, ServiceWebview>
+    @unobservable private readonly _consoleView: ConsoleServiceView
+    @unobservable private readonly _webViews: Map<number, WebServiceView>
     @unobservable private readonly _connection: HubConnection
     @unobservable private readonly _buildOutputSubscription: ISubscription<ServiceBuildOutput>
     private _outputSubscription: ISubscription<string> | null = null
-    private _renderer: Renderer
+    private _renderer: ServiceView
 
-    get renderer(): Renderer { return this._renderer }
+    get renderer(): ServiceView { return this._renderer }
 
     constructor(name: string, stdin: boolean, virtualPorts: readonly number[], arePortsBeingOpened: Ref<boolean>,
         connection: HubConnection) {
@@ -26,9 +26,9 @@ export class Service extends ObservableObject {
         this.stdin = stdin
         this.virtualPorts = virtualPorts
         this._connection = connection
-        this._console = new ServiceConsole()
-        this._webviews = new Map(virtualPorts.map(p => [p, new ServiceWebview(p, arePortsBeingOpened)]))
-        this._renderer = this._console
+        this._consoleView = new ConsoleServiceView()
+        this._webViews = new Map(virtualPorts.map(p => [p, new WebServiceView(p, arePortsBeingOpened)]))
+        this._renderer = this._consoleView
         const stream = this._connection.stream<ServiceBuildOutput>("ReadBuildOutput", this.name)
         this._buildOutputSubscription = stream.subscribe({
             next: value => this.onBuildOutput(value),
@@ -39,9 +39,9 @@ export class Service extends ObservableObject {
 
     override dispose(): void {
         Transaction.run(() => {
-            this._console.dispose()
-            this._webviews.forEach(r => r.dispose())
-            this._webviews.toMutable().clear()
+            this._consoleView.dispose()
+            this._webViews.forEach(r => r.dispose())
+            this._webViews.toMutable().clear()
             this._buildOutputSubscription.dispose()
             this._outputSubscription?.dispose()
         })
@@ -49,14 +49,14 @@ export class Service extends ObservableObject {
 
     @transaction
     selectConsoleRenderer(): void {
-        this._renderer = this._console
+        this._renderer = this._consoleView
     }
 
     @transaction
     selectWebRenderer(port: number): void {
-        if (!this._webviews.has(port))
+        if (!this._webViews.has(port))
             throw new Error(`Webview for port ${port} does not exist`)
-        this._renderer = this._webviews.get(port) as ServiceWebview
+        this._renderer = this._webViews.get(port) as WebServiceView
     }
 
     private static onBuildError(error: Error): void {
@@ -68,14 +68,14 @@ export class Service extends ObservableObject {
     }
 
     private onBuildOutput(output: ServiceBuildOutput): void {
-        this._console.writeBuildOutput(output)
+        this._consoleView.writeBuildOutput(output)
     }
 
     @transaction
     private onBuildComplete(): void {
-        this._console.clear()
+        this._consoleView.clear()
         if (this.stdin)
-            this._console.enableStdin(input => this.onInput(input))
+            this._consoleView.enableStdin(input => this.onInput(input))
         const stream = this._connection.stream("ReadServiceOutput", this.name)
         this._outputSubscription = stream.subscribe({
             next: value => this.onOutput(value),
@@ -83,15 +83,15 @@ export class Service extends ObservableObject {
             complete: () => this.onComplete()
         })
         if (this.virtualPorts.length > 0)
-            this._renderer = this._webviews.get(this.virtualPorts[0]) as Renderer
+            this._renderer = this._webViews.get(this.virtualPorts[0]) as ServiceView
     }
 
     private onOutput(text: string): void {
-        this._console.writeServiceOutput(text)
+        this._consoleView.writeServiceOutput(text)
     }
 
     private onComplete(): void {
-        this._console.writeServiceOutput("\r\n\u001b[38;5;120m[INFO] Service stopped\r\n")
+        this._consoleView.writeServiceOutput("\r\n\u001b[38;5;120m[INFO] Service stopped\r\n")
     }
 
     private async onInput(text: string): Promise<void> {

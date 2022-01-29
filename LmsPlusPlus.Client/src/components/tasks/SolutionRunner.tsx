@@ -1,9 +1,11 @@
-import React, { useEffect, useRef } from "react"
+import React from "react"
 import { autorender } from "../autorender"
 import * as models from "../../models"
 import { ServicesExplorer } from "./ServicesExplorer"
 import { Button } from "../Button"
 import styles from "./SolutionRunner.module.scss"
+import { ConsoleServiceView } from "./ConsoleServiceView"
+import { WebServiceView } from "./WebServiceView"
 
 interface SolutionRunnerProps {
     model: models.TasksView
@@ -27,20 +29,15 @@ export function SolutionRunnerSidePanelContent({ model }: SolutionRunnerProps): 
 }
 
 export function SolutionRunnerMainPanelContent({ model }: SolutionRunnerProps): JSX.Element {
-    const ref = useRef<HTMLDivElement>(null)
-
-    useEffect(() => {
-        if (ref.current) {
-            const solutionRunner = getSolutionRunner(model)
-            solutionRunner.mountApplication(ref.current)
-        }
-        return () => model.solutionRunner?.unmountApplication()
-    }, [model])
-
     return autorender(() => {
-        model.solutionRunner // subscribe
-        return <div ref={ref} />
-    }, [model, ref])
+        const serviceView = getSolutionRunner(model).serviceView
+        if (serviceView instanceof models.ConsoleServiceView)
+            return <ConsoleServiceView model={serviceView} />
+        else if (serviceView instanceof models.WebServiceView)
+            return <WebServiceView model={serviceView} />
+        else
+            return <></>
+    }, [model])
 }
 
 function getSolutionRunner(model: models.TasksView): models.SolutionRunner {
