@@ -28,10 +28,9 @@ self.addEventListener("fetch", event => {
             const newHost = "localhost"
             let newPort: number
             if (isRelativePath) {
-                if (virtualPort === null) {
-                    virtualPort = Number(url.searchParams.get("virtual-port"))
-                    url.searchParams.delete("virtual-port")
-                }
+                if (virtualPort === null)
+                    virtualPort = Number(url.searchParams.get("lmsplusplus-virtual-port"))
+                url.searchParams.delete("lmsplusplus-virtual-port")
                 newPort = portMappings.get(virtualPort) as number
             } else
                 newPort = portMappings.get(Number(url.port)) as number
@@ -39,7 +38,7 @@ self.addEventListener("fetch", event => {
             headers.set("lmsplusplus-host", newHost)
             headers.set("lmsplusplus-port", newPort.toString())
             let body: ArrayBuffer | null = null
-            if (request.method !== "GET" && request.method !== "OPTIONS")
+            if (request.method !== "GET" && request.method !== "HEAD")
                 body = await request.arrayBuffer()
             const newUrl = `/api/proxy${url.pathname}?${url.searchParams.toString()}`
             const newRequest = new Request(newUrl, {

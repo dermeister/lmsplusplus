@@ -73,6 +73,6 @@ export class ServiceWebview extends ObservableObject implements Renderer {
     @reaction
     private connectIframeToBackend(): void {
         if (!this._isBackendLoading.value)
-            this._iframe.src = `/?virtual-port=${this._virtualPort}`
+            this._iframe.src = `/?lmsplusplus-virtual-port=${this._virtualPort}`
     }
 }
