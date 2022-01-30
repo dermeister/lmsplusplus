@@ -1,10 +1,11 @@
-import React from "react"
+import React, { useState } from "react"
 import ReactDOM from "react-dom"
 import * as models from "../models"
 import { autorender } from "./autorender"
 import { Button } from "./Button"
 import styles from "./ContextMenu.module.scss"
 import { Overlay } from "./Overlay"
+import { combineClassNames, maybeValue } from "./utils"
 
 interface ContextMenuProps {
     model: models.ContextMenu
@@ -53,26 +54,50 @@ interface ContextMenuButtonProps {
     onClick?(): void
 }
 
-ContextMenu.Button = function ContextMenuButton(props: ContextMenuButtonProps): JSX.Element {
+ContextMenu.Button = function ContextMenuButton({ children, onClick, variant }: ContextMenuButtonProps): JSX.Element {
     return (
-        <Button
-            variant={convertButtonVariant(props.variant)}
-            onClick={props.onClick}
-            tabIndex={-1}
-            className={variants[props.variant]}
-        >
-            {props.children}
+        <Button variant={variant}
+                onClick={onClick}
+                tabIndex={-1}
+                className={variants[variant]}>
+            {children}
         </Button>
     )
-}
-
-function convertButtonVariant(variant: "primary" | "danger"): "secondary" | "danger" {
-    if (variant === "primary")
-        return "secondary"
-    return variant
 }
 
 const variants = {
     primary: styles.primary,
     danger: styles.danger
+}
+
+interface ContextMenuSubmenuProps {
+    children: React.ReactNode
+    title: string
+}
+
+ContextMenu.Submenu = function ContextMenuSubmenu({ children, title }: ContextMenuSubmenuProps): JSX.Element {
+    const [isOpened, setIsOpened] = useState(false)
+
+    function items(): JSX.Element {
+        if (!isOpened)
+            return <></>
+        return (
+            <div className={styles.submenuItemsContainer}>
+                <div className={styles.submenuItems}>{children}</div>
+            </div>
+        )
+    }
+
+    return (
+        <div onMouseOver={() => setIsOpened(true)}
+             onMouseLeave={() => setIsOpened(false)}
+             className={styles.submenuContainer}>
+            <Button variant="primary"
+                    tabIndex={-1}
+                    className={combineClassNames(styles.primary, maybeValue(styles.focused, isOpened))}>
+                <p className={styles.submenuTitle}>{title}</p>
+            </Button>
+            {items()}
+        </div>
+    )
 }

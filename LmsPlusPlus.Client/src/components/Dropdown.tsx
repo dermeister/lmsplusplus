@@ -42,8 +42,7 @@ export function Dropdown<T>(props: DropdownProps<T>): JSX.Element {
     }
 
     function otherItems(): JSX.Element {
-        const itemsWithoutSelected = items
-            .filter(i => selectedItemIndex === undefined || i.key !== items[selectedItemIndex].key)
+        const itemsWithoutSelected = items.filter(i => selectedItemIndex === undefined || i.key !== items[selectedItemIndex].key)
         return (
             <ul className={styles.items}>
                 {itemsWithoutSelected.map(item => (

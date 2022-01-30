@@ -8,14 +8,14 @@ import { ServiceView } from "./service/ServiceView"
 import serviceWorkerUrl from "../../../service-worker?url"
 
 interface ServiceConfiguration {
-    name: string;
-    stdin: boolean;
-    virtualPorts: readonly number[];
+    name: string
+    stdin: boolean
+    virtualPorts: readonly number[]
 }
 
 interface PortMapping {
-    port: number;
-    virtualPort: number;
+    port: number
+    virtualPort: number
 }
 
 export class SolutionRunner extends ObservableObject {

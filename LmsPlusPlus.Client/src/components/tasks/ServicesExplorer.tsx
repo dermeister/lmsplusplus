@@ -27,14 +27,16 @@ function contextMenu(c: models.ItemNode<models.Service>): JSX.Element {
         return <></>
     return (
         <ContextMenu model={c.contextMenu}>
-            <ContextMenu.Button variant="primary" onClick={() => onOpenConsole(c)}>
-                Open console
-            </ContextMenu.Button>
-            {c.item.virtualPorts.map(p => (
-                <ContextMenu.Button key={p} variant="primary" onClick={() => onOpenWebview(c, p)}>
-                    Open webview ({p})
+            <ContextMenu.Submenu title="View">
+                <ContextMenu.Button variant="primary" onClick={() => onOpenConsole(c)}>
+                    Open console
                 </ContextMenu.Button>
-            ))}
+                {c.item.virtualPorts.map(p => (
+                    <ContextMenu.Button key={p} variant="primary" onClick={() => onOpenWebview(c, p)}>
+                        Open webview (port {p})
+                    </ContextMenu.Button>
+                ))}
+            </ContextMenu.Submenu>
         </ContextMenu>
     )
 }

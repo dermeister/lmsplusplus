@@ -1,4 +1,4 @@
 export interface ServiceBuildOutput {
-    text: string;
-    anchor: string | null;
+    text: string
+    anchor: string | null
 }

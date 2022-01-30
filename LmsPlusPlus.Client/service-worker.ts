@@ -1,8 +1,8 @@
 declare const self: ServiceWorkerGlobalScope
 
 interface PortMapping {
-    virtualPort: number;
-    port: number;
+    virtualPort: number
+    port: number
 }
 
 const portMappingsPromise = new Promise<Map<number, number>>(resolve => {
