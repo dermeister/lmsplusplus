@@ -62,7 +62,7 @@ export class SolutionRunner extends ObservableObject {
     @reaction
     private updateServiceView(): void {
         if (this._servicesExplorer?.selectedNode)
-            this._serviceView = this._servicesExplorer.selectedNode.item.renderer
+            this._serviceView = this._servicesExplorer.selectedNode.item.serviceView
     }
 
     @reaction

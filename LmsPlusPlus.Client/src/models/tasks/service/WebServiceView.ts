@@ -11,6 +11,7 @@ export class WebServiceView implements ServiceView, Disposable {
     private _mountContainerResizeObserver: ResizeObserver | null = null
 
     get isBackendLoading(): boolean { return this._isBackendLoading.value }
+    get virtualPort(): number { return this._virtualPort }
 
     constructor(virtualPort: number, isBackendLoading: Ref<boolean>) {
         this._virtualPort = virtualPort

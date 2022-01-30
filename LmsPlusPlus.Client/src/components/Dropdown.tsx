@@ -6,33 +6,33 @@ import { combineClassNames, maybeValue } from "./utils"
 export interface DropdownItem<T> {
     value: T
     title: string
-    key: number
 }
 
 interface DropdownPropsBase<T> {
-    items: DropdownItem<T>[]
+    items: readonly DropdownItem<T>[]
 
-    onChange?(active: number): void
+    onValueChange?(active: T): void
 }
 
 interface DropdownPropsWithSelectedItem<T> extends DropdownPropsBase<T> {
-    selectedItemIndex: number
+    selectedValue: T
     placeholder?: undefined
 }
 
 interface DropdownPropsWithPlaceholder<T> extends DropdownPropsBase<T> {
-    selectedItemIndex?: undefined
+    selectedValue?: T
     placeholder: string
 }
 
 type DropdownProps<T> = DropdownPropsWithSelectedItem<T> | DropdownPropsWithPlaceholder<T>
 
 export function Dropdown<T>(props: DropdownProps<T>): JSX.Element {
-    const { selectedItemIndex, placeholder, items } = props
+    const { selectedValue, placeholder, items } = props
     const [isOpened, setIsOpened] = useState(false)
 
     function selectedItem(): JSX.Element {
-        let content = selectedItemIndex !== undefined ? items[selectedItemIndex].title : placeholder
+        const item = items.find(i => i.value === selectedValue)
+        let content = item?.title ?? placeholder
         const combinedClassName = combineClassNames(styles.preview, maybeValue(styles.opened, isOpened))
         return (
             <div onClick={() => setIsOpened(!isOpened)} className={combinedClassName}>
@@ -42,12 +42,12 @@ export function Dropdown<T>(props: DropdownProps<T>): JSX.Element {
     }
 
     function otherItems(): JSX.Element {
-        const itemsWithoutSelected = items.filter(i => selectedItemIndex === undefined || i.key !== items[selectedItemIndex].key)
+        const itemsWithoutSelected = items.filter(i => selectedValue === undefined || i.value !== selectedValue)
         return (
             <ul className={styles.items}>
                 {itemsWithoutSelected.map(item => (
-                    <li key={item.key}
-                        onClick={() => onChange(items.indexOf(item))}
+                    <li key={item.title}
+                        onClick={() => onChange(item.value)}
                         className={styles.item}>
                         {item.title}
                     </li>
@@ -56,9 +56,9 @@ export function Dropdown<T>(props: DropdownProps<T>): JSX.Element {
         )
     }
 
-    function onChange(value: number): void {
-        props.onChange?.(value)
+    function onChange(value: T): void {
         setIsOpened(false)
+        props.onValueChange?.(value)
     }
 
     if (!isOpened)

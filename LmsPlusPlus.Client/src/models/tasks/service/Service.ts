@@ -15,9 +15,11 @@ export class Service extends ObservableObject {
     @unobservable private readonly _connection: HubConnection
     @unobservable private readonly _buildOutputSubscription: ISubscription<ServiceBuildOutput>
     private _outputSubscription: ISubscription<string> | null = null
-    private _renderer: ServiceView
+    private _serviceView: ServiceView
 
-    get renderer(): ServiceView { return this._renderer }
+    get consoleServiceView(): ServiceView { return this._consoleView }
+    get webServiceViews(): readonly WebServiceView[] { return Array.from(this._webViews.values()) }
+    get serviceView(): ServiceView { return this._serviceView }
 
     constructor(name: string, stdin: boolean, virtualPorts: readonly number[], arePortsBeingOpened: Ref<boolean>,
         connection: HubConnection) {
@@ -28,7 +30,7 @@ export class Service extends ObservableObject {
         this._connection = connection
         this._consoleView = new ConsoleServiceView()
         this._webViews = new Map(virtualPorts.map(p => [p, new WebServiceView(p, arePortsBeingOpened)]))
-        this._renderer = this._consoleView
+        this._serviceView = this._consoleView
         const stream = this._connection.stream<ServiceBuildOutput>("ReadBuildOutput", this.name)
         this._buildOutputSubscription = stream.subscribe({
             next: value => this.onBuildOutput(value),
@@ -48,15 +50,8 @@ export class Service extends ObservableObject {
     }
 
     @transaction
-    selectConsoleRenderer(): void {
-        this._renderer = this._consoleView
-    }
-
-    @transaction
-    selectWebRenderer(port: number): void {
-        if (!this._webViews.has(port))
-            throw new Error(`Webview for port ${port} does not exist`)
-        this._renderer = this._webViews.get(port) as WebServiceView
+    setServiceView(view: ServiceView): void {
+        this._serviceView = view
     }
 
     private static onBuildError(error: Error): void {
@@ -83,7 +78,7 @@ export class Service extends ObservableObject {
             complete: () => this.onComplete()
         })
         if (this.virtualPorts.length > 0)
-            this._renderer = this._webViews.get(this.virtualPorts[0]) as ServiceView
+            this._serviceView = this._webViews.get(this.virtualPorts[0]) as ServiceView
     }
 
     private onOutput(text: string): void {

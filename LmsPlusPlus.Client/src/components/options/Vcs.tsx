@@ -27,19 +27,18 @@ export function Vcs({ model }: VcsProps): JSX.Element {
 }
 
 function accountDropdown(options: models.Options): JSX.Element {
-    async function onChange(index: number): Promise<void> {
-        await options.setCurrentAccount(accounts[index].value)
+    async function onChange(account: domain.Account): Promise<void> {
+        await options.setCurrentAccount(account)
     }
 
     const accounts = options.vcsAccounts.map(createAccountDropdownItem)
     if (!options.vcsCurrentAccount)
-        return <Dropdown items={accounts} onChange={onChange} placeholder="Choose account" />
-    const selectedAccountIndex = options.vcsAccounts.indexOf(options.vcsCurrentAccount)
-    return <Dropdown selectedItemIndex={selectedAccountIndex} items={accounts} onChange={onChange} />
+        return <Dropdown items={accounts} onValueChange={onChange} placeholder="Choose account" />
+    return <Dropdown selectedValue={options.vcsCurrentAccount} items={accounts} onValueChange={onChange} />
 }
 
 function createAccountDropdownItem(account: domain.Account): DropdownItem<domain.Account> {
-    return { value: account, title: `${account.username} (${account.provider.name})`, key: account.id }
+    return { value: account, title: `${account.username} (${account.provider.name})` }
 }
 
 function providerList(options: models.Options): JSX.Element {

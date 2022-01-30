@@ -48,19 +48,23 @@
   position: relative;
 }
 
-.submenu-title {
+.submenu-button {
+  padding-right: 20px;
+
+  text-overflow: ellipsis;
+
   background-image: var(--arrow-right-icon-url);
   background-repeat: no-repeat;
   background-size: 7px;
-  background-position: calc(100% - 4px) 2px;
+  background-position: calc(100% - 4px) 8px;
 }
 
 .submenu-items-container {
   position: absolute;
-  left: calc(100%);
+  left: 100%;
   top: 0;
 
-  padding-left: 6px;
+  padding-left: 4px;
 }
 
 .submenu-items {
@@ -70,5 +74,12 @@
   padding: 6px 0;
 
   background-color: library.$background-primary;
+}
+
+.radio-button-active {
+  background-image: var(--check-icon-url);
+  background-repeat: no-repeat;
+  background-size: 10px;
+  background-position: calc(100% - 6px) 8px;
 }
 
