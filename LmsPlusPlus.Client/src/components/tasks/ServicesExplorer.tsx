@@ -29,7 +29,7 @@ function contextMenu(service: models.ItemNode<models.Service>): JSX.Element {
         <ContextMenu model={service.contextMenu}>
             <ContextMenu.Submenu title="View">
                 <ContextMenu.RadioGroup items={createItems(service)}
-                                        onValueChange={(v) => onServiceViewChange(service, v)}
+                                        onValueChange={v => onServiceViewChange(service, v)}
                                         selectedValue={service.item.serviceView} />
             </ContextMenu.Submenu>
         </ContextMenu>

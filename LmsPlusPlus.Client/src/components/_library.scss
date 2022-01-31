@@ -50,9 +50,9 @@ $text-small: 0.75rem;
   @if $side == "all" {
     box-shadow: 0 0 4px var(--shadow-primary);
   } @else if $side == "right" {
-    box-shadow: 1px 0 4px -1px var(--shadow-primary);
+    box-shadow: 4px 0 4px -3px var(--shadow-primary);
   } @else if $side == "bottom" {
-    box-shadow: 0 1px 4px -1px var(--shadow-primary);
+    box-shadow: 0 4px 4px -3px var(--shadow-primary);
   } @else {
     @error "Invalid side";
   }

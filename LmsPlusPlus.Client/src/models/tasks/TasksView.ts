@@ -58,15 +58,15 @@ export class TasksView extends View {
     @transaction
     updateTask(task: domain.Task): void {
         this.ensureCanPerformOperation()
-        this._taskEditor = new TaskEditor(task)
+        this._taskEditor = new TaskEditor(task, this._database.technologies)
     }
 
     @transaction
     createTask(course: domain.Course): void {
         this.ensureCanPerformOperation()
-        const task = new domain.Task(domain.Task.NO_ID, course, "", "")
+        const task = new domain.Task(domain.Task.NO_ID, course, "", "", [])
         task.solutions = []
-        this._taskEditor = new TaskEditor(task)
+        this._taskEditor = new TaskEditor(task, this._database.technologies)
     }
 
     @transaction @options({ monitor: TasksView.s_monitor })

@@ -6,6 +6,7 @@ import { Field } from "../Field"
 import { Input } from "../Input"
 import { MonacoEditor } from "../MonacoEditor"
 import styles from "./TaskEditor.module.scss"
+import { MultiselectDropdown } from "../MultiselectDropdown"
 
 interface TaskEditorProps {
     model: models.TasksView
@@ -16,11 +17,18 @@ export function TaskEditorSidePanelContent({ model }: TaskEditorProps): JSX.Elem
         const taskEditor = getTaskEditor(model)
         return (
             <div className={styles.sidePanelContent}>
-                <Field label="Title" className={styles.taskTitle}>
+                <Field label="Title" className={styles.field}>
                     <Input id="task-title"
                            className={styles.input}
                            value={taskEditor.title}
                            onChange={e => taskEditor.setTitle(e.target.value)} />
+                </Field>
+                <Field label="Technologies" className={styles.field}>
+                    <MultiselectDropdown items={taskEditor.availableTechnologies.map(t => ({ title: t, value: t }))}
+                                         selectedValues={taskEditor.selectedTechnologies}
+                                         onValuesChange={values => taskEditor.setSelectedTechnologies(values)}
+                                         createPlaceholder={() =>
+                                             createTechnologiesDropdownPlaceholder(taskEditor.selectedTechnologies)} />
                 </Field>
                 <div className={styles.buttons}>
                     <Button variant="primary"
@@ -37,6 +45,12 @@ export function TaskEditorSidePanelContent({ model }: TaskEditorProps): JSX.Elem
             </div>
         )
     }, [model])
+}
+
+function createTechnologiesDropdownPlaceholder(selectedTechnologies: readonly string[]): string {
+    if (selectedTechnologies.length === 1)
+        return "1 technology selected"
+    return `${selectedTechnologies.length} technologies selected`
 }
 
 export function TaskEditorMainPanelContent({ model }: TaskEditorProps): JSX.Element {

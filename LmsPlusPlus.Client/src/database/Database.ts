@@ -12,8 +12,10 @@ export class Database extends ObservableObject {
     private _preferences = domain.Preferences.default
     private _user = domain.User.default
     private _permissions = domain.Permissions.default
+    private _technologies: readonly string[] = []
 
     get courses(): readonly domain.Course[] { return this._courses }
+    get technologies(): readonly string[] { return this._technologies }
     get vcsConfiguration(): domain.VcsConfiguration { return this._vcsConfiguration }
     get preferences(): domain.Preferences { return this._preferences }
     get user(): domain.User { return this._user }
@@ -26,12 +28,13 @@ export class Database extends ObservableObject {
 
         await new Promise(r => setTimeout(r, 1000))
 
-        task = new domain.Task(Database.s_nextId++, task.course, task.title, task.description)
+        const newTask = new domain.Task(Database.s_nextId++, task.course, task.title, task.description, task.technologies)
+        newTask.solutions = task.solutions
         const courses = this._courses.toMutable()
-        const course = courses.find(c => c.id === task.course.id)
+        const course = courses.find(c => c.id === newTask.course.id)
         if (course) {
             const updatedCourse = new domain.Course(course.id, course.name)
-            updatedCourse.tasks = course.tasks.concat(task)
+            updatedCourse.tasks = course.tasks.concat(newTask)
             courses.splice(courses.indexOf(course), 1, updatedCourse)
         }
         this._courses = courses
@@ -49,7 +52,7 @@ export class Database extends ObservableObject {
         if (course) {
             const oldTask = course.tasks.find(t => t.id === task.id)
             if (oldTask) {
-                const updatedTask = new domain.Task(task.id, task.course, task.title, task.description)
+                const updatedTask = new domain.Task(task.id, task.course, task.title, task.description, task.technologies)
                 updatedTask.solutions = task.solutions
                 const updatedCourse = new domain.Course(course.id, course.name)
                 updatedCourse.tasks = course.tasks.map(t => t === oldTask ? updatedTask : t)
@@ -116,7 +119,8 @@ export class Database extends ObservableObject {
         if (course) {
             const oldTask = course.tasks.find(t => t.id === solution.task.id)
             if (oldTask) {
-                const updatedTask = new domain.Task(oldTask.id, oldTask.course, oldTask.title, oldTask.description)
+                const updatedTask = new domain.Task(oldTask.id, oldTask.course, oldTask.title, oldTask.description,
+                    oldTask.technologies)
                 updatedTask.solutions = oldTask.solutions.concat(solution)
                 const updatedCourse = new domain.Course(course.id, course.name)
                 updatedCourse.tasks = course.tasks.map(t => t === oldTask ? updatedTask : t)
@@ -138,7 +142,8 @@ export class Database extends ObservableObject {
         if (course) {
             const oldTask = course.tasks.find(t => t.id === solution.task.id)
             if (oldTask) {
-                const updatedTask = new domain.Task(oldTask.id, oldTask.course, oldTask.title, oldTask.description)
+                const updatedTask = new domain.Task(oldTask.id, oldTask.course, oldTask.title, oldTask.description,
+                    oldTask.technologies)
                 updatedTask.solutions = oldTask.solutions.filter(s => s.id !== solution.id)
                 const updatedCourse = new domain.Course(course.id, course.name)
                 updatedCourse.tasks = course.tasks.map(t => t === oldTask ? updatedTask : t)
@@ -155,17 +160,20 @@ export class Database extends ObservableObject {
 
     @reaction
     private async data_fetched_from_api(): Promise<void> {
+        // technologies
+        this._technologies = ["Java", "C#", "C", "C++", "PHP", "JavaScript"]
+
         // courses
         const course1 = new domain.Course(Database.s_nextId++, "СПП")
         course1.tasks = [
-            new domain.Task(Database.s_nextId++, course1, "Task 1", "# Task 1"),
-            new domain.Task(Database.s_nextId++, course1, "Task 2", "# Task 2")
+            new domain.Task(Database.s_nextId++, course1, "Task 1", "# Task 1", [this._technologies[0]]),
+            new domain.Task(Database.s_nextId++, course1, "Task 2", "# Task 2", [this._technologies[1]])
         ]
         const course2 = new domain.Course(Database.s_nextId++, "ЯП")
         course2.tasks = [
-            new domain.Task(Database.s_nextId++, course2, "Task 1", "# Task 1"),
-            new domain.Task(Database.s_nextId++, course2, "Task 2", "# Task 2"),
-            new domain.Task(Database.s_nextId++, course2, "Task 3", "# Task 3")
+            new domain.Task(Database.s_nextId++, course2, "Task 1", "# Task 1", [this._technologies[2]]),
+            new domain.Task(Database.s_nextId++, course2, "Task 2", "# Task 2", [this._technologies[3]]),
+            new domain.Task(Database.s_nextId++, course2, "Task 3", "# Task 3", [this._technologies[4]])
         ]
         this._courses = [course1, course2]
 
@@ -178,7 +186,7 @@ export class Database extends ObservableObject {
         this._courses[1].tasks[2].solutions = []
 
         // preferences
-        this._preferences = await Promise.resolve(new domain.Preferences(true))
+        this._preferences = await new domain.Preferences(true)
 
         // vcs configuration
         const github = new domain.Provider(Database.s_nextId++, "GitHub", githubIcon)
@@ -198,6 +206,6 @@ export class Database extends ObservableObject {
         this._user = await new domain.User()
 
         // permissions
-        this._permissions = await domain.Permissions.student
+        this._permissions = await domain.Permissions.teacher
     }
 }

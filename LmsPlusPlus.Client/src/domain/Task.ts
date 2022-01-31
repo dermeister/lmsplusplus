@@ -7,6 +7,7 @@ export class Task {
     readonly course: Course
     readonly title: string
     readonly description: string
+    readonly technologies: readonly string[]
     private _solutions: readonly Solution[] = []
     private _solutionsInitialized = false
 
@@ -23,10 +24,11 @@ export class Task {
             throw new Error("Task tasks have already been initialized")
     }
 
-    constructor(id: number, course: Course, title: string, description: string) {
+    constructor(id: number, course: Course, title: string, description: string, technologies: readonly string[]) {
         this.id = id
         this.course = course
         this.title = title
         this.description = description
+        this.technologies = technologies
     }
 }
