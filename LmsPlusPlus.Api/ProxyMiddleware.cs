@@ -45,7 +45,8 @@ public class ProxyMiddleware
         string host = request.Headers["lmsplusplus-host"];
         var port = ushort.Parse(request.Headers["lmsplusplus-port"]);
         string path = request.Path.Value!["/proxy".Length..];
-        Uri requestUri = new($"http://{host}:{port}{path}");
+        string query = request.QueryString.Value ?? "";
+        Uri requestUri = new($"http://{host}:{port}{path}{query}");
         HttpMethod method = new(request.Method);
         StringContent content = new(body);
         HttpRequestMessage requestMessage = new()
