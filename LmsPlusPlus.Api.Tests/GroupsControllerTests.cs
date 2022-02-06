@@ -14,30 +14,30 @@ public class GroupsControllerTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
+        _app = new WebApplication();
+        DatabaseModels.User user1 = new()
+        {
+            Login = "user1",
+            PasswordHash = "password1",
+            FirstName = "User 1",
+            LastName = "User 1",
+            Role = DatabaseModels.Role.Author
+        };
+        DatabaseModels.Topic topic1 = new()
+        {
+            Author = user1,
+            Name = "Topic 1"
+        };
+        DatabaseModels.Group group1 = new()
+        {
+            Name = "Group 1",
+            Topic = topic1
+        };
+        _app.Context.Add(user1);
+        _app.Context.Add(topic1);
+        _app.Context.Add(group1);
         try
         {
-            _app = new WebApplication();
-            DatabaseModels.User user1 = new()
-            {
-                Login = "user1",
-                PasswordHash = "password1",
-                FirstName = "User 1",
-                LastName = "User 1",
-                Role = DatabaseModels.Role.Author
-            };
-            DatabaseModels.Topic topic1 = new()
-            {
-                Author = user1,
-                Name = "Topic 1"
-            };
-            DatabaseModels.Group group1 = new()
-            {
-                Name = "Group 1",
-                Topic = topic1
-            };
-            _app.Context.Add(user1);
-            _app.Context.Add(topic1);
-            _app.Context.Add(group1);
             await _app.Context.SaveChangesAsync();
         }
         catch (Exception)
