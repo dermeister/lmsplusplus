@@ -2,7 +2,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using LmsPlusPlus.Api.Infrastructure;
-using LmsPlusPlus.Api.Models;
 using LmsPlusPlus.Runtime;
 using Microsoft.AspNetCore.SignalR;
 
@@ -12,17 +11,17 @@ public class ApplicationHub : Hub
 {
     const string ApplicationItemKey = "application";
     readonly SemaphoreSlim _lock = new(1);
-    readonly ApplicationContext _dbContext;
+    readonly ApplicationContext _context;
     readonly string _workingDirectory = Path.Combine(Path.GetTempPath(), path2: "lmsplusplus", path3: "runtime-working-directory");
 
-    public ApplicationHub(ApplicationContext dbContext) => _dbContext = dbContext;
+    public ApplicationHub(ApplicationContext context) => _context = context;
 
     public async Task<IEnumerable<ServiceConfiguration>> StartApplication(int solutionId)
     {
-        Solution? solution = await _dbContext.Solutions.FindAsync(solutionId);
+        DatabaseModels.Solution? solution = await _context.Solutions.FindAsync(solutionId);
         if (solution is null)
             throw new Exception();
-        ApplicationConfiguration applicationConfiguration = new(solution.RepositoryUrl, _workingDirectory);
+        ApplicationConfiguration applicationConfiguration = new(solution.Repository.Url, _workingDirectory);
         Application application = new(applicationConfiguration);
         Context.Items[ApplicationItemKey] = application;
         ReadOnlyCollection<Runtime.ServiceConfiguration> serviceConfigurations = await application.GetServiceConfigurations();
