@@ -55,10 +55,10 @@ public class ApplicationTests : IClassFixture<ApplicationFixture>
 
         // Act
         string serviceName = (await application.GetServiceConfigurations()).First().Name;
-        string? output = await application.ReadServiceOutputAsync(serviceName);
+        string? output = await TestUtils.ReadAllServiceOutput(application, serviceName);
 
         // Assert
-        Assert.Equal(expected: "Hello from service!\n", output);
+        Assert.EndsWith(expectedEndString: "Hello from service!\r\n", output ?? "");
     }
 
     [Fact]
@@ -70,14 +70,11 @@ public class ApplicationTests : IClassFixture<ApplicationFixture>
 
         // Act
         string serviceName = (await application.GetServiceConfigurations()).First().Name;
-        await application.WriteServiceInputAsync(serviceName, input: "hello");
-        string? output1 = await application.ReadServiceOutputAsync(serviceName);
-        await application.WriteServiceInputAsync(serviceName, input: "world");
-        string? output2 = await application.ReadServiceOutputAsync(serviceName);
+        await application.WriteServiceInputAsync(serviceName, input: "hello\n");
+        string? output = await TestUtils.ReadAllServiceOutput(application, serviceName);
 
         // Assert
-        Assert.Equal(expected: "hello", output1);
-        Assert.Equal(expected: "world", output2);
+        Assert.EndsWith(expectedEndString: "hello\r\nhello\r\n", output ?? "");
     }
 
     [Fact]
@@ -108,11 +105,11 @@ public class ApplicationTests : IClassFixture<ApplicationFixture>
         await using Application application = new(applicationConfiguration);
 
         // Act
-        await application.WriteServiceInputAsync(serviceName: "backend", input: "hello world");
-        string? output = await application.ReadServiceOutputAsync("frontend");
+        await application.WriteServiceInputAsync(serviceName: "backend", input: "hello world\n");
+        string? output = await TestUtils.ReadAllServiceOutput(application, serviceName: "frontend");
 
         // Assert
-        Assert.Equal(expected: "hello world", output);
+        Assert.EndsWith(expectedEndString: "hello world\r\n", output ?? "");
     }
 
     ApplicationConfiguration CreateApplicationConfiguration(string applicationName)

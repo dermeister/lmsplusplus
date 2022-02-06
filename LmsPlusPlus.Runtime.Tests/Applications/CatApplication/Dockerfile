@@ -1,3 +1,3 @@
 FROM alpine
 
-CMD cat
+CMD read input && echo $input

@@ -34,12 +34,12 @@ public class ServiceTests
         await service.Start();
 
         // Act
-        string? output1 = await service.ReadOutputAsync();
+        string? output1 = await TestUtils.ReadAllServiceOutput(service);
         string? output2 = await service.ReadOutputAsync();
         string? output3 = await service.ReadOutputAsync();
 
         // Assert
-        Assert.Equal(expected: "Hello from service!\n", output1);
+        Assert.EndsWith(expectedEndString: "Hello from service!\r\n", output1 ?? "");
         Assert.Null(output2);
         Assert.Null(output3);
     }
@@ -54,7 +54,7 @@ public class ServiceTests
         // Act
         await service.DisposeAsync();
         Task ReadBuildOutput() => service.ReadBuildOutputAsync();
-        Task WriteInput() => service.WriteInputAsync("input");
+        Task WriteInput() => service.WriteInputAsync("input\n");
         Task ReadOutput() => service.ReadOutputAsync();
         Task GetOpenedPorts() => service.GetOpenedPortsAsync();
 
@@ -73,7 +73,7 @@ public class ServiceTests
         await using Service service = new(configuration);
 
         // Act
-        Task WriteInput() => service.WriteInputAsync("input");
+        Task WriteInput() => service.WriteInputAsync("input\n");
         Task ReadOutput() => service.ReadOutputAsync();
         Task GetOpenedPorts() => service.GetOpenedPortsAsync();
 
@@ -95,14 +95,11 @@ public class ServiceTests
         await service.Start();
 
         // Act
-        await service.WriteInputAsync("hello");
-        string? output1 = await service.ReadOutputAsync();
-        await service.WriteInputAsync("world");
-        string? output2 = await service.ReadOutputAsync();
+        await service.WriteInputAsync("hello\n");
+        string? output = await TestUtils.ReadAllServiceOutput(service);
 
         // Assert
-        Assert.Equal(expected: "hello", output1);
-        Assert.Equal(expected: "world", output2);
+        Assert.EndsWith(expectedEndString: "hello\r\nhello\r\n", output ?? "");
     }
 
     [Fact]
