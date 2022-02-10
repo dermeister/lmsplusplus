@@ -1,4 +1,3 @@
-using LmsPlusPlus.Api.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,20 +7,20 @@ namespace LmsPlusPlus.Api;
 [Route("tasks")]
 public class TasksController : ControllerBase
 {
-    readonly ApplicationContext _context;
+    readonly Infrastructure.ApplicationContext _context;
 
-    public TasksController(ApplicationContext context) => _context = context;
+    public TasksController(Infrastructure.ApplicationContext context) => _context = context;
 
     [HttpGet]
-    public async Task<IEnumerable<DatabaseModels.Task>> GetAll() => await _context.Tasks.ToArrayAsync();
+    public async Task<IEnumerable<Infrastructure.Task>> GetAll() => await _context.Tasks.ToArrayAsync();
 
     [HttpGet("{id:long}")]
-    public async Task<DatabaseModels.Task?> GetById(long id) => await _context.Tasks.FindAsync(id);
+    public async Task<Infrastructure.Task?> GetById(long id) => await _context.Tasks.FindAsync(id);
 
     [HttpPost]
-    public async Task<DatabaseModels.Task> Create(RequestModels.Task requestTask)
+    public async Task<Infrastructure.Task> Create(RequestModels.Task requestTask)
     {
-        DatabaseModels.Task databaseTask = new()
+        Infrastructure.Task databaseTask = new()
         {
             Title = requestTask.Title,
             Description = requestTask.Description,
@@ -33,9 +32,9 @@ public class TasksController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    public async Task<ActionResult<DatabaseModels.Task>> Update(long id, RequestModels.Task requestTask)
+    public async Task<ActionResult<Infrastructure.Task>> Update(long id, RequestModels.Task requestTask)
     {
-        DatabaseModels.Task? databaseTask = await _context.Tasks.FindAsync(id);
+        Infrastructure.Task? databaseTask = await _context.Tasks.FindAsync(id);
         if (databaseTask is null)
             return BadRequest();
         databaseTask.Title = requestTask.Title;
@@ -48,7 +47,7 @@ public class TasksController : ControllerBase
     [HttpDelete("{id:long}")]
     public async Task Delete(long id)
     {
-        DatabaseModels.Task? task = await _context.Tasks.FindAsync(id);
+        Infrastructure.Task? task = await _context.Tasks.FindAsync(id);
         if (task is not null)
         {
             _context.Remove(task);

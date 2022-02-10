@@ -15,15 +15,15 @@ public class TopicsControllerTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         _app = new WebApplication();
-        DatabaseModels.User user1 = new()
+        Infrastructure.User user1 = new()
         {
             Login = "user1",
             PasswordHash = "password1",
             FirstName = "User 1",
             LastName = "User 1",
-            Role = DatabaseModels.Role.Author
+            Role = Infrastructure.Role.Author
         };
-        DatabaseModels.Topic topic1 = new()
+        Infrastructure.Topic topic1 = new()
         {
             Author = user1,
             Name = "Topic 1"
@@ -74,7 +74,7 @@ public class TopicsControllerTests : IAsyncLifetime
     public async Task GetTopicByIdOk()
     {
         // Arrange
-        DatabaseModels.Topic topic = await _app.Context.Topics.FirstAsync();
+        Infrastructure.Topic topic = await _app.Context.Topics.FirstAsync();
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"topics/{topic.Id}", HttpMethod.Get);
 
         // Act
@@ -88,7 +88,7 @@ public class TopicsControllerTests : IAsyncLifetime
     public async Task CreateTopicBadRequest()
     {
         // Arrange
-        DatabaseModels.User user = await _app.Context.Users.FirstAsync();
+        Infrastructure.User user = await _app.Context.Users.FirstAsync();
         RequestModels.Topic topic = new(null!, user.Id);
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "topics", HttpMethod.Post, topic);
         int oldTopicsCount = await _app.Context.Topics.CountAsync();
@@ -106,7 +106,7 @@ public class TopicsControllerTests : IAsyncLifetime
     public async Task CreateTopicOk()
     {
         // Arrange
-        DatabaseModels.User user = await _app.Context.Users.FirstAsync();
+        Infrastructure.User user = await _app.Context.Users.FirstAsync();
         RequestModels.Topic topic = new(Name: "New topic 1", user.Id);
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "topics", HttpMethod.Post, topic);
         int oldTopicsCount = await _app.Context.Topics.CountAsync();
@@ -139,7 +139,7 @@ public class TopicsControllerTests : IAsyncLifetime
     public async Task UpdateTopicOk()
     {
         // Arrange
-        DatabaseModels.Topic databaseTopic = await _app.Context.Topics.FirstAsync();
+        Infrastructure.Topic databaseTopic = await _app.Context.Topics.FirstAsync();
         RequestModels.Topic requestTopic = new(Name: "New topic", databaseTopic.AuthorId);
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"topics/{databaseTopic.Id}", HttpMethod.Put, requestTopic);
 
@@ -171,7 +171,7 @@ public class TopicsControllerTests : IAsyncLifetime
     public async Task DeleteExistingTopicOk()
     {
         // Arrange
-        DatabaseModels.Topic databaseTopic = await _app.Context.Topics.FirstAsync();
+        Infrastructure.Topic databaseTopic = await _app.Context.Topics.FirstAsync();
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"topics/{databaseTopic.Id}", HttpMethod.Delete);
         int oldTopicsCount = await _app.Context.Topics.CountAsync();
 
@@ -186,8 +186,8 @@ public class TopicsControllerTests : IAsyncLifetime
 
     async Task<long> GetNonExistentTopicId()
     {
-        DatabaseModels.Topic[] topics = await (from topic in _app.Context.Topics orderby topic.Id select topic).ToArrayAsync();
-        DatabaseModels.Topic? lastTopic = topics.LastOrDefault();
+        Infrastructure.Topic[] topics = await (from topic in _app.Context.Topics orderby topic.Id select topic).ToArrayAsync();
+        Infrastructure.Topic? lastTopic = topics.LastOrDefault();
         if (lastTopic is null)
             return 0;
         return lastTopic.Id + 1;

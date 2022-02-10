@@ -15,7 +15,7 @@ public class RepositoryHostingProvidersControllerTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         _app = new WebApplication();
-        DatabaseModels.RepositoryHostingProvider provider1 = new() { Name = "Provider 1" };
+        Infrastructure.RepositoryHostingProvider provider1 = new() { Name = "Provider 1" };
         _app.Context.Add(provider1);
         try
         {
@@ -97,7 +97,7 @@ public class RepositoryHostingProvidersControllerTests : IAsyncLifetime
     public async Task UpdateProviderOk()
     {
         // Arrange
-        DatabaseModels.RepositoryHostingProvider provider = await _app.Context.RepositoryHostingProviders.FirstAsync();
+        Infrastructure.RepositoryHostingProvider provider = await _app.Context.RepositoryHostingProviders.FirstAsync();
         RequestModels.RepositoryHostingProvider requestProvider = new(Name: "New provider 1");
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"repository-hosting-providers/{provider.Id}",
             HttpMethod.Put, requestProvider);
@@ -131,7 +131,7 @@ public class RepositoryHostingProvidersControllerTests : IAsyncLifetime
     public async Task DeleteExistingProviderOk()
     {
         // Arrange
-        DatabaseModels.RepositoryHostingProvider providers = await _app.Context.RepositoryHostingProviders.FirstAsync();
+        Infrastructure.RepositoryHostingProvider providers = await _app.Context.RepositoryHostingProviders.FirstAsync();
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"repository-hosting-providers/{providers.Id}",
             HttpMethod.Delete);
         int oldProvidersCount = await _app.Context.RepositoryHostingProviders.CountAsync();
@@ -147,10 +147,10 @@ public class RepositoryHostingProvidersControllerTests : IAsyncLifetime
 
     async Task<long> GetNonExistentProviderId()
     {
-        DatabaseModels.RepositoryHostingProvider[] providers = await (from provider in _app.Context.RepositoryHostingProviders
+        Infrastructure.RepositoryHostingProvider[] providers = await (from provider in _app.Context.RepositoryHostingProviders
                                                                       orderby provider.Id
                                                                       select provider).ToArrayAsync();
-        DatabaseModels.RepositoryHostingProvider? lastProvider = providers.LastOrDefault();
+        Infrastructure.RepositoryHostingProvider? lastProvider = providers.LastOrDefault();
         if (lastProvider is null)
             return 0;
         return lastProvider.Id + 1;

@@ -2,15 +2,17 @@ using LmsPlusPlus.Api.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Configuration;
 
 namespace LmsPlusPlus.Api.Tests;
 
-public class TestApplicationContext : ApplicationContext
+public sealed class TestApplicationContext : ApplicationContext
 {
-    public sealed override DatabaseFacade Database => base.Database;
+    readonly IConfiguration _configuration;
 
-    public TestApplicationContext(DbContextOptions<TestApplicationContext> options) : base(options)
+    public TestApplicationContext(DbContextOptions<TestApplicationContext> options, IConfiguration configuration) : base(options)
     {
+        _configuration = configuration;
         IRelationalDatabaseCreator creator = Database.GetService<IRelationalDatabaseCreator>();
         if (!creator.Exists())
             creator.Create();
@@ -18,7 +20,7 @@ public class TestApplicationContext : ApplicationContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.UseDatabaseTemplate("lmsplusplus-test");
+        modelBuilder.UseDatabaseTemplate(_configuration["PostgresTemplateDb"]);
         base.OnModelCreating(modelBuilder);
     }
 }

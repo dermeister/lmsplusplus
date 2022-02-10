@@ -15,25 +15,25 @@ public class TasksControllerTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         _app = new WebApplication();
-        DatabaseModels.User user1 = new()
+        Infrastructure.User user1 = new()
         {
             Login = "user1",
             PasswordHash = "password1",
             FirstName = "User 1",
             LastName = "User 1",
-            Role = DatabaseModels.Role.Author
+            Role = Infrastructure.Role.Author
         };
-        DatabaseModels.Topic topic1 = new()
+        Infrastructure.Topic topic1 = new()
         {
             Author = user1,
             Name = "Topic 1"
         };
-        DatabaseModels.Group group1 = new()
+        Infrastructure.Group group1 = new()
         {
             Name = "Group 1",
             Topic = topic1
         };
-        DatabaseModels.Task task1 = new()
+        Infrastructure.Task task1 = new()
         {
             Title = "Task 1",
             Description = "Task 1",
@@ -87,7 +87,7 @@ public class TasksControllerTests : IAsyncLifetime
     public async Task GetTaskByIdOk()
     {
         // Arrange
-        DatabaseModels.Task task = await _app.Context.Tasks.FirstAsync();
+        Infrastructure.Task task = await _app.Context.Tasks.FirstAsync();
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"tasks/{task.Id}", HttpMethod.Get);
 
         // Act
@@ -118,7 +118,7 @@ public class TasksControllerTests : IAsyncLifetime
     public async Task CreateTaskOk()
     {
         // Arrange
-        DatabaseModels.Topic topic = await _app.Context.Topics.FirstAsync();
+        Infrastructure.Topic topic = await _app.Context.Topics.FirstAsync();
         RequestModels.Task task = new(Title: "New task 1", Description: "New task 1", topic.Id);
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Post, task);
         int oldTasksCount = await _app.Context.Tasks.CountAsync();
@@ -151,7 +151,7 @@ public class TasksControllerTests : IAsyncLifetime
     public async Task UpdateTaskOk()
     {
         // Arrange
-        DatabaseModels.Task databaseTask = await _app.Context.Tasks.FirstAsync();
+        Infrastructure.Task databaseTask = await _app.Context.Tasks.FirstAsync();
         RequestModels.Task requestTask = new(Title: "New task 1", Description: "New task 1", databaseTask.TopicId);
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"tasks/{databaseTask.Id}", HttpMethod.Put, requestTask);
 
@@ -183,7 +183,7 @@ public class TasksControllerTests : IAsyncLifetime
     public async Task DeleteExistingTaskOk()
     {
         // Arrange
-        DatabaseModels.Task databaseTask = await _app.Context.Tasks.FirstAsync();
+        Infrastructure.Task databaseTask = await _app.Context.Tasks.FirstAsync();
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"tasks/{databaseTask.Id}", HttpMethod.Delete);
         int oldTasksCount = await _app.Context.Tasks.CountAsync();
 
@@ -198,8 +198,8 @@ public class TasksControllerTests : IAsyncLifetime
 
     async Task<long> GetNonExistentTaskId()
     {
-        DatabaseModels.Task[] tasks = await (from task in _app.Context.Tasks orderby task.Id select task).ToArrayAsync();
-        DatabaseModels.Task? lastTask = tasks.LastOrDefault();
+        Infrastructure.Task[] tasks = await (from task in _app.Context.Tasks orderby task.Id select task).ToArrayAsync();
+        Infrastructure.Task? lastTask = tasks.LastOrDefault();
         if (lastTask is null)
             return 0;
         return lastTask.Id + 1;

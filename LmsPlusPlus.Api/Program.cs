@@ -7,11 +7,11 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationContext>((serviceProvider, optionsBuilder) =>
 {
     IConfiguration configuration = serviceProvider.GetRequiredService<IConfiguration>();
-    string? host = configuration["POSTGRES_HOST"];
-    string? port = configuration["POSTGRES_PORT"];
-    string? database = configuration["POSTGRES_DB"];
-    string? username = configuration["POSTGRES_USERNAME"];
-    string? password = configuration["POSTGRES_PASSWORD"];
+    string? host = configuration["PostgresHost"];
+    string? port = configuration["PostgresPort"];
+    string? database = configuration["PostgresDb"];
+    string? username = configuration["PostgresUsername"];
+    string? password = configuration["PostgresPassword"];
     optionsBuilder
         .UseNpgsql($"Host={host};Port={port};Database={database};Username={username};Password={password}")
         .UseSnakeCaseNamingConvention();

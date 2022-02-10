@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using LmsPlusPlus.Api.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LmsPlusPlus.Api.Tests;
@@ -26,17 +27,27 @@ class WebApplication : IAsyncDisposable
         {
             _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(webHostBuilder =>
             {
+                webHostBuilder.ConfigureAppConfiguration((_, configurationBuilder) =>
+                {
+                    IConfigurationRoot configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Test.json").Build();
+                    configurationBuilder.AddConfiguration(configuration);
+                });
                 webHostBuilder.ConfigureServices((context, services) =>
                 {
                     ServiceDescriptor descriptor = services.First(s => s.ServiceType == typeof(ApplicationContext));
                     services.Remove(descriptor);
-                    string? host = context.Configuration["POSTGRES_HOST"];
-                    string? port = context.Configuration["POSTGRES_PORT"];
-                    string? username = context.Configuration["POSTGRES_USERNAME"];
-                    string? password = context.Configuration["POSTGRES_PASSWORD"];
-                    services.AddDbContext<ApplicationContext, TestApplicationContext>(optionsBuilder => optionsBuilder
-                        .UseNpgsql($"Host={host};Port={port};Database={_testDatabaseName};Username={username};Password={password}")
-                        .UseSnakeCaseNamingConvention());
+                    string? host = context.Configuration["PostgresHost"];
+                    string? port = context.Configuration["PostgresPort"];
+                    string? username = context.Configuration["PostgresUsername"];
+                    string? password = context.Configuration["PostgresPassword"];
+                    string connectionString =
+                        $"Host={host};Port={port};Database={_testDatabaseName};Username={username};Password={password}";
+                    services.AddDbContext<ApplicationContext, TestApplicationContext>(optionsBuilder =>
+                    {
+                        optionsBuilder
+                            .UseNpgsql(connectionString)
+                            .UseSnakeCaseNamingConvention();
+                    });
                 });
             });
             _scope = _factory.Server.Services.CreateScope();

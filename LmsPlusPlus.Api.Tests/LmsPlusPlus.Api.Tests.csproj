@@ -3,7 +3,6 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
-
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
@@ -25,4 +24,10 @@
       <ProjectReference Include="..\LmsPlusPlus.Api\LmsPlusPlus.Api.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="appsettings.Test.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+    
 </Project>

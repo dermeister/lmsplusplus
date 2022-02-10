@@ -15,13 +15,13 @@ public sealed class UsersControllerTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         _app = new WebApplication();
-        DatabaseModels.User user1 = new()
+        Infrastructure.User user1 = new()
         {
             Login = "user1",
             PasswordHash = "password1",
             FirstName = "User 1",
             LastName = "User 1",
-            Role = DatabaseModels.Role.Solver
+            Role = Infrastructure.Role.Solver
         };
         _app.Context.Add(user1);
         try
@@ -100,7 +100,7 @@ public sealed class UsersControllerTests : IAsyncLifetime
     public async Task UpdateUserOk()
     {
         // Arrange
-        DatabaseModels.User databaseUser = await _app.Context.Users.FirstAsync();
+        Infrastructure.User databaseUser = await _app.Context.Users.FirstAsync();
         RequestModels.User requestUser = new(databaseUser.Login, databaseUser.PasswordHash, FirstName: "User 2", LastName: "User 2");
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"users/{databaseUser.Id}", HttpMethod.Put, requestUser);
 
@@ -132,7 +132,7 @@ public sealed class UsersControllerTests : IAsyncLifetime
     public async Task DeleteExistingUserOk()
     {
         // Arrange
-        DatabaseModels.User user = await _app.Context.Users.FirstAsync();
+        Infrastructure.User user = await _app.Context.Users.FirstAsync();
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"users/{user.Id}", HttpMethod.Delete);
         int oldUsersCount = await _app.Context.Users.CountAsync();
 
@@ -147,8 +147,8 @@ public sealed class UsersControllerTests : IAsyncLifetime
 
     async Task<long> GetNonExistentUserId()
     {
-        DatabaseModels.User[] users = await (from user in _app.Context.Users orderby user.Id select user).ToArrayAsync();
-        DatabaseModels.User? lastUser = users.LastOrDefault();
+        Infrastructure.User[] users = await (from user in _app.Context.Users orderby user.Id select user).ToArrayAsync();
+        Infrastructure.User? lastUser = users.LastOrDefault();
         if (lastUser is null)
             return 0;
         return lastUser.Id + 1;

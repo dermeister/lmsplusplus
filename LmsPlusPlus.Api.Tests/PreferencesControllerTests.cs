@@ -14,15 +14,15 @@ public class PreferencesControllerTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         _app = new WebApplication();
-        DatabaseModels.User user1 = new()
+        Infrastructure.User user1 = new()
         {
             Login = "user1",
             PasswordHash = "password1",
             FirstName = "User 1",
             LastName = "User 1",
-            Role = DatabaseModels.Role.Solver
+            Role = Infrastructure.Role.Solver
         };
-        DatabaseModels.Preferences preferences1 = new()
+        Infrastructure.Preferences preferences1 = new()
         {
             Theme = "Dark",
             User = user1
@@ -46,7 +46,7 @@ public class PreferencesControllerTests : IAsyncLifetime
     public async Task GetPreferences()
     {
         // Arrange
-        DatabaseModels.User user = await _app.Context.Users.FirstAsync();
+        Infrastructure.User user = await _app.Context.Users.FirstAsync();
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"preferences/{user.Id}", HttpMethod.Get);
 
         // Act
@@ -60,7 +60,7 @@ public class PreferencesControllerTests : IAsyncLifetime
     public async Task UpdatePreferencesBadRequest()
     {
         // Arrange
-        DatabaseModels.User user = await _app.Context.Users.FirstAsync();
+        Infrastructure.User user = await _app.Context.Users.FirstAsync();
         RequestModels.Preferences preferences = new(null!);
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"preferences/{user.Id}", HttpMethod.Put, preferences);
 
@@ -75,7 +75,7 @@ public class PreferencesControllerTests : IAsyncLifetime
     public async Task UpdatePreferencesOk()
     {
         // Arrange
-        DatabaseModels.User user = await _app.Context.Users.FirstAsync();
+        Infrastructure.User user = await _app.Context.Users.FirstAsync();
         RequestModels.Preferences preferences = new(Theme: "Light");
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"preferences/{user.Id}", HttpMethod.Put, preferences);
 

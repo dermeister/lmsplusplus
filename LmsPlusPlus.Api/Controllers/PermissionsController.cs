@@ -1,4 +1,3 @@
-using LmsPlusPlus.Api.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,27 +7,27 @@ namespace LmsPlusPlus.Api;
 [Route("permissions")]
 public class PermissionsController : ControllerBase
 {
-    readonly ApplicationContext _context;
+    readonly Infrastructure.ApplicationContext _context;
 
-    public PermissionsController(ApplicationContext context) => _context = context;
+    public PermissionsController(Infrastructure.ApplicationContext context) => _context = context;
 
     [HttpGet]
-    public async Task<IEnumerable<DatabaseModels.Permissions>> GetAll() => await _context.Permissions.ToArrayAsync();
+    public async Task<IEnumerable<Infrastructure.Permissions>> GetAll() => await _context.Permissions.ToArrayAsync();
 
     [HttpGet("{role}")]
-    public async Task<DatabaseModels.Permissions?> GetPermissionsByRole(string role)
+    public async Task<Infrastructure.Permissions?> GetPermissionsByRole(string role)
     {
-        if (!Enum.TryParse(role, ignoreCase: true, out DatabaseModels.Role parsedRole))
+        if (!Enum.TryParse(role, ignoreCase: true, out Infrastructure.Role parsedRole))
             return null;
         return await _context.Permissions.FindAsync(parsedRole);
     }
 
     [HttpPut("{role}")]
-    public async Task<ActionResult<DatabaseModels.Permissions>> Update(string role, RequestModels.Permissions requestPermissions)
+    public async Task<ActionResult<Infrastructure.Permissions>> Update(string role, RequestModels.Permissions requestPermissions)
     {
-        if (!Enum.TryParse(role, ignoreCase: true, out DatabaseModels.Role parsedRole))
+        if (!Enum.TryParse(role, ignoreCase: true, out Infrastructure.Role parsedRole))
             return BadRequest();
-        DatabaseModels.Permissions? databasePermissions = await _context.Permissions.FindAsync(parsedRole);
+        Infrastructure.Permissions? databasePermissions = await _context.Permissions.FindAsync(parsedRole);
         if (databasePermissions is null)
             return BadRequest();
         databasePermissions.CanCreateTask = requestPermissions.CanCreateTask;

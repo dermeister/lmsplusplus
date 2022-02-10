@@ -1,4 +1,4 @@
-namespace LmsPlusPlus.Api.DatabaseModels;
+namespace LmsPlusPlus.Api.Infrastructure;
 
 public record Group
 {

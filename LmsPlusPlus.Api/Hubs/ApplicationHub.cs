@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using LmsPlusPlus.Api.Infrastructure;
 using LmsPlusPlus.Runtime;
 using Microsoft.AspNetCore.SignalR;
 
@@ -11,14 +10,14 @@ public class ApplicationHub : Hub
 {
     const string ApplicationItemKey = "application";
     readonly SemaphoreSlim _lock = new(1);
-    readonly ApplicationContext _context;
+    readonly Infrastructure.ApplicationContext _context;
     readonly string _workingDirectory = Path.Combine(Path.GetTempPath(), path2: "lmsplusplus", path3: "runtime-working-directory");
 
-    public ApplicationHub(ApplicationContext context) => _context = context;
+    public ApplicationHub(Infrastructure.ApplicationContext context) => _context = context;
 
     public async Task<IEnumerable<ServiceConfiguration>> StartApplication(int solutionId)
     {
-        DatabaseModels.Solution? solution = await _context.Solutions.FindAsync(solutionId);
+        Infrastructure.Solution? solution = await _context.Solutions.FindAsync(solutionId);
         if (solution is null)
             throw new Exception();
         ApplicationConfiguration applicationConfiguration = new(solution.Repository.Url, _workingDirectory);
@@ -44,59 +43,58 @@ public class ApplicationHub : Hub
     public async IAsyncEnumerable<ServiceBuildOutput> ReadBuildOutput(string serviceName,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        if (TryGetApplication(out Application? application))
-        {
-            LmsPlusPlus.Runtime.ServiceBuildOutput? buildOutput;
-            do
-                try
-                {
-                    await _lock.WaitAsync(cancellationToken);
-                    buildOutput = await application.ReadServiceBuildOutputAsync(serviceName, cancellationToken);
-                    if (buildOutput is not null)
-                        yield return new ServiceBuildOutput(buildOutput.Text, buildOutput.Anchor);
-                }
-                finally
-                {
-                    _lock.Release();
-                }
-            while (buildOutput is not null);
-        }
-    }
-
-    public async IAsyncEnumerable<string> ReadServiceOutput(string serviceName,
-        [EnumeratorCancellation] CancellationToken cancellationToken)
-    {
-        if (TryGetApplication(out Application? application))
-        {
-            string? serviceOutput;
-            do
-                try
-                {
-                    await _lock.WaitAsync(cancellationToken);
-                    serviceOutput = await application.ReadServiceOutputAsync(serviceName, cancellationToken);
-                    if (serviceOutput is not null)
-                        yield return serviceOutput;
-                }
-                finally
-                {
-                    _lock.Release();
-                }
-            while (serviceOutput is not null);
-        }
-    }
-
-    public async Task WriteServiceInput(string serviceName, string text)
-    {
-        if (TryGetApplication(out Application? application))
+        if (!TryGetApplication(out Application? application))
+            throw new Exception();
+        Runtime.ServiceBuildOutput? buildOutput;
+        do
             try
             {
-                await _lock.WaitAsync();
-                await application.WriteServiceInputAsync(serviceName, text);
+                await _lock.WaitAsync(cancellationToken);
+                buildOutput = await application.ReadServiceBuildOutputAsync(serviceName, cancellationToken);
+                if (buildOutput is not null)
+                    yield return new ServiceBuildOutput(buildOutput.Text, buildOutput.Anchor);
             }
             finally
             {
                 _lock.Release();
             }
+        while (buildOutput is not null);
+    }
+
+    public async IAsyncEnumerable<string> ReadServiceOutput(string serviceName,
+        [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        if (!TryGetApplication(out Application? application))
+            throw new Exception();
+        string? serviceOutput;
+        do
+            try
+            {
+                await _lock.WaitAsync(cancellationToken);
+                serviceOutput = await application.ReadServiceOutputAsync(serviceName, cancellationToken);
+                if (serviceOutput is not null)
+                    yield return serviceOutput;
+            }
+            finally
+            {
+                _lock.Release();
+            }
+        while (serviceOutput is not null);
+    }
+
+    public async Task WriteServiceInput(string serviceName, string text)
+    {
+        if (!TryGetApplication(out Application? application))
+            throw new Exception();
+        try
+        {
+            await _lock.WaitAsync();
+            await application.WriteServiceInputAsync(serviceName, text);
+        }
+        finally
+        {
+            _lock.Release();
+        }
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
