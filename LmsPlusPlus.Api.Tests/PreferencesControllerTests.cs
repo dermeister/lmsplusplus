@@ -61,7 +61,7 @@ public class PreferencesControllerTests : IAsyncLifetime
     {
         // Arrange
         Infrastructure.User user = await _app.Context.Users.FirstAsync();
-        RequestModels.Preferences preferences = new(null!);
+        Request.Preferences preferences = new(null!);
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"preferences/{user.Id}", HttpMethod.Put, preferences);
 
         // Act
@@ -76,7 +76,7 @@ public class PreferencesControllerTests : IAsyncLifetime
     {
         // Arrange
         Infrastructure.User user = await _app.Context.Users.FirstAsync();
-        RequestModels.Preferences preferences = new(Theme: "Light");
+        Request.Preferences preferences = new(Theme: "Light");
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"preferences/{user.Id}", HttpMethod.Put, preferences);
 
         // Act

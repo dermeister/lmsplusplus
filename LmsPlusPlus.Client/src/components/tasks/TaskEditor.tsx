@@ -24,11 +24,11 @@ export function TaskEditorSidePanelContent({ model }: TaskEditorProps): JSX.Elem
                            onChange={e => taskEditor.setTitle(e.target.value)} />
                 </Field>
                 <Field label="Technologies" className={styles.field}>
-                    <MultiselectDropdown items={taskEditor.availableTechnologies.map(t => ({ title: t, value: t }))}
+                    <MultiselectDropdown items={taskEditor.availableTechnologies.map(t => ({ title: t.name, value: t }))}
                                          selectedValues={taskEditor.selectedTechnologies}
                                          onValuesChange={values => taskEditor.setSelectedTechnologies(values)}
-                                         createPlaceholder={() =>
-                                             createTechnologiesDropdownPlaceholder(taskEditor.selectedTechnologies)} />
+                                         createPlaceholder={() => createTechnologiesDropdownPlaceholder(taskEditor
+                                             .selectedTechnologies.map(t => t.name))} />
                 </Field>
                 <div className={styles.buttons}>
                     <Button variant="primary"

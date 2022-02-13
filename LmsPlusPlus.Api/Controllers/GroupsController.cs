@@ -19,7 +19,7 @@ public class GroupsController : ControllerBase
     public async Task<Infrastructure.Group?> GetById(long id) => await _context.Groups.FindAsync(id);
 
     [HttpPost]
-    public async Task<Infrastructure.Group> Create(RequestModels.Group requestGroup)
+    public async Task<Infrastructure.Group> Create(Request.Group requestGroup)
     {
         Infrastructure.Group databaseGroup = new()
         {
@@ -32,7 +32,7 @@ public class GroupsController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    public async Task<ActionResult<Infrastructure.Group>> Update(long id, RequestModels.Group requestGroup)
+    public async Task<ActionResult<Infrastructure.Group>> Update(long id, Request.Group requestGroup)
     {
         Infrastructure.Group? databaseGroup = await _context.Groups.FindAsync(id);
         if (databaseGroup is null)

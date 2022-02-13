@@ -5,20 +5,20 @@ import * as domain from "../../domain"
 
 export class TaskEditor extends ObservableObject {
     @unobservable readonly description: monaco.editor.ITextModel
-    @unobservable readonly availableTechnologies: readonly string[]
+    @unobservable readonly availableTechnologies: readonly domain.Technology[]
     @unobservable private readonly _id: number
-    @unobservable private readonly _course: domain.Course
-    @unobservable private readonly _solutions: readonly domain.Solution[]
+    @unobservable private readonly _topic: domain.Topic
+    @unobservable private readonly _solutions: domain.Solution[]
     private _title: string
-    private _selectedTechnologies: readonly string[]
+    private _selectedTechnologies: readonly domain.Technology[]
 
     get title(): string { return this._title }
-    get selectedTechnologies(): readonly string[] { return this._selectedTechnologies }
+    get selectedTechnologies(): readonly domain.Technology[] { return this._selectedTechnologies }
 
-    constructor(task: domain.Task, availableTechnologies: readonly string[]) {
+    constructor(task: domain.Task, availableTechnologies: readonly domain.Technology[]) {
         super()
         this._id = task.id
-        this._course = task.course
+        this._topic = task.topic
         this._title = task.title
         this.description = standalone(() => monaco.editor.createModel(task.description, "markdown"))
         this._selectedTechnologies = task.technologies
@@ -39,13 +39,13 @@ export class TaskEditor extends ObservableObject {
     }
 
     @transaction
-    setSelectedTechnologies(technologies: readonly string[]): void {
+    setSelectedTechnologies(technologies: readonly domain.Technology[]): void {
         this._selectedTechnologies = technologies
     }
 
     @transaction
     getTask(): domain.Task {
-        const task = new domain.Task(this._id, this._course, this._title, this.description.getValue(), this._selectedTechnologies)
+        const task = new domain.Task(this._id, this._topic, this._title, this.description.getValue(), this._selectedTechnologies)
         task.solutions = this._solutions
         return task
     }

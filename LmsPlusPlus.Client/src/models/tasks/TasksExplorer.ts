@@ -2,16 +2,16 @@ import { reaction, Ref, Transaction, unobservable } from "reactronic"
 import * as domain from "../../domain"
 import { Explorer, GroupNode, ItemNode } from "../explorer"
 
-export class CourseNode extends GroupNode {
-    @unobservable readonly item: domain.Course
+export class TopicNode extends GroupNode {
+    @unobservable readonly item: domain.Topic
 
     override get children(): readonly ItemNode<domain.Task>[] {
         return super.children as readonly ItemNode<domain.Task>[]
     }
 
-    constructor(course: domain.Course) {
-        super(course.name, `course-${course.id}`, CourseNode.createTaskNodes(course.tasks))
-        this.item = course
+    constructor(topic: domain.Topic) {
+        super(topic.name, `topic-${topic.id}`, TopicNode.createTaskNodes(topic.tasks))
+        this.item = topic
     }
 
     private static createTaskNodes(tasks: readonly domain.Task[]): readonly ItemNode<domain.Task>[] {
@@ -19,21 +19,21 @@ export class CourseNode extends GroupNode {
     }
 }
 
-export class TasksExplorer extends Explorer<domain.Task, CourseNode> {
-    @unobservable private readonly _courses: Ref<readonly domain.Course[]>
+export class TasksExplorer extends Explorer<domain.Task, TopicNode> {
+    @unobservable private readonly _topics: Ref<readonly domain.Topic[]>
 
-    constructor(courses: Ref<readonly domain.Course[]>) {
-        super(TasksExplorer.createChildren(courses.value))
-        this._courses = courses
+    constructor(topics: Ref<readonly domain.Topic[]>) {
+        super(TasksExplorer.createChildren(topics.value))
+        this._topics = topics
     }
 
-    private static createChildren(courses: readonly domain.Course[]): readonly CourseNode[] {
-        return courses.map(c => new CourseNode(c))
+    private static createChildren(topics: readonly domain.Topic[]): readonly TopicNode[] {
+        return topics.map(c => new TopicNode(c))
     }
 
     @reaction
     private updateExplorer(): void {
-        const newChildren = TasksExplorer.createChildren(this._courses.value)
+        const newChildren = TasksExplorer.createChildren(this._topics.value)
         this.updateChildren(newChildren)
     }
 }

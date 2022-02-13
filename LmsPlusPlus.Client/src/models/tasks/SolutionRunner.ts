@@ -51,7 +51,7 @@ export class SolutionRunner extends ObservableObject {
     private async createServicesExplorer(): Promise<void> {
         this._connection = new HubConnectionBuilder().withUrl("/api/application").build()
         await this._connection.start()
-        const configurations = await this._connection.invoke<ServiceConfiguration[]>("StartApplication", 1)
+        const configurations = await this._connection.invoke<ServiceConfiguration[]>("StartApplication", this._solution.id)
         this._areServicePortsBeingOpened = configurations.some(c => c.virtualPorts.length > 0)
         this._services = configurations.map(c =>
             new Service(c.name, c.stdin, c.virtualPorts, new Ref(this, "_areServicePortsBeingOpened"), this._connection!))

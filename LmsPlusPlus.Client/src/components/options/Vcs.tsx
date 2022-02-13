@@ -27,14 +27,13 @@ export function Vcs({ model }: VcsProps): JSX.Element {
 }
 
 function accountDropdown(options: models.Options): JSX.Element {
-    async function onChange(account: domain.Account): Promise<void> {
-        await options.setCurrentAccount(account)
-    }
-
     const accounts = options.vcsAccounts.map(createAccountDropdownItem)
-    if (!options.vcsCurrentAccount)
-        return <Dropdown items={accounts} onValueChange={onChange} placeholder="Choose account" />
-    return <Dropdown selectedValue={options.vcsCurrentAccount} items={accounts} onValueChange={onChange} />
+    return (
+        <Dropdown items={accounts}
+                  onValueChange={a => options.setCurrentAccount(a)}
+                  selectedValue={options.vcsCurrentAccount}
+                  createPlaceholder={() => options.vcsCurrentAccount?.username ?? "Choose account"} />
+    )
 }
 
 function createAccountDropdownItem(account: domain.Account): DropdownItem<domain.Account> {
@@ -55,7 +54,7 @@ function providerList(options: models.Options): JSX.Element {
                                  className={styles.providerIcon} />
                             {provider.name}
                         </h2>
-                        <button className={styles.addAccount} />
+                        <button className={styles.addAccount} onClick={() => options.addAccount(provider)} />
                     </div>
                     {accountList(options, provider)}
                 </li>

@@ -5,6 +5,7 @@ import { Button } from "../Button"
 import { Field } from "../Field"
 import { Input } from "../Input"
 import styles from "./SolutionEditor.module.scss"
+import { Dropdown } from "../Dropdown"
 
 interface SolutionEditorProps {
     model: models.TasksView
@@ -15,11 +16,17 @@ export function SolutionEditorSidePanelContent({ model }: SolutionEditorProps): 
         const solutionEditor = getSolutionEditor(model)
         return (
             <div className={styles.form}>
-                <Field label="Name" className={styles.solutionName}>
+                <Field label="Name" className={styles.field}>
                     <Input id="solution-name"
                            className={styles.input}
                            value={solutionEditor.name}
                            onChange={e => solutionEditor.setName(e.target.value)} />
+                </Field>
+                <Field label="Technology" className={styles.field}>
+                    <Dropdown items={solutionEditor.availableTechnologies.map(t => ({ title: t.name, value: t }))}
+                              selectedValue={solutionEditor.selectedTechnology}
+                              onValueChange={t => solutionEditor.setTechnology(t)}
+                              createPlaceholder={() => solutionEditor.selectedTechnology?.name ?? "Select technology"} />
                 </Field>
                 <div className={styles.buttons}>
                     <Button variant="primary"
@@ -43,7 +50,8 @@ export function SolutionEditorMainPanelContent(_: SolutionEditorProps): JSX.Elem
 }
 
 function getSolutionEditor(model: models.TasksView): models.SolutionEditor {
-    if (!model.solutionEditor)
+    const { solutionEditor } = model
+    if (!solutionEditor)
         throw new Error("Solution editor is not created")
-    return model.solutionEditor
+    return solutionEditor
 }

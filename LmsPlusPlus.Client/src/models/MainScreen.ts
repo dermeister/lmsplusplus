@@ -2,7 +2,7 @@ import { Screen } from "./Screen"
 import { Ref, transaction, Transaction, unobservable } from "reactronic"
 import { SidePanel } from "./SidePanel"
 import { Options } from "./options"
-import { Database } from "../database"
+import { DatabaseContext } from "../database"
 import { View } from "./View"
 import { TasksView } from "./tasks"
 import { OptionsView } from "./options"
@@ -14,7 +14,7 @@ export class MainScreen extends Screen {
     @unobservable readonly sidePanel: SidePanel
     @unobservable private readonly _options: Options
     @unobservable private readonly _views: Map<string, View>
-    @unobservable private readonly _database: Database
+    @unobservable private readonly _database: DatabaseContext
     private _openedViewId: string
 
     get openedView(): View {
@@ -26,7 +26,7 @@ export class MainScreen extends Screen {
     private get openedViewSidePanelTitle(): string { return this.openedView.sidePanelTitle }
     private get openedViewIsPerformingOperation(): boolean { return this.openedView.isPerformingOperation }
 
-    constructor(database: Database) {
+    constructor(database: DatabaseContext) {
         super()
         this._database = database
         this._options = new Options(this._database)

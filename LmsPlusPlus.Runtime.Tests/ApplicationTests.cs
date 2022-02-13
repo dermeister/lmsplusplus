@@ -137,9 +137,8 @@ public sealed class ApplicationFixture : IDisposable
             foreach (string file in Directory.EnumerateFiles(directory, searchPattern: "*", options))
             {
                 string relativeFilePath = Path.GetRelativePath(directory, file);
-                if (relativeFilePath.StartsWith(".git"))
-                    continue;
-                repository.Index.Add(relativeFilePath);
+                if (!relativeFilePath.StartsWith(".git")) // TODO: implement via DirectoryInfo
+                    repository.Index.Add(relativeFilePath);
             }
             repository.Index.Write();
             Signature signature = CreateCommitSignature();

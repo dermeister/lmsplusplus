@@ -65,17 +65,27 @@ CREATE TABLE "public"."tasks"
     UNIQUE ("title", "topic_id")
 );
 
-CREATE TABLE "public"."repository_hosting_providers"
+CREATE TABLE "public"."vcs_hosting_providers"
 (
-    "id"   SMALLINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    "id"   VARCHAR(500) PRIMARY KEY,
     "name" VARCHAR(500) NOT NULL UNIQUE
+);
+
+CREATE TABLE "public"."vcs_accounts"
+(
+    "id"                  BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    "name"                VARCHAR(200) NOT NULL,
+    "access_token"        VARCHAR(200) NOT NULL,
+    "hosting_provider_id" VARCHAR(500) NOT NULL REFERENCES "public"."vcs_hosting_providers" ("id"),
+    UNIQUE ("name", "hosting_provider_id")
 );
 
 CREATE TABLE "public"."repositories"
 (
-    "id"                  BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    "url"                 VARCHAR(1000) NOT NULL UNIQUE,
-    "hosting_provider_id" SMALLINT      NOT NULL REFERENCES "public"."repository_hosting_providers" ("id")
+    "id"             BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    "name"           VARCHAR(1000) NOT NULL,
+    "url"            VARCHAR(1000) NOT NULL UNIQUE,
+    "vcs_account_id" BIGINT        NOT NULL REFERENCES "public"."vcs_accounts" ("id")
 );
 
 CREATE TABLE "public"."technologies"
@@ -88,16 +98,17 @@ CREATE TABLE "public"."technologies"
 
 CREATE TABLE "public"."m2m_tasks_technologies" -- TODO: check at the end of transaction that task contains at least one technology
 (
-    "task_id"       BIGINT   NOT NULL REFERENCES "public"."tasks" ("id"),
-    "technology_id" SMALLINT NOT NULL REFERENCES "public"."technologies" ("id"),
-    UNIQUE ("task_id", "technology_id")
+    "task_id"       BIGINT   NOT NULL REFERENCES "public"."tasks" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    "technology_id" SMALLINT NOT NULL REFERENCES "public"."technologies" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    PRIMARY KEY ("task_id", "technology_id")
 );
 
 CREATE TABLE "public"."solutions"
 (
     "id"            BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    "repository_id" BIGINT NOT NULL REFERENCES "public"."repositories" ("id"),
-    "solver_id"     BIGINT NOT NULL REFERENCES "public"."users" ("id"), -- TODO: ensure role is 'solver'
-    "task_id"       BIGINT NOT NULL REFERENCES "public"."tasks" ("id"),
+    "repository_id" BIGINT   NOT NULL REFERENCES "public"."repositories" ("id"), -- TODO: add trigger for deleting repository
+    "solver_id"     BIGINT   NOT NULL REFERENCES "public"."users" ("id"),        -- TODO: ensure role is 'solver'
+    "task_id"       BIGINT   NOT NULL REFERENCES "public"."tasks" ("id"),
+    "technology_id" SMALLINT NOT NULL REFERENCES "public"."technologies" ("id"),
     UNIQUE ("solver_id", "task_id")
 );

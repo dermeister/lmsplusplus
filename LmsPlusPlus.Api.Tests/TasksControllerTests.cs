@@ -101,7 +101,7 @@ public class TasksControllerTests : IAsyncLifetime
     public async Task CreateTaskBadRequest()
     {
         // Arrange
-        RequestModels.Task task = new(null!, null!, TopicId: 0);
+        Request.Task task = new(null!, null!, TopicId: 0, Array.Empty<short>());
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Post, task);
         int oldTasksCount = await _app.Context.Tasks.CountAsync();
 
@@ -119,7 +119,7 @@ public class TasksControllerTests : IAsyncLifetime
     {
         // Arrange
         Infrastructure.Topic topic = await _app.Context.Topics.FirstAsync();
-        RequestModels.Task task = new(Title: "New task 1", Description: "New task 1", topic.Id);
+        Request.Task task = new(Title: "New task 1", Description: "New task 1", topic.Id, Array.Empty<short>());
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Post, task);
         int oldTasksCount = await _app.Context.Tasks.CountAsync();
 
@@ -136,7 +136,7 @@ public class TasksControllerTests : IAsyncLifetime
     public async Task UpdateTaskBadRequest()
     {
         // Arrange
-        RequestModels.Task task = new(null!, null!, TopicId: 0);
+        Request.Task task = new(null!, null!, TopicId: 0, Array.Empty<short>());
         long nonExistentTaskId = await GetNonExistentTaskId();
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"tasks/{nonExistentTaskId}", HttpMethod.Put, task);
 
@@ -152,7 +152,7 @@ public class TasksControllerTests : IAsyncLifetime
     {
         // Arrange
         Infrastructure.Task databaseTask = await _app.Context.Tasks.FirstAsync();
-        RequestModels.Task requestTask = new(Title: "New task 1", Description: "New task 1", databaseTask.TopicId);
+        Request.Task requestTask = new(Title: "New task 1", Description: "New task 1", databaseTask.TopicId, Array.Empty<short>());
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"tasks/{databaseTask.Id}", HttpMethod.Put, requestTask);
 
         // Act

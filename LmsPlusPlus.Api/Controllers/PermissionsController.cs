@@ -23,7 +23,7 @@ public class PermissionsController : ControllerBase
     }
 
     [HttpPut("{role}")]
-    public async Task<ActionResult<Infrastructure.Permissions>> Update(string role, RequestModels.Permissions requestPermissions)
+    public async Task<ActionResult<Infrastructure.Permissions>> Update(string role, Request.Permissions requestPermissions)
     {
         if (!Enum.TryParse(role, ignoreCase: true, out Infrastructure.Role parsedRole))
             return BadRequest();

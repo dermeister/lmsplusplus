@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using LmsPlusPlus.Runtime;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace LmsPlusPlus.Api;
 
@@ -11,13 +12,18 @@ public class ApplicationHub : Hub
     const string ApplicationItemKey = "application";
     readonly SemaphoreSlim _lock = new(1);
     readonly Infrastructure.ApplicationContext _context;
-    readonly string _workingDirectory = Path.Combine(Path.GetTempPath(), path2: "lmsplusplus", path3: "runtime-working-directory");
+    readonly string _workingDirectory;
 
-    public ApplicationHub(Infrastructure.ApplicationContext context) => _context = context;
+    public ApplicationHub(Infrastructure.ApplicationContext context, IConfiguration configuration)
+    {
+        _context = context;
+        _workingDirectory = configuration["WorkingDirectory"];
+    }
 
     public async Task<IEnumerable<ServiceConfiguration>> StartApplication(int solutionId)
     {
-        Infrastructure.Solution? solution = await _context.Solutions.FindAsync(solutionId);
+        Infrastructure.Solution? solution = await _context.Solutions.Include(s => s.Repository)
+            .SingleOrDefaultAsync(s => s.Id == solutionId);
         if (solution is null)
             throw new Exception();
         ApplicationConfiguration applicationConfiguration = new(solution.Repository.Url, _workingDirectory);

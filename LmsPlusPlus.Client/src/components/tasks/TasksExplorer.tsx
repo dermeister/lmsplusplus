@@ -14,35 +14,35 @@ export function TasksExplorer({ model }: TasksExplorerProps): JSX.Element {
     const permissions = usePermissions()
 
     return autorender(() => (
-        <Explorer model={model.tasksExplorer}>{courses(model, model.tasksExplorer.children, permissions)}</Explorer>
+        <Explorer model={model.tasksExplorer}>{topics(model, model.tasksExplorer.children, permissions)}</Explorer>
     ), [model, permissions])
 }
 
-function courses(model: models.TasksView,
-    courses: readonly models.CourseNode[],
+function topics(model: models.TasksView,
+    topics: readonly models.TopicNode[],
     permissions: domain.Permissions): JSX.Element[] {
-    return courses.map(course => {
+    return topics.map(topic => {
         let contextMenu
         if (permissions.canCreateTask)
             contextMenu = (
-                <ContextMenu model={course.contextMenu}>
-                    <ContextMenu.Button variant="primary" onClick={() => onCreateTask(model, course)}>
+                <ContextMenu model={topic.contextMenu}>
+                    <ContextMenu.Button variant="primary" onClick={() => onCreateTask(model, topic)}>
                         New Task
                     </ContextMenu.Button>
                 </ContextMenu>
             )
         return (
-            <li key={course.key}>
-                <Explorer.Group group={course} contextMenu={contextMenu}>{course.title}</Explorer.Group>
-                <Explorer.Children group={course}>{tasks(model, course.children, permissions)}</Explorer.Children>
+            <li key={topic.key}>
+                <Explorer.Group group={topic} contextMenu={contextMenu}>{topic.title}</Explorer.Group>
+                <Explorer.Children group={topic}>{tasks(model, topic.children, permissions)}</Explorer.Children>
             </li>
         )
     })
 }
 
-function onCreateTask(model: models.TasksView, course: models.CourseNode): void {
-    course.contextMenu?.close()
-    model.createTask(course.item)
+function onCreateTask(model: models.TasksView, topic: models.TopicNode): void {
+    topic.contextMenu?.close()
+    model.createTask(topic.item)
 }
 
 function tasks(model: models.TasksView,

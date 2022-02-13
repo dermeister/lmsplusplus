@@ -19,7 +19,7 @@ public class TopicsController : ControllerBase
     public async Task<Infrastructure.Topic?> GetById(long id) => await _context.Topics.FindAsync(id);
 
     [HttpPost]
-    public async Task<Infrastructure.Topic> Create(RequestModels.Topic requestTopic)
+    public async Task<Infrastructure.Topic> Create(Request.Topic requestTopic)
     {
         Infrastructure.Topic databaseTopic = new()
         {
@@ -32,7 +32,7 @@ public class TopicsController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    public async Task<ActionResult<Infrastructure.Topic>> Update(long id, RequestModels.Topic requestTopic)
+    public async Task<ActionResult<Infrastructure.Topic>> Update(long id, Request.Topic requestTopic)
     {
         Infrastructure.Topic? databaseTopic = await _context.Topics.FindAsync(id);
         if (databaseTopic is null)

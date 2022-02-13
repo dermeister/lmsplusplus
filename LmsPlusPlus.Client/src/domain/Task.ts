@@ -1,32 +1,22 @@
-import { Course } from "./Course"
+import { Topic } from "./Topic"
 import { Solution } from "./Solution"
+import { Technology } from "./Technology"
 
 export class Task {
     static readonly NO_ID = -1
     readonly id: number
-    readonly course: Course
+    readonly topic: Topic
     readonly title: string
     readonly description: string
-    readonly technologies: readonly string[]
-    private _solutions: readonly Solution[] = []
-    private _solutionsInitialized = false
+    readonly technologies: readonly Technology[]
+    private _solutions: Solution[] = []
 
-    get solutions(): readonly Solution[] {
-        if (!this._solutionsInitialized)
-            throw new Error("Task solutions have not been initialized")
-        return this._solutions
-    }
-    set solutions(solutions: readonly Solution[]) {
-        if (!this._solutionsInitialized) {
-            this._solutions = solutions
-            this._solutionsInitialized = true
-        } else
-            throw new Error("Task tasks have already been initialized")
-    }
+    get solutions(): Solution[] { return this._solutions }
+    set solutions(solutions: Solution[]) { this._solutions = solutions }
 
-    constructor(id: number, course: Course, title: string, description: string, technologies: readonly string[]) {
+    constructor(id: number, topic: Topic, title: string, description: string, technologies: readonly Technology[]) {
         this.id = id
-        this.course = course
+        this.topic = topic
         this.title = title
         this.description = description
         this.technologies = technologies

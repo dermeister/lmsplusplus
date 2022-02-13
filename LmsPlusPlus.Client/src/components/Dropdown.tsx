@@ -8,35 +8,23 @@ export interface DropdownItem<T> {
     title: string
 }
 
-interface DropdownPropsBase<T> {
+interface DropdownProps<T> {
     items: readonly DropdownItem<T>[]
+    selectedValue: T | null
+    createPlaceholder: () => string
 
-    onValueChange?(active: T): void
+    onValueChange?(values: T): void
 }
-
-interface DropdownPropsWithSelectedItem<T> extends DropdownPropsBase<T> {
-    selectedValue: T
-    placeholder?: undefined
-}
-
-interface DropdownPropsWithPlaceholder<T> extends DropdownPropsBase<T> {
-    selectedValue?: T
-    placeholder: string
-}
-
-type DropdownProps<T> = DropdownPropsWithSelectedItem<T> | DropdownPropsWithPlaceholder<T>
 
 export function Dropdown<T>(props: DropdownProps<T>): JSX.Element {
-    const { selectedValue, placeholder, items } = props
+    const { selectedValue, createPlaceholder, items } = props
     const [isOpened, setIsOpened] = useState(false)
 
     function selectedItem(): JSX.Element {
-        const item = items.find(i => i.value === selectedValue)
-        let content = item?.title ?? placeholder
         const combinedClassName = combineClassNames(styles.preview, maybeValue(styles.opened, isOpened))
         return (
             <div onClick={() => setIsOpened(!isOpened)} className={combinedClassName}>
-                {content}
+                {createPlaceholder()}
             </div>
         )
     }

@@ -54,7 +54,7 @@ public sealed class UsersControllerTests : IAsyncLifetime
     public async Task CreateUserBadRequest()
     {
         // Arrange
-        RequestModels.User user = new(Login: "test", null!, null!, null!);
+        Request.User user = new(Login: "test", null!, null!, null!);
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "users", HttpMethod.Post, user);
 
         // Act
@@ -68,7 +68,7 @@ public sealed class UsersControllerTests : IAsyncLifetime
     public async Task CreateUserOk()
     {
         // Arrange
-        RequestModels.User user = new(Login: "test", Password: "test", FirstName: "test", LastName: "test");
+        Request.User user = new(Login: "test", Password: "test", FirstName: "test", LastName: "test");
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "users", HttpMethod.Post, user);
         int oldUsersCount = await _app.Context.Users.CountAsync();
 
@@ -85,7 +85,7 @@ public sealed class UsersControllerTests : IAsyncLifetime
     public async Task UpdateUserBadRequest()
     {
         // Arrange
-        RequestModels.User user = new(Login: "test", null!, null!, null!);
+        Request.User user = new(Login: "test", null!, null!, null!);
         long nonExistentId = await GetNonExistentUserId();
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"users/{nonExistentId}", HttpMethod.Put, user);
 
@@ -101,7 +101,7 @@ public sealed class UsersControllerTests : IAsyncLifetime
     {
         // Arrange
         Infrastructure.User databaseUser = await _app.Context.Users.FirstAsync();
-        RequestModels.User requestUser = new(databaseUser.Login, databaseUser.PasswordHash, FirstName: "User 2", LastName: "User 2");
+        Request.User requestUser = new(databaseUser.Login, databaseUser.PasswordHash, FirstName: "User 2", LastName: "User 2");
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"users/{databaseUser.Id}", HttpMethod.Put, requestUser);
 
         // Act

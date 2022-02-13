@@ -94,7 +94,7 @@ public class GroupsControllerTests : IAsyncLifetime
     public async Task CreateGroupBadRequest()
     {
         // Arrange
-        RequestModels.Group group = new(null!, TopicId: 0);
+        Request.Group group = new(null!, TopicId: 0);
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "groups", HttpMethod.Post, group);
         int oldGroupsCount = await _app.Context.Groups.CountAsync();
 
@@ -112,7 +112,7 @@ public class GroupsControllerTests : IAsyncLifetime
     {
         // Arrange
         Infrastructure.Topic topic = await _app.Context.Topics.FirstAsync();
-        RequestModels.Group group = new(Name: "New group 1", topic.Id);
+        Request.Group group = new(Name: "New group 1", topic.Id);
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "groups", HttpMethod.Post, group);
         int oldGroupsCount = await _app.Context.Groups.CountAsync();
 
@@ -129,7 +129,7 @@ public class GroupsControllerTests : IAsyncLifetime
     public async Task UpdateGroupBadRequest()
     {
         // Arrange
-        RequestModels.Group group = new(null!, TopicId: 0);
+        Request.Group group = new(null!, TopicId: 0);
         long nonExistentGroupId = await GetNonExistentGroupId();
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"groups/{nonExistentGroupId}", HttpMethod.Put, group);
 
@@ -145,7 +145,7 @@ public class GroupsControllerTests : IAsyncLifetime
     {
         // Arrange
         Infrastructure.Group databaseGroup = await _app.Context.Groups.FirstAsync();
-        RequestModels.Group requestGroup = new(Name: "New group 1", databaseGroup.TopicId);
+        Request.Group requestGroup = new(Name: "New group 1", databaseGroup.TopicId);
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"groups/{databaseGroup.Id}", HttpMethod.Put, requestGroup);
 
         // Act

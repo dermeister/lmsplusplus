@@ -1,1 +1,1 @@
-export { Database } from "./Database"
+export { DatabaseContext } from "./DatabaseContext"

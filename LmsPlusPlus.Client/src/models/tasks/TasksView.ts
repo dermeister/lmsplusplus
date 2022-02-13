@@ -1,6 +1,6 @@
 import { View } from "../View"
 import { cached, Monitor, options, Reentrance, Ref, transaction, Transaction, unobservable } from "reactronic"
-import { Database } from "../../database"
+import { DatabaseContext } from "../../database"
 import * as domain from "../../domain"
 import { TaskEditor } from "./TaskEditor"
 import { SolutionEditor } from "./SolutionEditor"
@@ -12,7 +12,7 @@ export class TasksView extends View {
     @unobservable readonly tasksExplorer: TasksExplorer
     private static readonly s_monitor = Monitor.create("tasks-monitor", 0, 0)
     private static readonly s_markdown = new MarkdownIt()
-    @unobservable private readonly _database: Database
+    @unobservable private readonly _database: DatabaseContext
     private _taskEditor: TaskEditor | null = null
     private _solutionEditor: SolutionEditor | null = null
     private _solutionRunner: SolutionRunner | null = null
@@ -39,10 +39,10 @@ export class TasksView extends View {
         return TasksView.s_markdown.render(description)
     }
 
-    constructor(id: string, database: Database) {
+    constructor(id: string, database: DatabaseContext) {
         super(id)
         this._database = database
-        this.tasksExplorer = new TasksExplorer(new Ref(this._database, "courses"))
+        this.tasksExplorer = new TasksExplorer(new Ref(this._database, "topics"))
     }
 
     override dispose(): void {
@@ -62,9 +62,9 @@ export class TasksView extends View {
     }
 
     @transaction
-    createTask(course: domain.Course): void {
+    createTask(topic: domain.Topic): void {
         this.ensureCanPerformOperation()
-        const task = new domain.Task(domain.Task.NO_ID, course, "", "", [])
+        const task = new domain.Task(domain.Task.NO_ID, topic, "", "", [])
         task.solutions = []
         this._taskEditor = new TaskEditor(task, this._database.technologies)
     }
@@ -97,7 +97,7 @@ export class TasksView extends View {
     @transaction
     createSolution(task: domain.Task): void {
         this.ensureCanPerformOperation()
-        const solution = new domain.Solution(domain.Solution.NO_ID, task, "")
+        const solution = new domain.Solution(domain.Solution.NO_ID, task, "", null)
         this._solutionEditor = new SolutionEditor(solution)
     }
 

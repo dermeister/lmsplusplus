@@ -19,7 +19,7 @@ public class PreferencesController : ControllerBase
     }
 
     [HttpPut("{userId:long}")]
-    public async Task<Infrastructure.Preferences> Update(long userId, RequestModels.Preferences requestPreferences)
+    public async Task<Infrastructure.Preferences> Update(long userId, Request.Preferences requestPreferences)
     {
         // TODO: userId should be taken from authorization token
         Infrastructure.Preferences databasePreferences = await _context.Preferences.FirstAsync(p => p.UserId == userId);

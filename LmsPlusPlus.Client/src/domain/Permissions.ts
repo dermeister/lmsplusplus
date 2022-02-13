@@ -1,7 +1,6 @@
 export class Permissions {
     static readonly default = Permissions.createDefaultPermissions()
-    static readonly student = Permissions.createStudentPermissions()
-    static readonly teacher = Permissions.createTeacherPermissions()
+    readonly id: number
     readonly canCreateTask: boolean
     readonly canUpdateTask: boolean
     readonly canDeleteTask: boolean
@@ -10,13 +9,9 @@ export class Permissions {
     readonly canCreateSolution: boolean
     readonly canDeleteSolution: boolean
 
-    constructor(canCreateTask: boolean,
-        canUpdateTask: boolean,
-        canDeleteTask: boolean,
-        canUpdateVcsConfiguration: boolean,
-        canUpdateUser: boolean,
-        canCreateSolution: boolean,
-        canDeleteSolution: boolean) {
+    constructor(id: number, canCreateTask: boolean, canUpdateTask: boolean, canDeleteTask: boolean,
+        canUpdateVcsConfiguration: boolean, canUpdateUser: boolean, canCreateSolution: boolean, canDeleteSolution: boolean) {
+        this.id = id
         this.canCreateTask = canCreateTask
         this.canUpdateTask = canUpdateTask
         this.canDeleteTask = canDeleteTask
@@ -27,14 +22,6 @@ export class Permissions {
     }
 
     private static createDefaultPermissions(): Permissions {
-        return new Permissions(false, false, false, false, false, false, false)
-    }
-
-    private static createStudentPermissions(): Permissions {
-        return new Permissions(false, false, false, true, true, true, true)
-    }
-
-    private static createTeacherPermissions(): Permissions {
-        return new Permissions(true, true, true, false, true, false, false)
+        return new Permissions(0, false, false, false, false, false, false, false)
     }
 }

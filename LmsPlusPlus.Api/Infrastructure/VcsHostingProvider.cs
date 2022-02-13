@@ -1,7 +1,7 @@
 namespace LmsPlusPlus.Api.Infrastructure;
 
-public record RepositoryHostingProvider
+public record VcsHostingProvider
 {
-    public short Id { get; set; }
+    public string Id { get; set; } = null!;
     public string Name { get; set; } = null!;
 }

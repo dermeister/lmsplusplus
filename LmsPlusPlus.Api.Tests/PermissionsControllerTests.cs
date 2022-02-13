@@ -34,7 +34,8 @@ public class PermissionsControllerTests : IAsyncLifetime
     public async Task GetPermissionsByNonExistentRoleOk()
     {
         // Arrange
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "permissions/non-existent-role", HttpMethod.Get);
+        string nonExistentRole = GetNonExistentRole();
+        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"permissions/{nonExistentRole}", HttpMethod.Get);
 
         // Act
         HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
@@ -60,9 +61,10 @@ public class PermissionsControllerTests : IAsyncLifetime
     public async Task UpdatePermissionsBadRequest()
     {
         // Arrange
-        RequestModels.Permissions permissions = new(CanCreateTask: false, CanUpdateTask: false, CanDeleteTask: false,
+        Request.Permissions permissions = new(CanCreateTask: false, CanUpdateTask: false, CanDeleteTask: false,
             CanUpdateVcsConfiguration: false, CanUpdateUser: false, CanCreateSolution: false, CanDeleteSolution: false);
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"permissions/non-existent-role", HttpMethod.Put,
+        string nonExistentRole = GetNonExistentRole();
+        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"permissions/{nonExistentRole}", HttpMethod.Put,
             permissions);
 
         // Act
@@ -76,7 +78,7 @@ public class PermissionsControllerTests : IAsyncLifetime
     public async Task UpdatePermissionsOk()
     {
         // Arrange
-        RequestModels.Permissions permissions = new(CanCreateTask: false, CanUpdateTask: false, CanDeleteTask: false,
+        Request.Permissions permissions = new(CanCreateTask: false, CanUpdateTask: false, CanDeleteTask: false,
             CanUpdateVcsConfiguration: false, CanUpdateUser: false, CanCreateSolution: false, CanDeleteSolution: false);
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "permissions/admin", HttpMethod.Put, permissions);
 
@@ -86,4 +88,6 @@ public class PermissionsControllerTests : IAsyncLifetime
         // Assert
         Assert.Equal(HttpStatusCode.OK, responseMessage.StatusCode);
     }
+
+    static string GetNonExistentRole() => "non-existent-role";
 }
