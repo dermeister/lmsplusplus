@@ -1,4 +1,4 @@
-using LmsPlusPlus.Api.Vsc;
+using LmsPlusPlus.Api.Vcs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LmsPlusPlus.Api;

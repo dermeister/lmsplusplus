@@ -12,5 +12,6 @@ public class TechnologiesController : ControllerBase
     public TechnologiesController(Infrastructure.ApplicationContext context) => _context = context;
 
     [HttpGet]
-    public async Task<IEnumerable<Infrastructure.Technology>> GetAll() => await _context.Technologies.ToArrayAsync();
+    public async Task<IEnumerable<Response.Technology>> GetAll() =>
+        await _context.Technologies.Select(t => (Response.Technology)t).ToArrayAsync();
 }

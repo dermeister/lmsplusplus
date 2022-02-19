@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using LmsPlusPlus.Api;
 using LmsPlusPlus.Api.Infrastructure;
-using LmsPlusPlus.Api.Vsc;
+using LmsPlusPlus.Api.Vcs;
 using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);

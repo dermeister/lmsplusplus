@@ -12,19 +12,20 @@ public class PreferencesController : ControllerBase
     public PreferencesController(Infrastructure.ApplicationContext context) => _context = context;
 
     [HttpGet("{userId:long}")]
-    public async Task<Infrastructure.Preferences> Get(long userId)
+    public async Task<Response.Preferences> Get(long userId)
     {
         // TODO: userId should be taken from authorization token
-        return await _context.Preferences.FirstAsync(p => p.UserId == userId);
+        Infrastructure.Preferences preferences = await _context.Preferences.SingleAsync(p => p.UserId == userId);
+        return (Response.Preferences)preferences;
     }
 
     [HttpPut("{userId:long}")]
-    public async Task<Infrastructure.Preferences> Update(long userId, Request.Preferences requestPreferences)
+    public async Task<Response.Preferences> Update(long userId, Request.Preferences requestPreferences)
     {
         // TODO: userId should be taken from authorization token
-        Infrastructure.Preferences databasePreferences = await _context.Preferences.FirstAsync(p => p.UserId == userId);
+        Infrastructure.Preferences databasePreferences = await _context.Preferences.SingleAsync(p => p.UserId == userId);
         databasePreferences.Theme = requestPreferences.Theme;
         await _context.SaveChangesAsync();
-        return databasePreferences;
+        return (Response.Preferences)databasePreferences;
     }
 }

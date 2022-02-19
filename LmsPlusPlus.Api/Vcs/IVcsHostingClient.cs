@@ -1,4 +1,4 @@
-namespace LmsPlusPlus.Api.Vsc;
+namespace LmsPlusPlus.Api.Vcs;
 
 interface IVcsHostingClient
 {

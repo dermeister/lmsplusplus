@@ -1,6 +1,6 @@
 using Octokit;
 
-namespace LmsPlusPlus.Api.Vsc;
+namespace LmsPlusPlus.Api.Vcs;
 
 class GitHubOauth : IVcsHostingOauth
 {

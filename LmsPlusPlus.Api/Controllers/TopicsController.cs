@@ -13,26 +13,32 @@ public class TopicsController : ControllerBase
     public TopicsController(Infrastructure.ApplicationContext context) => _context = context;
 
     [HttpGet]
-    public async Task<IEnumerable<Infrastructure.Topic>> GetAll() => await _context.Topics.ToArrayAsync();
+    public async Task<IEnumerable<Response.Topic>> GetAll() => await _context.Topics.Select(t => (Response.Topic)t).ToArrayAsync();
 
     [HttpGet("{id:long}")]
-    public async Task<Infrastructure.Topic?> GetById(long id) => await _context.Topics.FindAsync(id);
+    public async Task<Response.Topic?> GetById(long id)
+    {
+        Infrastructure.Topic? topic = await _context.Topics.FindAsync(id);
+        if (topic is null)
+            return null;
+        return (Response.Topic)topic;
+    }
 
     [HttpPost]
-    public async Task<Infrastructure.Topic> Create(Request.Topic requestTopic)
+    public async Task<Response.Topic> Create(Request.Topic requestTopic)
     {
         Infrastructure.Topic databaseTopic = new()
         {
             Name = requestTopic.Name,
             AuthorId = requestTopic.AuthorId
         };
-        EntityEntry<Infrastructure.Topic> entry = _context.Add(databaseTopic);
+        _context.Add(databaseTopic);
         await _context.SaveChangesAsync();
-        return entry.Entity;
+        return (Response.Topic)databaseTopic;
     }
 
     [HttpPut("{id:long}")]
-    public async Task<ActionResult<Infrastructure.Topic>> Update(long id, Request.Topic requestTopic)
+    public async Task<ActionResult<Response.Topic>> Update(long id, Request.Topic requestTopic)
     {
         Infrastructure.Topic? databaseTopic = await _context.Topics.FindAsync(id);
         if (databaseTopic is null)
@@ -40,7 +46,7 @@ public class TopicsController : ControllerBase
         databaseTopic.Name = requestTopic.Name;
         databaseTopic.AuthorId = requestTopic.AuthorId;
         await _context.SaveChangesAsync();
-        return databaseTopic;
+        return (Response.Topic)databaseTopic;
     }
 
     [HttpDelete("{id:long}")]

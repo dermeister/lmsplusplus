@@ -12,10 +12,8 @@ public class TasksController : ControllerBase
     public TasksController(Infrastructure.ApplicationContext context) => _context = context;
 
     [HttpGet]
-    public async Task<IEnumerable<Response.Task>> GetAll()
-    {
-        return await _context.Tasks.Include(t => t.Technologies).Select(t => (Response.Task)t).ToArrayAsync();
-    }
+    public async Task<IEnumerable<Response.Task>> GetAll() =>
+        await _context.Tasks.Include(t => t.Technologies).Select(t => (Response.Task)t).ToArrayAsync();
 
     [HttpGet("{id:long}")]
     public async Task<Response.Task?> GetById(long id)

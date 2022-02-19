@@ -12,10 +12,10 @@ public class UsersController : ControllerBase
     public UsersController(Infrastructure.ApplicationContext context) => _context = context;
 
     [HttpGet]
-    public async Task<IEnumerable<Infrastructure.User>> GetAll() => await _context.Users.ToArrayAsync();
+    public async Task<IEnumerable<Response.User>> GetAll() => await _context.Users.Select(u => (Response.User)u).ToArrayAsync();
 
     [HttpPost]
-    public async Task<Infrastructure.User> Create(Request.User requestUser)
+    public async Task<Response.User> Create(Request.User requestUser)
     {
         Infrastructure.User databaseUser = new()
         {
@@ -27,11 +27,11 @@ public class UsersController : ControllerBase
         };
         _context.Add(databaseUser);
         await _context.SaveChangesAsync();
-        return databaseUser;
+        return (Response.User)databaseUser;
     }
 
     [HttpPut("{id:long}")]
-    public async Task<ActionResult<Infrastructure.User>> Update(long id, Request.User requestUser)
+    public async Task<ActionResult<Response.User>> Update(long id, Request.User requestUser)
     {
         Infrastructure.User? databaseUser = await _context.Users.FindAsync(id);
         if (databaseUser is null)
@@ -41,7 +41,7 @@ public class UsersController : ControllerBase
         databaseUser.LastName = requestUser.LastName;
         databaseUser.PasswordHash = requestUser.Password;
         await _context.SaveChangesAsync();
-        return databaseUser;
+        return (Response.User)databaseUser;
     }
 
     [HttpDelete("{id:long}")]

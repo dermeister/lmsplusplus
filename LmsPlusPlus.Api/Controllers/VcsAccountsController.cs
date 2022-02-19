@@ -12,7 +12,8 @@ public class VcsAccountsController : ControllerBase
     public VcsAccountsController(Infrastructure.ApplicationContext context) => _context = context;
 
     [HttpGet]
-    public async Task<IEnumerable<Infrastructure.VcsAccount>> GetAll() => await _context.VcsAccounts.ToArrayAsync();
+    public async Task<IEnumerable<Response.VcsAccount>> GetAll() =>
+        await _context.VcsAccounts.Select(a => (Response.VcsAccount)a).ToArrayAsync();
 
     [HttpDelete("{id:long}")]
     public async Task Delete(long id)

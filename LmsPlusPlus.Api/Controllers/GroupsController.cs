@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace LmsPlusPlus.Api;
 
@@ -13,26 +12,32 @@ public class GroupsController : ControllerBase
     public GroupsController(Infrastructure.ApplicationContext context) => _context = context;
 
     [HttpGet]
-    public async Task<IEnumerable<Infrastructure.Group>> GetAll() => await _context.Groups.ToArrayAsync();
+    public async Task<IEnumerable<Response.Group>> GetAll() => await _context.Groups.Select(g => (Response.Group)g).ToArrayAsync();
 
     [HttpGet("{id:long}")]
-    public async Task<Infrastructure.Group?> GetById(long id) => await _context.Groups.FindAsync(id);
+    public async Task<Response.Group?> GetById(long id)
+    {
+        Infrastructure.Group? group = await _context.Groups.FindAsync(id);
+        if (group is null)
+            return null;
+        return (Response.Group)group;
+    }
 
     [HttpPost]
-    public async Task<Infrastructure.Group> Create(Request.Group requestGroup)
+    public async Task<Response.Group> Create(Request.Group requestGroup)
     {
         Infrastructure.Group databaseGroup = new()
         {
             Name = requestGroup.Name,
             TopicId = requestGroup.TopicId
         };
-        EntityEntry<Infrastructure.Group> entry = _context.Add(databaseGroup);
+        _context.Add(databaseGroup);
         await _context.SaveChangesAsync();
-        return entry.Entity;
+        return (Response.Group)databaseGroup;
     }
 
     [HttpPut("{id:long}")]
-    public async Task<ActionResult<Infrastructure.Group>> Update(long id, Request.Group requestGroup)
+    public async Task<ActionResult<Response.Group>> Update(long id, Request.Group requestGroup)
     {
         Infrastructure.Group? databaseGroup = await _context.Groups.FindAsync(id);
         if (databaseGroup is null)
@@ -40,7 +45,7 @@ public class GroupsController : ControllerBase
         databaseGroup.Name = requestGroup.Name;
         databaseGroup.TopicId = requestGroup.TopicId;
         await _context.SaveChangesAsync();
-        return databaseGroup;
+        return (Response.Group)databaseGroup;
     }
 
     [HttpDelete("{id:long}")]

@@ -46,7 +46,7 @@ public class RepositoryHostingProvidersControllerTests : IAsyncLifetime
     public async Task CreateProviderBadRequest()
     {
         // Arrange
-        Request.RepositoryHostingProvider topic = new(null!);
+        Request.VcsHostingProvider topic = new(null!);
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "vcs-hosting-providers", HttpMethod.Post, topic);
         int oldProvidersCount = await _app.Context.VcsHostingProviders.CountAsync();
 
@@ -63,7 +63,7 @@ public class RepositoryHostingProvidersControllerTests : IAsyncLifetime
     public async Task CreateProviderOk()
     {
         // Arrange
-        Request.RepositoryHostingProvider topic = new(Name: "New provider 1");
+        Request.VcsHostingProvider topic = new(Name: "New provider 1");
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "vcs-hosting-providers", HttpMethod.Post, topic);
         int oldProvidersCount = await _app.Context.VcsHostingProviders.CountAsync();
 
@@ -80,7 +80,7 @@ public class RepositoryHostingProvidersControllerTests : IAsyncLifetime
     public async Task UpdateProviderBadRequest()
     {
         // Arrange
-        Request.RepositoryHostingProvider provider = new(Name: "New provider 1");
+        Request.VcsHostingProvider provider = new(Name: "New provider 1");
         string nonExistentProviderId = GetNonExistentProviderId();
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"vcs-hosting-providers/{nonExistentProviderId}",
             HttpMethod.Put, provider);
@@ -97,7 +97,7 @@ public class RepositoryHostingProvidersControllerTests : IAsyncLifetime
     {
         // Arrange
         Infrastructure.VcsHostingProvider provider = await _app.Context.VcsHostingProviders.FirstAsync();
-        Request.RepositoryHostingProvider requestProvider = new(Name: "New provider 1");
+        Request.VcsHostingProvider requestProvider = new(Name: "New provider 1");
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"vcs-hosting-providers/{provider.Id}",
             HttpMethod.Put, requestProvider);
 

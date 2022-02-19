@@ -1,7 +1,7 @@
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 
-namespace LmsPlusPlus.Api.Vsc;
+namespace LmsPlusPlus.Api.Vcs;
 
 static class RepositoryUtils
 {
