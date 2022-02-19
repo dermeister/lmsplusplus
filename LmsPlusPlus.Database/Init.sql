@@ -15,7 +15,7 @@ CREATE TABLE "public"."users"
 CREATE FUNCTION users_create_preferences_for_new_user() RETURNS TRIGGER AS
 $$
 BEGIN
-    INSERT INTO "public"."preferences" (theme, user_id) VALUES ('Dark', NEW."id");
+    INSERT INTO "public"."preferences" ("user_id", "theme") VALUES (NEW."id", 'Dark');
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -47,9 +47,8 @@ VALUES ('admin', false, false, false, false, true, false, false),
 -- preferences
 CREATE TABLE "public"."preferences"
 (
-    "id"      BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    "theme"   VARCHAR(200) NOT NULL,
-    "user_id" BIGINT       NOT NULL REFERENCES "public"."users" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "user_id" BIGINT PRIMARY KEY REFERENCES "public"."users" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    "theme"   VARCHAR(200) NOT NULL
 );
 
 -- topics

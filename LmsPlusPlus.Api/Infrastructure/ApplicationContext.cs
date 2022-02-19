@@ -29,10 +29,13 @@ public class ApplicationContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresEnum<Role>();
-        modelBuilder.Entity<Permissions>()
-            .HasKey(p => p.Role);
-        modelBuilder.Entity<Repository>()
-            .ToTable("repositories");
+        modelBuilder.Entity<Permissions>().HasKey(p => p.Role);
+        modelBuilder.Entity<Preferences>().HasKey(p => p.UserId);
+        modelBuilder.Entity<Repository>().ToTable("repositories");
+        modelBuilder.Entity<Preferences>()
+            .HasOne(p => p.User)
+            .WithOne()
+            .HasForeignKey<Preferences>(p => p.UserId);
         modelBuilder.Entity<Task>()
             .HasMany(t => t.Technologies)
             .WithMany(t => t.Tasks)
