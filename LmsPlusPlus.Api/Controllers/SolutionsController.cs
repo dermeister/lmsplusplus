@@ -18,10 +18,8 @@ public class SolutionsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Response.Solution>> GetAll()
-    {
-        return await _context.Solutions.Include(s => s.Repository).Select(s => (Response.Solution)s).ToArrayAsync();
-    }
+    public async Task<IEnumerable<Response.Solution>> GetAll() =>
+        await _context.Solutions.Include(s => s.Repository).Select(s => (Response.Solution)s).ToArrayAsync();
 
     [HttpPost]
     public async Task<Response.Solution> Create(Request.Solution requestSolution)

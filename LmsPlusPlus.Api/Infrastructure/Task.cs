@@ -7,5 +7,5 @@ public record Task
     public string Description { get; set; } = null!;
     public long TopicId { get; set; }
     public Topic Topic { get; set; } = null!;
-    public List<Technology> Technologies { get; set; } = null!; // TODO: another type
+    public ICollection<Technology> Technologies { get; set; } = null!;
 }
