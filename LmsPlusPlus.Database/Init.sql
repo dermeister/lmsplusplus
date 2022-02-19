@@ -156,7 +156,6 @@ CREATE TABLE "public"."vcs_accounts"
 CREATE TABLE "public"."repositories"
 (
     "id"             BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    "name"           VARCHAR(1000) NOT NULL,
     "url"            VARCHAR(1000) NOT NULL UNIQUE,
     "vcs_account_id" BIGINT        NOT NULL REFERENCES "public"."vcs_accounts" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );

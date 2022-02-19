@@ -40,7 +40,6 @@ public class SolutionsController : ControllerBase
             Repository = new Infrastructure.Repository
             {
                 Url = repositoryUri.ToString(),
-                Name = requestSolution.RepositoryName,
                 VcsAccountId = account.Id
             },
             SolverId = 1,
