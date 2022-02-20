@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,17 +13,26 @@ public class VcsAccountsController : ControllerBase
     public VcsAccountsController(Infrastructure.ApplicationContext context) => _context = context;
 
     [HttpGet]
-    public async Task<IEnumerable<Response.VcsAccount>> GetAll() =>
-        await _context.VcsAccounts.Select(a => (Response.VcsAccount)a).ToArrayAsync();
-
-    [HttpDelete("{id:long}")]
-    public async Task Delete(long id)
+    [Authorize(Roles = "Solver")]
+    public async Task<IEnumerable<Response.VcsAccount>> GetAll()
     {
-        Infrastructure.VcsAccount? account = await _context.VcsAccounts.FindAsync(id);
+        long userId = Utils.GetUserIdFromClaims(User);
+        return await (from a in _context.VcsAccounts where a.UserId == userId select (Response.VcsAccount)a).ToArrayAsync();
+    }
+
+    [HttpDelete("{accountId:long}")]
+    [Authorize(Roles = "Solver")]
+    public async Task<IActionResult> Delete(long accountId)
+    {
+        long userId = Utils.GetUserIdFromClaims(User);
+        Infrastructure.VcsAccount? account = await _context.VcsAccounts.FindAsync(accountId);
         if (account is not null)
         {
+            if (account.UserId != userId)
+                return Unauthorized();
             _context.Remove(account);
             await _context.SaveChangesAsync();
         }
+        return Ok();
     }
 }

@@ -8,4 +8,5 @@ public record User
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
     public Role Role { get; set; }
+    public ICollection<Group> Groups { get; set; } = null!;
 }

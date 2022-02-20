@@ -1,4 +1,5 @@
 using LmsPlusPlus.Api.Vcs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,12 +19,39 @@ public class SolutionsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Response.Solution>> GetAll() =>
-        await _context.Solutions.Include(s => s.Repository).Select(s => (Response.Solution)s).ToArrayAsync();
+    [Authorize(Roles = "Author, Solver")]
+    public async Task<ActionResult<IEnumerable<Response.Solution>>> GetAll()
+    {
+        Infrastructure.Role userRole = Utils.GetUserRoleFromClaims(User);
+        long userId = Utils.GetUserIdFromClaims(User);
+        return userRole switch
+        {
+            Infrastructure.Role.Author => await (from s in _context.Solutions
+                                                 join ts in _context.Tasks on s.TaskId equals ts.Id
+                                                 join tp in _context.Topics on ts.TopicId equals tp.Id
+                                                 where tp.Id == userId
+                                                 select (Response.Solution)s).ToArrayAsync(),
+            Infrastructure.Role.Solver => await (from s in _context.Solutions
+                                                 join u in _context.Users on s.SolverId equals u.Id
+                                                 where u.Id == userId
+                                                 select (Response.Solution)s).ToArrayAsync(),
+            Infrastructure.Role.Admin => Unauthorized(),
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
 
     [HttpPost]
-    public async Task<Response.Solution> Create(Request.Solution requestSolution)
+    [Authorize(Roles = "Solver")]
+    public async Task<ActionResult<Response.Solution>> Create(Request.Solution requestSolution)
     {
+        long solverId = Utils.GetUserIdFromClaims(User);
+        bool solverCanViewTask = await (from ts in _context.Tasks
+                                        join tp in _context.Topics on ts.TopicId equals tp.Id
+                                        join g in _context.Groups.Include(g => g.Users) on tp.Id equals g.TopicId
+                                        where ts.Id == requestSolution.TaskId
+                                        select g.Users.Select(u => u.Id).Contains(solverId)).SingleOrDefaultAsync();
+        if (!solverCanViewTask)
+            return Unauthorized();
         Infrastructure.VcsAccount account = await _context.VcsAccounts.FirstAsync(a => a.Name == "dermeister");
         Infrastructure.Repository templateRepository = await _context.Technologies
             .Include(t => t.TemplateRepository.VcsAccount)
@@ -40,7 +68,7 @@ public class SolutionsController : ControllerBase
                 Url = repositoryUri.ToString(),
                 VcsAccountId = account.Id
             },
-            SolverId = 1,
+            SolverId = solverId,
             TaskId = requestSolution.TaskId,
             TechnologyId = requestSolution.TechnologyId
         };
@@ -49,14 +77,19 @@ public class SolutionsController : ControllerBase
         return (Response.Solution)databaseSolution;
     }
 
-    [HttpDelete("{id:long}")]
-    public async Task Delete(long id)
+    [HttpDelete("{solutionId:long}")]
+    [Authorize(Roles = "Solver")]
+    public async Task<IActionResult> Delete(long solutionId)
     {
-        Infrastructure.Solution? solution = await _context.Solutions.FindAsync(id);
+        long userId = Utils.GetUserIdFromClaims(User);
+        Infrastructure.Solution? solution = await _context.Solutions.FindAsync(solutionId);
         if (solution is not null)
         {
+            if (solution.SolverId != userId)
+                return Unauthorized();
             _context.Remove(solution);
             await _context.SaveChangesAsync();
         }
+        return Ok();
     }
 }

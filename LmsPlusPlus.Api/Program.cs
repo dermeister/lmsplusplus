@@ -1,8 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using LmsPlusPlus.Api;
 using LmsPlusPlus.Api.Infrastructure;
 using LmsPlusPlus.Api.Vcs;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddInMemoryCollection(new Dictionary<string, string>
@@ -11,7 +14,7 @@ builder.Configuration.AddInMemoryCollection(new Dictionary<string, string>
 });
 builder.Services.AddDbContext<ApplicationContext>((serviceProvider, optionsBuilder) =>
 {
-    IConfiguration configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    IConfiguration configuration = serviceProvider.GetRequiredService<IConfiguration>(); // use builder.Configuration
     string? host = configuration["PostgresHost"];
     string? port = configuration["PostgresPort"];
     string? database = configuration["PostgresDb"];
@@ -20,6 +23,18 @@ builder.Services.AddDbContext<ApplicationContext>((serviceProvider, optionsBuild
     optionsBuilder
         .UseNpgsql($"Host={host};Port={port};Database={database};Username={username};Password={password}")
         .UseSnakeCaseNamingConvention();
+});
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    string secret = builder.Configuration["JwtSecret"];
+    SymmetricSecurityKey key = new(Encoding.Default.GetBytes(secret));
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidIssuer = builder.Configuration["JwtIssuer"],
+        ValidAudience = builder.Configuration["JwtAudience"],
+        IssuerSigningKey = key,
+        ValidateIssuerSigningKey = true
+    };
 });
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -35,6 +50,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseMiddleware<ProxyMiddleware>();
 app.UseAuthorization();
 app.MapControllers();

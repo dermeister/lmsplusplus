@@ -6,4 +6,5 @@ public record Group
     public string Name { get; set; } = null!;
     public long TopicId { get; set; }
     public Topic Topic { get; set; } = null!;
+    public ICollection<User> Users { get; set; } = null!;
 }

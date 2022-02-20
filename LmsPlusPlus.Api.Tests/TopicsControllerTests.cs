@@ -89,7 +89,7 @@ public class TopicsControllerTests : IAsyncLifetime
     {
         // Arrange
         Infrastructure.User user = await _app.Context.Users.FirstAsync();
-        Request.Topic topic = new(null!, user.Id);
+        Request.CreateTopic topic = new(null!, user.Id);
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "topics", HttpMethod.Post, topic);
         int oldTopicsCount = await _app.Context.Topics.CountAsync();
 
@@ -107,7 +107,7 @@ public class TopicsControllerTests : IAsyncLifetime
     {
         // Arrange
         Infrastructure.User user = await _app.Context.Users.FirstAsync();
-        Request.Topic topic = new(Name: "New topic 1", user.Id);
+        Request.CreateTopic topic = new(Name: "New topic 1", user.Id);
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "topics", HttpMethod.Post, topic);
         int oldTopicsCount = await _app.Context.Topics.CountAsync();
 
@@ -124,7 +124,7 @@ public class TopicsControllerTests : IAsyncLifetime
     public async Task UpdateTopicBadRequest()
     {
         // Arrange
-        Request.Topic topic = new(Name: "New topic 1", AuthorId: 0);
+        Request.UpdateTopic topic = new(Name: "New topic 1");
         long nonExistentTopicId = await GetNonExistentTopicId();
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"topics/{nonExistentTopicId}", HttpMethod.Put, topic);
 
@@ -140,7 +140,7 @@ public class TopicsControllerTests : IAsyncLifetime
     {
         // Arrange
         Infrastructure.Topic databaseTopic = await _app.Context.Topics.FirstAsync();
-        Request.Topic requestTopic = new(Name: "New topic", databaseTopic.AuthorId);
+        Request.UpdatedGroup requestTopic = new(Name: "New topic");
         HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"topics/{databaseTopic.Id}", HttpMethod.Put, requestTopic);
 
         // Act

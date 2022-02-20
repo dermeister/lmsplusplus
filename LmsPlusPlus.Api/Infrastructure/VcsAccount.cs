@@ -7,4 +7,5 @@ public record VcsAccount
     public string AccessToken { get; set; } = null!;
     public string HostingProviderId { get; set; } = null!;
     public VcsHostingProvider HostingProvider { get; set; } = null!;
+    public long UserId { get; set; }
 }

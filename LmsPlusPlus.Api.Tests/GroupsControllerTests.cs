@@ -94,8 +94,8 @@ public class GroupsControllerTests : IAsyncLifetime
     public async Task CreateGroupBadRequest()
     {
         // Arrange
-        Request.Group group = new(null!, TopicId: 0);
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "groups", HttpMethod.Post, group);
+        Request.CreatedGroup createdGroup = new(null!, TopicId: 0);
+        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "groups", HttpMethod.Post, createdGroup);
         int oldGroupsCount = await _app.Context.Groups.CountAsync();
 
         // Act
@@ -112,8 +112,8 @@ public class GroupsControllerTests : IAsyncLifetime
     {
         // Arrange
         Infrastructure.Topic topic = await _app.Context.Topics.FirstAsync();
-        Request.Group group = new(Name: "New group 1", topic.Id);
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "groups", HttpMethod.Post, group);
+        Request.CreatedGroup createdGroup = new(Name: "New group 1", topic.Id);
+        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "groups", HttpMethod.Post, createdGroup);
         int oldGroupsCount = await _app.Context.Groups.CountAsync();
 
         // Act
@@ -129,9 +129,9 @@ public class GroupsControllerTests : IAsyncLifetime
     public async Task UpdateGroupBadRequest()
     {
         // Arrange
-        Request.Group group = new(null!, TopicId: 0);
+        Request.CreatedGroup createdGroup = new(null!, TopicId: 0);
         long nonExistentGroupId = await GetNonExistentGroupId();
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"groups/{nonExistentGroupId}", HttpMethod.Put, group);
+        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"groups/{nonExistentGroupId}", HttpMethod.Put, createdGroup);
 
         // Act
         HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
@@ -145,8 +145,8 @@ public class GroupsControllerTests : IAsyncLifetime
     {
         // Arrange
         Infrastructure.Group databaseGroup = await _app.Context.Groups.FirstAsync();
-        Request.Group requestGroup = new(Name: "New group 1", databaseGroup.TopicId);
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"groups/{databaseGroup.Id}", HttpMethod.Put, requestGroup);
+        Request.CreatedGroup requestCreatedGroup = new(Name: "New group 1", databaseGroup.TopicId);
+        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"groups/{databaseGroup.Id}", HttpMethod.Put, requestCreatedGroup);
 
         // Act
         HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);

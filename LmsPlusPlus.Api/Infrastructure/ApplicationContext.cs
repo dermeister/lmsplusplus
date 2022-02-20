@@ -43,6 +43,13 @@ public class ApplicationContext : DbContext
                 j => j.HasOne<Technology>().WithMany().HasForeignKey("technology_id"),
                 j => j.HasOne<Task>().WithMany().HasForeignKey("task_id"),
                 j => j.ToTable("m2m_tasks_technologies"));
+        modelBuilder.Entity<Group>()
+            .HasMany(g => g.Users)
+            .WithMany(u => u.Groups)
+            .UsingEntity<Dictionary<string, object>>(joinEntityName: "UserGroup",
+                j => j.HasOne<User>().WithMany().HasForeignKey("user_id"),
+                j => j.HasOne<Group>().WithMany().HasForeignKey("group_id"),
+                j => j.ToTable("m2m_users_groups"));
         base.OnModelCreating(modelBuilder);
     }
 }

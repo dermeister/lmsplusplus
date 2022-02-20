@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LmsPlusPlus.Api;
 
 [ApiController]
+[Authorize]
 [Route("permissions")]
 public class PermissionsController : ControllerBase
 {
@@ -12,36 +14,13 @@ public class PermissionsController : ControllerBase
     public PermissionsController(Infrastructure.ApplicationContext context) => _context = context;
 
     [HttpGet]
-    public async Task<IEnumerable<Response.Permissions>> GetAll() =>
-        await _context.Permissions.Select(p => (Response.Permissions)p).ToArrayAsync();
-
-    [HttpGet("{role}")]
-    public async Task<Response.Permissions?> GetPermissionsByRole(string role)
+    public async Task<Response.Permissions> GetPermissions()
     {
-        if (!Enum.TryParse(role, ignoreCase: true, out Infrastructure.Role parsedRole))
-            return null;
-        Infrastructure.Permissions? permissions = await _context.Permissions.FindAsync(parsedRole);
-        if (permissions is null)
-            return null;
+        long id = Utils.GetUserIdFromClaims(User);
+        Infrastructure.Permissions permissions = await (from u in _context.Users
+                                                        join p in _context.Permissions on u.Role equals p.Role
+                                                        where u.Id == id
+                                                        select p).SingleAsync();
         return (Response.Permissions)permissions;
-    }
-
-    [HttpPut("{role}")]
-    public async Task<ActionResult<Response.Permissions>> Update(string role, Request.Permissions requestPermissions)
-    {
-        if (!Enum.TryParse(role, ignoreCase: true, out Infrastructure.Role parsedRole))
-            return BadRequest();
-        Infrastructure.Permissions? databasePermissions = await _context.Permissions.FindAsync(parsedRole);
-        if (databasePermissions is null)
-            return BadRequest();
-        databasePermissions.CanCreateTask = requestPermissions.CanCreateTask;
-        databasePermissions.CanUpdateTask = requestPermissions.CanUpdateTask;
-        databasePermissions.CanDeleteTask = requestPermissions.CanDeleteTask;
-        databasePermissions.CanUpdateVcsConfiguration = requestPermissions.CanUpdateVcsConfiguration;
-        databasePermissions.CanUpdateUser = requestPermissions.CanUpdateUser;
-        databasePermissions.CanCreateSolution = requestPermissions.CanCreateSolution;
-        databasePermissions.CanDeleteSolution = requestPermissions.CanDeleteSolution;
-        await _context.SaveChangesAsync();
-        return (Response.Permissions)databasePermissions;
     }
 }

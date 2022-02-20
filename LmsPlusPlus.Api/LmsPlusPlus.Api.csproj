@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="EFCore.NamingConventions" Version="6.0.0" />
     <PackageReference Include="LibGit2Sharp" Version="0.27.0-preview-0175" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.2" />
     <PackageReference Include="Octokit" Version="0.50.0" />
