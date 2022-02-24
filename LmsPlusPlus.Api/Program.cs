@@ -43,6 +43,7 @@ builder.Services.AddSignalR();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<VcsHostingOauthFactory>();
 builder.Services.AddScoped<VcsHostingClientFactory>();
+builder.Services.AddScoped<JwtGenerator>();
 WebApplication app = builder.Build();
 if (app.Environment.IsDevelopment())
 {

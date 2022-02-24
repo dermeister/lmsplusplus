@@ -4,17 +4,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LmsPlusPlus.Api;
 
-[ApiController]
-[Route("topics")]
+[ApiController, Route("topics")]
 public class TopicsController : ControllerBase
 {
     readonly Infrastructure.ApplicationContext _context;
 
     public TopicsController(Infrastructure.ApplicationContext context) => _context = context;
 
-    [HttpGet]
-    [Authorize("Author, Solver")]
-    public async Task<ActionResult<IEnumerable<Response.Topic>>> GetAll()
+    [HttpGet, Authorize(Roles = "Author, Solver")]
+    public async Task<IEnumerable<Response.Topic>> GetAll()
     {
         Infrastructure.Role role = Utils.GetUserRoleFromClaims(User);
         long id = Utils.GetUserIdFromClaims(User);
@@ -25,26 +23,11 @@ public class TopicsController : ControllerBase
                 .Include(u => u.Groups)
                 .SelectMany(u => from g in u.Groups select (Response.Topic)g.Topic)
                 .ToArrayAsync(),
-            Infrastructure.Role.Admin => Unauthorized(),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
 
-    [HttpGet("{topicId:long}")]
-    [Authorize(Roles = "Author")]
-    public async Task<ActionResult<Response.Topic?>> GetById(long topicId)
-    {
-        long userId = Utils.GetUserIdFromClaims(User);
-        Infrastructure.Topic? topic = await _context.Topics.FindAsync(topicId);
-        if (topic is null)
-            return Ok(null);
-        if (topic.AuthorId != userId)
-            return Unauthorized();
-        return (Response.Topic)topic;
-    }
-
-    [HttpPost]
-    [Authorize(Roles = "Author")]
+    [HttpPost, Authorize(Roles = "Author")]
     public async Task<Response.Topic> Create(Request.CreateTopic requestTopic)
     {
         Infrastructure.Topic databaseTopic = new()
@@ -57,8 +40,7 @@ public class TopicsController : ControllerBase
         return (Response.Topic)databaseTopic;
     }
 
-    [HttpPut("{topicId:long}")]
-    [Authorize(Roles = "Author")]
+    [HttpPut("{topicId:long}"), Authorize(Roles = "Author")]
     public async Task<ActionResult<Response.Topic>> Update(long topicId, Request.UpdateTopic requestTopic)
     {
         long authorId = Utils.GetUserIdFromClaims(User);
@@ -66,13 +48,13 @@ public class TopicsController : ControllerBase
         if (databaseTopic is null)
             return BadRequest();
         if (databaseTopic.AuthorId != authorId)
-            return Unauthorized();
+            return Forbid();
         databaseTopic.Name = requestTopic.Name;
         await _context.SaveChangesAsync();
         return (Response.Topic)databaseTopic;
     }
 
-    [HttpDelete("{topicId:long}")]
+    [HttpDelete("{topicId:long}"), Authorize(Roles = "Author")]
     public async Task<IActionResult> Delete(long topicId)
     {
         long authorId = Utils.GetUserIdFromClaims(User);
@@ -80,7 +62,7 @@ public class TopicsController : ControllerBase
         if (topic is not null)
         {
             if (topic.AuthorId != authorId)
-                return Unauthorized();
+                return Forbid();
             _context.Remove(topic);
             await _context.SaveChangesAsync();
         }

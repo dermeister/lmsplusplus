@@ -4,8 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LmsPlusPlus.Api;
 
-[ApiController]
-[Route("vcs-accounts")]
+[ApiController, Authorize(Roles = "Solver"), Route("vcs-accounts")]
 public class VcsAccountsController : ControllerBase
 {
     readonly Infrastructure.ApplicationContext _context;
@@ -13,7 +12,6 @@ public class VcsAccountsController : ControllerBase
     public VcsAccountsController(Infrastructure.ApplicationContext context) => _context = context;
 
     [HttpGet]
-    [Authorize(Roles = "Solver")]
     public async Task<IEnumerable<Response.VcsAccount>> GetAll()
     {
         long userId = Utils.GetUserIdFromClaims(User);
@@ -21,7 +19,6 @@ public class VcsAccountsController : ControllerBase
     }
 
     [HttpDelete("{accountId:long}")]
-    [Authorize(Roles = "Solver")]
     public async Task<IActionResult> Delete(long accountId)
     {
         long userId = Utils.GetUserIdFromClaims(User);

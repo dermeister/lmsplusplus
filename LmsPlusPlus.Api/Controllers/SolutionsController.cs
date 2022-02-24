@@ -5,8 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LmsPlusPlus.Api;
 
-[ApiController]
-[Route("solutions")]
+[ApiController, Route("solutions")]
 public class SolutionsController : ControllerBase
 {
     readonly Infrastructure.ApplicationContext _context;
@@ -18,9 +17,8 @@ public class SolutionsController : ControllerBase
         _vcsHostingClientFactory = vcsHostingClientFactory;
     }
 
-    [HttpGet]
-    [Authorize(Roles = "Author, Solver")]
-    public async Task<ActionResult<IEnumerable<Response.Solution>>> GetAll()
+    [HttpGet, Authorize(Roles = "Author, Solver")]
+    public async Task<IEnumerable<Response.Solution>> GetAll()
     {
         Infrastructure.Role userRole = Utils.GetUserRoleFromClaims(User);
         long userId = Utils.GetUserIdFromClaims(User);
@@ -35,13 +33,11 @@ public class SolutionsController : ControllerBase
                                                  join u in _context.Users on s.SolverId equals u.Id
                                                  where u.Id == userId
                                                  select (Response.Solution)s).ToArrayAsync(),
-            Infrastructure.Role.Admin => Unauthorized(),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
 
-    [HttpPost]
-    [Authorize(Roles = "Solver")]
+    [HttpPost, Authorize(Roles = "Solver")]
     public async Task<ActionResult<Response.Solution>> Create(Request.Solution requestSolution)
     {
         long solverId = Utils.GetUserIdFromClaims(User);
@@ -51,7 +47,7 @@ public class SolutionsController : ControllerBase
                                         where ts.Id == requestSolution.TaskId
                                         select g.Users.Select(u => u.Id).Contains(solverId)).SingleOrDefaultAsync();
         if (!solverCanViewTask)
-            return Unauthorized();
+            return Forbid();
         Infrastructure.VcsAccount account = await _context.VcsAccounts.FirstAsync(a => a.Name == "dermeister");
         Infrastructure.Repository templateRepository = await _context.Technologies
             .Include(t => t.TemplateRepository.VcsAccount)
@@ -77,8 +73,7 @@ public class SolutionsController : ControllerBase
         return (Response.Solution)databaseSolution;
     }
 
-    [HttpDelete("{solutionId:long}")]
-    [Authorize(Roles = "Solver")]
+    [HttpDelete("{solutionId:long}"), Authorize(Roles = "Solver")]
     public async Task<IActionResult> Delete(long solutionId)
     {
         long userId = Utils.GetUserIdFromClaims(User);

@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -8,86 +9,57 @@ namespace LmsPlusPlus.Api.Tests;
 public class PermissionsControllerTests : IAsyncLifetime
 {
     WebApplication _app = null!;
+    Infrastructure.User _user = null!;
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
         _app = new WebApplication();
-        return Task.CompletedTask;
+        _user = new Infrastructure.User
+        {
+            Login = "User",
+            PasswordHash = "User",
+            FirstName = "User",
+            LastName = "User",
+            Role = Infrastructure.Role.Author
+        };
+        _app.Context.AddRange(_user);
+        try
+        {
+            await _app.Context.SaveChangesAsync();
+        }
+        catch (Exception)
+        {
+            await _app.DisposeAsync();
+            throw;
+        }
     }
 
     public async Task DisposeAsync() => await _app.DisposeAsync();
 
     [Fact]
-    public async Task GetAllPermissionsOk()
+    public async Task GetPermissionsUnauthorized()
     {
         // Arrange
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "permissions", HttpMethod.Get);
+        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "permissions", HttpMethod.Get, jwt: null);
 
         // Act
         HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, responseMessage.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetPermissionsSuccess()
+    {
+        // Arrange
+        string jwt = _app.JwtGenerator.Generate(_user.Id.ToString(), _user.Role.ToString());
+        HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage(url: "permissions", HttpMethod.Get, jwt);
+
+        // Act
+        HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage1);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, responseMessage.StatusCode);
     }
-
-    [Fact]
-    public async Task GetPermissionsByNonExistentRoleOk()
-    {
-        // Arrange
-        string nonExistentRole = GetNonExistentRole();
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"permissions/{nonExistentRole}", HttpMethod.Get);
-
-        // Act
-        HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.NoContent, responseMessage.StatusCode);
-    }
-
-    [Fact]
-    public async Task GetPermissionsByRoleOk()
-    {
-        // Arrange
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "permissions/admin", HttpMethod.Get);
-
-        // Act
-        HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, responseMessage.StatusCode);
-    }
-
-    [Fact]
-    public async Task UpdatePermissionsBadRequest()
-    {
-        // Arrange
-        Request.Permissions permissions = new(CanCreateTask: false, CanUpdateTask: false, CanDeleteTask: false,
-            CanUpdateVcsConfiguration: false, CanUpdateUser: false, CanCreateSolution: false, CanDeleteSolution: false);
-        string nonExistentRole = GetNonExistentRole();
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"permissions/{nonExistentRole}", HttpMethod.Put,
-            permissions);
-
-        // Act
-        HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, responseMessage.StatusCode);
-    }
-
-    [Fact]
-    public async Task UpdatePermissionsOk()
-    {
-        // Arrange
-        Request.Permissions permissions = new(CanCreateTask: false, CanUpdateTask: false, CanDeleteTask: false,
-            CanUpdateVcsConfiguration: false, CanUpdateUser: false, CanCreateSolution: false, CanDeleteSolution: false);
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "permissions/admin", HttpMethod.Put, permissions);
-
-        // Act
-        HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, responseMessage.StatusCode);
-    }
-
-    static string GetNonExistentRole() => "non-existent-role";
 }

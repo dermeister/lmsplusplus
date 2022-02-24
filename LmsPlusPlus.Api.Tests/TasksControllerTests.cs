@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -11,38 +13,130 @@ namespace LmsPlusPlus.Api.Tests;
 public class TasksControllerTests : IAsyncLifetime
 {
     WebApplication _app = null!;
+    Infrastructure.User _author1 = null!;
+    Infrastructure.User _author2 = null!;
+    Infrastructure.User _solver = null!;
+    Infrastructure.User _admin = null!;
+    Infrastructure.Topic _topic1 = null!;
+    Infrastructure.Technology _technology1 = null!;
+    Infrastructure.Technology _technology2 = null!;
+    Infrastructure.Task _task1 = null!;
 
     public async Task InitializeAsync()
     {
         _app = new WebApplication();
-        Infrastructure.User user1 = new()
+        _author1 = new Infrastructure.User
         {
-            Login = "user1",
-            PasswordHash = "password1",
-            FirstName = "User 1",
-            LastName = "User 1",
+            Login = "author1",
+            PasswordHash = "author1",
+            FirstName = "Author 1",
+            LastName = "Author 1",
             Role = Infrastructure.Role.Author
         };
-        Infrastructure.Topic topic1 = new()
+        _author2 = new Infrastructure.User
         {
-            Author = user1,
-            Name = "Topic 1"
+            Login = "author2",
+            PasswordHash = "author2",
+            FirstName = "Author 2",
+            LastName = "Author 2",
+            Role = Infrastructure.Role.Author
         };
-        Infrastructure.Group group1 = new()
+        _solver = new Infrastructure.User
         {
-            Name = "Group 1",
-            Topic = topic1
+            Login = "solver",
+            PasswordHash = "solver",
+            FirstName = "Solver",
+            LastName = "Solver",
+            Role = Infrastructure.Role.Solver
         };
-        Infrastructure.Task task1 = new()
+        _admin = new Infrastructure.User
+        {
+            Login = "admin",
+            PasswordHash = "admin",
+            FirstName = "Admin",
+            LastName = "Admin",
+            Role = Infrastructure.Role.Admin
+        };
+        _app.Context.AddRange(_author1, _author2, _solver, _admin);
+        try
+        {
+            await _app.Context.SaveChangesAsync();
+        }
+        catch (Exception)
+        {
+            await _app.DisposeAsync();
+            throw;
+        }
+        _topic1 = new Infrastructure.Topic
+        {
+            Name = "Topic",
+            Author = _author1
+        };
+        Infrastructure.Topic topic2 = new()
+        {
+            Name = "Topic 2",
+            Author = _author2
+        };
+        Infrastructure.Group group = new()
+        {
+            Topic = _topic1,
+            Name = "Group",
+            Users = new[] { _solver }
+        };
+        Infrastructure.VcsHostingProvider provider = new()
+        {
+            Id = "provider",
+            Name = "Provider"
+        };
+        Infrastructure.VcsAccount account = new()
+        {
+            Name = "account",
+            AccessToken = "token",
+            HostingProvider = provider,
+            UserId = _admin.Id
+        };
+        Infrastructure.Repository repository1 = new()
+        {
+            VcsAccount = account,
+            Url = "repository-1"
+        };
+        Infrastructure.Repository repository2 = new()
+        {
+            VcsAccount = account,
+            Url = "repository-2"
+        };
+        _technology1 = new Infrastructure.Technology
+        {
+            Name = "Technology 1",
+            TemplateRepository = repository1
+        };
+        _technology2 = new Infrastructure.Technology
+        {
+            Name = "Technology 2",
+            TemplateRepository = repository2
+        };
+        _task1 = new Infrastructure.Task
         {
             Title = "Task 1",
             Description = "Task 1",
-            Topic = topic1
+            Topic = _topic1,
+            Technologies = new[] { _technology1 }
         };
-        _app.Context.Add(user1);
-        _app.Context.Add(topic1);
-        _app.Context.Add(group1);
-        _app.Context.Add(task1);
+        Infrastructure.Task task2 = new()
+        {
+            Title = "Task 2",
+            Description = "Task 2",
+            Topic = _topic1,
+            Technologies = new[] { _technology1 }
+        };
+        Infrastructure.Task task3 = new()
+        {
+            Title = "Task 3",
+            Description = "Task 3",
+            Topic = topic2,
+            Technologies = new[] { _technology1 }
+        };
+        _app.Context.AddRange(_topic1, topic2, group, provider, account, repository1, _technology1, _technology2, _task1, task2, task3);
         try
         {
             await _app.Context.SaveChangesAsync();
@@ -57,88 +151,160 @@ public class TasksControllerTests : IAsyncLifetime
     public async Task DisposeAsync() => await _app.DisposeAsync();
 
     [Fact]
-    public async Task GetAllTasksOk()
+    public async Task GetAllTasksUnauthorized()
     {
         // Arrange
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Get);
+        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Get, jwt: null);
 
         // Act
         HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, responseMessage.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, responseMessage.StatusCode);
     }
 
     [Fact]
-    public async Task GetTaskByIdNonExistent()
+    public async Task GetAllTasksForbidden()
     {
         // Arrange
-        long nonExistentTaskId = await GetNonExistentTaskId();
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"tasks/{nonExistentTaskId}", HttpMethod.Get);
+        string jwt = _app.JwtGenerator.Generate(_admin.Id.ToString(), _admin.Role.ToString());
+        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Get, jwt);
 
         // Act
         HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
 
         // Assert
-        Assert.Equal(HttpStatusCode.NoContent, responseMessage.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, responseMessage.StatusCode);
     }
 
     [Fact]
-    public async Task GetTaskByIdOk()
+    public async Task GetAllTasksSuccess()
     {
         // Arrange
-        Infrastructure.Task task = await _app.Context.Tasks.FirstAsync();
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"tasks/{task.Id}", HttpMethod.Get);
+        string jwt1 = _app.JwtGenerator.Generate(_solver.Id.ToString(), _solver.Role.ToString());
+        HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Get, jwt1);
+        string jwt2 = _app.JwtGenerator.Generate(_author1.Id.ToString(), _author1.Role.ToString());
+        HttpRequestMessage requestMessage2 = Utils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Get, jwt2);
+
+        // Act
+        Task<HttpResponseMessage> responseMessage1 = _app.Client.SendAsync(requestMessage1);
+        Task<HttpResponseMessage> responseMessage2 = _app.Client.SendAsync(requestMessage2);
+        await Task.WhenAll(responseMessage1, responseMessage2);
+        IEnumerable<Response.Task> tasks1 = await Utils.ReadHttpResponse<IEnumerable<Response.Task>>(responseMessage1.Result);
+        IEnumerable<Response.Task> tasks2 = await Utils.ReadHttpResponse<IEnumerable<Response.Task>>(responseMessage2.Result);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, responseMessage1.Result.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, responseMessage2.Result.StatusCode);
+        Assert.Equal(expected: 2, tasks2.Count());
+        Assert.Equal(expected: 2, tasks1.Count());
+    }
+
+    [Fact]
+    public async Task CreateTaskUnauthorized()
+    {
+        // Arrange
+        Request.CreateTask task = new(Title: "New title", Description: "New title", _topic1.Id, new[] { _technology1.Id });
+        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Post, jwt: null, task);
 
         // Act
         HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, responseMessage.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, responseMessage.StatusCode);
+    }
+
+    [Fact]
+    public async Task CreateTaskForbidden()
+    {
+        // Arrange
+        Request.CreateTask task = new(Title: "New task", Description: "New task", _topic1.Id, new[] { _technology1.Id });
+        string jwt1 = _app.JwtGenerator.Generate(_solver.Id.ToString(), _solver.Role.ToString());
+        HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Post, jwt1, task);
+        string jwt2 = _app.JwtGenerator.Generate(_author2.Id.ToString(), _author2.Role.ToString());
+        HttpRequestMessage requestMessage2 = Utils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Post, jwt2, task);
+
+        // Act
+        Task<HttpResponseMessage> responseMessage1 = _app.Client.SendAsync(requestMessage1);
+        Task<HttpResponseMessage> responseMessage2 = _app.Client.SendAsync(requestMessage2);
+        await Task.WhenAll(responseMessage1, responseMessage2);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, responseMessage1.Result.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, responseMessage2.Result.StatusCode);
     }
 
     [Fact]
     public async Task CreateTaskBadRequest()
     {
         // Arrange
-        Request.Task task = new(null!, null!, TopicId: 0, Array.Empty<short>());
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Post, task);
-        int oldTasksCount = await _app.Context.Tasks.CountAsync();
+        Request.CreateTask task = new(null!, null!, _topic1.Id, new[] { _technology1.Id });
+        string jwt = _app.JwtGenerator.Generate(_author1.Id.ToString(), _author1.Role.ToString());
+        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Post, jwt, task);
 
         // Act
         HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
-        int newTasksCount = await _app.Context.Tasks.CountAsync();
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, responseMessage.StatusCode);
-        Assert.Equal(oldTasksCount, newTasksCount);
     }
 
     [Fact]
-    public async Task CreateTaskOk()
+    public async Task CreateTaskSuccess()
     {
         // Arrange
-        Infrastructure.Topic topic = await _app.Context.Topics.FirstAsync();
-        Request.Task task = new(Title: "New task 1", Description: "New task 1", topic.Id, Array.Empty<short>());
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Post, task);
-        int oldTasksCount = await _app.Context.Tasks.CountAsync();
+        Request.CreateTask task = new(Title: "New task", Description: "New task", _topic1.Id, new[] { _technology1.Id });
+        string jwt = _app.JwtGenerator.Generate(_author1.Id.ToString(), _author1.Role.ToString());
+        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Post, jwt, task);
 
         // Act
         HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
-        int newTasksCount = await _app.Context.Tasks.CountAsync();
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, responseMessage.StatusCode);
-        Assert.Equal(oldTasksCount + 1, newTasksCount);
+    }
+
+    [Fact]
+    public async Task UpdateTaskUnauthorized()
+    {
+        // Arrange
+        Request.UpdateTask task = new(Title: "New task", Description: "New task", new[] { _technology1.Id });
+        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage($"tasks/{_task1.Id}", HttpMethod.Put, jwt: null, task);
+
+        // Act
+        HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, responseMessage.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateTaskForbidden()
+    {
+        // Arrange
+        Request.UpdateTask task = new(Title: "New task", Description: "New task", new[] { _technology1.Id });
+        string jwt1 = _app.JwtGenerator.Generate(_solver.Id.ToString(), _solver.Role.ToString());
+        HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage($"tasks/{_task1.Id}", HttpMethod.Put, jwt1, task);
+        string jwt2 = _app.JwtGenerator.Generate(_author2.Id.ToString(), _author2.Role.ToString());
+        HttpRequestMessage requestMessage2 = Utils.CreateHttpRequestMessage($"tasks/{_task1.Id}", HttpMethod.Put, jwt2, task);
+
+        // Act
+        Task<HttpResponseMessage> responseMessage1 = _app.Client.SendAsync(requestMessage1);
+        Task<HttpResponseMessage> responseMessage2 = _app.Client.SendAsync(requestMessage2);
+        await Task.WhenAll(responseMessage1, responseMessage2);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, responseMessage1.Result.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, responseMessage2.Result.StatusCode);
     }
 
     [Fact]
     public async Task UpdateTaskBadRequest()
     {
         // Arrange
-        Request.Task task = new(null!, null!, TopicId: 0, Array.Empty<short>());
-        long nonExistentTaskId = await GetNonExistentTaskId();
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"tasks/{nonExistentTaskId}", HttpMethod.Put, task);
+        Request.UpdateTask task = new(null!, null!, new[] { _technology1.Id });
+        string jwt = _app.JwtGenerator.Generate(_author1.Id.ToString(), _author1.Role.ToString());
+        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage($"tasks/{_task1.Id}", HttpMethod.Put, jwt, task);
 
         // Act
         HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
@@ -148,12 +314,12 @@ public class TasksControllerTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task UpdateTaskOk()
+    public async Task UpdateTaskSuccess()
     {
         // Arrange
-        Infrastructure.Task databaseTask = await _app.Context.Tasks.FirstAsync();
-        Request.Task requestTask = new(Title: "New task 1", Description: "New task 1", databaseTask.TopicId, Array.Empty<short>());
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"tasks/{databaseTask.Id}", HttpMethod.Put, requestTask);
+        Request.UpdateTask task = new(Title: "New task", Description: "New task", new[] { _technology1.Id, _technology2.Id });
+        string jwt = _app.JwtGenerator.Generate(_author1.Id.ToString(), _author1.Role.ToString());
+        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage($"tasks/{_task1.Id}", HttpMethod.Put, jwt, task);
 
         // Act
         HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
@@ -163,45 +329,52 @@ public class TasksControllerTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task DeleteNonExistentTaskOk()
+    public async Task DeleteTaskUnauthorized()
     {
         // Arrange
-        long nonExistentTaskId = await GetNonExistentTaskId();
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"tasks/{nonExistentTaskId}", HttpMethod.Delete);
-        int oldTasksCount = await _app.Context.Tasks.CountAsync();
+        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage($"tasks/{_task1.Id}", HttpMethod.Delete, jwt: null);
 
         // Act
         HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
-        int newTasksCount = await _app.Context.Tasks.CountAsync();
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, responseMessage.StatusCode);
-        Assert.Equal(oldTasksCount, newTasksCount);
+        Assert.Equal(HttpStatusCode.Unauthorized, responseMessage.StatusCode);
     }
 
     [Fact]
-    public async Task DeleteExistingTaskOk()
+    public async Task DeleteTaskForbidden()
     {
         // Arrange
-        Infrastructure.Task databaseTask = await _app.Context.Tasks.FirstAsync();
-        HttpRequestMessage requestMessage = TestUtils.CreateHttpRequestMessage($"tasks/{databaseTask.Id}", HttpMethod.Delete);
-        int oldTasksCount = await _app.Context.Tasks.CountAsync();
+        string jwt1 = _app.JwtGenerator.Generate(_solver.Id.ToString(), _solver.Role.ToString());
+        HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage($"tasks/{_task1.Id}", HttpMethod.Delete, jwt1);
+        string jwt2 = _app.JwtGenerator.Generate(_author2.Id.ToString(), _author2.Role.ToString());
+        HttpRequestMessage requestMessage2 = Utils.CreateHttpRequestMessage($"tasks/{_task1.Id}", HttpMethod.Delete, jwt2);
 
         // Act
-        HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
-        int newTasksCount = await _app.Context.Tasks.CountAsync();
+        Task<HttpResponseMessage> responseMessage1 = _app.Client.SendAsync(requestMessage1);
+        Task<HttpResponseMessage> responseMessage2 = _app.Client.SendAsync(requestMessage2);
+        await Task.WhenAll(responseMessage1, responseMessage2);
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, responseMessage.StatusCode);
-        Assert.Equal(oldTasksCount - 1, newTasksCount);
+        Assert.Equal(HttpStatusCode.Forbidden, responseMessage1.Result.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, responseMessage2.Result.StatusCode);
     }
 
-    async Task<long> GetNonExistentTaskId()
+    [Fact]
+    public async Task DeleteTaskSuccess()
     {
-        Infrastructure.Task[] tasks = await (from task in _app.Context.Tasks orderby task.Id select task).ToArrayAsync();
-        Infrastructure.Task? lastTask = tasks.LastOrDefault();
-        if (lastTask is null)
-            return 0;
-        return lastTask.Id + 1;
+        // Arrange
+        string jwt = _app.JwtGenerator.Generate(_author1.Id.ToString(), _author1.Role.ToString());
+        HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage(url: "tasks/0", HttpMethod.Delete, jwt);
+        HttpRequestMessage requestMessage2 = Utils.CreateHttpRequestMessage($"tasks/{_task1.Id}", HttpMethod.Delete, jwt);
+
+        // Act
+        Task<HttpResponseMessage> responseMessage1 = _app.Client.SendAsync(requestMessage1);
+        Task<HttpResponseMessage> responseMessage2 = _app.Client.SendAsync(requestMessage2);
+        await Task.WhenAll(responseMessage1, responseMessage2);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, responseMessage1.Result.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, responseMessage2.Result.StatusCode);
     }
 }

@@ -20,6 +20,7 @@ class WebApplication : IAsyncDisposable
 
     internal HttpClient Client { get; }
     internal ApplicationContext Context { get; }
+    internal JwtGenerator JwtGenerator { get; }
 
     internal WebApplication()
     {
@@ -53,6 +54,7 @@ class WebApplication : IAsyncDisposable
             _scope = _factory.Server.Services.CreateScope();
             Context = _scope.ServiceProvider.GetRequiredService<TestApplicationContext>();
             Client = _factory.CreateClient();
+            JwtGenerator = _scope.ServiceProvider.GetRequiredService<JwtGenerator>();
         }
         catch (Exception)
         {

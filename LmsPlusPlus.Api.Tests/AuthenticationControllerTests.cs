@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -6,8 +6,9 @@ using Xunit;
 
 namespace LmsPlusPlus.Api.Tests;
 
-public sealed class UsersControllerTests : IAsyncLifetime
+public class AuthenticationControllerTests : IAsyncLifetime
 {
+    const string Password = "Password";
     WebApplication _app = null!;
     Infrastructure.User _user = null!;
 
@@ -17,7 +18,7 @@ public sealed class UsersControllerTests : IAsyncLifetime
         _user = new Infrastructure.User
         {
             Login = "user",
-            PasswordHash = "password",
+            PasswordHash = Password,
             FirstName = "User",
             LastName = "User",
             Role = Infrastructure.Role.Author
@@ -37,24 +38,25 @@ public sealed class UsersControllerTests : IAsyncLifetime
     public async Task DisposeAsync() => await _app.DisposeAsync();
 
     [Fact]
-    public async Task GetUserUnauthorized()
+    public async Task SignInBadRequest()
     {
         // Arrange
-        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "users", HttpMethod.Get, jwt: null);
+        Request.SignIn signIn = new(Login: "Invalid", Password: "Invalid");
+        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "sign-in", HttpMethod.Post, jwt: null, signIn);
 
         // Act
         HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Unauthorized, responseMessage.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, responseMessage.StatusCode);
     }
 
     [Fact]
-    public async Task GetUserSuccess()
+    public async Task SignInSuccess()
     {
         // Arrange
-        string jwt = _app.JwtGenerator.Generate(_user.Id.ToString(), _user.Role.ToString());
-        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "users", HttpMethod.Get, jwt);
+        Request.SignIn signIn = new(_user.Login, Password);
+        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "sign-in", HttpMethod.Post, jwt: null, signIn);
 
         // Act
         HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);

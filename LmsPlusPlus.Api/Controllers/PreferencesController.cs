@@ -4,9 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LmsPlusPlus.Api;
 
-[ApiController]
-[Authorize(Roles = "Author, Solver")]
-[Route("preferences")]
+[ApiController, Route("preferences"), Authorize(Roles = "Author, Solver, Admin")]
 public class PreferencesController : ControllerBase
 {
     readonly Infrastructure.ApplicationContext _context;
