@@ -9,37 +9,14 @@ namespace LmsPlusPlus.Api.Tests;
 public class RepositoryHostingProvidersControllerTests : IAsyncLifetime
 {
     WebApplication _app = null!;
-    Infrastructure.User _author = null!;
-    Infrastructure.User _solver = null!;
+    TestData _data = null!;
 
     public async Task InitializeAsync()
     {
         _app = new WebApplication();
-        _author = new Infrastructure.User
-        {
-            Login = "Author",
-            PasswordHash = "Author",
-            FirstName = "Author",
-            LastName = "Author",
-            Role = Infrastructure.Role.Author
-        };
-        _solver = new Infrastructure.User
-        {
-            Login = "Solver",
-            PasswordHash = "Solver",
-            FirstName = "Solver",
-            LastName = "Solver",
-            Role = Infrastructure.Role.Solver
-        };
-        Infrastructure.VcsHostingProvider provider = new()
-        {
-            Id = "provider",
-            Name = "Provider"
-        };
-        _app.Context.AddRange(_author, _solver, provider);
         try
         {
-            await _app.Context.SaveChangesAsync();
+            _data = await TestData.Create(_app.Context);
         }
         catch (Exception)
         {
@@ -67,7 +44,7 @@ public class RepositoryHostingProvidersControllerTests : IAsyncLifetime
     public async Task GetProvidersForbidden()
     {
         // Arrange
-        string jwt = _app.JwtGenerator.Generate(_author.Id.ToString(), _author.Role.ToString());
+        string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
         HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "vcs-hosting-providers", HttpMethod.Get, jwt);
 
         // Act
@@ -81,7 +58,7 @@ public class RepositoryHostingProvidersControllerTests : IAsyncLifetime
     public async Task GetProvidersSuccess()
     {
         // Arrange
-        string jwt = _app.JwtGenerator.Generate(_solver.Id.ToString(), _solver.Role.ToString());
+        string jwt = _app.JwtGenerator.Generate(_data.Solver.Id.ToString(), _data.Solver.Role.ToString());
         HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "vcs-hosting-providers", HttpMethod.Get, jwt);
 
         // Act

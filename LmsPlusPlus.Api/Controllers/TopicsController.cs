@@ -14,22 +14,25 @@ public class TopicsController : ControllerBase
     [HttpGet, Authorize(Roles = "Author, Solver")]
     public async Task<IEnumerable<Response.Topic>> GetAll()
     {
-        Infrastructure.Role role = Utils.GetUserRoleFromClaims(User);
-        long id = Utils.GetUserIdFromClaims(User);
-        return role switch
+        Infrastructure.Role userRole = Utils.GetUserRoleFromClaims(User);
+        long userId = Utils.GetUserIdFromClaims(User);
+        return userRole switch
         {
-            Infrastructure.Role.Author => await (from t in _context.Topics where t.AuthorId == id select (Response.Topic)t).ToArrayAsync(),
-            Infrastructure.Role.Solver => await _context.Users
-                .Include(u => u.Groups)
-                .SelectMany(u => from g in u.Groups select (Response.Topic)g.Topic)
+            Infrastructure.Role.Author => await (from t in _context.Topics where t.AuthorId == userId select (Response.Topic)t)
                 .ToArrayAsync(),
+            Infrastructure.Role.Solver => await (from u in _context.Users.Include(u => u.Groups)
+                                                 where u.Id == userId
+                                                 select from g in u.Groups select (Response.Topic)g.Topic).SingleAsync(),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
 
     [HttpPost, Authorize(Roles = "Author")]
-    public async Task<Response.Topic> Create(Request.CreateTopic requestTopic)
+    public async Task<ActionResult<Response.Topic>> Create(Request.CreateTopic requestTopic)
     {
+        long userId = Utils.GetUserIdFromClaims(User);
+        if (requestTopic.AuthorId != userId)
+            return Forbid();
         Infrastructure.Topic databaseTopic = new()
         {
             Name = requestTopic.Name,

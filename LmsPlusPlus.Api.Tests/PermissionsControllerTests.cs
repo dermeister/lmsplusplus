@@ -9,23 +9,14 @@ namespace LmsPlusPlus.Api.Tests;
 public class PermissionsControllerTests : IAsyncLifetime
 {
     WebApplication _app = null!;
-    Infrastructure.User _user = null!;
+    TestData _data = null!;
 
     public async Task InitializeAsync()
     {
         _app = new WebApplication();
-        _user = new Infrastructure.User
-        {
-            Login = "User",
-            PasswordHash = "User",
-            FirstName = "User",
-            LastName = "User",
-            Role = Infrastructure.Role.Author
-        };
-        _app.Context.AddRange(_user);
         try
         {
-            await _app.Context.SaveChangesAsync();
+            _data = await TestData.Create(_app.Context);
         }
         catch (Exception)
         {
@@ -53,7 +44,7 @@ public class PermissionsControllerTests : IAsyncLifetime
     public async Task GetPermissionsSuccess()
     {
         // Arrange
-        string jwt = _app.JwtGenerator.Generate(_user.Id.ToString(), _user.Role.ToString());
+        string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
         HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage(url: "permissions", HttpMethod.Get, jwt);
 
         // Act

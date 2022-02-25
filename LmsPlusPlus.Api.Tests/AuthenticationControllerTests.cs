@@ -8,25 +8,15 @@ namespace LmsPlusPlus.Api.Tests;
 
 public class AuthenticationControllerTests : IAsyncLifetime
 {
-    const string Password = "Password";
     WebApplication _app = null!;
-    Infrastructure.User _user = null!;
+    TestData _data = null!;
 
     public async Task InitializeAsync()
     {
         _app = new WebApplication();
-        _user = new Infrastructure.User
-        {
-            Login = "user",
-            PasswordHash = Password,
-            FirstName = "User",
-            LastName = "User",
-            Role = Infrastructure.Role.Author
-        };
-        _app.Context.Add(_user);
         try
         {
-            await _app.Context.SaveChangesAsync();
+            _data = await TestData.Create(_app.Context);
         }
         catch (Exception)
         {
@@ -55,7 +45,7 @@ public class AuthenticationControllerTests : IAsyncLifetime
     public async Task SignInSuccess()
     {
         // Arrange
-        Request.SignIn signIn = new(_user.Login, Password);
+        Request.SignIn signIn = new(_data.Solver.Login, TestData.SolverPassword);
         HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "sign-in", HttpMethod.Post, jwt: null, signIn);
 
         // Act

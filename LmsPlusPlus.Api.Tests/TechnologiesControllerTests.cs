@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -9,63 +11,14 @@ namespace LmsPlusPlus.Api.Tests;
 public class TechnologiesControllerTests : IAsyncLifetime
 {
     WebApplication _app = null!;
-    Infrastructure.User _author = null!;
-    Infrastructure.User _solver = null!;
-    Infrastructure.User _admin = null!;
+    TestData _data = null!;
 
     public async Task InitializeAsync()
     {
         _app = new WebApplication();
-        _author = new Infrastructure.User
-        {
-            Login = "author",
-            PasswordHash = "author",
-            FirstName = "Author",
-            LastName = "Author",
-            Role = Infrastructure.Role.Author
-        };
-        _solver = new Infrastructure.User
-        {
-            Login = "solver",
-            PasswordHash = "solver",
-            FirstName = "Solver",
-            LastName = "Solver",
-            Role = Infrastructure.Role.Solver
-        };
-        _admin = new Infrastructure.User
-        {
-            Login = "admin",
-            PasswordHash = "admin",
-            FirstName = "Admin",
-            LastName = "Admin",
-            Role = Infrastructure.Role.Admin
-        };
-        _app.Context.AddRange(_author, _solver, _admin);
         try
         {
-            await _app.Context.SaveChangesAsync();
-        }
-        catch (Exception)
-        {
-            await _app.DisposeAsync();
-            throw;
-        }
-        Infrastructure.VcsHostingProvider provider = new()
-        {
-            Id = "provider",
-            Name = "Provider"
-        };
-        Infrastructure.VcsAccount account = new()
-        {
-            Name = "account",
-            AccessToken = "token",
-            HostingProvider = provider,
-            UserId = _admin.Id,
-        };
-        _app.Context.AddRange(provider, account);
-        try
-        {
-            await _app.Context.SaveChangesAsync();
+            _data = await TestData.Create(_app.Context);
         }
         catch (Exception)
         {
@@ -77,7 +30,7 @@ public class TechnologiesControllerTests : IAsyncLifetime
     public async Task DisposeAsync() => await _app.DisposeAsync();
 
     [Fact]
-    public async Task GetAllTasksUnauthorized()
+    public async Task GetAllTechnologiesUnauthorized()
     {
         // Arrange
         HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "technologies", HttpMethod.Get, jwt: null);
@@ -90,10 +43,10 @@ public class TechnologiesControllerTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetAllTasksForbidden()
+    public async Task GetAllTechnologiesForbidden()
     {
         // Arrange
-        string jwt = _app.JwtGenerator.Generate(_admin.Id.ToString(), _admin.Role.ToString());
+        string jwt = _app.JwtGenerator.Generate(_data.Admin.Id.ToString(), _data.Admin.Role.ToString());
         HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "technologies", HttpMethod.Get, jwt);
 
         // Act
@@ -104,21 +57,27 @@ public class TechnologiesControllerTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetAllTasksSuccess()
+    public async Task GetAllTechnologiesSuccess()
     {
         // Arrange
-        string jwt1 = _app.JwtGenerator.Generate(_author.Id.ToString(), _author.Role.ToString());
+        string jwt1 = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
         HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage(url: "technologies", HttpMethod.Get, jwt1);
-        string jwt2 = _app.JwtGenerator.Generate(_solver.Id.ToString(), _solver.Role.ToString());
+        string jwt2 = _app.JwtGenerator.Generate(_data.Solver.Id.ToString(), _data.Solver.Role.ToString());
         HttpRequestMessage requestMessage2 = Utils.CreateHttpRequestMessage(url: "technologies", HttpMethod.Get, jwt2);
 
         // Act
         Task<HttpResponseMessage> responseMessage1 = _app.Client.SendAsync(requestMessage1);
         Task<HttpResponseMessage> responseMessage2 = _app.Client.SendAsync(requestMessage2);
         await Task.WhenAll(responseMessage1, responseMessage2);
+        IEnumerable<Response.Technology> technologies1 =
+            await Utils.ReadHttpResponse<IEnumerable<Response.Technology>>(responseMessage1.Result);
+        IEnumerable<Response.Technology> technologies2 =
+            await Utils.ReadHttpResponse<IEnumerable<Response.Technology>>(responseMessage2.Result);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, responseMessage1.Result.StatusCode);
         Assert.Equal(HttpStatusCode.OK, responseMessage2.Result.StatusCode);
+        Assert.Single(technologies1);
+        Assert.Single(technologies2);
     }
 }

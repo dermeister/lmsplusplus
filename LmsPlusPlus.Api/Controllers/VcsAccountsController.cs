@@ -26,7 +26,7 @@ public class VcsAccountsController : ControllerBase
         if (account is not null)
         {
             if (account.UserId != userId)
-                return Unauthorized();
+                return Forbid();
             _context.Remove(account);
             await _context.SaveChangesAsync();
         }

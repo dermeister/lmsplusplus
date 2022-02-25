@@ -9,23 +9,14 @@ namespace LmsPlusPlus.Api.Tests;
 public sealed class UsersControllerTests : IAsyncLifetime
 {
     WebApplication _app = null!;
-    Infrastructure.User _user = null!;
+    TestData _data = null!;
 
     public async Task InitializeAsync()
     {
         _app = new WebApplication();
-        _user = new Infrastructure.User
-        {
-            Login = "user",
-            PasswordHash = "password",
-            FirstName = "User",
-            LastName = "User",
-            Role = Infrastructure.Role.Author
-        };
-        _app.Context.Add(_user);
         try
         {
-            await _app.Context.SaveChangesAsync();
+            _data = await TestData.Create(_app.Context);
         }
         catch (Exception)
         {
@@ -53,7 +44,7 @@ public sealed class UsersControllerTests : IAsyncLifetime
     public async Task GetUserSuccess()
     {
         // Arrange
-        string jwt = _app.JwtGenerator.Generate(_user.Id.ToString(), _user.Role.ToString());
+        string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
         HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "users", HttpMethod.Get, jwt);
 
         // Act

@@ -31,7 +31,7 @@ public class GroupsController : ControllerBase
     }
 
     [HttpPost, Authorize(Roles = "Author")]
-    public async Task<ActionResult<Response.Group>> Create(Request.CreatedGroup requestGroup)
+    public async Task<ActionResult<Response.Group>> Create(Request.CreateGroup requestGroup)
     {
         long authorId = Utils.GetUserIdFromClaims(User);
         Infrastructure.Topic? topic = await _context.Topics.FindAsync(requestGroup.TopicId);
@@ -50,7 +50,7 @@ public class GroupsController : ControllerBase
     }
 
     [HttpPut("{groupId:long}"), Authorize(Roles = "Author")]
-    public async Task<ActionResult<Response.Group>> Update(long groupId, Request.UpdatedGroup requestGroup)
+    public async Task<ActionResult<Response.Group>> Update(long groupId, Request.UpdateGroup requestGroup)
     {
         long authorId = Utils.GetUserIdFromClaims(User);
         Infrastructure.Group? databaseGroup = await _context.Groups.Include(g => g.Topic).SingleOrDefaultAsync(g => g.Id == groupId);

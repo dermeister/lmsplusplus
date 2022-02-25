@@ -9,23 +9,14 @@ namespace LmsPlusPlus.Api.Tests;
 public class PreferencesControllerTests : IAsyncLifetime
 {
     WebApplication _app = null!;
-    Infrastructure.User _user = null!;
+    TestData _data = null!;
 
     public async Task InitializeAsync()
     {
         _app = new WebApplication();
-        _user = new Infrastructure.User
-        {
-            Login = "user",
-            PasswordHash = "user",
-            FirstName = "User",
-            LastName = "User",
-            Role = Infrastructure.Role.Author
-        };
-        _app.Context.Add(_user);
         try
         {
-            await _app.Context.SaveChangesAsync();
+            _data = await TestData.Create(_app.Context);
         }
         catch (Exception)
         {
@@ -53,8 +44,52 @@ public class PreferencesControllerTests : IAsyncLifetime
     public async Task GetPreferencesSuccess()
     {
         // Arrange
-        string jwt = _app.JwtGenerator.Generate(_user.Id.ToString(), _user.Role.ToString());
+        string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
         HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage($"preferences", HttpMethod.Get, jwt);
+
+        // Act
+        HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, responseMessage.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdatePreferencesUnauthorized()
+    {
+        // Arrange
+        Request.Preferences preferences = new(Theme: "Light");
+        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "preferences", HttpMethod.Put, jwt: null, preferences);
+
+        // Act
+        HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, responseMessage.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdatePreferencesBadRequest()
+    {
+        // Arrange
+        Request.Preferences preferences = new(Theme: null!);
+        string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
+        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "preferences", HttpMethod.Put, jwt, preferences);
+
+        // Act
+        HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, responseMessage.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdatePreferencesSuccess()
+    {
+        // Arrange
+        Request.Preferences preferences = new(Theme: "Light");
+        string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
+        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "preferences", HttpMethod.Put, jwt, preferences);
 
         // Act
         HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
