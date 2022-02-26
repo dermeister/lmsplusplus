@@ -190,10 +190,14 @@ public class TopicsControllerTests : IAsyncLifetime
         Task<HttpResponseMessage> responseMessage1 = _app.Client.SendAsync(requestMessage1);
         Task<HttpResponseMessage> responseMessage2 = _app.Client.SendAsync(requestMessage2);
         await Task.WhenAll(responseMessage1, responseMessage2);
+        Dictionary<string, IEnumerable<string>> errors1 = await Utils.GetBadRequestErrors(responseMessage1.Result);
+        Dictionary<string, IEnumerable<string>> errors2 = await Utils.GetBadRequestErrors(responseMessage2.Result);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, responseMessage1.Result.StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, responseMessage2.Result.StatusCode);
+        Assert.Single(errors1);
+        Assert.Empty(errors2);
     }
 
     [Fact]

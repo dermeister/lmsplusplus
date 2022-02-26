@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace LmsPlusPlus.Api;
 
@@ -30,8 +31,8 @@ public class TopicsController : ControllerBase
     [HttpPost, Authorize(Roles = "Author")]
     public async Task<ActionResult<Response.Topic>> Create(Request.CreateTopic requestTopic)
     {
-        long userId = Utils.GetUserIdFromClaims(User);
-        if (requestTopic.AuthorId != userId)
+        long authorId = Utils.GetUserIdFromClaims(User);
+        if (requestTopic.AuthorId != authorId)
             return Forbid();
         Infrastructure.Topic databaseTopic = new()
         {
@@ -39,7 +40,24 @@ public class TopicsController : ControllerBase
             AuthorId = requestTopic.AuthorId
         };
         _context.Add(databaseTopic);
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException e) when (e.InnerException is PostgresException postgresException)
+        {
+            switch (postgresException)
+            {
+                case { SqlState: Infrastructure.PostgresErrorCodes.NotNullViolation, ColumnName: "name" }:
+                    ModelState.AddModelError(key: "Name", errorMessage: "Name must not be null.");
+                    return ValidationProblem();
+                case { SqlState: Infrastructure.PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "topics_author_id_fkey" }:
+                    ModelState.AddModelError(key: "AuthorId", $"Author with id {authorId} doest not exist.");
+                    return ValidationProblem();
+                default:
+                    throw;
+            }
+        }
         return (Response.Topic)databaseTopic;
     }
 
@@ -53,7 +71,19 @@ public class TopicsController : ControllerBase
         if (databaseTopic.AuthorId != authorId)
             return Forbid();
         databaseTopic.Name = requestTopic.Name;
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException e) when (e.InnerException is PostgresException postgresException)
+        {
+            if (postgresException is { SqlState: Infrastructure.PostgresErrorCodes.NotNullViolation, ColumnName: "name" })
+            {
+                ModelState.AddModelError(key: "Name", errorMessage: "Name must not be null.");
+                return ValidationProblem();
+            }
+            throw;
+        }
         return (Response.Topic)databaseTopic;
     }
 
