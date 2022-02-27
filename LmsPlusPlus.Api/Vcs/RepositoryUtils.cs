@@ -1,5 +1,6 @@
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
+using LibGit2SharpRepository = LibGit2Sharp.Repository;
 
 namespace LmsPlusPlus.Api.Vcs;
 
@@ -15,7 +16,7 @@ static class RepositoryUtils
         Task cloneDestinationRepositoryTask = CloneRepository(destinationRepositoryUri.ToString(), destinationRepositoryDirectory, username,
             token);
         await Task.WhenAll(cloneSourceRepositoryTask, cloneDestinationRepositoryTask);
-        Repository destinationRepository = new(destinationRepositoryDirectory);
+        LibGit2SharpRepository destinationRepository = new(destinationRepositoryDirectory);
         CopyRepositoryContent(sourceRepositoryDirectory, destinationRepositoryDirectory, destinationRepository);
         Signature signature = new(name, email, DateTimeOffset.Now);
         destinationRepository.Commit(message: "Initial commit", signature, signature);
@@ -37,7 +38,7 @@ static class RepositoryUtils
 
     static Task CloneRepository(string url, string directory, string username, string token)
     {
-        return Task.Run(() => Repository.Clone(url, directory, new CloneOptions
+        return Task.Run(() => LibGit2SharpRepository.Clone(url, directory, new CloneOptions
         {
             CredentialsProvider = CreateCredentialsProvider(username, token)
         }));

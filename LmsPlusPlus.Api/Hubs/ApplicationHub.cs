@@ -26,7 +26,7 @@ public class ApplicationHub : Hub
             .SingleOrDefaultAsync(s => s.Id == solutionId);
         if (solution is null)
             throw new ArgumentException(message: $"Invalid solution id {solution}", nameof(solutionId));
-        ApplicationConfiguration applicationConfiguration = new(solution.Repository.Url, _workingDirectory);
+        ApplicationConfiguration applicationConfiguration = new(solution.Repository.CloneUrl, _workingDirectory);
         Application application = new(applicationConfiguration);
         Context.Items[ApplicationItemKey] = application;
         ReadOnlyCollection<Runtime.ServiceConfiguration> serviceConfigurations = await application.GetServiceConfigurations();

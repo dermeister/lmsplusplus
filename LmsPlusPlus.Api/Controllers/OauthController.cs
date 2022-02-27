@@ -7,30 +7,30 @@ namespace LmsPlusPlus.Api;
 public class OauthController : ControllerBase
 {
     readonly Infrastructure.ApplicationContext _context;
-    readonly VcsHostingOauthFactory _vcsHostingOauthFactory;
-    readonly VcsHostingClientFactory _vcsHostingClientFactory;
+    readonly HostingOauthFactory _hostingOauthFactory;
+    readonly HostingClientFactory _hostingClientFactory;
 
-    public OauthController(Infrastructure.ApplicationContext context, VcsHostingOauthFactory vcsHostingOauthFactory,
-        VcsHostingClientFactory vcsHostingClientFactory)
+    public OauthController(Infrastructure.ApplicationContext context, HostingOauthFactory hostingOauthFactory,
+        HostingClientFactory hostingClientFactory)
     {
         _context = context;
-        _vcsHostingOauthFactory = vcsHostingOauthFactory;
-        _vcsHostingClientFactory = vcsHostingClientFactory;
+        _hostingOauthFactory = hostingOauthFactory;
+        _hostingClientFactory = hostingClientFactory;
     }
 
     [HttpGet("authorization-url/{provider}")]
     public string GetAuthorizationUrl(string provider)
     {
-        IVcsHostingOauth oauth = _vcsHostingOauthFactory.CreateOAuth(provider);
-        return oauth.CreateAuthorizationUri().ToString();
+        IHostingOauth oauth = _hostingOauthFactory.CreateOAuth(provider);
+        return oauth.CreateAuthorizationUrl().ToString();
     }
 
     [HttpGet("callback/{provider}")]
     public async Task<IActionResult> Callback(string provider, string code)
     {
-        IVcsHostingOauth oauth = _vcsHostingOauthFactory.CreateOAuth(provider);
+        IHostingOauth oauth = _hostingOauthFactory.CreateOAuth(provider);
         string token = await oauth.CreateAccessToken(code);
-        IVcsHostingClient client = _vcsHostingClientFactory.CreateClient(provider, token);
+        IHostingClient client = _hostingClientFactory.CreateClient(provider, token);
         string username = await client.GetUsername();
         Infrastructure.VcsAccount account = new()
         {

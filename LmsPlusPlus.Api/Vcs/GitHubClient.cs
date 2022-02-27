@@ -1,8 +1,9 @@
 using Octokit;
+using OctokitRepository = Octokit.Repository;
 
 namespace LmsPlusPlus.Api.Vcs;
 
-class GitHubClient : IVcsHostingClient
+class GitHubClient : IHostingClient
 {
     readonly ProductHeaderValue _productHeaderValue = new("LMS++");
     readonly Octokit.GitHubClient _client;
@@ -25,14 +26,16 @@ class GitHubClient : IVcsHostingClient
         return user.Login;
     }
 
-    public async Task<Uri> CreateRepositoryFromTemplate(string name, Uri templateRepositoryUri)
+    public async Task<Repository> CreateRepositoryFromTemplate(string name, Uri templateRepositoryUri)
     {
-        Repository newOctokitRepository = await _client.Repository.Create(new NewRepository(name));
+        OctokitRepository newOctokitRepository = await _client.Repository.Create(new NewRepository(name));
         User user = await _client.User.Current();
         IEnumerable<EmailAddress> emails = await _client.User.Email.GetAll();
         string email = emails.First(e => e.Primary).Email;
         await RepositoryUtils.CopyRepository(_workingDirectory, templateRepositoryUri, new Uri(newOctokitRepository.CloneUrl), user.Login,
             _token, user.Name, email);
-        return new Uri(newOctokitRepository.CloneUrl);
+        Uri websiteUrl = new(newOctokitRepository.HtmlUrl);
+        Uri cloneUrl = new(newOctokitRepository.CloneUrl);
+        return new Repository(websiteUrl, cloneUrl);
     }
 }

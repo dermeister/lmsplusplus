@@ -1,4 +1,3 @@
-using LmsPlusPlus.Api.Vcs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,12 +9,12 @@ namespace LmsPlusPlus.Api;
 public class SolutionsController : ControllerBase
 {
     readonly Infrastructure.ApplicationContext _context;
-    readonly VcsHostingClientFactory _vcsHostingClientFactory;
+    readonly Vcs.HostingClientFactory _hostingClientFactory;
 
-    public SolutionsController(Infrastructure.ApplicationContext context, VcsHostingClientFactory vcsHostingClientFactory)
+    public SolutionsController(Infrastructure.ApplicationContext context, Vcs.HostingClientFactory hostingClientFactory)
     {
         _context = context;
-        _vcsHostingClientFactory = vcsHostingClientFactory;
+        _hostingClientFactory = hostingClientFactory;
     }
 
     [HttpGet, Authorize(Roles = "Author, Solver")]
@@ -55,14 +54,16 @@ public class SolutionsController : ControllerBase
             .Where(t => t.Id == requestSolution.TechnologyId)
             .Select(t => t.TemplateRepository)
             .SingleAsync();
-        IVcsHostingClient client = _vcsHostingClientFactory.CreateClient(templateRepository.VcsAccount.HostingProviderId,
+        Vcs.IHostingClient client = _hostingClientFactory.CreateClient(templateRepository.VcsAccount.HostingProviderId,
             account.AccessToken);
-        Uri repositoryUri = await client.CreateRepositoryFromTemplate(requestSolution.RepositoryName, new Uri(templateRepository.Url));
+        Vcs.Repository repository =
+            await client.CreateRepositoryFromTemplate(requestSolution.RepositoryName, new Uri(templateRepository.CloneUrl));
         Infrastructure.Solution databaseSolution = new()
         {
             Repository = new Infrastructure.Repository
             {
-                Url = repositoryUri.ToString(),
+                CloneUrl = repository.CloneUrl.ToString(),
+                WebsiteUrl = repository.WebsiteUrl.ToString(),
                 VcsAccountId = account.Id
             },
             SolverId = solverId,

@@ -83,7 +83,8 @@ CREATE TABLE "vcs_accounts"
 CREATE TABLE "repositories"
 (
     "id"             BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    "url"            VARCHAR(1000) NOT NULL UNIQUE,
+    "website_url"    VARCHAR(1000) NOT NULL UNIQUE,
+    "clone_url"      VARCHAR(1000) NOT NULL UNIQUE,
     "vcs_account_id" BIGINT        NOT NULL REFERENCES "vcs_accounts" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 

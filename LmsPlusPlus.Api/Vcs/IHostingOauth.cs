@@ -1,8 +1,8 @@
 namespace LmsPlusPlus.Api.Vcs;
 
-interface IVcsHostingOauth
+interface IHostingOauth
 {
-    Uri CreateAuthorizationUri();
+    Uri CreateAuthorizationUrl();
 
     Task<string> CreateAccessToken(string code);
 }

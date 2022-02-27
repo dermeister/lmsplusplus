@@ -97,7 +97,8 @@ class TestData
         };
         Infrastructure.Repository templateRepository = new()
         {
-            Url = "Url",
+            CloneUrl = "Url",
+            WebsiteUrl = "Url",
             VcsAccount = templateAccount
         };
         Infrastructure.Technology technology = new()

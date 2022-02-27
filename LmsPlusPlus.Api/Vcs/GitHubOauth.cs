@@ -2,7 +2,7 @@ using Octokit;
 
 namespace LmsPlusPlus.Api.Vcs;
 
-class GitHubOauth : IVcsHostingOauth
+class GitHubOauth : IHostingOauth
 {
     readonly ProductHeaderValue _productHeaderValue = new("LMS++");
     readonly Octokit.GitHubClient _client;
@@ -16,7 +16,7 @@ class GitHubOauth : IVcsHostingOauth
         _client = new Octokit.GitHubClient(_productHeaderValue);
     }
 
-    public Uri CreateAuthorizationUri()
+    public Uri CreateAuthorizationUrl()
     {
         OauthLoginRequest request = new(_clientId) { Scopes = { "repo", "user:email" } };
         return _client.Oauth.GetGitHubLoginUrl(request);
