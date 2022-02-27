@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LmsPlusPlus.Api;
 
-[ApiController]
-[Route("oauth")]
+[ApiController, Route("oauth")]
 public class OauthController : ControllerBase
 {
     readonly Infrastructure.ApplicationContext _context;
