@@ -105,10 +105,10 @@ CREATE TABLE "m2m_tasks_technologies"
 CREATE TABLE "solutions"
 (
     "id"            BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    "repository_id" BIGINT   NOT NULL REFERENCES "repositories" ("id"),
-    "solver_id"     BIGINT   NOT NULL REFERENCES "users" ("id"),
-    "task_id"       BIGINT   NOT NULL REFERENCES "tasks" ("id"),
-    "technology_id" SMALLINT NOT NULL REFERENCES "technologies" ("id"),
+    "repository_id" BIGINT   NOT NULL REFERENCES "repositories" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    "solver_id"     BIGINT   NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    "task_id"       BIGINT   NOT NULL REFERENCES "tasks" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    "technology_id" SMALLINT NOT NULL REFERENCES "technologies" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     UNIQUE ("solver_id", "task_id")
 );
 

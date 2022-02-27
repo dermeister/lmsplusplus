@@ -119,15 +119,36 @@ public class TasksControllerTests : IAsyncLifetime
     public async Task CreateTaskBadRequest()
     {
         // Arrange
-        Request.CreateTask task = new(null!, null!, _data.Topic.Id, new[] { _data.Technology.Id });
+        Request.CreateTask task = new(null!, Description: "New task", _data.Topic.Id, new[] { _data.Technology.Id });
         string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
-        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Post, jwt, task);
+        HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Post, jwt, task);
+        task = new Request.CreateTask(Title: "New task", null!, _data.Topic.Id, new[] { _data.Technology.Id });
+        HttpRequestMessage requestMessage2 = Utils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Post, jwt, task);
+        task = new Request.CreateTask(Title: "New task", Description: "New task", TopicId: 0, new[] { _data.Technology.Id });
+        HttpRequestMessage requestMessage3 = Utils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Post, jwt, task);
+        task = new Request.CreateTask(Title: "New task", Description: "New task", _data.Topic.Id, Array.Empty<short>());
+        HttpRequestMessage requestMessage4 = Utils.CreateHttpRequestMessage(url: "tasks", HttpMethod.Post, jwt, task);
 
         // Act
-        HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
+        Task<HttpResponseMessage> responseMessage1 = _app.Client.SendAsync(requestMessage1);
+        Task<HttpResponseMessage> responseMessage2 = _app.Client.SendAsync(requestMessage2);
+        Task<HttpResponseMessage> responseMessage3 = _app.Client.SendAsync(requestMessage3);
+        Task<HttpResponseMessage> responseMessage4 = _app.Client.SendAsync(requestMessage4);
+        await Task.WhenAll(responseMessage1, responseMessage2, responseMessage3, responseMessage4);
+        Dictionary<string, IEnumerable<string>> errors1 = await Utils.GetBadRequestErrors(responseMessage1.Result);
+        Dictionary<string, IEnumerable<string>> errors2 = await Utils.GetBadRequestErrors(responseMessage2.Result);
+        Dictionary<string, IEnumerable<string>> errors3 = await Utils.GetBadRequestErrors(responseMessage3.Result);
+        Dictionary<string, IEnumerable<string>> errors4 = await Utils.GetBadRequestErrors(responseMessage4.Result);
 
         // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, responseMessage.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, responseMessage1.Result.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, responseMessage2.Result.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, responseMessage3.Result.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, responseMessage4.Result.StatusCode);
+        Assert.Single(errors1);
+        Assert.Single(errors2);
+        Assert.Single(errors3);
+        Assert.Single(errors4);
     }
 
     [Fact]
@@ -183,19 +204,36 @@ public class TasksControllerTests : IAsyncLifetime
     public async Task UpdateTaskBadRequest()
     {
         // Arrange
-        Request.UpdateTask task = new(null!, null!, new[] { _data.Technology.Id });
+        Request.UpdateTask task = new(null!, Description: "New task", new[] { _data.Technology.Id });
         string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
         HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage($"tasks/{_data.Task.Id}", HttpMethod.Put, jwt, task);
-        HttpRequestMessage requestMessage2 = Utils.CreateHttpRequestMessage(url: "tasks/0", HttpMethod.Put, jwt, task);
+        task = new Request.UpdateTask(Title: "New task", null!, new[] { _data.Technology.Id });
+        HttpRequestMessage requestMessage2 = Utils.CreateHttpRequestMessage($"tasks/{_data.Task.Id}", HttpMethod.Put, jwt, task);
+        task = new Request.UpdateTask(Title: "New task", Description: "New task", Array.Empty<short>());
+        HttpRequestMessage requestMessage3 = Utils.CreateHttpRequestMessage($"tasks/{_data.Task.Id}", HttpMethod.Put, jwt, task);
+        task = new Request.UpdateTask(Title: "New task", Description: "New task", new[] { _data.Technology.Id });
+        HttpRequestMessage requestMessage4 = Utils.CreateHttpRequestMessage(url: "tasks/0", HttpMethod.Put, jwt, task);
 
         // Act
         Task<HttpResponseMessage> responseMessage1 = _app.Client.SendAsync(requestMessage1);
         Task<HttpResponseMessage> responseMessage2 = _app.Client.SendAsync(requestMessage2);
-        await Task.WhenAll(responseMessage1, responseMessage2);
+        Task<HttpResponseMessage> responseMessage3 = _app.Client.SendAsync(requestMessage3);
+        Task<HttpResponseMessage> responseMessage4 = _app.Client.SendAsync(requestMessage4);
+        await Task.WhenAll(responseMessage1, responseMessage2, responseMessage3, responseMessage4);
+        Dictionary<string, IEnumerable<string>> errors1 = await Utils.GetBadRequestErrors(responseMessage1.Result);
+        Dictionary<string, IEnumerable<string>> errors2 = await Utils.GetBadRequestErrors(responseMessage2.Result);
+        Dictionary<string, IEnumerable<string>> errors3 = await Utils.GetBadRequestErrors(responseMessage3.Result);
+        Dictionary<string, IEnumerable<string>> errors4 = await Utils.GetBadRequestErrors(responseMessage4.Result);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, responseMessage1.Result.StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, responseMessage2.Result.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, responseMessage3.Result.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, responseMessage4.Result.StatusCode);
+        Assert.Single(errors1);
+        Assert.Single(errors2);
+        Assert.Single(errors3);
+        Assert.Empty(errors4);
     }
 
     [Fact]

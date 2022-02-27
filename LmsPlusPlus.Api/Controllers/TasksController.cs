@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace LmsPlusPlus.Api;
 
@@ -39,7 +40,10 @@ public class TasksController : ControllerBase
         long authorId = Utils.GetUserIdFromClaims(User);
         Infrastructure.Topic? topic = await _context.Topics.FindAsync(requestTask.TopicId);
         if (topic is null)
-            return BadRequest();
+        {
+            ModelState.AddModelError(key: "TopicId", $"Topic with id {requestTask.TopicId} does not exist.");
+            return ValidationProblem();
+        }
         if (topic.AuthorId != authorId)
             return Forbid();
         List<Infrastructure.Technology> technologies =
@@ -52,7 +56,28 @@ public class TasksController : ControllerBase
             Technologies = technologies
         };
         _context.Add(databaseTask);
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException e) when (e.InnerException is PostgresException postgresException)
+        {
+            if (postgresException is { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "tasks_topic_id_fkey" })
+            {
+                ModelState.AddModelError(key: "TopicId", $"Topic with id {requestTask.TopicId} does not exist.");
+                return ValidationProblem();
+            }
+            throw;
+        }
+        catch (PostgresException postgresException)
+        {
+            if (postgresException is { SqlState: PostgresErrorCodes.RaiseException })
+            {
+                ModelState.AddModelError(key: "TechnologyIds", errorMessage: "Task must contain at least one technology.");
+                return ValidationProblem();
+            }
+            throw;
+        }
         return (Response.Task)databaseTask;
     }
 
@@ -71,7 +96,19 @@ public class TasksController : ControllerBase
         databaseTask.Title = requestTask.Title;
         databaseTask.Description = requestTask.Description;
         databaseTask.Technologies = technologies;
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (PostgresException postgresException)
+        {
+            if (postgresException is { SqlState: PostgresErrorCodes.RaiseException })
+            {
+                ModelState.AddModelError(key: "TechnologyIds", errorMessage: "Task must contain at least one technology.");
+                return ValidationProblem();
+            }
+            throw;
+        }
         return (Response.Task)databaseTask;
     }
 

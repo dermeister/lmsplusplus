@@ -248,6 +248,20 @@ public class TopicsControllerTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task DeleteTopicBadRequest()
+    {
+        // Arrange
+        string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
+        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage($"topics/{_data.Topic.Id}", HttpMethod.Delete, jwt);
+
+        // Act
+        HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, responseMessage.StatusCode);
+    }
+
+    [Fact]
     public async Task DeleteTopicSuccess()
     {
         // Arrange

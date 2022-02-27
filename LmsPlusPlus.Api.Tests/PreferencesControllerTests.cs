@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -78,9 +79,11 @@ public class PreferencesControllerTests : IAsyncLifetime
 
         // Act
         HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
+        Dictionary<string, IEnumerable<string>> errors = await Utils.GetBadRequestErrors(responseMessage);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, responseMessage.StatusCode);
+        Assert.Single(errors);
     }
 
     [Fact]

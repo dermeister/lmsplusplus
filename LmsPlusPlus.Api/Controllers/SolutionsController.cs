@@ -2,6 +2,7 @@ using LmsPlusPlus.Api.Vcs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace LmsPlusPlus.Api;
 
@@ -48,7 +49,7 @@ public class SolutionsController : ControllerBase
                                         select g.Users.Select(u => u.Id).Contains(solverId)).SingleOrDefaultAsync();
         if (!solverCanViewTask)
             return Forbid();
-        Infrastructure.VcsAccount account = await _context.VcsAccounts.FirstAsync(a => a.Name == "dermeister");
+        Infrastructure.VcsAccount account = await _context.VcsAccounts.FirstAsync(a => a.UserId == solverId);
         Infrastructure.Repository templateRepository = await _context.Technologies
             .Include(t => t.TemplateRepository.VcsAccount)
             .Where(t => t.Id == requestSolution.TechnologyId)
@@ -69,7 +70,24 @@ public class SolutionsController : ControllerBase
             TechnologyId = requestSolution.TechnologyId
         };
         _context.Add(databaseSolution);
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException e) when (e.InnerException is PostgresException postgresException)
+        {
+            switch (postgresException)
+            {
+                case { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "solutions_task_id_fkey" }:
+                    ModelState.AddModelError(key: "TaskId", $"Task with id {requestSolution.TaskId} does not exist.");
+                    return ValidationProblem();
+                case { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "solutions_technology_id_fkey" }:
+                    ModelState.AddModelError(key: "TechnologyId", $"Technology with id {requestSolution.TechnologyId} does not exist.");
+                    return ValidationProblem();
+                default:
+                    throw;
+            }
+        }
         return (Response.Solution)databaseSolution;
     }
 

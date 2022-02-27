@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace LmsPlusPlus.Api;
 
@@ -36,7 +37,10 @@ public class GroupsController : ControllerBase
         long authorId = Utils.GetUserIdFromClaims(User);
         Infrastructure.Topic? topic = await _context.Topics.FindAsync(requestGroup.TopicId);
         if (topic is null)
-            return BadRequest();
+        {
+            ModelState.AddModelError(key: "TopicId", $"Topic with id {requestGroup.TopicId} does not exist.");
+            return ValidationProblem();
+        }
         if (topic.AuthorId != authorId)
             return Forbid();
         Infrastructure.Group databaseGroup = new()
@@ -44,7 +48,19 @@ public class GroupsController : ControllerBase
             Name = requestGroup.Name,
             TopicId = requestGroup.TopicId
         };
-        _context.Add(databaseGroup);
+        try
+        {
+            _context.Add(databaseGroup);
+        }
+        catch (DbUpdateException e) when (e.InnerException is PostgresException postgresException)
+        {
+            if (postgresException is { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "groups_topic_id_fkey" })
+            {
+                ModelState.AddModelError(key: "TopicId", $"Topic with id {requestGroup.TopicId} does not exist.");
+                return ValidationProblem();
+            }
+            throw;
+        }
         await _context.SaveChangesAsync();
         return (Response.Group)databaseGroup;
     }

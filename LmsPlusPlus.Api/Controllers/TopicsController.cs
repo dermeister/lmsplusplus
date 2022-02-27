@@ -40,24 +40,7 @@ public class TopicsController : ControllerBase
             AuthorId = requestTopic.AuthorId
         };
         _context.Add(databaseTopic);
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateException e) when (e.InnerException is PostgresException postgresException)
-        {
-            switch (postgresException)
-            {
-                case { SqlState: Infrastructure.PostgresErrorCodes.NotNullViolation, ColumnName: "name" }:
-                    ModelState.AddModelError(key: "Name", errorMessage: "Name must not be null.");
-                    return ValidationProblem();
-                case { SqlState: Infrastructure.PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "topics_author_id_fkey" }:
-                    ModelState.AddModelError(key: "AuthorId", $"Author with id {authorId} doest not exist.");
-                    return ValidationProblem();
-                default:
-                    throw;
-            }
-        }
+        await _context.SaveChangesAsync();
         return (Response.Topic)databaseTopic;
     }
 
@@ -71,19 +54,7 @@ public class TopicsController : ControllerBase
         if (databaseTopic.AuthorId != authorId)
             return Forbid();
         databaseTopic.Name = requestTopic.Name;
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateException e) when (e.InnerException is PostgresException postgresException)
-        {
-            if (postgresException is { SqlState: Infrastructure.PostgresErrorCodes.NotNullViolation, ColumnName: "name" })
-            {
-                ModelState.AddModelError(key: "Name", errorMessage: "Name must not be null.");
-                return ValidationProblem();
-            }
-            throw;
-        }
+        await _context.SaveChangesAsync();
         return (Response.Topic)databaseTopic;
     }
 
@@ -97,7 +68,19 @@ public class TopicsController : ControllerBase
             if (topic.AuthorId != authorId)
                 return Forbid();
             _context.Remove(topic);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException e) when (e.InnerException is PostgresException postgresException)
+            {
+                if (postgresException is { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "tasks_topic_id_fkey" })
+                {
+                    ModelState.AddModelError(key: "TopicId", $"Topic with id {topicId} is used by tasks.");
+                    return ValidationProblem();
+                }
+                throw;
+            }
         }
         return Ok();
     }
