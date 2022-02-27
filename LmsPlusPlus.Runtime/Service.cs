@@ -57,7 +57,6 @@ sealed class Service : IAsyncDisposable
             if (canReadBuildImageProgress)
             {
                 JSONMessage message = await _buildImageProgressChannel.Reader.ReadAsync(cancellationToken);
-                // TODO: handle build errors
                 switch (message)
                 {
                     case { Stream: not null }:
@@ -75,7 +74,8 @@ sealed class Service : IAsyncDisposable
                         isAuxMessage = true;
                         break;
                     default:
-                        throw new Exception();
+                        output = null;
+                        break;
                 }
             }
             else
@@ -196,6 +196,10 @@ sealed class Service : IAsyncDisposable
             await _dockerClient.Images.BuildImageFromDockerfileAsync(imageBuildParameters, contents, authConfigs: null, headers: null,
                 progress);
         }
+        catch (DockerApiException e)
+        {
+            throw new ImageBuildException(e);
+        }
         finally
         {
             _buildImageProgressChannel.Writer.Complete();
@@ -268,7 +272,7 @@ sealed class Service : IAsyncDisposable
     PortMapping CreatePortMapping(string containerPortInDockerFormat, PortBinding portBinding)
     {
         if (_configuration.VirtualPortMappings is null)
-            throw new InvalidOperationException("Virtual port mappings has not been initialized");
+            throw new InvalidOperationException("Virtual port mappings not initialized");
         (ushort containerPort, PortType portType) = ConvertContainerPortFromDockerFormat(containerPortInDockerFormat);
         bool Match(VirtualPortMapping virtualPortMapping) => virtualPortMapping.ContainerPort == containerPort;
         ushort correspondingVirtualHostPort = _configuration.VirtualPortMappings.First(Match).VirtualHostPort;

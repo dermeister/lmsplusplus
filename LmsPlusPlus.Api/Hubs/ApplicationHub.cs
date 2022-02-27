@@ -25,7 +25,7 @@ public class ApplicationHub : Hub
         Infrastructure.Solution? solution = await _context.Solutions.Include(s => s.Repository)
             .SingleOrDefaultAsync(s => s.Id == solutionId);
         if (solution is null)
-            throw new Exception();
+            throw new ArgumentException(message: $"Invalid solution id {solution}", nameof(solutionId));
         ApplicationConfiguration applicationConfiguration = new(solution.Repository.Url, _workingDirectory);
         Application application = new(applicationConfiguration);
         Context.Items[ApplicationItemKey] = application;
@@ -40,7 +40,7 @@ public class ApplicationHub : Hub
     public async Task<IEnumerable<PortMapping>> GetOpenedPorts(string serviceName)
     {
         if (!TryGetApplication(out Application? application))
-            throw new Exception();
+            throw ApplicationNotStarted();
         ReadOnlyCollection<LmsPlusPlus.Runtime.PortMapping> portMappings = await application.GetOpenedPortsAsync(serviceName);
         return from portMapping in portMappings
                select new PortMapping(portMapping.VirtualHostPort, portMapping.HostPort);
@@ -50,7 +50,7 @@ public class ApplicationHub : Hub
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         if (!TryGetApplication(out Application? application))
-            throw new Exception();
+            throw ApplicationNotStarted();
         Runtime.ServiceBuildOutput? buildOutput;
         do
             try
@@ -71,7 +71,7 @@ public class ApplicationHub : Hub
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         if (!TryGetApplication(out Application? application))
-            throw new Exception();
+            throw ApplicationNotStarted();
         string? serviceOutput;
         do
             try
@@ -91,7 +91,7 @@ public class ApplicationHub : Hub
     public async Task WriteServiceInput(string serviceName, string text)
     {
         if (!TryGetApplication(out Application? application))
-            throw new Exception();
+            throw ApplicationNotStarted();
         try
         {
             await _lock.WaitAsync();
@@ -121,6 +121,8 @@ public class ApplicationHub : Hub
 
     protected override void Dispose(bool disposing) => _lock.Dispose();
 
+    static InvalidOperationException ApplicationNotStarted() => new("Application not started");
+
     bool TryGetApplication([MaybeNullWhen(false)] out Application result)
     {
         if (Context.Items.TryGetValue(ApplicationItemKey, out object? o) && o is Application application)
@@ -128,11 +130,8 @@ public class ApplicationHub : Hub
             result = application;
             return true;
         }
-        else
-        {
-            result = null;
-            return false;
-        }
+        result = null;
+        return false;
     }
 }
 

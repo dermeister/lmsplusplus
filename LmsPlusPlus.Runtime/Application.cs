@@ -21,13 +21,10 @@ public sealed class Application : IAsyncDisposable
     string? _networkId;
     bool _isDisposed;
 
-    static Application()
-    {
-        s_yamlDeserializer = new DeserializerBuilder()
-            .WithNamingConvention(UnderscoredNamingConvention.Instance)
-            .IgnoreUnmatchedProperties()
-            .Build();
-    }
+    static Application() => s_yamlDeserializer = new DeserializerBuilder()
+        .WithNamingConvention(UnderscoredNamingConvention.Instance)
+        .IgnoreUnmatchedProperties()
+        .Build();
 
     public Application(ApplicationConfiguration configuration)
     {
@@ -111,7 +108,10 @@ public sealed class Application : IAsyncDisposable
     static void ValidateCompose(Compose compose)
     {
         if (compose.Services.Values.Any(service => service.Build is null))
-            throw new Exception("Invalid docker-compose file");
+        {
+            string[] errors = { @"""build"" configuration key is not provided for some services." };
+            throw new DockerComposeException(errors);
+        }
         // TODO: Validate ports
     }
 
@@ -128,7 +128,17 @@ public sealed class Application : IAsyncDisposable
     async Task<Dictionary<string, ServiceConfiguration>> CloneRepositoryAndCreateServiceConfigurations()
     {
         Directory.CreateDirectory(_repositoryDirectory);
-        await Task.Run(() => Repository.Clone(_configuration.RepositoryUrl, _repositoryDirectory));
+        await Task.Run(() =>
+        {
+            try
+            {
+                return Repository.Clone(_configuration.RepositoryUrl, _repositoryDirectory);
+            }
+            catch (LibGit2SharpException e)
+            {
+                throw new RepositoryCloneException(e);
+            }
+        });
         string configurationDirectoryPath = Path.Combine(_repositoryDirectory, path2: ".lmsplusplus");
         string dockerComposeFilePath = Path.Combine(configurationDirectoryPath, path2: "docker-compose.yml");
         string dockerComposeFileContent = await File.ReadAllTextAsync(dockerComposeFilePath);
