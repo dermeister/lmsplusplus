@@ -1,4 +1,4 @@
-﻿namespace LmsPlusPlus.Runtime.DockerCompose;
+namespace LmsPlusPlus.Runtime.DockerCompose;
 
 class Service
 {

@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using Docker.DotNet;
 using Docker.DotNet.Models;
 using LibGit2Sharp;

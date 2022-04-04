@@ -1,4 +1,4 @@
-﻿namespace LmsPlusPlus.Runtime;
+namespace LmsPlusPlus.Runtime;
 
 public record ApplicationConfiguration(string RepositoryUrl, string WorkingDirectory)
 {

@@ -1,4 +1,4 @@
-﻿namespace LmsPlusPlus.Api.Vcs;
+namespace LmsPlusPlus.Api.Vcs;
 
 class Repository
 {
