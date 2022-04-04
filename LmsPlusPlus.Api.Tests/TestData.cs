@@ -5,17 +5,17 @@ namespace LmsPlusPlus.Api.Tests;
 class TestData
 {
     internal const string SolverPassword = "solver";
-    internal Infrastructure.User Author { get; set; }
-    internal Infrastructure.User AuthorWithoutTopics { get; set; }
-    internal Infrastructure.User Solver { get; set; }
-    internal Infrastructure.User SolverWithoutAccounts { get; set; }
-    internal Infrastructure.User Admin { get; set; }
-    internal Infrastructure.Topic Topic { get; set; }
-    internal Infrastructure.Group Group { get; set; }
-    internal Infrastructure.VcsAccount Account { get; set; }
-    internal Infrastructure.Repository TemplateRepository { get; set; }
-    internal Infrastructure.Technology Technology { get; set; }
-    internal Infrastructure.Task Task { get; set; }
+    internal Infrastructure.User Author { get; set; } = null!;
+    internal Infrastructure.User AuthorWithoutTopics { get; set; } = null!;
+    internal Infrastructure.User Solver { get; set; } = null!;
+    internal Infrastructure.User SolverWithoutAccounts { get; set; } = null!;
+    internal Infrastructure.User Admin { get; set; } = null!;
+    internal Infrastructure.Topic Topic { get; set; } = null!;
+    internal Infrastructure.Group Group { get; set; } = null!;
+    internal Infrastructure.VcsAccount Account { get; set; } = null!;
+    internal Infrastructure.Repository TemplateRepository { get; set; } = null!;
+    internal Infrastructure.Technology Technology { get; set; } = null!;
+    internal Infrastructure.Task Task { get; set; } = null!;
 
     TestData()
     {
