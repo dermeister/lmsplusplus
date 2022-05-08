@@ -35,8 +35,8 @@ self.addEventListener("fetch", event => {
             } else
                 newPort = portMappings.get(Number(url.port)) as number
             const headers = new Headers(request.headers)
-            headers.set("lmsplusplus-host", newHost)
-            headers.set("lmsplusplus-port", newPort.toString())
+            headers.set("X-LmsPlusPlus-Host", newHost)
+            headers.set("X-LmsPlusPlus-Port", newPort.toString())
             let body: ArrayBuffer | null = null
             if (request.method !== "GET" && request.method !== "HEAD")
                 body = await request.arrayBuffer()
@@ -58,4 +58,4 @@ self.addEventListener("fetch", event => {
         }))
 })
 
-export {}
+export { }

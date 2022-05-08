@@ -1,13 +1,23 @@
+using System.Net;
 using Microsoft.Extensions.Primitives;
 
 namespace LmsPlusPlus.Api;
 
-public class ProxyMiddleware
+public class ServiceProxyMiddleware
 {
+    class MissingProxyRequestHeadersException : Exception
+    {
+        internal MissingProxyRequestHeadersException(string message) : base(message)
+        {
+        }
+    }
+
+    const int RequestRetryDelay = 200;
+
     readonly HttpClient _httpClient;
     readonly RequestDelegate _requestDelegate;
 
-    public ProxyMiddleware(RequestDelegate requestDelegate, HttpClient httpClient)
+    public ServiceProxyMiddleware(RequestDelegate requestDelegate, HttpClient httpClient)
     {
         _requestDelegate = requestDelegate;
         _httpClient = httpClient;
@@ -15,20 +25,29 @@ public class ProxyMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        if (context.Request.Path.StartsWithSegments("/proxy"))
+        if (context.Request.Path.StartsWithSegments("/proxy", out PathString remainingPath))
         {
-            HttpResponseMessage? responseMessage;
-            StreamReader sr = new(context.Request.Body);
-            string body = await sr.ReadToEndAsync();
+            using StreamReader requestBodyReader = new(context.Request.Body);
+            string requestBody = await requestBodyReader.ReadToEndAsync();
             try
             {
-                responseMessage = await _httpClient.SendAsync(CreateHttpRequestMessage(context.Request, body));
+                await RedirectRequest(context, remainingPath, requestBody);
             }
             catch (HttpRequestException)
             {
-                await Task.Delay(200);
-                responseMessage = await _httpClient.SendAsync(CreateHttpRequestMessage(context.Request, body));
+                await Task.Delay(RequestRetryDelay);
+                await RedirectRequest(context, remainingPath, requestBody);
             }
+        }
+        else
+            await _requestDelegate(context);
+    }
+
+    async Task RedirectRequest(HttpContext context, string targetPath, string body)
+    {
+        try
+        {
+            HttpResponseMessage responseMessage = await _httpClient.SendAsync(CreateHttpRequestMessage(context.Request, targetPath, body));
             context.Response.StatusCode = (int)responseMessage.StatusCode;
             foreach ((string key, IEnumerable<string> value) in responseMessage.Headers)
                 context.Response.Headers.Add(key, value.ToArray());
@@ -36,26 +55,34 @@ public class ProxyMiddleware
                 context.Response.Headers.Add(key, value.ToArray());
             await responseMessage.Content.CopyToAsync(context.Response.Body);
         }
-        else
-            await _requestDelegate(context);
+        catch (MissingProxyRequestHeadersException e)
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            context.Response.Headers.Add("Content-Type", "application/json");
+            await context.Response.WriteAsync($"{{\"message\":\"{e.Message}\"}}");
+        }
     }
 
-    static HttpRequestMessage CreateHttpRequestMessage(HttpRequest request, string body)
+    static HttpRequestMessage CreateHttpRequestMessage(HttpRequest request, string path, string body)
     {
-        string host = request.Headers["lmsplusplus-host"];
-        var port = ushort.Parse(request.Headers["lmsplusplus-port"]);
-        string path = request.Path.Value!["/proxy".Length..];
+        const string customHostHeader = "X-LmsPlusPlus-Host";
+        const string customPortHeader = "X-LmsPlusPlus-Port";
+        string schema = "http";
+        if (!request.Headers.TryGetValue(customHostHeader, out StringValues host))
+            throw new MissingProxyRequestHeadersException($"Header {customHostHeader} is not provided");
+        if (!request.Headers.TryGetValue(customPortHeader, out StringValues port))
+            throw new MissingProxyRequestHeadersException($"Header {customPortHeader} is not provided");
         string query = request.QueryString.Value ?? "";
-        Uri requestUri = new($"http://{host}:{port}{path}{query}");
+        Uri requestUri = new($"{schema}://{host}:{port}{path}{query}");
         HttpMethod method = new(request.Method);
-        StringContent content = new(body);
-        HttpRequestMessage requestMessage = new()
+        HttpRequestMessage requestMessage = new(method, requestUri)
         {
-            RequestUri = requestUri,
-            Method = method,
-            Content = content
+            Content = new StringContent(body)
         };
-        foreach ((string key, StringValues value) in request.Headers.Where(h => !h.Key.StartsWith("lmsplusplus")))
+        var requestMessageHeaders = from header in request.Headers
+                                    where header.Key is not customHostHeader or customPortHeader
+                                    select header;
+        foreach ((string key, StringValues value) in requestMessageHeaders)
         {
             string[] values = value.ToArray();
             if (!requestMessage.Content.Headers.TryAddWithoutValidation(key, values))
@@ -64,3 +91,5 @@ public class ProxyMiddleware
         return requestMessage;
     }
 }
+
+

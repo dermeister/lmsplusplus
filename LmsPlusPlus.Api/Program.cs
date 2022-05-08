@@ -53,7 +53,7 @@ if (app.Environment.IsDevelopment())
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMiddleware<ProxyMiddleware>();
+app.UseMiddleware<ServiceProxyMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.UseEndpoints(endpoints => { endpoints.MapHub<ApplicationHub>("/application"); });
