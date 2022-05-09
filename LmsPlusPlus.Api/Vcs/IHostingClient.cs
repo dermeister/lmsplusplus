@@ -2,7 +2,11 @@ namespace LmsPlusPlus.Api.Vcs;
 
 interface IHostingClient
 {
-    Task<string> GetUsername();
+    Uri CreateAuthorizationUrl(string clientId);
 
-    Task<Repository> CreateRepositoryFromTemplate(string name, Uri templateRepositoryUri);
+    Task<string> CreateAuthorizationAccessToken(string code, string clientId, string clientSecret);
+
+    Task<string> GetUsername(string accessToken);
+
+    Task<Repository> CreateRepositoryFromTemplate(string name, string accessToken, Repository templateRepository);
 }

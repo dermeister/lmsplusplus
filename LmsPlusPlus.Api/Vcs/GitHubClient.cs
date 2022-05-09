@@ -1,41 +1,45 @@
 using Octokit;
-using OctokitRepository = Octokit.Repository;
 
 namespace LmsPlusPlus.Api.Vcs;
 
 class GitHubClient : IHostingClient
 {
-    readonly ProductHeaderValue _productHeaderValue = new("LMS++");
-    readonly Octokit.GitHubClient _client;
-    readonly string _workingDirectory;
-    readonly string _token;
+    static readonly ProductHeaderValue ProductHeaderValue = new("LMS++");
+    readonly Octokit.GitHubClient _client = new(ProductHeaderValue);
 
-    internal GitHubClient(string token, string workingDirectory)
+    public Uri CreateAuthorizationUrl(string clientId)
     {
-        _token = token;
-        _client = new Octokit.GitHubClient(_productHeaderValue)
+        OauthLoginRequest request = new(clientId) { Scopes = { "repo" } };
+        return _client.Oauth.GetGitHubLoginUrl(request);
+    }
+
+    public async Task<string> CreateAuthorizationAccessToken(string code, string clientId, string clientSecret)
+    {
+        OauthTokenRequest request = new(clientId, clientSecret, code);
+        OauthToken token = await _client.Oauth.CreateAccessToken(request);
+        return token.AccessToken;
+    }
+
+    public async Task<Repository> CreateRepositoryFromTemplate(string repositoryName, string accessToken, Repository templateRepository)
+    {
+        Octokit.Repository gitHubRepository = await _client.Repository.Create(new NewRepository(repositoryName));
+        Repository repository = new(gitHubRepository.CloneUrl, gitHubRepository.HtmlUrl, accessToken);
+        await templateRepository.CopyTo(repository);
+        return repository;
+    }
+
+    public async Task<string> GetUsername(string accessToken)
+    {
+        _client.Credentials = new Credentials(accessToken);
+        User user;
+        try
         {
-            Credentials = new Credentials(token)
-        };
-        _workingDirectory = workingDirectory;
-    }
-
-    public async Task<string> GetUsername()
-    {
-        User user = await _client.User.Current();
+            user = await _client.User.Current();
+        }
+        finally
+        {
+            _client.Credentials = null;
+        }
         return user.Login;
-    }
-
-    public async Task<Repository> CreateRepositoryFromTemplate(string name, Uri templateRepositoryUri)
-    {
-        OctokitRepository newOctokitRepository = await _client.Repository.Create(new NewRepository(name));
-        User user = await _client.User.Current();
-        IEnumerable<EmailAddress> emails = await _client.User.Email.GetAll();
-        string email = emails.First(e => e.Primary).Email;
-        await RepositoryUtils.CopyRepository(_workingDirectory, templateRepositoryUri, new Uri(newOctokitRepository.CloneUrl), user.Login,
-            _token, user.Name, email);
-        Uri websiteUrl = new(newOctokitRepository.HtmlUrl);
-        Uri cloneUrl = new(newOctokitRepository.CloneUrl);
-        return new Repository(websiteUrl, cloneUrl);
     }
 }
