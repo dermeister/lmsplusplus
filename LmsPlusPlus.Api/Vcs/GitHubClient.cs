@@ -7,10 +7,11 @@ class GitHubClient : IHostingClient
     static readonly ProductHeaderValue ProductHeaderValue = new("LMS++");
     readonly Octokit.GitHubClient _client = new(ProductHeaderValue);
 
-    public Uri CreateAuthorizationUrl(string clientId)
+    public string CreateAuthorizationUrl(string clientId)
     {
         OauthLoginRequest request = new(clientId) { Scopes = { "repo" } };
-        return _client.Oauth.GetGitHubLoginUrl(request);
+        Uri url = _client.Oauth.GetGitHubLoginUrl(request);
+        return url.ToString();
     }
 
     public async Task<string> CreateAuthorizationAccessToken(string code, string clientId, string clientSecret)
