@@ -141,7 +141,7 @@ public sealed class ApplicationFixture : IDisposable
                     repository.Index.Add(relativeFilePath);
             }
             repository.Index.Write();
-            Signature signature = CreateCommitSignature();
+            Signature signature = new(name: "unit-test", email: "unit-test@test.com", DateTimeOffset.Now);
             repository.Commit(message: "Test commit", signature, signature);
             string applicationName = Path.GetFileName(directory); // Get directory's short name
             _applicationRepositories[applicationName] = directory;
@@ -168,6 +168,4 @@ public sealed class ApplicationFixture : IDisposable
     }
 
     internal string GetApplicationRepositoryUrl(string applicationName) => _applicationRepositories[applicationName];
-
-    static Signature CreateCommitSignature() => new(name: "unit-test", email: "unit-test@test.com", DateTimeOffset.Now);
 }

@@ -9,12 +9,10 @@ namespace LmsPlusPlus.Api;
 public class SolutionsController : ControllerBase
 {
     readonly Infrastructure.ApplicationContext _context;
-    readonly Vcs.HostingClientFactory _hostingClientFactory;
 
-    public SolutionsController(Infrastructure.ApplicationContext context, Vcs.HostingClientFactory hostingClientFactory)
+    public SolutionsController(Infrastructure.ApplicationContext context)
     {
         _context = context;
-        _hostingClientFactory = hostingClientFactory;
     }
 
     [HttpGet, Authorize(Roles = "Author, Solver")]
@@ -49,21 +47,20 @@ public class SolutionsController : ControllerBase
         if (!solverCanViewTask)
             return Forbid();
         Infrastructure.VcsAccount account = await _context.VcsAccounts.FirstAsync(a => a.UserId == solverId);
-        Infrastructure.Repository templateRepository = await _context.Technologies
+        Infrastructure.Repository databaseTemplateRepository = await _context.Technologies
             .Include(t => t.TemplateRepository.VcsAccount)
             .Where(t => t.Id == requestSolution.TechnologyId)
             .Select(t => t.TemplateRepository)
             .SingleAsync();
-        Vcs.IHostingClient client = _hostingClientFactory.CreateClient(templateRepository.VcsAccount.HostingProviderId,
-            account.AccessToken);
-        Vcs.Repository repository =
-            await client.CreateRepositoryFromTemplate(requestSolution.RepositoryName, new Uri(templateRepository.CloneUrl));
+        Vcs.IHostingClient hostingClient = Vcs.HostingClientFactory.CreateClient(account.HostingProviderId);
+        Vcs.Repository hostingTemplateRepository = new(databaseTemplateRepository.CloneUrl, websiteUrl: null, databaseTemplateRepository.VcsAccount.AccessToken);
+        Vcs.Repository repository = await hostingClient.CreateRepositoryFromTemplate(requestSolution.RepositoryName, account.AccessToken, hostingTemplateRepository);
         Infrastructure.Solution databaseSolution = new()
         {
             Repository = new Infrastructure.Repository
             {
-                CloneUrl = repository.CloneUrl.ToString(),
-                WebsiteUrl = repository.WebsiteUrl.ToString(),
+                CloneUrl = repository.CloneUrl,
+                WebsiteUrl = repository.WebsiteUrl,
                 VcsAccountId = account.Id
             },
             SolverId = solverId,

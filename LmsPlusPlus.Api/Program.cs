@@ -41,7 +41,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<HostingOauthFactory>();
 builder.Services.AddScoped<HostingClientFactory>();
 builder.Services.AddScoped<JwtGenerator>();
 WebApplication app = builder.Build();

@@ -7,31 +7,22 @@ namespace LmsPlusPlus.Api;
 public class OauthController : ControllerBase
 {
     readonly Infrastructure.ApplicationContext _context;
-    readonly HostingOauthFactory _hostingOauthFactory;
-    readonly HostingClientFactory _hostingClientFactory;
 
-    public OauthController(Infrastructure.ApplicationContext context, HostingOauthFactory hostingOauthFactory,
-        HostingClientFactory hostingClientFactory)
-    {
-        _context = context;
-        _hostingOauthFactory = hostingOauthFactory;
-        _hostingClientFactory = hostingClientFactory;
-    }
+    public OauthController(Infrastructure.ApplicationContext context) => _context = context;
 
     [HttpGet("authorization-url/{provider}")]
     public string GetAuthorizationUrl(string provider)
     {
-        IHostingOauth oauth = _hostingOauthFactory.CreateOAuth(provider);
-        return oauth.CreateAuthorizationUrl().ToString();
+        IHostingClient hostingClient = HostingClientFactory.CreateClient(provider);
+        return hostingClient.CreateAuthorizationUrl("id");
     }
 
     [HttpGet("callback/{provider}")]
     public async Task<IActionResult> Callback(string provider, string code)
     {
-        IHostingOauth oauth = _hostingOauthFactory.CreateOAuth(provider);
-        string token = await oauth.CreateAccessToken(code);
-        IHostingClient client = _hostingClientFactory.CreateClient(provider, token);
-        string username = await client.GetUsername();
+        IHostingClient hostingClient = HostingClientFactory.CreateClient(provider);
+        string token = await hostingClient.CreateAuthorizationAccessToken(code, "id", "secret");
+        string username = await hostingClient.GetUsername(token);
         Infrastructure.VcsAccount account = new()
         {
             Name = username,
