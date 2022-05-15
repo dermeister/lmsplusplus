@@ -4,18 +4,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LmsPlusPlus.Api;
 
-[ApiController, Authorize(Roles = "Author, Solver, Admin"), Route("permissions")]
+[ApiController, Route("permissions")]
 public class PermissionsController : ControllerBase
 {
     readonly Infrastructure.ApplicationContext _context;
 
     public PermissionsController(Infrastructure.ApplicationContext context) => _context = context;
 
-    [HttpGet]
-    public async Task<Response.Permissions> GetPermissions()
+    [HttpGet, Authorize(Roles = "Author, Solver, Admin")]
+    public async Task<Response.Permissions> Get()
     {
-        Infrastructure.Role role = Utils.GetUserRoleFromClaims(User);
-        Infrastructure.Permissions permissions = await _context.Permissions.Where(p => p.Role == role).SingleAsync();
+        AuthorizationCredentials credentials = new(User);
+        Infrastructure.Permissions permissions = await _context.Permissions.Where(p => p.Role == credentials.UserRole).SingleAsync();
         return (Response.Permissions)permissions;
     }
 }
