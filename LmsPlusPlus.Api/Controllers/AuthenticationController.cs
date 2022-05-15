@@ -18,8 +18,9 @@ public class AuthenticationController : ControllerBase
     [HttpPost("sign-in")]
     public async Task<ActionResult<Response.SignIn>> SignIn(Request.SignIn signIn)
     {
-        Infrastructure.User? user = await _context.Users
-            .SingleOrDefaultAsync(u => u.Login == signIn.Login && u.PasswordHash == signIn.Password);
+        var user = await (from u in _context.Users
+                          where u.Login == signIn.Login && u.PasswordHash == signIn.Password
+                          select new { u.Id, u.Role }).SingleOrDefaultAsync();
         if (user is null)
             return BadRequest();
         return new Response.SignIn(_jwtGenerator.Generate(user.Id.ToString(), user.Role.ToString()));
