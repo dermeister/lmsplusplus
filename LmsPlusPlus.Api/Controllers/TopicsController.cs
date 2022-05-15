@@ -74,7 +74,7 @@ public class TopicsController : ControllerBase
             }
             catch (DbUpdateException e) when (e.InnerException is PostgresException postgresException)
             {
-                if (postgresException is { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "tasks_topic_id_fkey" })
+                if (postgresException is { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "fk_tasks_topic_id" })
                 {
                     ModelState.AddModelError(key: "TopicId", $"Topic with id {topicId} is used by tasks.");
                     return ValidationProblem();

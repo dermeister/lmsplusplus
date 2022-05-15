@@ -62,7 +62,7 @@ public class TasksController : ControllerBase
         }
         catch (DbUpdateException e) when (e.InnerException is PostgresException postgresException)
         {
-            if (postgresException is { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "tasks_topic_id_fkey" })
+            if (postgresException is { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "fk_tasks_topic_id" })
             {
                 ModelState.AddModelError(key: "TopicId", $"Topic with id {requestTask.TopicId} does not exist.");
                 return ValidationProblem();

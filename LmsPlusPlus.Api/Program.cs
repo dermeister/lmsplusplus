@@ -20,8 +20,7 @@ builder.Services.AddDbContext<ApplicationContext>((serviceProvider, optionsBuild
     string? database = configuration["PostgresDb"];
     string? username = configuration["PostgresUsername"];
     string? password = configuration["PostgresPassword"];
-    optionsBuilder
-        .UseNpgsql($"Host={host};Port={port};Database={database};Username={username};Password={password}")
+    optionsBuilder.UseNpgsql($"Host={host};Port={port};Database={database};Username={username};Password={password}")
         .UseSnakeCaseNamingConvention();
 });
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>

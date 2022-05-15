@@ -8,4 +8,5 @@ public record VcsAccount
     public string HostingProviderId { get; set; } = null!;
     public VcsHostingProvider HostingProvider { get; set; } = null!;
     public long UserId { get; set; }
+    public User User { get; set; } = null!;
 }

@@ -78,7 +78,7 @@ public sealed class RepositoryFixture : IDisposable
         try
         {
             const string fileName = "test.txt";
-            File.WriteAllText(Path.Combine(repository.Info.WorkingDirectory, fileName), "Hello World!");
+            File.WriteAllText(Path.Combine(repository.Info.WorkingDirectory, fileName), "Test text");
             repository.Index.Add(fileName);
             repository.Index.Write();
             Signature signature = new("unit-test", "unit-test@test.com", DateTimeOffset.Now);

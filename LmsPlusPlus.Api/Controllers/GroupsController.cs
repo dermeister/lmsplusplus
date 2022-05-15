@@ -54,7 +54,7 @@ public class GroupsController : ControllerBase
         }
         catch (DbUpdateException e) when (e.InnerException is PostgresException postgresException)
         {
-            if (postgresException is { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "groups_topic_id_fkey" })
+            if (postgresException is { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "fk_groups_topic_id" })
             {
                 ModelState.AddModelError(key: "TopicId", $"Topic with id {requestGroup.TopicId} does not exist.");
                 return ValidationProblem();

@@ -35,28 +35,25 @@ class WebApplication : IAsyncDisposable
                 });
                 webHostBuilder.ConfigureServices((context, services) =>
                 {
-                    ServiceDescriptor descriptor = services.First(s => s.ServiceType == typeof(ApplicationContext));
+                    ServiceDescriptor descriptor = services.First(s => s.ServiceType == typeof(DbContextOptions<ApplicationContext>));
                     services.Remove(descriptor);
                     string? host = context.Configuration["PostgresHost"];
                     string? port = context.Configuration["PostgresPort"];
                     string? username = context.Configuration["PostgresUsername"];
                     string? password = context.Configuration["PostgresPassword"];
-                    string connectionString =
-                        $"Host={host};Port={port};Database={_testDatabaseName};Username={username};Password={password}";
-                    services.AddDbContext<ApplicationContext, TestApplicationContext>(optionsBuilder =>
+                    string connectionString = $"Host={host};Port={port};Database={_testDatabaseName};Username={username};Password={password}";
+                    services.AddDbContext<ApplicationContext>(optionsBuilder =>
                     {
-                        optionsBuilder
-                            .UseNpgsql(connectionString)
-                            .UseSnakeCaseNamingConvention();
+                        optionsBuilder.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
                     });
                 });
             });
             _scope = _factory.Server.Services.CreateScope();
-            Context = _scope.ServiceProvider.GetRequiredService<TestApplicationContext>();
+            Context = _scope.ServiceProvider.GetRequiredService<ApplicationContext>();
             Client = _factory.CreateClient();
             JwtGenerator = _scope.ServiceProvider.GetRequiredService<JwtGenerator>();
         }
-        catch (Exception)
+        catch
         {
             Context?.Database.EnsureDeleted();
             _scope?.Dispose();
