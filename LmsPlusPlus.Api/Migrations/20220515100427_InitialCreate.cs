@@ -235,6 +235,7 @@ public partial class InitialCreate : Migration
                 principalColumn: "id",
                 onDelete: ReferentialAction.Cascade);
         });
+
         migrationBuilder.InsertData(table: "permissions",
             columns: new[] { "role", "can_create_solution", "can_create_task", "can_delete_solution", "can_delete_task", "can_update_task", "can_update_user", "can_update_vcs_configuration" },
             values: new object[,]
@@ -243,6 +244,7 @@ public partial class InitialCreate : Migration
                 { Role.Author, false, true, false, true, true, false, false },
                 { Role.Solver, true, false, true, false, false, false, true }
             });
+
         migrationBuilder.CreateIndex(name: "ix_groups_topic_id", table: "groups", column: "topic_id");
         migrationBuilder.CreateIndex(name: "ix_m2m_tasks_technologies_technology_id", table: "m2m_tasks_technologies", column: "technology_id");
         migrationBuilder.CreateIndex(name: "ix_m2m_users_groups_group_id", table: "m2m_users_groups", column: "group_id");
@@ -264,6 +266,7 @@ public partial class InitialCreate : Migration
         migrationBuilder.CreateIndex(name: "ix_vcs_accounts_name_hosting_provider_id", table: "vcs_accounts", columns: new[] { "name", "hosting_provider_id" }, unique: true);
         migrationBuilder.CreateIndex(name: "ix_vcs_accounts_user_id", table: "vcs_accounts", column: "user_id");
         migrationBuilder.CreateIndex(name: "ix_vcs_hosting_providers_name", table: "vcs_hosting_providers", column: "name", unique: true);
+
         migrationBuilder.Sql(@"
             CREATE FUNCTION is_user_in_role(user_id BIGINT, expected_role role) RETURNS BOOLEAN AS
             $$
@@ -275,6 +278,7 @@ public partial class InitialCreate : Migration
             END;
             $$ LANGUAGE plpgsql;
         ");
+
         migrationBuilder.Sql(@"
             CREATE FUNCTION users_create_preferences_for_new_user() RETURNS TRIGGER AS
             $$
@@ -284,6 +288,7 @@ public partial class InitialCreate : Migration
             END;
             $$ LANGUAGE plpgsql;
         ");
+
         migrationBuilder.Sql(@"
             CREATE TRIGGER create_preferences_for_new_user
                 AFTER INSERT
@@ -291,6 +296,7 @@ public partial class InitialCreate : Migration
                 FOR EACH ROW
             EXECUTE FUNCTION users_create_preferences_for_new_user();
         ");
+
         migrationBuilder.Sql(@"
             CREATE FUNCTION topics_ensure_user_in_author_role() RETURNS TRIGGER AS
             $$
@@ -302,6 +308,7 @@ public partial class InitialCreate : Migration
             END;
             $$ LANGUAGE plpgsql;
         ");
+
         migrationBuilder.Sql(@"
             CREATE TRIGGER ensure_user_in_author_role
                 BEFORE INSERT OR UPDATE
@@ -309,6 +316,7 @@ public partial class InitialCreate : Migration
                 FOR EACH ROW
             EXECUTE FUNCTION topics_ensure_user_in_author_role();
         ");
+
         migrationBuilder.Sql(@"
             CREATE FUNCTION tasks_ensure_task_has_at_least_one_technology() RETURNS TRIGGER AS
             $$
@@ -328,6 +336,7 @@ public partial class InitialCreate : Migration
             END;
             $$ LANGUAGE plpgsql;
         ");
+
         migrationBuilder.Sql(@"
             CREATE CONSTRAINT TRIGGER ensure_task_has_at_least_one_technology
                 AFTER INSERT OR UPDATE
@@ -335,6 +344,7 @@ public partial class InitialCreate : Migration
                 FOR EACH ROW
             EXECUTE FUNCTION tasks_ensure_task_has_at_least_one_technology();
         ");
+
         migrationBuilder.Sql(@"
             CREATE FUNCTION technologies_ensure_task_has_at_least_one_technology() RETURNS TRIGGER AS
             $$
@@ -356,6 +366,7 @@ public partial class InitialCreate : Migration
             END;
             $$ LANGUAGE plpgsql;
         ");
+
         migrationBuilder.Sql(@"
             CREATE CONSTRAINT TRIGGER ensure_task_has_at_least_one_technology
                 AFTER DELETE
@@ -363,6 +374,7 @@ public partial class InitialCreate : Migration
                 FOR EACH ROW
             EXECUTE FUNCTION technologies_ensure_task_has_at_least_one_technology();
         ");
+
         migrationBuilder.Sql(@"
             CREATE FUNCTION m2m_tasks_technologies_ensure_task_has_at_least_one_technology() RETURNS TRIGGER AS
             $$
@@ -384,6 +396,7 @@ public partial class InitialCreate : Migration
             END;
             $$ LANGUAGE plpgsql;
         ");
+
         migrationBuilder.Sql(@"
             CREATE CONSTRAINT TRIGGER ensure_task_has_at_least_one_technology
                 AFTER UPDATE OR DELETE
@@ -391,6 +404,7 @@ public partial class InitialCreate : Migration
                 FOR EACH ROW
             EXECUTE FUNCTION m2m_tasks_technologies_ensure_task_has_at_least_one_technology();
         ");
+
         migrationBuilder.Sql(@"
             CREATE FUNCTION solutions_delete_solution_repository() RETURNS TRIGGER AS
             $$
@@ -400,6 +414,7 @@ public partial class InitialCreate : Migration
             END;
             $$ LANGUAGE plpgsql;
         ");
+
         migrationBuilder.Sql(@"
             CREATE TRIGGER delete_solution_repository
                 AFTER DELETE
@@ -407,6 +422,7 @@ public partial class InitialCreate : Migration
                 FOR EACH ROW
             EXECUTE FUNCTION solutions_delete_solution_repository();
         ");
+
         migrationBuilder.Sql(@"
             CREATE FUNCTION solutions_ensure_user_in_solver_role() RETURNS TRIGGER AS
             $$
@@ -418,6 +434,7 @@ public partial class InitialCreate : Migration
             END;
             $$ LANGUAGE plpgsql;
         ");
+
         migrationBuilder.Sql(@"
             CREATE TRIGGER ensure_user_in_solver_role
                 BEFORE INSERT OR UPDATE
