@@ -13,5 +13,5 @@ public class RepositoryHostingProvidersController : ControllerBase
 
     [HttpGet, Authorize(Roles = "Solver")]
     public async Task<IEnumerable<Response.VcsHostingProvider>> GetAll() =>
-        await _context.VcsHostingProviders.Select(p => (Response.VcsHostingProvider)p).ToArrayAsync();
+        await (from p in _context.VcsHostingProviders select (Response.VcsHostingProvider)p).ToArrayAsync();
 }
