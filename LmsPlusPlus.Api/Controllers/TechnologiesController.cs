@@ -13,5 +13,5 @@ public class TechnologiesController : ControllerBase
 
     [HttpGet, Authorize(Roles = "Author, Solver")]
     public async Task<IEnumerable<Response.Technology>> GetAll() =>
-        await _context.Technologies.Select(t => (Response.Technology)t).ToArrayAsync();
+        await (from t in _context.Technologies select (Response.Technology)t).ToArrayAsync();
 }
