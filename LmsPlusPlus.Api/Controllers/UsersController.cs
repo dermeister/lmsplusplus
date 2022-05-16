@@ -3,17 +3,18 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LmsPlusPlus.Api;
 
-[ApiController, Route("users"), Authorize(Roles = "Admin, Author, Solver")]
+[ApiController, Route("users")]
 public class UsersController : ControllerBase
 {
     readonly Infrastructure.ApplicationContext _context;
 
     public UsersController(Infrastructure.ApplicationContext context) => _context = context;
 
-    public async Task<Response.User> GetUser()
+    [HttpGet, Authorize(Roles = "Admin, Author, Solver")]
+    public async Task<Response.User> Get()
     {
-        long id = Utils.GetUserIdFromClaims(User);
-        Infrastructure.User user = (await _context.Users.FindAsync(id))!;
+        AuthorizationCredentials credentials = new(User);
+        Infrastructure.User user = (await _context.Users.FindAsync(credentials.UserId))!;
         return (Response.User)user;
     }
 }

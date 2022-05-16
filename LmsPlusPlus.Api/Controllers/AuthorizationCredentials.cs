@@ -2,10 +2,10 @@ using System.Security.Claims;
 
 namespace LmsPlusPlus.Api;
 
-class AuthorizationCredentials
+readonly struct AuthorizationCredentials
 {
     internal Infrastructure.Role UserRole { get; }
-    internal long UserId { get; set; }
+    internal long UserId { get; }
 
     internal AuthorizationCredentials(ClaimsPrincipal claimsPrincipal)
     {
