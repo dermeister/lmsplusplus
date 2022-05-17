@@ -204,6 +204,7 @@ public class ApplicationContext : DbContext
             entity.HasOne(g => g.Topic)
                 .WithMany()
                 .HasForeignKey(g => g.TopicId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_groups_topic_id");
         });
     }
@@ -225,7 +226,7 @@ public class ApplicationContext : DbContext
             entity.HasOne(t => t.Topic)
                 .WithMany()
                 .HasForeignKey(t => t.TopicId)
-                .OnDelete(DeleteBehavior.Restrict)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_tasks_topic_id");
             entity.HasMany(t => t.Technologies)
                 .WithMany(t => t.Tasks)
