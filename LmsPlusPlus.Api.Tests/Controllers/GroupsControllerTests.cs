@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 namespace LmsPlusPlus.Api.Tests;
@@ -122,21 +124,32 @@ public class GroupsControllerTests : IAsyncLifetime
         Request.CreateGroup group = new(null!, _data.Topic.Id);
         string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
         HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage(url: "groups", HttpMethod.Post, jwt, group);
-        group = new Request.CreateGroup(Name: "New group", TopicId: 0);
+        const string name = "New group";
+        group = new Request.CreateGroup(name, TopicId: 0);
         HttpRequestMessage requestMessage2 = Utils.CreateHttpRequestMessage(url: "groups", HttpMethod.Post, jwt, group);
+        const int repetitionCount = 1000;
+        StringBuilder sb = new(name.Length * repetitionCount);
+        for (var i = 0; i < repetitionCount; i++)
+            sb.Append(name);
+        group = new Request.CreateGroup(sb.ToString(), _data.Topic.Id);
+        HttpRequestMessage requestMessage3 = Utils.CreateHttpRequestMessage(url: "groups", HttpMethod.Post, jwt, group);
 
         // Act
         Task<HttpResponseMessage> responseMessage1 = _app.Client.SendAsync(requestMessage1);
         Task<HttpResponseMessage> responseMessage2 = _app.Client.SendAsync(requestMessage2);
-        await Task.WhenAll(responseMessage1, responseMessage2);
+        Task<HttpResponseMessage> responseMessage3 = _app.Client.SendAsync(requestMessage3);
+        await Task.WhenAll(responseMessage1, responseMessage2, responseMessage3);
         Dictionary<string, IEnumerable<string>> errors1 = await Utils.GetBadRequestErrors(responseMessage1.Result);
         Dictionary<string, IEnumerable<string>> errors2 = await Utils.GetBadRequestErrors(responseMessage2.Result);
+        Dictionary<string, IEnumerable<string>> errors3 = await Utils.GetBadRequestErrors(responseMessage3.Result);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, responseMessage1.Result.StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, responseMessage2.Result.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, responseMessage3.Result.StatusCode);
         Assert.Single(errors1);
         Assert.Single(errors2);
+        Assert.Single(errors3);
     }
 
     [Fact]
@@ -195,21 +208,33 @@ public class GroupsControllerTests : IAsyncLifetime
         Request.UpdateGroup group = new(Name: null!);
         string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
         HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage($"groups/{_data.Group.Id}", HttpMethod.Put, jwt, group);
-        group = new Request.UpdateGroup(Name: "New group");
+        const string name = "New group";
+        group = new Request.UpdateGroup(name);
         HttpRequestMessage requestMessage2 = Utils.CreateHttpRequestMessage(url: "groups/0", HttpMethod.Put, jwt, group);
+        const int repetitionCount = 1000;
+        StringBuilder sb = new(name.Length * repetitionCount);
+        for (var i = 0; i < repetitionCount; i++)
+            sb.Append(name);
+        group = new Request.UpdateGroup(sb.ToString());
+        HttpRequestMessage requestMessage3 = Utils.CreateHttpRequestMessage($"groups/{_data.Group.Id}", HttpMethod.Put, jwt, group);
 
         // Act
         Task<HttpResponseMessage> responseMessage1 = _app.Client.SendAsync(requestMessage1);
         Task<HttpResponseMessage> responseMessage2 = _app.Client.SendAsync(requestMessage2);
-        await Task.WhenAll(responseMessage1, responseMessage2);
-        Dictionary<string, IEnumerable<string>> errors1 = await Utils.GetBadRequestErrors(responseMessage1.Result);
-        Dictionary<string, IEnumerable<string>> errors2 = await Utils.GetBadRequestErrors(responseMessage2.Result);
+        Task<HttpResponseMessage> responseMessage3 = _app.Client.SendAsync(requestMessage3);
+        await Task.WhenAll(responseMessage1, responseMessage2, responseMessage3);
+        Task<Dictionary<string, IEnumerable<string>>> errors1 = Utils.GetBadRequestErrors(responseMessage1.Result);
+        Task<ProblemDetails> problemDetails = Utils.ReadHttpResponse<ProblemDetails>(responseMessage2.Result);
+        Task<Dictionary<string, IEnumerable<string>>> errors2 = Utils.GetBadRequestErrors(responseMessage3.Result);
+        await Task.WhenAll(errors1, problemDetails, errors2);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, responseMessage1.Result.StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, responseMessage2.Result.StatusCode);
-        Assert.Single(errors1);
-        Assert.Empty(errors2);
+        Assert.Equal(HttpStatusCode.BadRequest, responseMessage3.Result.StatusCode);
+        Assert.Single(errors1.Result);
+        Assert.Equal(expected: "Cannot update group.", problemDetails.Result.Title);
+        Assert.Single(errors2.Result);
     }
 
     [Fact]
