@@ -15,14 +15,14 @@ public class TopicsController : ControllerBase
     [HttpGet, Authorize(Roles = "Author, Solver")]
     public async Task<IEnumerable<Response.Topic>> GetAll()
     {
-        Infrastructure.Role userRole = Utils.GetUserRoleFromClaims(User);
-        long userId = Utils.GetUserIdFromClaims(User);
-        return userRole switch
+        AuthorizationCredentials credentials = new(User);
+        return credentials.UserRole switch
         {
-            Infrastructure.Role.Author => await (from t in _context.Topics where t.AuthorId == userId select (Response.Topic)t)
-                .ToArrayAsync(),
+            Infrastructure.Role.Author => await (from t in _context.Topics
+                                                 where t.AuthorId == credentials.UserId
+                                                 select (Response.Topic)t).ToArrayAsync(),
             Infrastructure.Role.Solver => await (from u in _context.Users.Include(u => u.Groups)
-                                                 where u.Id == userId
+                                                 where u.Id == credentials.UserId
                                                  select from g in u.Groups select (Response.Topic)g.Topic).SingleAsync(),
             _ => throw new ArgumentOutOfRangeException()
         };
@@ -31,8 +31,8 @@ public class TopicsController : ControllerBase
     [HttpPost, Authorize(Roles = "Author")]
     public async Task<ActionResult<Response.Topic>> Create(Request.CreateTopic requestTopic)
     {
-        long authorId = Utils.GetUserIdFromClaims(User);
-        if (requestTopic.AuthorId != authorId)
+        AuthorizationCredentials credentials = new(User);
+        if (requestTopic.AuthorId != credentials.UserId)
             return Forbid();
         Infrastructure.Topic databaseTopic = new()
         {
@@ -40,46 +40,57 @@ public class TopicsController : ControllerBase
             AuthorId = requestTopic.AuthorId
         };
         _context.Add(databaseTopic);
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException e) when (e.InnerException is PostgresException { SqlState: PostgresErrorCodes.StringDataRightTruncation })
+        {
+            ModelState.AddModelError(nameof(requestTopic.Name), "Name is too long.");
+            return ValidationProblem();
+        }
         return (Response.Topic)databaseTopic;
     }
 
     [HttpPut("{topicId:long}"), Authorize(Roles = "Author")]
     public async Task<ActionResult<Response.Topic>> Update(long topicId, Request.UpdateTopic requestTopic)
     {
-        long authorId = Utils.GetUserIdFromClaims(User);
+        AuthorizationCredentials credentials = new(User);
         Infrastructure.Topic? databaseTopic = await _context.Topics.FindAsync(topicId);
         if (databaseTopic is null)
-            return BadRequest();
-        if (databaseTopic.AuthorId != authorId)
+            return Problem(detail: "Topic does not exist.", statusCode: StatusCodes.Status400BadRequest, title: "Cannot update topic.");
+        if (databaseTopic.AuthorId != credentials.UserId)
             return Forbid();
         databaseTopic.Name = requestTopic.Name;
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException e) when (e.InnerException is PostgresException { SqlState: PostgresErrorCodes.StringDataRightTruncation })
+        {
+            ModelState.AddModelError(nameof(requestTopic.Name), "Name is too long.");
+            return ValidationProblem();
+        }
         return (Response.Topic)databaseTopic;
     }
 
     [HttpDelete("{topicId:long}"), Authorize(Roles = "Author")]
     public async Task<IActionResult> Delete(long topicId)
     {
-        long authorId = Utils.GetUserIdFromClaims(User);
+        AuthorizationCredentials credentials = new(User);
         Infrastructure.Topic? topic = await _context.Topics.FindAsync(topicId);
         if (topic is not null)
         {
-            if (topic.AuthorId != authorId)
+            if (topic.AuthorId != credentials.UserId)
                 return Forbid();
             _context.Remove(topic);
             try
             {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException e) when (e.InnerException is PostgresException postgresException)
+            catch (DbUpdateException e) when (e.InnerException is PostgresException { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "fk_tasks_topic_id" })
             {
-                if (postgresException is { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "fk_tasks_topic_id" })
-                {
-                    ModelState.AddModelError(key: "TopicId", $"Topic with id {topicId} is used by tasks.");
-                    return ValidationProblem();
-                }
-                throw;
+                return Problem(detail: "Topic is used by tasks.", statusCode: StatusCodes.Status400BadRequest, title: "Cannot delete topic.");
             }
         }
         return Ok();

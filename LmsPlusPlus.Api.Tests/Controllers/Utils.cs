@@ -31,7 +31,6 @@ static class Utils
 
     internal static async Task<T> ReadHttpResponse<T>(HttpResponseMessage message)
     {
-        message.EnsureSuccessStatusCode();
         string content = await message.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<T>(content, s_jsonSerializerOptions)!;
     }
@@ -48,6 +47,5 @@ static class Utils
         return errors.Deserialize<Dictionary<string, IEnumerable<string>>>()!;
     }
 
-    static string SerializeBody(object body) =>
-        JsonSerializer.Serialize(body, s_jsonSerializerOptions);
+    static string SerializeBody(object body) => JsonSerializer.Serialize(body, s_jsonSerializerOptions);
 }
