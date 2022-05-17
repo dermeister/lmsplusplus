@@ -11,6 +11,7 @@ namespace LmsPlusPlus.Api.Migrations
             migrationBuilder.DropForeignKey(
                 name: "fk_tasks_topic_id",
                 table: "tasks");
+
             migrationBuilder.AddForeignKey(
                 name: "fk_tasks_topic_id",
                 table: "tasks",
@@ -25,6 +26,7 @@ namespace LmsPlusPlus.Api.Migrations
             migrationBuilder.DropForeignKey(
                 name: "fk_tasks_topic_id",
                 table: "tasks");
+
             migrationBuilder.AddForeignKey(
                 name: "fk_tasks_topic_id",
                 table: "tasks",

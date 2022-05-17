@@ -12,229 +12,268 @@ public partial class InitialCreate : Migration
     {
         migrationBuilder.AlterDatabase().Annotation("Npgsql:Enum:role", "admin,author,solver");
 
-        migrationBuilder.CreateTable(name: "permissions", columns: table => new
-        {
-            role = table.Column<Role>(type: "role", nullable: false),
-            can_create_task = table.Column<bool>(type: "boolean", nullable: false),
-            can_update_task = table.Column<bool>(type: "boolean", nullable: false),
-            can_delete_task = table.Column<bool>(type: "boolean", nullable: false),
-            can_update_vcs_configuration = table.Column<bool>(type: "boolean", nullable: false),
-            can_update_user = table.Column<bool>(type: "boolean", nullable: false),
-            can_create_solution = table.Column<bool>(type: "boolean", nullable: false),
-            can_delete_solution = table.Column<bool>(type: "boolean", nullable: false)
-        }, constraints: table =>
-        {
-            table.PrimaryKey("pk_permissions_role", x => x.role);
-        });
+        migrationBuilder.CreateTable(
+            name: "permissions",
+            columns: table => new
+            {
+                role = table.Column<Role>(type: "role", nullable: false),
+                can_create_task = table.Column<bool>(type: "boolean", nullable: false),
+                can_update_task = table.Column<bool>(type: "boolean", nullable: false),
+                can_delete_task = table.Column<bool>(type: "boolean", nullable: false),
+                can_update_vcs_configuration = table.Column<bool>(type: "boolean", nullable: false),
+                can_update_user = table.Column<bool>(type: "boolean", nullable: false),
+                can_create_solution = table.Column<bool>(type: "boolean", nullable: false),
+                can_delete_solution = table.Column<bool>(type: "boolean", nullable: false)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("pk_permissions_role", x => x.role);
+            });
 
-        migrationBuilder.CreateTable(name: "users", columns: table => new
-        {
-            id = table.Column<long>(type: "bigint", nullable: false).Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
-            login = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-            password_hash = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
-            first_name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-            last_name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-            role = table.Column<Role>(type: "role", nullable: false)
-        }, constraints: table =>
-        {
-            table.PrimaryKey("pk_users_id", x => x.id);
-        });
+        migrationBuilder.CreateTable(
+            name: "users",
+            columns: table => new
+            {
+                id = table.Column<long>(type: "bigint", nullable: false).Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
+                login = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                password_hash = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                first_name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                last_name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                role = table.Column<Role>(type: "role", nullable: false)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("pk_users_id", x => x.id);
+            });
 
-        migrationBuilder.CreateTable(name: "vcs_hosting_providers", columns: table => new
-        {
-            id = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-            name = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false)
-        }, constraints: table =>
-        {
-            table.PrimaryKey("pk_vcs_hosting_providers_id", x => x.id);
-        });
+        migrationBuilder.CreateTable(
+            name: "vcs_hosting_providers",
+            columns: table => new
+            {
+                id = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                name = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("pk_vcs_hosting_providers_id", x => x.id);
+            });
 
-        migrationBuilder.CreateTable(name: "preferences", columns: table => new
-        {
-            user_id = table.Column<long>(type: "bigint", nullable: false),
-            theme = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
-        }, constraints: table =>
-        {
-            table.PrimaryKey("pk_preferences_user_id", x => x.user_id);
-            table.ForeignKey(
-                name: "fk_preferences_user_id",
-                column: x => x.user_id,
-                principalTable: "users",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-        });
+        migrationBuilder.CreateTable(
+            name: "preferences",
+            columns: table => new
+            {
+                user_id = table.Column<long>(type: "bigint", nullable: false),
+                theme = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("pk_preferences_user_id", x => x.user_id);
+                table.ForeignKey(
+                    name: "fk_preferences_user_id",
+                    column: x => x.user_id,
+                    principalTable: "users",
+                    principalColumn: "id",
+                    onDelete: ReferentialAction.Cascade);
+            });
 
-        migrationBuilder.CreateTable(name: "topics", columns: table => new
-        {
-            id = table.Column<long>(type: "bigint", nullable: false)
+        migrationBuilder.CreateTable(
+            name: "topics",
+            columns: table => new
+            {
+                id = table.Column<long>(type: "bigint", nullable: false)
                     .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
-            name = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
-            author_id = table.Column<long>(type: "bigint", nullable: false)
-        }, constraints: table =>
-        {
-            table.PrimaryKey("pk_topics_id", x => x.id);
-            table.ForeignKey(
-                name: "fk_topics_author_id",
-                column: x => x.author_id,
-                principalTable: "users",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-        });
+                name = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                author_id = table.Column<long>(type: "bigint", nullable: false)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("pk_topics_id", x => x.id);
+                table.ForeignKey(
+                    name: "fk_topics_author_id",
+                    column: x => x.author_id,
+                    principalTable: "users",
+                    principalColumn: "id",
+                    onDelete: ReferentialAction.Cascade);
+            });
 
-        migrationBuilder.CreateTable(name: "vcs_accounts", columns: table => new
-        {
-            id = table.Column<long>(type: "bigint", nullable: false)
+        migrationBuilder.CreateTable(
+            name: "vcs_accounts",
+            columns: table => new
+            {
+                id = table.Column<long>(type: "bigint", nullable: false)
                     .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
-            name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-            access_token = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-            hosting_provider_id = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-            user_id = table.Column<long>(type: "bigint", nullable: false)
-        }, constraints: table =>
-        {
-            table.PrimaryKey("pk_vcs_accounts_id", x => x.id);
-            table.ForeignKey(name: "fk_vcs_accounts_hosting_provider_id",
-                column: x => x.hosting_provider_id,
-                principalTable: "vcs_hosting_providers",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-            table.ForeignKey(name: "fk_vcs_accounts_user_id",
-                column: x => x.user_id,
-                principalTable: "users",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-        });
+                name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                access_token = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                hosting_provider_id = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                user_id = table.Column<long>(type: "bigint", nullable: false)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("pk_vcs_accounts_id", x => x.id);
+                table.ForeignKey(name: "fk_vcs_accounts_hosting_provider_id",
+                    column: x => x.hosting_provider_id,
+                    principalTable: "vcs_hosting_providers",
+                    principalColumn: "id",
+                    onDelete: ReferentialAction.Cascade);
+                table.ForeignKey(name: "fk_vcs_accounts_user_id",
+                    column: x => x.user_id,
+                    principalTable: "users",
+                    principalColumn: "id",
+                    onDelete: ReferentialAction.Cascade);
+            });
 
-        migrationBuilder.CreateTable(name: "groups", columns: table => new
-        {
-            id = table.Column<long>(type: "bigint", nullable: false).Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
-            name = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
-            topic_id = table.Column<long>(type: "bigint", nullable: false)
-        }, constraints: table =>
-        {
-            table.PrimaryKey("pk_groups_id", x => x.id);
-            table.ForeignKey(name: "fk_groups_topic_id",
-                column: x => x.topic_id,
-                principalTable: "topics",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-        });
+        migrationBuilder.CreateTable(
+            name: "groups",
+            columns: table => new
+            {
+                id = table.Column<long>(type: "bigint", nullable: false).Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
+                name = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                topic_id = table.Column<long>(type: "bigint", nullable: false)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("pk_groups_id", x => x.id);
+                table.ForeignKey(name: "fk_groups_topic_id",
+                    column: x => x.topic_id,
+                    principalTable: "topics",
+                    principalColumn: "id",
+                    onDelete: ReferentialAction.Cascade);
+            });
 
-        migrationBuilder.CreateTable(name: "tasks", columns: table => new
-        {
-            id = table.Column<long>(type: "bigint", nullable: false).Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
-            title = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
-            description = table.Column<string>(type: "text", nullable: false),
-            topic_id = table.Column<long>(type: "bigint", nullable: false)
-        }, constraints: table =>
-        {
-            table.PrimaryKey("pk_tasks_id", x => x.id);
-            table.ForeignKey(name: "fk_tasks_topic_id",
-                column: x => x.topic_id,
-                principalTable: "topics",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Restrict);
-        });
+        migrationBuilder.CreateTable(
+            name: "tasks",
+            columns: table => new
+            {
+                id = table.Column<long>(type: "bigint", nullable: false).Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
+                title = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                description = table.Column<string>(type: "text", nullable: false),
+                topic_id = table.Column<long>(type: "bigint", nullable: false)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("pk_tasks_id", x => x.id);
+                table.ForeignKey(name: "fk_tasks_topic_id",
+                    column: x => x.topic_id,
+                    principalTable: "topics",
+                    principalColumn: "id",
+                    onDelete: ReferentialAction.Restrict);
+            });
 
-        migrationBuilder.CreateTable(name: "repositories", columns: table => new
-        {
-            id = table.Column<long>(type: "bigint", nullable: false).Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
-            clone_url = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
-            website_url = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
-            vcs_account_id = table.Column<long>(type: "bigint", nullable: false)
-        }, constraints: table =>
-        {
-            table.PrimaryKey("pk_repositories_id", x => x.id);
-            table.ForeignKey(name: "fk_repositories_vcs_account_id",
-                column: x => x.vcs_account_id,
-                principalTable: "vcs_accounts",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-        });
+        migrationBuilder.CreateTable(
+            name: "repositories",
+            columns: table => new
+            {
+                id = table.Column<long>(type: "bigint", nullable: false).Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
+                clone_url = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                website_url = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                vcs_account_id = table.Column<long>(type: "bigint", nullable: false)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("pk_repositories_id", x => x.id);
+                table.ForeignKey(name: "fk_repositories_vcs_account_id",
+                    column: x => x.vcs_account_id,
+                    principalTable: "vcs_accounts",
+                    principalColumn: "id",
+                    onDelete: ReferentialAction.Cascade);
+            });
 
-        migrationBuilder.CreateTable(name: "m2m_users_groups", columns: table => new
-        {
-            user_id = table.Column<long>(type: "bigint", nullable: false),
-            group_id = table.Column<long>(type: "bigint", nullable: false)
-        }, constraints: table =>
-        {
-            table.PrimaryKey("pk_m2m_users_groups", x => new { x.user_id, x.group_id });
-            table.ForeignKey(name: "fk_m2m_users_groups_group_id",
-                column: x => x.group_id,
-                principalTable: "groups",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-            table.ForeignKey(name: "fk_m2m_users_groups_user_id",
-                column: x => x.user_id,
-                principalTable: "users",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-        });
+        migrationBuilder.CreateTable(
+            name: "m2m_users_groups",
+            columns: table => new
+            {
+                user_id = table.Column<long>(type: "bigint", nullable: false),
+                group_id = table.Column<long>(type: "bigint", nullable: false)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("pk_m2m_users_groups", x => new { x.user_id, x.group_id });
+                table.ForeignKey(name: "fk_m2m_users_groups_group_id",
+                    column: x => x.group_id,
+                    principalTable: "groups",
+                    principalColumn: "id",
+                    onDelete: ReferentialAction.Cascade);
+                table.ForeignKey(name: "fk_m2m_users_groups_user_id",
+                    column: x => x.user_id,
+                    principalTable: "users",
+                    principalColumn: "id",
+                    onDelete: ReferentialAction.Cascade);
+            });
 
-        migrationBuilder.CreateTable(name: "technologies", columns: table => new
-        {
-            id = table.Column<short>(type: "smallint", nullable: false).Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
-            name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-            template_repository_id = table.Column<long>(type: "bigint", nullable: false)
-        }, constraints: table =>
-        {
-            table.PrimaryKey("pk_technologies_id", x => x.id);
-            table.ForeignKey(name: "fk_technologies_template_repository_id",
-                column: x => x.template_repository_id,
-                principalTable: "repositories",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-        });
+        migrationBuilder.CreateTable(
+            name: "technologies",
+            columns: table => new
+            {
+                id = table.Column<short>(type: "smallint", nullable: false).Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
+                name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                template_repository_id = table.Column<long>(type: "bigint", nullable: false)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("pk_technologies_id", x => x.id);
+                table.ForeignKey(name: "fk_technologies_template_repository_id",
+                    column: x => x.template_repository_id,
+                    principalTable: "repositories",
+                    principalColumn: "id",
+                    onDelete: ReferentialAction.Cascade);
+            });
 
-        migrationBuilder.CreateTable(name: "m2m_tasks_technologies", columns: table => new
-        {
-            task_id = table.Column<long>(type: "bigint", nullable: false),
-            technology_id = table.Column<short>(type: "smallint", nullable: false)
-        }, constraints: table =>
-        {
-            table.PrimaryKey("pk_m2m_tasks_technologies", x => new { x.task_id, x.technology_id });
-            table.ForeignKey(name: "fk_m2m_tasks_technologies_task_id",
-                column: x => x.task_id,
-                principalTable: "tasks",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-            table.ForeignKey(name: "fk_m2m_tasks_technologies_technology_id",
-                column: x => x.technology_id,
-                principalTable: "technologies",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-        });
+        migrationBuilder.CreateTable(
+            name: "m2m_tasks_technologies",
+            columns: table => new
+            {
+                task_id = table.Column<long>(type: "bigint", nullable: false),
+                technology_id = table.Column<short>(type: "smallint", nullable: false)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("pk_m2m_tasks_technologies", x => new { x.task_id, x.technology_id });
+                table.ForeignKey(name: "fk_m2m_tasks_technologies_task_id",
+                    column: x => x.task_id,
+                    principalTable: "tasks",
+                    principalColumn: "id",
+                    onDelete: ReferentialAction.Cascade);
+                table.ForeignKey(name: "fk_m2m_tasks_technologies_technology_id",
+                    column: x => x.technology_id,
+                    principalTable: "technologies",
+                    principalColumn: "id",
+                    onDelete: ReferentialAction.Cascade);
+            });
 
-        migrationBuilder.CreateTable(name: "solutions", columns: table => new
-        {
-            id = table.Column<long>(type: "bigint", nullable: false).Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
-            repository_id = table.Column<long>(type: "bigint", nullable: false),
-            solver_id = table.Column<long>(type: "bigint", nullable: false),
-            task_id = table.Column<long>(type: "bigint", nullable: false),
-            technology_id = table.Column<short>(type: "smallint", nullable: false)
-        }, constraints: table =>
-        {
-            table.PrimaryKey("pk_solutions_id", x => x.id);
-            table.ForeignKey(name: "fk_solutions_repository_id",
-                column: x => x.repository_id,
-                principalTable: "repositories",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-            table.ForeignKey(name: "fk_solutions_solver_id",
-                column: x => x.solver_id,
-                principalTable: "users",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-            table.ForeignKey(name: "fk_solutions_task_id",
-                column: x => x.task_id,
-                principalTable: "tasks",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-            table.ForeignKey(name: "fk_solutions_technology_id",
-                column: x => x.technology_id,
-                principalTable: "technologies",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-        });
+        migrationBuilder.CreateTable(
+            name: "solutions",
+            columns: table => new
+            {
+                id = table.Column<long>(type: "bigint", nullable: false).Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
+                repository_id = table.Column<long>(type: "bigint", nullable: false),
+                solver_id = table.Column<long>(type: "bigint", nullable: false),
+                task_id = table.Column<long>(type: "bigint", nullable: false),
+                technology_id = table.Column<short>(type: "smallint", nullable: false)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("pk_solutions_id", x => x.id);
+                table.ForeignKey(name: "fk_solutions_repository_id",
+                    column: x => x.repository_id,
+                    principalTable: "repositories",
+                    principalColumn: "id",
+                    onDelete: ReferentialAction.Cascade);
+                table.ForeignKey(name: "fk_solutions_solver_id",
+                    column: x => x.solver_id,
+                    principalTable: "users",
+                    principalColumn: "id",
+                    onDelete: ReferentialAction.Cascade);
+                table.ForeignKey(name: "fk_solutions_task_id",
+                    column: x => x.task_id,
+                    principalTable: "tasks",
+                    principalColumn: "id",
+                    onDelete: ReferentialAction.Cascade);
+                table.ForeignKey(name: "fk_solutions_technology_id",
+                    column: x => x.technology_id,
+                    principalTable: "technologies",
+                    principalColumn: "id",
+                    onDelete: ReferentialAction.Cascade);
+            });
 
         migrationBuilder.InsertData(table: "permissions",
             columns: new[] { "role", "can_create_solution", "can_create_task", "can_delete_solution", "can_delete_task", "can_update_task", "can_update_user", "can_update_vcs_configuration" },
@@ -245,27 +284,119 @@ public partial class InitialCreate : Migration
                 { Role.Solver, true, false, true, false, false, false, true }
             });
 
-        migrationBuilder.CreateIndex(name: "ix_groups_topic_id", table: "groups", column: "topic_id");
-        migrationBuilder.CreateIndex(name: "ix_m2m_tasks_technologies_technology_id", table: "m2m_tasks_technologies", column: "technology_id");
-        migrationBuilder.CreateIndex(name: "ix_m2m_users_groups_group_id", table: "m2m_users_groups", column: "group_id");
-        migrationBuilder.CreateIndex(name: "ix_repositories_clone_url", table: "repositories", column: "clone_url", unique: true);
-        migrationBuilder.CreateIndex(name: "ix_repositories_vcs_account_id", table: "repositories", column: "vcs_account_id");
-        migrationBuilder.CreateIndex(name: "ix_repositories_website_url", table: "repositories", column: "website_url", unique: true);
-        migrationBuilder.CreateIndex(name: "ix_solutions_repository_id", table: "solutions", column: "repository_id");
-        migrationBuilder.CreateIndex(name: "ix_solutions_solver_id_task_id", table: "solutions", columns: new[] { "solver_id", "task_id" }, unique: true);
-        migrationBuilder.CreateIndex(name: "ix_solutions_task_id", table: "solutions", column: "task_id");
-        migrationBuilder.CreateIndex(name: "ix_solutions_technology_id", table: "solutions", column: "technology_id");
-        migrationBuilder.CreateIndex(name: "ix_tasks_title_topic_id", table: "tasks", columns: new[] { "title", "topic_id" }, unique: true);
-        migrationBuilder.CreateIndex(name: "ix_tasks_topic_id", table: "tasks", column: "topic_id");
-        migrationBuilder.CreateIndex(name: "ix_technologies_name_template_repository_id", table: "technologies", columns: new[] { "name", "template_repository_id" }, unique: true);
-        migrationBuilder.CreateIndex(name: "ix_technologies_template_repository_id", table: "technologies", column: "template_repository_id");
-        migrationBuilder.CreateIndex(name: "ix_topics_author_id", table: "topics", column: "author_id");
-        migrationBuilder.CreateIndex(name: "ix_topics_name", table: "topics", column: "name", unique: true);
-        migrationBuilder.CreateIndex(name: "ix_users_login", table: "users", column: "login", unique: true);
-        migrationBuilder.CreateIndex(name: "ix_vcs_accounts_hosting_provider_id", table: "vcs_accounts", column: "hosting_provider_id");
-        migrationBuilder.CreateIndex(name: "ix_vcs_accounts_name_hosting_provider_id", table: "vcs_accounts", columns: new[] { "name", "hosting_provider_id" }, unique: true);
-        migrationBuilder.CreateIndex(name: "ix_vcs_accounts_user_id", table: "vcs_accounts", column: "user_id");
-        migrationBuilder.CreateIndex(name: "ix_vcs_hosting_providers_name", table: "vcs_hosting_providers", column: "name", unique: true);
+
+        migrationBuilder.CreateIndex(name: "ix_groups_topic_id",
+            table: "groups",
+            column: "topic_id");
+
+        migrationBuilder.CreateIndex(
+            name: "ix_m2m_tasks_technologies_technology_id",
+            table: "m2m_tasks_technologies",
+            column: "technology_id");
+
+        migrationBuilder.CreateIndex(
+            name: "ix_m2m_users_groups_group_id",
+            table: "m2m_users_groups",
+            column: "group_id");
+
+        migrationBuilder.CreateIndex(
+            name: "ix_repositories_clone_url",
+            table: "repositories",
+            column: "clone_url",
+            unique: true);
+
+        migrationBuilder.CreateIndex(
+            name: "ix_repositories_vcs_account_id",
+            table: "repositories",
+            column: "vcs_account_id");
+
+        migrationBuilder.CreateIndex(
+            name: "ix_repositories_website_url",
+            table: "repositories",
+            column: "website_url",
+            unique: true);
+
+        migrationBuilder.CreateIndex(
+            name: "ix_solutions_repository_id",
+            table: "solutions",
+            column: "repository_id");
+
+        migrationBuilder.CreateIndex(
+            name: "ix_solutions_solver_id_task_id",
+            table: "solutions",
+            columns: new[] { "solver_id", "task_id" },
+            unique: true);
+
+        migrationBuilder.CreateIndex(
+            name: "ix_solutions_task_id",
+            table: "solutions",
+            column: "task_id");
+
+        migrationBuilder.CreateIndex(
+            name: "ix_solutions_technology_id",
+            table: "solutions",
+            column: "technology_id");
+
+        migrationBuilder.CreateIndex(
+            name: "ix_tasks_title_topic_id",
+            table: "tasks",
+            columns: new[] { "title", "topic_id" },
+            unique: true);
+
+        migrationBuilder.CreateIndex(
+            name: "ix_tasks_topic_id",
+            table: "tasks",
+            column: "topic_id");
+
+        migrationBuilder.CreateIndex(
+            name: "ix_technologies_name_template_repository_id",
+            table: "technologies",
+            columns: new[] { "name", "template_repository_id" },
+            unique: true);
+
+        migrationBuilder.CreateIndex(
+            name: "ix_technologies_template_repository_id",
+            table: "technologies",
+            column: "template_repository_id");
+
+        migrationBuilder.CreateIndex(
+            name: "ix_topics_author_id",
+            table: "topics",
+            column: "author_id");
+
+        migrationBuilder.CreateIndex(
+            name: "ix_topics_name",
+            table: "topics",
+            column: "name",
+            unique: true);
+
+        migrationBuilder.CreateIndex(
+            name: "ix_users_login",
+            table: "users",
+            column: "login",
+            unique: true);
+
+        migrationBuilder.CreateIndex(
+            name: "ix_vcs_accounts_hosting_provider_id",
+            table: "vcs_accounts",
+            column: "hosting_provider_id");
+
+        migrationBuilder.CreateIndex(
+            name: "ix_vcs_accounts_name_hosting_provider_id",
+            table: "vcs_accounts",
+            columns: new[] { "name", "hosting_provider_id" },
+            unique: true);
+
+        migrationBuilder.CreateIndex(
+            name: "ix_vcs_accounts_user_id",
+            table: "vcs_accounts",
+            column: "user_id");
+
+        migrationBuilder.CreateIndex(
+            name: "ix_vcs_hosting_providers_name",
+            table: "vcs_hosting_providers",
+            column: "name",
+            unique: true);
 
         migrationBuilder.Sql(@"
             CREATE FUNCTION is_user_in_role(user_id BIGINT, expected_role role) RETURNS BOOLEAN AS
