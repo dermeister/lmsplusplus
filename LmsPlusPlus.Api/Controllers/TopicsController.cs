@@ -40,15 +40,7 @@ public class TopicsController : ControllerBase
             AuthorId = requestTopic.AuthorId
         };
         _context.Add(databaseTopic);
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateException e) when (e.InnerException is PostgresException { SqlState: PostgresErrorCodes.StringDataRightTruncation })
-        {
-            ModelState.AddModelError(nameof(requestTopic.Name), "Name is too long.");
-            return ValidationProblem();
-        }
+        await _context.SaveChangesAsync();
         return (Response.Topic)databaseTopic;
     }
 
@@ -62,15 +54,7 @@ public class TopicsController : ControllerBase
         if (databaseTopic.AuthorId != credentials.UserId)
             return Forbid();
         databaseTopic.Name = requestTopic.Name;
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateException e) when (e.InnerException is PostgresException { SqlState: PostgresErrorCodes.StringDataRightTruncation })
-        {
-            ModelState.AddModelError(nameof(requestTopic.Name), "Name is too long.");
-            return ValidationProblem();
-        }
+        await _context.SaveChangesAsync();
         return (Response.Topic)databaseTopic;
     }
 
@@ -84,14 +68,7 @@ public class TopicsController : ControllerBase
             if (topic.AuthorId != credentials.UserId)
                 return Forbid();
             _context.Remove(topic);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException e) when (e.InnerException is PostgresException { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "fk_tasks_topic_id" })
-            {
-                return Problem(detail: "Topic is used by tasks.", statusCode: StatusCodes.Status400BadRequest, title: "Cannot delete topic.");
-            }
+            await _context.SaveChangesAsync();
         }
         return Ok();
     }

@@ -48,15 +48,7 @@ public class GroupsController : ControllerBase
             TopicId = requestGroup.TopicId
         };
         _context.Add(databaseGroup);
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateException e) when (e.InnerException is PostgresException { SqlState: PostgresErrorCodes.StringDataRightTruncation })
-        {
-            ModelState.AddModelError(nameof(requestGroup.Name), $"Name is too long.");
-            return ValidationProblem();
-        }
+        await _context.SaveChangesAsync();
         return (Response.Group)databaseGroup;
     }
 
@@ -70,15 +62,7 @@ public class GroupsController : ControllerBase
         if (databaseGroup.Topic.AuthorId != credentials.UserId)
             return Forbid();
         databaseGroup.Name = requestGroup.Name;
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateException e) when (e.InnerException is PostgresException { SqlState: PostgresErrorCodes.StringDataRightTruncation })
-        {
-            ModelState.AddModelError(nameof(requestGroup.Name), $"Name is too long.");
-            return ValidationProblem();
-        }
+        await _context.SaveChangesAsync();
         return (Response.Group)databaseGroup;
     }
 

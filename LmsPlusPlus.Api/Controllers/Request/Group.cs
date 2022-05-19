@@ -1,5 +1,24 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace LmsPlusPlus.Api.Request;
 
-public record CreateGroup(string Name, long TopicId);
+public record CreateGroup
+{
+    [MaxLength(1000)]
+    public string Name { get; }
+    public long TopicId { get; }
 
-public record UpdateGroup(string Name);
+    public CreateGroup(string name, long topicId)
+    {
+        Name = name;
+        TopicId = topicId;
+    }
+}
+
+public record UpdateGroup
+{
+    [MaxLength(1000)]
+    public string Name { get; }
+
+    public UpdateGroup(string name) => Name = name;
+}

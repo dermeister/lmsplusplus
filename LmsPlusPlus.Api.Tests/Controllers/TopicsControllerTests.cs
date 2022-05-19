@@ -84,7 +84,7 @@ public class TopicsControllerTests : IAsyncLifetime
     public async Task CreateTopicUnauthorized()
     {
         // Arrange
-        Request.CreateTopic topic = new(Name: "New topic", _data.Author.Id);
+        Request.CreateTopic topic = new(name: "New topic", _data.Author.Id);
         HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "topics", HttpMethod.Post, jwt: null, topic);
 
         // Act
@@ -98,7 +98,7 @@ public class TopicsControllerTests : IAsyncLifetime
     public async Task CreateTopicForbidden()
     {
         // Arrange
-        Request.CreateTopic topic = new(Name: "New topic", _data.AuthorWithoutTopics.Id);
+        Request.CreateTopic topic = new(name: "New topic", _data.AuthorWithoutTopics.Id);
         string jwt1 = _app.JwtGenerator.Generate(_data.Solver.Id.ToString(), _data.Solver.Role.ToString());
         HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage(url: "topics", HttpMethod.Post, jwt1, topic);
         string jwt2 = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
@@ -118,7 +118,7 @@ public class TopicsControllerTests : IAsyncLifetime
     public async Task CreateTopicBadRequest()
     {
         // Arrange
-        Request.CreateTopic topic = new(Name: null!, _data.Author.Id);
+        Request.CreateTopic topic = new(name: null!, _data.Author.Id);
         string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
         HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage(url: "topics", HttpMethod.Post, jwt, topic);
         const string name = "New topic";
@@ -148,7 +148,7 @@ public class TopicsControllerTests : IAsyncLifetime
     public async Task CreateTopicSuccess()
     {
         // Arrange
-        Request.CreateTopic topic = new(Name: "New topic", _data.Author.Id);
+        Request.CreateTopic topic = new(name: "New topic", _data.Author.Id);
         string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
         HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "topics", HttpMethod.Post, jwt, topic);
 
@@ -274,22 +274,6 @@ public class TopicsControllerTests : IAsyncLifetime
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, responseMessage1.Result.StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, responseMessage2.Result.StatusCode);
-    }
-
-    [Fact]
-    public async Task DeleteTopicBadRequest()
-    {
-        // Arrange
-        string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
-        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage($"topics/{_data.Topic.Id}", HttpMethod.Delete, jwt);
-
-        // Act
-        HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);
-        ProblemDetails problemDetails = await Utils.ReadHttpResponse<ProblemDetails>(responseMessage);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, responseMessage.StatusCode);
-        Assert.Equal(expected: "Cannot delete topic.", problemDetails.Title);
     }
 
     [Fact]

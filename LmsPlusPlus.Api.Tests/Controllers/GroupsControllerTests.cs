@@ -87,7 +87,7 @@ public class GroupsControllerTests : IAsyncLifetime
     public async Task CreateGroupUnauthorized()
     {
         // Arrange
-        Request.CreateGroup group = new(Name: "New group", _data.Topic.Id);
+        Request.CreateGroup group = new(name: "New group", _data.Topic.Id);
         HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "groups", HttpMethod.Post, jwt: null, group);
 
         // Act
@@ -101,7 +101,7 @@ public class GroupsControllerTests : IAsyncLifetime
     public async Task CreateGroupForbidden()
     {
         // Arrange
-        Request.CreateGroup group = new(Name: "New group", _data.Topic.Id);
+        Request.CreateGroup group = new(name: "New group", _data.Topic.Id);
         string jwt1 = _app.JwtGenerator.Generate(_data.Solver.Id.ToString(), _data.Solver.Role.ToString());
         HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage(url: "groups", HttpMethod.Post, jwt1, group);
         string jwt2 = _app.JwtGenerator.Generate(_data.AuthorWithoutTopics.Id.ToString(), _data.AuthorWithoutTopics.Role.ToString());
@@ -125,7 +125,7 @@ public class GroupsControllerTests : IAsyncLifetime
         string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
         HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage(url: "groups", HttpMethod.Post, jwt, group);
         const string name = "New group";
-        group = new Request.CreateGroup(name, TopicId: 0);
+        group = new Request.CreateGroup(name, topicId: 0);
         HttpRequestMessage requestMessage2 = Utils.CreateHttpRequestMessage(url: "groups", HttpMethod.Post, jwt, group);
         const int repetitionCount = 1000;
         StringBuilder sb = new(name.Length * repetitionCount);
@@ -156,7 +156,7 @@ public class GroupsControllerTests : IAsyncLifetime
     public async Task CreateGroupSuccess()
     {
         // Arrange
-        Request.CreateGroup group = new(Name: "New group", _data.Topic.Id);
+        Request.CreateGroup group = new(name: "New group", _data.Topic.Id);
         string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
         HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "groups", HttpMethod.Post, jwt, group);
 
@@ -171,7 +171,7 @@ public class GroupsControllerTests : IAsyncLifetime
     public async Task UpdateGroupUnauthorized()
     {
         // Arrange
-        Request.UpdateGroup group = new(Name: "New group");
+        Request.UpdateGroup group = new(name: "New group");
         HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage($"groups/{_data.Group.Id}", HttpMethod.Put, jwt: null, group);
 
         // Act
@@ -185,7 +185,7 @@ public class GroupsControllerTests : IAsyncLifetime
     public async Task UpdateGroupForbidden()
     {
         // Arrange
-        Request.UpdateGroup group = new(Name: "New group");
+        Request.UpdateGroup group = new(name: "New group");
         string jwt1 = _app.JwtGenerator.Generate(_data.Solver.Id.ToString(), _data.Solver.Role.ToString());
         HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage($"groups/{_data.Group.Id}", HttpMethod.Put, jwt1, group);
         string jwt2 = _app.JwtGenerator.Generate(_data.AuthorWithoutTopics.Id.ToString(), _data.AuthorWithoutTopics.Role.ToString());
@@ -205,7 +205,7 @@ public class GroupsControllerTests : IAsyncLifetime
     public async Task UpdateGroupBadRequest()
     {
         // Arrange
-        Request.UpdateGroup group = new(Name: null!);
+        Request.UpdateGroup group = new(name: null!);
         string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
         HttpRequestMessage requestMessage1 = Utils.CreateHttpRequestMessage($"groups/{_data.Group.Id}", HttpMethod.Put, jwt, group);
         const string name = "New group";
@@ -241,7 +241,7 @@ public class GroupsControllerTests : IAsyncLifetime
     public async Task UpdateGroupSuccess()
     {
         // Arrange
-        Request.UpdateGroup group = new(Name: "New group");
+        Request.UpdateGroup group = new(name: "New group");
         string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
         HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage($"groups/{_data.Group.Id}", HttpMethod.Put, jwt, group);
 
