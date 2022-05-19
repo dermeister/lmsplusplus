@@ -1,0 +1,29 @@
+name: LMS++
+on: push
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    services:
+      test-database:
+        postgres:
+        image: postgres
+        env:
+          POSTGRES_USERNAME: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+      - name: Run tests
+        run: dotnet test -c Release ./LmsPlusPlus.Api.Tests
