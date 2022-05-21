@@ -42,12 +42,19 @@ public class SolutionsController : ControllerBase
                                                      select @group.Users.Select(u => u.Id).Contains(credentials.UserId)).SingleOrDefaultAsync();
         if (!solverCanCreateSolutionForTask)
             return Forbid();
-        Infrastructure.VcsAccount activeAccount = await (from a in _context.ActiveVcsAccounts.Include(a => a.VcsAccount)
-                                                         where a.UserId == credentials.UserId
-                                                         select a.VcsAccount).SingleAsync();
-        Infrastructure.Repository databaseTemplateRepository = await (from t in _context.Technologies.Include(t => t.TemplateRepository)
-                                                                      where t.Id == requestSolution.TechnologyId
-                                                                      select t.TemplateRepository).SingleAsync();
+        Infrastructure.VcsAccount? activeAccount = await (from a in _context.ActiveVcsAccounts.Include(a => a.VcsAccount)
+                                                          where a.UserId == credentials.UserId
+                                                          select a.VcsAccount).SingleOrDefaultAsync();
+        if (activeAccount is null)
+            return Problem(detail: "Active account is not selected.", statusCode: StatusCodes.Status400BadRequest, title: "Cannot create solution.");
+        Infrastructure.Repository? databaseTemplateRepository = await (from t in _context.Technologies.Include(t => t.TemplateRepository)
+                                                                       where t.Id == requestSolution.TechnologyId
+                                                                       select t.TemplateRepository).SingleOrDefaultAsync();
+        if (databaseTemplateRepository is null)
+        {
+            ModelState.AddModelError(nameof(requestSolution.TechnologyId), $"Technology with id {requestSolution.TechnologyId} does not exist.");
+            return ValidationProblem();
+        }
         Vcs.IHostingClient hostingClient = Vcs.HostingClientFactory.CreateClient(activeAccount.HostingProviderId);
         Vcs.Repository vcsTemplateRepository = new(databaseTemplateRepository.CloneUrl, websiteUrl: null,
             databaseTemplateRepository.VcsAccount.AccessToken);
