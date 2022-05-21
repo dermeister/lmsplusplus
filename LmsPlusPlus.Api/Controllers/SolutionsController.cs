@@ -59,7 +59,7 @@ public class SolutionsController : ControllerBase
         }
         catch (Vcs.RepositoryCreationException)
         {
-            return Problem(detail: "Unable to create repository.", statusCode: StatusCodes.Status400BadRequest, title: "Unable to create solution.");
+            return Problem(detail: "Cannot create repository.", statusCode: StatusCodes.Status400BadRequest, title: "Cannot create solution.");
         }
         Infrastructure.Solution databaseSolution = new()
         {
