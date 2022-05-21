@@ -28,11 +28,6 @@ class WebApplication : IAsyncDisposable
         {
             _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(webHostBuilder =>
             {
-                webHostBuilder.ConfigureAppConfiguration((_, configurationBuilder) =>
-                {
-                    IConfigurationRoot configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Test.json").Build();
-                    configurationBuilder.AddConfiguration(configuration);
-                });
                 webHostBuilder.ConfigureServices((context, services) =>
                 {
                     ServiceDescriptor descriptor = services.First(s => s.ServiceType == typeof(DbContextOptions<ApplicationContext>));
