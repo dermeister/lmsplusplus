@@ -35,12 +35,12 @@ public class SolutionsController : ControllerBase
     public async Task<ActionResult<Response.Solution>> Create(Request.Solution requestSolution)
     {
         AuthorizationCredentials credentials = new(User);
-        bool solverAssignedToTask = await (from task in _context.Tasks
-                                           join topic in _context.Topics on task.TopicId equals topic.Id
-                                           join @group in _context.Groups.Include(g => g.Users) on topic.Id equals @group.TopicId
-                                           where task.Id == requestSolution.TaskId
-                                           select @group.Users.Select(u => u.Id).Contains(credentials.UserId)).SingleOrDefaultAsync();
-        if (!solverAssignedToTask)
+        bool solverCanCreateSolutionForTask = await (from task in _context.Tasks
+                                                     join topic in _context.Topics on task.TopicId equals topic.Id
+                                                     join @group in _context.Groups.Include(g => g.Users) on topic.Id equals @group.TopicId
+                                                     where task.Id == requestSolution.TaskId
+                                                     select @group.Users.Select(u => u.Id).Contains(credentials.UserId)).SingleOrDefaultAsync();
+        if (!solverCanCreateSolutionForTask)
             return Forbid();
         Infrastructure.VcsAccount activeAccount = await (from a in _context.ActiveVcsAccounts.Include(a => a.VcsAccount)
                                                          where a.UserId == credentials.UserId
@@ -67,17 +67,9 @@ public class SolutionsController : ControllerBase
         {
             await _context.SaveChangesAsync();
         }
-        catch (DbUpdateException e)
+        catch (DbUpdateException e) when (e.InnerException is PostgresException { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "fk_solutions_task_id" })
         {
-            switch (e.InnerException)
-            {
-                case PostgresException { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "solutions_task_id_fkey" }:
-                    return Problem(detail: $"Task with id {requestSolution.TaskId} does not exist.", statusCode: StatusCodes.Status400BadRequest, title: "Cannot create solution.");
-                case PostgresException { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "solutions_technology_id_fkey" }:
-                    return Problem(detail: $"Technology with id {requestSolution.TechnologyId} is not available for task with with id {requestSolution.TaskId}.", statusCode: StatusCodes.Status400BadRequest, title: "Cannot create solution.");
-                default:
-                    throw;
-            }
+            return Problem(detail: $"Task with id {requestSolution.TaskId} does not exist.", statusCode: StatusCodes.Status400BadRequest, title: "Cannot create solution.");
         }
         return (Response.Solution)databaseSolution;
     }
