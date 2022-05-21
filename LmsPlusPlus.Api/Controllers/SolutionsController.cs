@@ -10,27 +10,23 @@ public class SolutionsController : ControllerBase
 {
     readonly Infrastructure.ApplicationContext _context;
 
-    public SolutionsController(Infrastructure.ApplicationContext context)
-    {
-        _context = context;
-    }
+    public SolutionsController(Infrastructure.ApplicationContext context) => _context = context;
 
     [HttpGet, Authorize(Roles = "Author, Solver")]
     public async Task<IEnumerable<Response.Solution>> GetAll()
     {
-        Infrastructure.Role userRole = Utils.GetUserRoleFromClaims(User);
-        long userId = Utils.GetUserIdFromClaims(User);
-        return userRole switch
+        AuthorizationCredentials credentials = new(User);
+        return credentials.UserRole switch
         {
-            Infrastructure.Role.Author => await (from s in _context.Solutions
-                                                 join ts in _context.Tasks on s.TaskId equals ts.Id
-                                                 join tp in _context.Topics on ts.TopicId equals tp.Id
-                                                 where tp.Id == userId
-                                                 select (Response.Solution)s).ToArrayAsync(),
-            Infrastructure.Role.Solver => await (from s in _context.Solutions
-                                                 join u in _context.Users on s.SolverId equals u.Id
-                                                 where u.Id == userId
-                                                 select (Response.Solution)s).ToArrayAsync(),
+            Infrastructure.Role.Author => await (from solution in _context.Solutions
+                                                 join task in _context.Tasks on solution.TaskId equals task.Id
+                                                 join topic in _context.Topics on task.TopicId equals topic.Id
+                                                 where topic.Id == credentials.UserId
+                                                 select (Response.Solution)solution).ToArrayAsync(),
+            Infrastructure.Role.Solver => await (from solution in _context.Solutions
+                                                 join user in _context.Users on solution.SolverId equals user.Id
+                                                 where user.Id == credentials.UserId
+                                                 select (Response.Solution)solution).ToArrayAsync(),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
@@ -38,32 +34,32 @@ public class SolutionsController : ControllerBase
     [HttpPost, Authorize(Roles = "Solver")]
     public async Task<ActionResult<Response.Solution>> Create(Request.Solution requestSolution)
     {
-        long solverId = Utils.GetUserIdFromClaims(User);
-        bool solverCanViewTask = await (from ts in _context.Tasks
-                                        join tp in _context.Topics on ts.TopicId equals tp.Id
-                                        join g in _context.Groups.Include(g => g.Users) on tp.Id equals g.TopicId
-                                        where ts.Id == requestSolution.TaskId
-                                        select g.Users.Select(u => u.Id).Contains(solverId)).SingleOrDefaultAsync();
-        if (!solverCanViewTask)
+        AuthorizationCredentials credentials = new(User);
+        bool solverAssignedToTask = await (from task in _context.Tasks
+                                           join topic in _context.Topics on task.TopicId equals topic.Id
+                                           join @group in _context.Groups.Include(g => g.Users) on topic.Id equals @group.TopicId
+                                           where task.Id == requestSolution.TaskId
+                                           select @group.Users.Select(u => u.Id).Contains(credentials.UserId)).SingleOrDefaultAsync();
+        if (!solverAssignedToTask)
             return Forbid();
-        Infrastructure.VcsAccount account = await _context.VcsAccounts.FirstAsync(a => a.UserId == solverId);
-        Infrastructure.Repository databaseTemplateRepository = await _context.Technologies
-            .Include(t => t.TemplateRepository.VcsAccount)
-            .Where(t => t.Id == requestSolution.TechnologyId)
-            .Select(t => t.TemplateRepository)
-            .SingleAsync();
-        Vcs.IHostingClient hostingClient = Vcs.HostingClientFactory.CreateClient(account.HostingProviderId);
-        Vcs.Repository hostingTemplateRepository = new(databaseTemplateRepository.CloneUrl, websiteUrl: null, databaseTemplateRepository.VcsAccount.AccessToken);
-        Vcs.Repository repository = await hostingClient.CreateRepositoryFromTemplate(requestSolution.RepositoryName, account.AccessToken, hostingTemplateRepository);
+        Infrastructure.VcsAccount activeAccount = await (from a in _context.ActiveVcsAccounts.Include(a => a.VcsAccount)
+                                                         where a.UserId == credentials.UserId
+                                                         select a.VcsAccount).SingleAsync();
+        Infrastructure.Repository databaseTemplateRepository = await (from t in _context.Technologies.Include(t => t.TemplateRepository)
+                                                                      where t.Id == requestSolution.TechnologyId
+                                                                      select t.TemplateRepository).SingleAsync();
+        Vcs.IHostingClient hostingClient = Vcs.HostingClientFactory.CreateClient(activeAccount.HostingProviderId);
+        Vcs.Repository vcsTemplateRepository = new(databaseTemplateRepository.CloneUrl, websiteUrl: null, databaseTemplateRepository.VcsAccount.AccessToken);
+        Vcs.Repository vcsCreatedRepository = await hostingClient.CreateRepositoryFromTemplate(requestSolution.RepositoryName, activeAccount.AccessToken, vcsTemplateRepository);
         Infrastructure.Solution databaseSolution = new()
         {
             Repository = new Infrastructure.Repository
             {
-                CloneUrl = repository.CloneUrl,
-                WebsiteUrl = repository.WebsiteUrl,
-                VcsAccountId = account.Id
+                CloneUrl = vcsCreatedRepository.CloneUrl,
+                WebsiteUrl = vcsCreatedRepository.WebsiteUrl,
+                VcsAccountId = activeAccount.Id
             },
-            SolverId = solverId,
+            SolverId = credentials.UserId,
             TaskId = requestSolution.TaskId,
             TechnologyId = requestSolution.TechnologyId
         };
@@ -72,16 +68,14 @@ public class SolutionsController : ControllerBase
         {
             await _context.SaveChangesAsync();
         }
-        catch (DbUpdateException e) when (e.InnerException is PostgresException postgresException)
+        catch (DbUpdateException e)
         {
-            switch (postgresException)
+            switch (e.InnerException)
             {
-                case { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "solutions_task_id_fkey" }:
-                    ModelState.AddModelError(key: "TaskId", $"Task with id {requestSolution.TaskId} does not exist.");
-                    return ValidationProblem();
-                case { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "solutions_technology_id_fkey" }:
-                    ModelState.AddModelError(key: "TechnologyId", $"Technology with id {requestSolution.TechnologyId} does not exist.");
-                    return ValidationProblem();
+                case PostgresException { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "solutions_task_id_fkey" }:
+                    return Problem(detail: $"Task with id {requestSolution.TaskId} does not exist.", statusCode: StatusCodes.Status400BadRequest, title: "Cannot create solution.");
+                case PostgresException { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "solutions_technology_id_fkey" }:
+                    return Problem(detail: $"Technology with id {requestSolution.TechnologyId} is not available for task with with id {requestSolution.TaskId}.", statusCode: StatusCodes.Status400BadRequest, title: "Cannot create solution.");
                 default:
                     throw;
             }
@@ -92,12 +86,12 @@ public class SolutionsController : ControllerBase
     [HttpDelete("{solutionId:long}"), Authorize(Roles = "Solver")]
     public async Task<IActionResult> Delete(long solutionId)
     {
-        long userId = Utils.GetUserIdFromClaims(User);
+        AuthorizationCredentials credentials = new(User);
         Infrastructure.Solution? solution = await _context.Solutions.FindAsync(solutionId);
         if (solution is not null)
         {
-            if (solution.SolverId != userId)
-                return Unauthorized();
+            if (solution.SolverId != credentials.UserId)
+                return Forbid();
             _context.Remove(solution);
             await _context.SaveChangesAsync();
         }

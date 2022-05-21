@@ -275,7 +275,8 @@ public partial class InitialCreate : Migration
                     onDelete: ReferentialAction.Cascade);
             });
 
-        migrationBuilder.InsertData(table: "permissions",
+        migrationBuilder.InsertData(
+            table: "permissions",
             columns: new[] { "role", "can_create_solution", "can_create_task", "can_delete_solution", "can_delete_task", "can_update_task", "can_update_user", "can_update_vcs_configuration" },
             values: new object[,]
             {
@@ -433,7 +434,7 @@ public partial class InitialCreate : Migration
             $$
             BEGIN
                 IF NOT is_user_in_role(NEW.author_id, 'author') THEN
-                    RAISE 'author_id must be id of user with ''author'' role';
+                    RAISE 'author_id must be id of user with ''author'' role.';
                 END IF;
                 RETURN NEW;
             END;
@@ -461,7 +462,7 @@ public partial class InitialCreate : Migration
                         JOIN technologies ON m2m_tasks_technologies.technology_id = technologies.id
                 WHERE tasks.id = NEW.id;
                 IF technologies_count = 0 THEN
-                    RAISE 'Cannot create task. Task must have at least one technology';
+                    RAISE 'Cannot create task. Task must have at least one technology.';
                 END IF;
                 RETURN NEW;
             END;
@@ -559,7 +560,7 @@ public partial class InitialCreate : Migration
             $$
             BEGIN
                 IF NOT is_user_in_role(NEW.solver_id, 'solver') THEN
-                    RAISE 'solver_id must id of user with ''solver'' role';
+                    RAISE 'solver_id must be id of user with ''solver'' role.';
                 END IF;
                 RETURN NEW;
             END;
