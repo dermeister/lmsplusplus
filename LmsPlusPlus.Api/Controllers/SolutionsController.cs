@@ -49,8 +49,18 @@ public class SolutionsController : ControllerBase
                                                                       where t.Id == requestSolution.TechnologyId
                                                                       select t.TemplateRepository).SingleAsync();
         Vcs.IHostingClient hostingClient = Vcs.HostingClientFactory.CreateClient(activeAccount.HostingProviderId);
-        Vcs.Repository vcsTemplateRepository = new(databaseTemplateRepository.CloneUrl, websiteUrl: null, databaseTemplateRepository.VcsAccount.AccessToken);
-        Vcs.Repository vcsCreatedRepository = await hostingClient.CreateRepositoryFromTemplate(requestSolution.RepositoryName, activeAccount.AccessToken, vcsTemplateRepository);
+        Vcs.Repository vcsTemplateRepository = new(databaseTemplateRepository.CloneUrl, websiteUrl: null,
+            databaseTemplateRepository.VcsAccount.AccessToken);
+        Vcs.Repository vcsCreatedRepository;
+        try
+        {
+            vcsCreatedRepository = await hostingClient.CreateRepositoryFromTemplate(requestSolution.RepositoryName, activeAccount.AccessToken,
+                vcsTemplateRepository);
+        }
+        catch (Vcs.RepositoryCreationException)
+        {
+            return Problem(detail: "Unable to create repository.", statusCode: StatusCodes.Status400BadRequest, title: "Unable to create solution.");
+        }
         Infrastructure.Solution databaseSolution = new()
         {
             Repository = new Infrastructure.Repository
@@ -67,9 +77,14 @@ public class SolutionsController : ControllerBase
         {
             await _context.SaveChangesAsync();
         }
-        catch (DbUpdateException e) when (e.InnerException is PostgresException { SqlState: PostgresErrorCodes.ForeignKeyViolation, ConstraintName: "fk_solutions_task_id" })
+        catch (DbUpdateException e) when (e.InnerException is PostgresException
         {
-            return Problem(detail: $"Task with id {requestSolution.TaskId} does not exist.", statusCode: StatusCodes.Status400BadRequest, title: "Cannot create solution.");
+            SqlState: PostgresErrorCodes.ForeignKeyViolation,
+            ConstraintName: "fk_solutions_task_id"
+        })
+        {
+            return Problem(detail: $"Task with id {requestSolution.TaskId} does not exist.", statusCode: StatusCodes.Status400BadRequest,
+                title: "Cannot create solution.");
         }
         return (Response.Solution)databaseSolution;
     }

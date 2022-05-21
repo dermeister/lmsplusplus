@@ -23,9 +23,25 @@ class GitHubClient : IHostingClient
 
     public async Task<Repository> CreateRepositoryFromTemplate(string repositoryName, string accessToken, Repository templateRepository)
     {
-        Octokit.Repository gitHubRepository = await _client.Repository.Create(new NewRepository(repositoryName));
+        Octokit.Repository gitHubRepository;
+        try
+        {
+            gitHubRepository = await _client.Repository.Create(new NewRepository(repositoryName));
+        }
+        catch (ApiException e)
+        {
+            throw new RepositoryCreationException(e);
+        }
         Repository repository = new(gitHubRepository.CloneUrl, gitHubRepository.HtmlUrl, accessToken);
-        await templateRepository.CopyTo(repository);
+        try
+        {
+            await templateRepository.CopyTo(repository);
+        }
+        catch
+        {
+            await _client.Repository.Delete(gitHubRepository.Owner.Login, gitHubRepository.Name);
+            throw;
+        }
         return repository;
     }
 
