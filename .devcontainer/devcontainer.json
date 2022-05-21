@@ -1,0 +1,24 @@
+{
+	"name": "LMS++",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspace",
+	"settings": {},
+	"extensions": [
+		"ms-dotnettools.csharp",
+		"Github.copilot"
+	],
+	"forwardPorts": [
+		3000
+	],
+	"remoteEnv": {
+		"ASPNETCORE_Kestrel__Certificates__Default__Password": "development",
+		"ASPNETCORE_Kestrel__Certificates__Default__Path": "/home/vscode/.aspnet/https/certificate.pfx"
+	},
+	"remoteUser": "vscode",
+	"features": {
+		"docker-in-docker": "latest",
+		"azure-cli": "latest",
+		"powershell": "latest"
+	}
+}
