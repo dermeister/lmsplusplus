@@ -341,7 +341,6 @@ public class ApplicationContext : DbContext
             entity.Property(s => s.RepositoryId).HasColumnName("repository_id");
             entity.Property(s => s.SolverId).HasColumnName("solver_id");
             entity.Property(s => s.TaskId).HasColumnName("task_id");
-            entity.Property(s => s.TechnologyId).HasColumnName("technology_id");
             entity.HasOne(s => s.Repository)
                 .WithMany()
                 .HasForeignKey(s => s.RepositoryId)
@@ -357,11 +356,6 @@ public class ApplicationContext : DbContext
                 .HasForeignKey(s => s.TaskId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_solutions_task_id");
-            entity.HasOne(s => s.Technology)
-                .WithMany()
-                .HasForeignKey(s => s.TechnologyId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("fk_solutions_technology_id");
             entity.HasIndex(s => new { s.SolverId, s.TaskId }, name: "unq_solutions_solver_id_task_id").IsUnique();
         });
     }

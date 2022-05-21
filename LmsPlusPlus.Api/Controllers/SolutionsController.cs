@@ -61,7 +61,6 @@ public class SolutionsController : ControllerBase
             },
             SolverId = credentials.UserId,
             TaskId = requestSolution.TaskId,
-            TechnologyId = requestSolution.TechnologyId
         };
         _context.Add(databaseSolution);
         try

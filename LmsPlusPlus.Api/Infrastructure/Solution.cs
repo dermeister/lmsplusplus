@@ -9,6 +9,4 @@ public record Solution
     public User Solver { get; set; } = null!;
     public long TaskId { get; set; }
     public Task Task { get; set; } = null!;
-    public short TechnologyId { get; set; }
-    public Technology Technology { get; set; } = null!;
 }
