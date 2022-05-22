@@ -2,16 +2,20 @@ import React from "react"
 import ReactDOM from "react-dom"
 import { Transaction } from "reactronic"
 import "xterm/css/xterm.css"
-import { App } from "./components/App"
+import { Workbench } from "./components/Workbench"
 import "./components/index.scss"
 import * as models from "./models"
+import { DatabaseContext } from "./database"
 
-const model = Transaction.run(() => new models.App())
+const app = Transaction.run(() => new Workbench(new DatabaseContext()))
+ReactDOM.render(app.render(), document.getElementById("root"))
 
-ReactDOM.render(<App model={model} />, document.getElementById("root"))
+// const model = Transaction.run(() => new models.App())
 
-window.onbeforeunload = () => {
-    model.dispose()
-    ReactDOM.unmountComponentAtNode(document.getElementById("root") as HTMLElement)
-}
+// ReactDOM.render(<App model={model} />, document.getElementById("root"))
+
+// window.onbeforeunload = () => {
+//     model.dispose()
+//     ReactDOM.unmountComponentAtNode(document.getElementById("root") as HTMLElement)
+// }
 

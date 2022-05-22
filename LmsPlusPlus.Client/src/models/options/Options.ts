@@ -6,10 +6,10 @@ import { ObservableObject } from "../../ObservableObject"
 export class Options extends ObservableObject {
     @unobservable private readonly _database: DatabaseContext
 
-    get darkMode(): boolean { return this._database.preferences.darkMode }
-    get vcsProviders(): readonly domain.Provider[] { return this._database.vcsConfiguration.providers }
-    get vcsAccounts(): readonly domain.Account[] { return this._database.vcsConfiguration.accounts }
-    get vcsCurrentAccount(): domain.Account | null { return this._database.vcsConfiguration.currentAccount }
+    get darkMode(): boolean { return this._database?.preferences.darkMode ?? true }
+    get vcsProviders(): readonly domain.Provider[] { return this._database?.vcsConfiguration.providers ?? [] }
+    get vcsAccounts(): readonly domain.Account[] { return this._database?.vcsConfiguration.accounts ?? [] }
+    get vcsCurrentAccount(): domain.Account | null { return this._database?.vcsConfiguration.currentAccount }
 
     constructor(database: DatabaseContext) {
         super()
@@ -29,11 +29,11 @@ export class Options extends ObservableObject {
 
     @transaction
     async deleteAccount(account: domain.Account): Promise<void> {
-        await this._database.deleteVcsAccount(account)
+        throw new Error("Not implemented")
     }
 
     @transaction
     async addAccount(provider: domain.Provider): Promise<void> {
-        await this._database.createVcsAccount(provider)
+        throw new Error("Not implemented")
     }
 }

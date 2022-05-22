@@ -1,16 +1,44 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "parserOptions": { "project": "./tsconfig.json" },
-  "plugins": ["@typescript-eslint"],
-  "ignorePatterns": ["vite.config.ts"],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "ignorePatterns": [
+    "vite.config.ts"
+  ],
   "rules": {
-    "eol-last": ["error", "always"],
-    "arrow-parens": ["error", "as-needed"],
-    "no-multiple-empty-lines": ["error", { "max": 1 }],
-    "max-len": ["error", { "code": 130 }],
-    "@typescript-eslint/semi": ["error", "never"],
-    "@typescript-eslint/quotes": ["error", "double"],
+    "eol-last": [
+      "error",
+      "always"
+    ],
+    "arrow-parens": [
+      "error",
+      "as-needed"
+    ],
+    "no-multiple-empty-lines": [
+      "error",
+      {
+        "max": 1
+      }
+    ],
+    "max-len": [
+      "error",
+      {
+        "code": 130
+      }
+    ],
+    "@typescript-eslint/semi": [
+      "error",
+      "never"
+    ],
+    "@typescript-eslint/quotes": [
+      "error",
+      "double"
+    ],
     "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/explicit-module-boundary-types": "error",
     "@typescript-eslint/prefer-readonly": "error",
@@ -27,11 +55,9 @@
           "private-static-field",
           "private-abstract-field",
           "private-instance-field",
-
           "public-constructor",
           "protected-constructor",
           "private-constructor",
-
           "public-static-method",
           "public-abstract-method",
           "public-instance-method",

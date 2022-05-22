@@ -1,7 +1,6 @@
-import { Screen } from "./Screen"
 import { transaction } from "reactronic"
 
-export class SignInScreen extends Screen {
+export class SignInScreen {
     private _login = ""
     private _password = ""
 

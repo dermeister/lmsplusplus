@@ -1,0 +1,56 @@
+@use "../library";
+
+.screen {
+    @include library.full-size;
+
+    display: grid;
+    grid-template-areas: "switch side-panel content";
+    grid-template-columns: 74px auto 1fr;
+}
+
+.view-switch {
+    @include library.shadow("right");
+
+    grid-area: switch;
+    padding: 14px;
+    z-index: 100;
+}
+
+.view-switch-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 14px;
+    width: 46px;
+    height: 46px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.view-switch-button-icon {
+    width: 30px;
+    height: 30px;
+}
+
+.side-panel {
+    grid-area: side-panel;
+    z-index: 99;
+}
+
+.content {
+    grid-area: content;
+    z-index: 98;
+
+    &>div {
+        @include library.full-size;
+    }
+}
+
+.content-hidden {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+}
