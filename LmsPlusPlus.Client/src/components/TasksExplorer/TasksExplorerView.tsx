@@ -2,11 +2,10 @@ import React from "react"
 import * as domain from "../../domain"
 import * as models from "../../models"
 import { autorender } from "../autorender"
-import { ContextMenu } from "../ContextMenu"
+import { ContextMenuView } from "../ContextMenu"
 import { Explorer } from "../Explorer"
 import { ITasksService } from "../ITasksService"
 import { usePermissions } from "../permissions"
-import { TasksViewModel } from "../TasksView/TasksView.model"
 import { TasksExplorer, TopicNode } from "./TasksExplorer"
 
 interface TasksExplorerViewProps {
@@ -27,11 +26,11 @@ function topics(model: ITasksService, topics: readonly TopicNode[], permissions:
         let contextMenu
         if (permissions.canCreateTask)
             contextMenu = (
-                <ContextMenu model={topic.contextMenu}>
-                    <ContextMenu.Button variant="primary" onClick={() => onCreateTask(model, topic)}>
+                <ContextMenuView model={topic.contextMenu}>
+                    <ContextMenuView.Button variant="primary" onClick={() => onCreateTask(model, topic)}>
                         New Task
-                    </ContextMenu.Button>
-                </ContextMenu>
+                    </ContextMenuView.Button>
+                </ContextMenuView>
             )
         return (
             <li key={topic.key}>
@@ -54,51 +53,51 @@ function tasks(model: ITasksService,
         let contextMenuBody
         if (permissions.canUpdateTask)
             contextMenuBody = (
-                <ContextMenu.Button variant="primary" onClick={() => onUpdateTask(model, task)}>
+                <ContextMenuView.Button variant="primary" onClick={() => onUpdateTask(model, task)}>
                     Edit Task
-                </ContextMenu.Button>
+                </ContextMenuView.Button>
             )
         if (permissions.canDeleteTask)
             contextMenuBody = (
                 <>
                     {contextMenuBody}
-                    <ContextMenu.Button variant="danger" onClick={() => onDeleteTask(model, task)}>
+                    <ContextMenuView.Button variant="danger" onClick={() => onDeleteTask(model, task)}>
                         Delete Task
-                    </ContextMenu.Button>
+                    </ContextMenuView.Button>
                 </>
             )
         if (permissions.canCreateSolution && task.item.solutions.length === 0)
             contextMenuBody = (
                 <>
                     {contextMenuBody}
-                    <ContextMenu.Button variant="primary" onClick={() => onCreateSolution(model, task)}>
+                    <ContextMenuView.Button variant="primary" onClick={() => onCreateSolution(model, task)}>
                         New Solution
-                    </ContextMenu.Button>
+                    </ContextMenuView.Button>
                 </>
             )
         if (task.item.solutions.length === 1) {
             contextMenuBody = (
                 <>
                     {contextMenuBody}
-                    <ContextMenu.Button variant="primary" onClick={() => onRunSolution(model, task)}>
+                    <ContextMenuView.Button variant="primary" onClick={() => onRunSolution(model, task)}>
                         Run solution
-                    </ContextMenu.Button>
+                    </ContextMenuView.Button>
                 </>
             )
             if (permissions.canDeleteSolution)
                 contextMenuBody = (
                     <>
                         {contextMenuBody}
-                        <ContextMenu.Button variant="danger" onClick={() => onDeleteSolution(model, task)}>
+                        <ContextMenuView.Button variant="danger" onClick={() => onDeleteSolution(model, task)}>
                             Delete Solution
-                        </ContextMenu.Button>
+                        </ContextMenuView.Button>
                     </>
                 )
         }
         const contextMenu = (
-            <ContextMenu model={task.contextMenu}>
+            <ContextMenuView model={task.contextMenu}>
                 {contextMenuBody}
-            </ContextMenu>
+            </ContextMenuView>
         )
         return <Explorer.Item key={task.key} item={task} contextMenu={contextMenu}>{task.title}</Explorer.Item>
     })

@@ -51,6 +51,6 @@ export class SolutionEditorView extends View {
 
     @transaction
     cancelSolutionEditing(): void {
-        this._viewGroup.closeView()
+        this._viewGroup.returnToPreviousView()
     }
 }

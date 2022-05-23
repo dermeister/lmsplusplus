@@ -1,16 +1,22 @@
 import { ContextMenu } from "./ContextMenu"
 
-export class WindowManager {
+export interface IContextMenuService {
+    open(contextMenu: ContextMenu, x: number, y: number): void
+
+    close(): void
+}
+
+export class ContextMenuServiceModel implements IContextMenuService {
     private _openedContextMenu: ContextMenu | null = null
 
-    openContextMenu(contextMenu: ContextMenu, x: number, y: number): void {
+    open(contextMenu: ContextMenu, x: number, y: number): void {
         if (this._openedContextMenu)
-            this.closeContextMenu()
+            this.close()
         contextMenu.open(x, y)
         this._openedContextMenu = contextMenu
     }
 
-    closeContextMenu(): void {
+    close(): void {
         this._openedContextMenu?.close()
         this._openedContextMenu = null
     }

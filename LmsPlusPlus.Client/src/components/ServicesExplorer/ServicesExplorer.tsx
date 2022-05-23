@@ -6,7 +6,7 @@ export class ServicesExplorer extends Explorer<Service, ItemNode<Service>> {
     @unobservable private readonly _services: Ref<readonly Service[]>
 
     constructor(services: Ref<readonly Service[]>) {
-        super(ServicesExplorer.createChildren(services.value))
+        super(ServicesExplorer.createChildren(services.value), null!)
         this._services = services
     }
 

@@ -66,7 +66,7 @@ export class SolutionRunner extends View {
     }
 
     stopSolution(): void {
-        this._viewGroup.closeView()
+        this._viewGroup.returnToPreviousView()
         this._connection?.stop()
     }
 

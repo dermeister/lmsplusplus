@@ -2,7 +2,7 @@ import React from "react"
 import * as models from "../../models"
 import { autorender } from "../autorender"
 import { Explorer } from "../Explorer"
-import { ContextMenu, RadioItem } from "../ContextMenu"
+import { ContextMenuView, RadioItem } from "../ContextMenu"
 import { ServicesExplorer } from "./ServicesExplorer"
 import { Service } from "../SolutionRunnerView/service/Service"
 import { ItemNode } from "../../models"
@@ -30,13 +30,13 @@ function contextMenu(service: models.ItemNode<Service>): JSX.Element {
     if (service.item.virtualPorts.length == 0)
         return <></>
     return (
-        <ContextMenu model={service.contextMenu}>
-            <ContextMenu.Submenu title="View">
-                <ContextMenu.RadioGroup items={createItems(service)}
+        <ContextMenuView model={service.contextMenu}>
+            <ContextMenuView.Submenu title="View">
+                <ContextMenuView.RadioGroup items={createItems(service)}
                     onValueChange={v => onServiceViewChange(service, v)}
                     selectedValue={service.item.serviceView} />
-            </ContextMenu.Submenu>
-        </ContextMenu>
+            </ContextMenuView.Submenu>
+        </ContextMenuView>
     )
 }
 

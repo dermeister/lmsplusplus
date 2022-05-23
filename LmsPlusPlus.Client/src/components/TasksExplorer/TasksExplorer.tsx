@@ -2,6 +2,7 @@ import React from "react"
 import { reaction, Ref, Transaction, unobservable } from "reactronic"
 import * as domain from "../../domain"
 import { Explorer, GroupNode, ItemNode } from "../../models"
+import { IContextMenuService } from "../ContextMenuService"
 import { ITasksService } from "../ITasksService"
 import { TasksViewModel } from "../TasksView/TasksView.model"
 import { TasksExplorerView } from "./TasksExplorerView"
@@ -27,8 +28,8 @@ export class TasksExplorer extends Explorer<domain.Task, TopicNode> {
     @unobservable private readonly _tasksService: ITasksService
     @unobservable private readonly _topics: Ref<readonly domain.Topic[]>
 
-    constructor(topics: Ref<readonly domain.Topic[]>, tasksSerivce: ITasksService) {
-        super(TasksExplorer.createChildren(topics.value))
+    constructor(topics: Ref<readonly domain.Topic[]>, tasksSerivce: ITasksService, contextMenuService: IContextMenuService) {
+        super(TasksExplorer.createChildren(topics.value), contextMenuService)
         this._tasksService = tasksSerivce
         this._topics = topics
     }

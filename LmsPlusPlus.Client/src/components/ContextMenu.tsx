@@ -4,15 +4,16 @@ import * as models from "../models"
 import { autorender } from "./autorender"
 import { Button } from "./Button"
 import styles from "./ContextMenu.module.scss"
+import { ContextMenu } from "./ContextMenuService"
 import { Overlay } from "./Overlay"
 import { combineClassNames, maybeValue } from "./utils"
 
 interface ContextMenuProps {
-    model: models.ContextMenu
+    model: ContextMenu
     children: React.ReactNode
 }
 
-export function ContextMenu({ model, children }: ContextMenuProps): JSX.Element {
+export function ContextMenuView({ model, children }: ContextMenuProps): JSX.Element {
     function positionMenu(menu: HTMLElement | null): void {
         if (menu) {
             const offset = 10
@@ -55,12 +56,12 @@ interface ContextMenuButtonProps {
     onClick?(): void
 }
 
-ContextMenu.Button = function ContextMenuButton({ children, onClick, variant, className }: ContextMenuButtonProps): JSX.Element {
+ContextMenuView.Button = function ContextMenuButton({ children, onClick, variant, className }: ContextMenuButtonProps): JSX.Element {
     return (
         <Button variant={variant}
-                onClick={onClick}
-                tabIndex={-1}
-                className={combineClassNames(variants[variant], className)}>
+            onClick={onClick}
+            tabIndex={-1}
+            className={combineClassNames(variants[variant], className)}>
             {children}
         </Button>
     )
@@ -76,7 +77,7 @@ interface ContextMenuSubmenuProps {
     title: string
 }
 
-ContextMenu.Submenu = function ContextMenuSubmenu({ children, title }: ContextMenuSubmenuProps): JSX.Element {
+ContextMenuView.Submenu = function ContextMenuSubmenu({ children, title }: ContextMenuSubmenuProps): JSX.Element {
     const [isOpened, setIsOpened] = useState(false)
 
     function items(): JSX.Element {
@@ -91,12 +92,12 @@ ContextMenu.Submenu = function ContextMenuSubmenu({ children, title }: ContextMe
 
     return (
         <div onMouseOver={() => setIsOpened(true)}
-             onMouseLeave={() => setIsOpened(false)}
-             className={styles.submenuContainer}>
-            <ContextMenu.Button variant="primary"
-                                className={combineClassNames(styles.submenuButton, maybeValue(styles.focused, isOpened))}>
+            onMouseLeave={() => setIsOpened(false)}
+            className={styles.submenuContainer}>
+            <ContextMenuView.Button variant="primary"
+                className={combineClassNames(styles.submenuButton, maybeValue(styles.focused, isOpened))}>
                 {title}
-            </ContextMenu.Button>
+            </ContextMenuView.Button>
             {items()}
         </div>
     )
@@ -114,7 +115,7 @@ interface ContextMenuRadioGroup<T> {
     onValueChange?(active: T): void
 }
 
-ContextMenu.RadioGroup = function ContextMenuRadioGroup<T>(props: ContextMenuRadioGroup<T>): JSX.Element {
+ContextMenuView.RadioGroup = function ContextMenuRadioGroup<T>(props: ContextMenuRadioGroup<T>): JSX.Element {
     const { items, selectedValue, onValueChange } = props
 
     function onClick(i: T): void {
@@ -129,12 +130,12 @@ ContextMenu.RadioGroup = function ContextMenuRadioGroup<T>(props: ContextMenuRad
     return (
         <div>
             {items.map(i => (
-                <ContextMenu.Button key={i.title}
-                                    variant="primary"
-                                    onClick={() => onClick(i.value)}
-                                    className={maybeValue(styles.radioButtonActive, isActive(i.value))}>
+                <ContextMenuView.Button key={i.title}
+                    variant="primary"
+                    onClick={() => onClick(i.value)}
+                    className={maybeValue(styles.radioButtonActive, isActive(i.value))}>
                     {i.title}
-                </ContextMenu.Button>
+                </ContextMenuView.Button>
             ))}
         </div>
     )

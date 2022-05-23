@@ -13,7 +13,7 @@ export class OptionCategoriesExplorerModel extends Explorer<OptionCategory, Item
     @unobservable private readonly _permissions: Ref<domain.Permissions>
 
     constructor(permissions: Ref<domain.Permissions>) {
-        super(OptionCategoriesExplorerModel.createChildren(permissions.value))
+        super(OptionCategoriesExplorerModel.createChildren(permissions.value), null!)
         this._permissions = permissions
         this.setSelectedNode(this.children[0])
     }

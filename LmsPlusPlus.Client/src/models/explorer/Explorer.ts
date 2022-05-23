@@ -1,8 +1,11 @@
-import { transaction, Transaction } from "reactronic"
+import { transaction, Transaction, unobservable } from "reactronic"
+import { IContextMenuService } from "../../components/ContextMenuService"
 import { Node, GroupNode, ItemNode } from "./Node"
 import { NodeVisitor } from "./NodeVisitor"
 
 export abstract class Explorer<TItem, TChild extends Node = Node> extends NodeVisitor {
+    @unobservable readonly contextMenuService: IContextMenuService
+
     private _oldNodes = new Map<string, Node>()
     private _newNodes = new Map<string, Node>()
     private _selectedNode: ItemNode<TItem> | null = null
@@ -11,8 +14,9 @@ export abstract class Explorer<TItem, TChild extends Node = Node> extends NodeVi
     get children(): readonly TChild[] { return this._children }
     get selectedNode(): ItemNode<TItem> | null { return this._selectedNode }
 
-    protected constructor(children: readonly TChild[]) {
+    protected constructor(children: readonly TChild[], contextMenuService: IContextMenuService) {
         super()
+        this.contextMenuService = contextMenuService
         this._children = this.reconcileChildren(children)
     }
 

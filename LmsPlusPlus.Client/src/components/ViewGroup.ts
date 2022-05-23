@@ -1,4 +1,4 @@
-import { ObservableObject, transaction, unobservable } from "reactronic"
+import { ObservableObject, Transaction, transaction, unobservable } from "reactronic"
 import { View } from "./View"
 
 export abstract class ViewGroup extends ObservableObject {
@@ -27,9 +27,9 @@ export abstract class ViewGroup extends ObservableObject {
   }
 
   @transaction
-  closeView(): View {
-    if (this._views.length === 1)
-      throw new Error("Cannot close the only view.")
+  returnToPreviousView(): View {
+    if (this._views.length <= 1)
+      throw new Error("Cannot close view.")
     const views = this._views.toMutable()
     const closedView = views.pop() as View
     this._currentView = views[views.length - 1]

@@ -1,23 +1,23 @@
 import React from "react"
 import { cached, reaction, Ref, transaction, unobservable } from "reactronic"
 import { DatabaseContext } from "../../database"
-import { WindowManager } from "../../models"
 import { ObservableObject } from "../../ObservableObject"
 import { IAuthService } from "../AuthService"
+import { ContextMenuService } from "../ContextMenuService"
 import { OptionsService } from "../Options"
 import { OptionsViewGroup } from "../OptionsViewGroup"
 import { SidePanel } from "../SidePanel"
 import { TasksViewGroup } from "../TasksViewGroup"
 import { ViewGroup } from "../ViewGroup"
-import { WorkbenchView } from "./Workbench.view"
+import { WorkbenchView } from "./WorkbenchScreen.view"
 
 export class WorkbenchScreenModel extends ObservableObject {
-    @unobservable readonly windowManager = new WindowManager()
     @unobservable readonly sidePanel: SidePanel
     @unobservable readonly context: DatabaseContext
     @unobservable private readonly _tasksViewGroup: TasksViewGroup
     @unobservable private readonly _optionsViewGroup: OptionsViewGroup
     @unobservable private readonly _optionsService: OptionsService
+    @unobservable private readonly _contextMenuService: ContextMenuService
     private _currentViewGroup: ViewGroup
     private _sidePanelTitle: string
     private _sidePanelIsPulsing: boolean
@@ -28,8 +28,9 @@ export class WorkbenchScreenModel extends ObservableObject {
     constructor(context: DatabaseContext, authService: IAuthService) {
         super()
         this.context = context
+        this._contextMenuService = new ContextMenuService()
         this._optionsService = new OptionsService(this.context)
-        this._tasksViewGroup = new TasksViewGroup("tasks-view-group", context)
+        this._tasksViewGroup = new TasksViewGroup("tasks-view-group", context, this._contextMenuService)
         this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, context, this._optionsService)
         this._currentViewGroup = this._tasksViewGroup
         this._sidePanelTitle = this._currentViewGroup.currentView.title

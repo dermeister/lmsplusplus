@@ -2,8 +2,7 @@ import React from "react"
 import * as models from "../../models"
 import { autorender } from "../autorender"
 import { combineClassNames, maybeValue } from "../utils"
-import { useContextMenu } from "../WindowManager"
-import { buildNodeClassName, useOffset } from "./common"
+import { buildNodeClassName, useExplorerModel, useOffset } from "./common"
 import styles from "./Explorer.module.scss"
 
 interface GroupProps {
@@ -14,7 +13,8 @@ interface GroupProps {
 
 export function Group({ group, children, contextMenu }: GroupProps): JSX.Element {
     const offset = useOffset()
-    const onContextMenu = useContextMenu(group.contextMenu)
+    const model = useExplorerModel()
+    // const onContextMenu = useContextMenu(group.contextMenu)
 
     function onClick(e: React.MouseEvent): void {
         if (e.target === e.currentTarget)
@@ -26,9 +26,12 @@ export function Group({ group, children, contextMenu }: GroupProps): JSX.Element
             maybeValue(styles.opened, group.isOpened))
         return (
             <p onClick={onClick}
-               onContextMenu={contextMenu ? onContextMenu : undefined}
-               className={className}
-               style={{ paddingLeft: offset }}>
+                onContextMenu={(e) => {
+                    e.preventDefault()
+                    model.contextMenuService.open(group.contextMenu, e.clientX, e.clientY)
+                }}
+                className={className}
+                style={{ paddingLeft: offset }}>
                 {children}
                 {contextMenu}
             </p>

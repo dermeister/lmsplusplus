@@ -1,6 +1,6 @@
 import { transaction, Transaction, unobservable } from "reactronic"
+import { ContextMenu } from "../../components/ContextMenuService"
 import { ObservableObject } from "../../ObservableObject"
-import { ContextMenu } from "../ContextMenu"
 import { NodeVisitor } from "./NodeVisitor"
 
 export abstract class Node extends ObservableObject {

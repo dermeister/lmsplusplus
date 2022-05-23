@@ -13,6 +13,7 @@ import { ITasksService } from "../ITasksService"
 import { TaskEditorView } from "../TaskEditorView/TaskEditor"
 import { SolutionEditorView } from "../SolutionEditorView/SolutionEditor"
 import { SolutionRunner } from "../SolutionRunnerView/SolutionRunner"
+import { IContextMenuService } from "../ContextMenuService"
 
 export class TasksViewModel extends View implements ITasksService {
     @unobservable readonly tasksExplorer: TasksExplorer
@@ -29,11 +30,11 @@ export class TasksViewModel extends View implements ITasksService {
     }
     private get topics(): readonly domain.Topic[] { return this._context.courses }
 
-    constructor(id: string, context: DatabaseContext, viewGroup: ViewGroup) {
+    constructor(id: string, context: DatabaseContext, viewGroup: ViewGroup, contextMenuService: IContextMenuService) {
         super(id)
         this._context = context
         this._viewGroup = viewGroup
-        this.tasksExplorer = new TasksExplorer(new Ref(this, "topics"), this)
+        this.tasksExplorer = new TasksExplorer(new Ref(this, "topics"), this, contextMenuService)
     }
 
     override renderSidePanelContent(): JSX.Element {

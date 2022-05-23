@@ -66,6 +66,6 @@ export class TaskEditorView extends View {
 
     @transaction
     cancelTaskEditing(): void {
-        this._viewGroup.closeView()
+        this._viewGroup.returnToPreviousView()
     }
 }
