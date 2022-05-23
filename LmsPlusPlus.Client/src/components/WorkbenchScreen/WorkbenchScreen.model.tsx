@@ -4,6 +4,7 @@ import { DatabaseContext } from "../../database"
 import { WindowManager } from "../../models"
 import { ObservableObject } from "../../ObservableObject"
 import { IAuthService } from "../AuthService"
+import { OptionsService } from "../Options"
 import { OptionsViewGroup } from "../OptionsViewGroup"
 import { SidePanel } from "../SidePanel"
 import { TasksViewGroup } from "../TasksViewGroup"
@@ -16,6 +17,7 @@ export class WorkbenchScreenModel extends ObservableObject {
     @unobservable readonly context: DatabaseContext
     @unobservable private readonly _tasksViewGroup: TasksViewGroup
     @unobservable private readonly _optionsViewGroup: OptionsViewGroup
+    @unobservable private readonly _optionsService: OptionsService
     private _currentViewGroup: ViewGroup
     private _sidePanelTitle: string
     private _sidePanelIsPulsing: boolean
@@ -26,8 +28,9 @@ export class WorkbenchScreenModel extends ObservableObject {
     constructor(context: DatabaseContext, authService: IAuthService) {
         super()
         this.context = context
+        this._optionsService = new OptionsService(this.context)
         this._tasksViewGroup = new TasksViewGroup("tasks-view-group", context)
-        this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService)
+        this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, context, this._optionsService)
         this._currentViewGroup = this._tasksViewGroup
         this._sidePanelTitle = this._currentViewGroup.currentView.title
         this._sidePanelIsPulsing = this._currentViewGroup.currentView.isPulsing

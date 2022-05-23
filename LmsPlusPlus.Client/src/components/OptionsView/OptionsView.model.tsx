@@ -1,21 +1,19 @@
 import React from "react"
 import { reaction, Ref, unobservable } from "reactronic"
-import * as domain from "../../domain"
-import { Options } from "../../models"
+import { DatabaseContext } from "../../database"
 import { IAuthService } from "../AuthService"
 import { IOptionCategory } from "../IOptionCategory"
 import { OptionCategoriesExplorer } from "../OptionCategoriesExplorer"
 import { OptionCategory } from "../OptionCategoriesExplorer/OptionCategoriesExplorer.model"
+import { IOptionsService } from "../Options"
 import { PreferencesOptionCategory } from "../PreferencesOptionCategory/PreferencesOptionCategory"
 import { VcsOptionCategory } from "../VcsOptionCategory/VcsOptionCategory"
 import { View } from "../View"
 import { MainContent, SidePanelContent } from "./OptionsView.view"
 
 export class OptionsViewModel extends View {
-    private permissions = new domain.Permissions(1, true, true, true, true, true, true, true)
-    @unobservable readonly categoriesExplorer = new OptionCategoriesExplorer(new Ref(this, "permissions"))
+    @unobservable readonly categoriesExplorer: OptionCategoriesExplorer
     @unobservable readonly authService: IAuthService
-    private readonly options: Options = new Options(null!)
     private readonly _preferencesOptionCategory: PreferencesOptionCategory
     private readonly _vcsOptionCategory: VcsOptionCategory
     private _currentOptionCategory: IOptionCategory
@@ -23,10 +21,11 @@ export class OptionsViewModel extends View {
     override get title(): string { return "Options" }
     get currentOptionCategory(): IOptionCategory { return this._currentOptionCategory }
 
-    constructor(id: string, authService: IAuthService) {
+    constructor(id: string, authService: IAuthService, context: DatabaseContext, optionsService: IOptionsService) {
         super(id)
-        this._preferencesOptionCategory = new PreferencesOptionCategory(this.options)
-        this._vcsOptionCategory = new VcsOptionCategory(this.options)
+        this.categoriesExplorer = new OptionCategoriesExplorer(new Ref(context, "permissions"))
+        this._preferencesOptionCategory = new PreferencesOptionCategory(optionsService)
+        this._vcsOptionCategory = new VcsOptionCategory(optionsService)
         this._currentOptionCategory = this._preferencesOptionCategory
         this.authService = authService
     }
@@ -45,12 +44,12 @@ export class OptionsViewModel extends View {
         switch (item) {
             case OptionCategory.Preferences:
                 this._currentOptionCategory = this._preferencesOptionCategory
-                break;
+                break
             case OptionCategory.Vcs:
                 this._currentOptionCategory = this._vcsOptionCategory
-                break;
+                break
             default:
-                break;
+                break
         }
     }
 }

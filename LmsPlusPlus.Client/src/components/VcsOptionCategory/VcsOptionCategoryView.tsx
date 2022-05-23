@@ -1,11 +1,9 @@
 import React from "react"
-import { VcsAccountRegisteringModal } from "../../database/VcsAccountRegisteringModal"
 import * as domain from "../../domain"
-import * as models from "../../models"
 import { autorender } from "../autorender"
 import { Dropdown, DropdownItem } from "../Dropdown"
 import { Field } from "../Field"
-import { IOptionsService } from "../IOptionsService"
+import { IOptionsService } from "../Options"
 import styles from "./Vcs.module.scss"
 import { VcsOptionCategory } from "./VcsOptionCategory"
 
