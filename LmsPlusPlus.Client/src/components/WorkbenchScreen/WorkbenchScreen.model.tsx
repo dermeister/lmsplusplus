@@ -1,18 +1,16 @@
-import React from "react";
-import { cached, ObservableObject, reaction, Ref, transaction, unobservable } from "reactronic";
-import { WorkbenchView } from "./Workbench.view";
-import { SidePanel } from "../SidePanel";
-import { View } from "../View";
-import { TasksView } from "../TasksView";
-import { OptionsView } from "../OptionsView";
-import { IViewService } from "../IViewService";
-import { DatabaseContext } from "../../database";
-import { ViewGroup } from "../ViewGroup";
-import { TasksViewGroup } from "../TasksViewGroup";
-import { OptionsViewGroup } from "../OptionsViewGroup";
-import { WindowManager } from "../../models";
+import React from "react"
+import { cached, reaction, Ref, transaction, unobservable } from "reactronic"
+import { DatabaseContext } from "../../database"
+import { WindowManager } from "../../models"
+import { ObservableObject } from "../../ObservableObject"
+import { IAuthService } from "../AuthService"
+import { OptionsViewGroup } from "../OptionsViewGroup"
+import { SidePanel } from "../SidePanel"
+import { TasksViewGroup } from "../TasksViewGroup"
+import { ViewGroup } from "../ViewGroup"
+import { WorkbenchView } from "./Workbench.view"
 
-export class WorkbenchModel extends ObservableObject {
+export class WorkbenchScreenModel extends ObservableObject {
     @unobservable readonly windowManager = new WindowManager()
     @unobservable readonly sidePanel: SidePanel
     @unobservable readonly context: DatabaseContext
@@ -25,11 +23,11 @@ export class WorkbenchModel extends ObservableObject {
     get currentViewGroup(): ViewGroup { return this._currentViewGroup }
     @cached get viewGroups(): readonly ViewGroup[] { return [this._tasksViewGroup, this._optionsViewGroup] }
 
-    constructor(context: DatabaseContext) {
+    constructor(context: DatabaseContext, authService: IAuthService) {
         super()
         this.context = context
         this._tasksViewGroup = new TasksViewGroup("tasks-view-group", context)
-        this._optionsViewGroup = new OptionsViewGroup("options-view-group")
+        this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService)
         this._currentViewGroup = this._tasksViewGroup
         this._sidePanelTitle = this._currentViewGroup.currentView.title
         this._sidePanelIsPulsing = this._currentViewGroup.currentView.isPulsing
@@ -38,14 +36,15 @@ export class WorkbenchModel extends ObservableObject {
         this.sidePanel = new SidePanel(titleRef, isPulsingRef)
     }
 
+    render(): JSX.Element {
+        return <WorkbenchView model={this} />
+    }
+
     @transaction
     showViewGroup(viewGroup: ViewGroup): void {
         this._currentViewGroup = viewGroup
     }
 
-    render(): JSX.Element {
-        return <WorkbenchView model={this} />
-    }
 
     @reaction
     private updateSidePanelRefs(): void {

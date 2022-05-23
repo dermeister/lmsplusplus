@@ -1,15 +1,14 @@
-import React from "react";
-import { autorender } from "../autorender";
-import { Button } from "../Button";
-import { View } from "../View";
-import { WorkbenchModel } from "./Workbench.model";
-import styles from "./Workbench.module.scss"
+import React from "react"
+import { autorender } from "../autorender"
+import { Button } from "../Button"
 import { Permissions } from "../permissions"
-import { WindowManager } from "../WindowManager";
-import { ViewGroup } from "../ViewGroup";
+import { ViewGroup } from "../ViewGroup"
+import { WindowManager } from "../WindowManager"
+import styles from "./Workbench.module.scss"
+import { WorkbenchScreenModel } from "./WorkbenchScreen.model"
 
 interface AppViewProps {
-    model: WorkbenchModel
+    model: WorkbenchScreenModel
 }
 
 export function WorkbenchView({ model }: AppViewProps): JSX.Element {
@@ -28,7 +27,7 @@ export function WorkbenchView({ model }: AppViewProps): JSX.Element {
     })
 }
 
-function renderViewSwitch(model: WorkbenchModel): JSX.Element[] {
+function renderViewSwitch(model: WorkbenchScreenModel): JSX.Element[] {
     return model.viewGroups.map(v => {
         const variant = model.currentViewGroup === v ? "primary" : "secondary"
         return (
@@ -42,7 +41,7 @@ function renderViewSwitch(model: WorkbenchModel): JSX.Element[] {
     })
 }
 
-function onViewSwitchButtonClick(model: WorkbenchModel, viewGroup: ViewGroup): void {
+function onViewSwitchButtonClick(model: WorkbenchScreenModel, viewGroup: ViewGroup): void {
     if (model.currentViewGroup !== viewGroup) {
         model.showViewGroup(viewGroup)
         model.sidePanel.open()

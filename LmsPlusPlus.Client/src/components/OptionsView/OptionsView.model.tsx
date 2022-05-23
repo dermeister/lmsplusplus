@@ -1,20 +1,20 @@
 import React from "react"
-import { View } from "../View"
-import viewSwitchButtonIcon from "../../assets/cog.svg"
-import { MainContent, SidePanelContent } from "./OptionsView.view"
 import { reaction, Ref, unobservable } from "reactronic"
-import { OptionCategoriesExplorer } from "../OptionCategoriesExplorer"
 import * as domain from "../../domain"
 import { Options } from "../../models"
-import { PreferencesOptionCategory } from "../PreferencesOptionCategory/PreferencesOptionCategory"
-import { IViewService } from "../IViewService"
-import { VcsOptionCategory } from "../VcsOptionCategory/VcsOptionCategory"
+import { IAuthService } from "../AuthService"
 import { IOptionCategory } from "../IOptionCategory"
+import { OptionCategoriesExplorer } from "../OptionCategoriesExplorer"
 import { OptionCategory } from "../OptionCategoriesExplorer/OptionCategoriesExplorer.model"
+import { PreferencesOptionCategory } from "../PreferencesOptionCategory/PreferencesOptionCategory"
+import { VcsOptionCategory } from "../VcsOptionCategory/VcsOptionCategory"
+import { View } from "../View"
+import { MainContent, SidePanelContent } from "./OptionsView.view"
 
 export class OptionsViewModel extends View {
     private permissions = new domain.Permissions(1, true, true, true, true, true, true, true)
     @unobservable readonly categoriesExplorer = new OptionCategoriesExplorer(new Ref(this, "permissions"))
+    @unobservable readonly authService: IAuthService
     private readonly options: Options = new Options(null!)
     private readonly _preferencesOptionCategory: PreferencesOptionCategory
     private readonly _vcsOptionCategory: VcsOptionCategory
@@ -23,11 +23,12 @@ export class OptionsViewModel extends View {
     override get title(): string { return "Options" }
     get currentOptionCategory(): IOptionCategory { return this._currentOptionCategory }
 
-    constructor(id: string) {
+    constructor(id: string, authService: IAuthService) {
         super(id)
         this._preferencesOptionCategory = new PreferencesOptionCategory(this.options)
         this._vcsOptionCategory = new VcsOptionCategory(this.options)
         this._currentOptionCategory = this._preferencesOptionCategory
+        this.authService = authService
     }
 
     override renderSidePanelContent(): JSX.Element {

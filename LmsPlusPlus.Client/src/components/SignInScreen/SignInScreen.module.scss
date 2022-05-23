@@ -1,0 +1,50 @@
+@use "../library";
+
+.screen {
+  @include library.full-size;
+
+  position: relative;
+}
+
+.screen-title {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+
+  font-size: 40px;
+}
+
+.form {
+  @include library.rounded-corners("all");
+  @include library.shadow("all");
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  padding: 20px;
+  width: 400px;
+}
+
+.form-heading {
+  margin-bottom: 28px;
+
+  font-size: library.$text-large;
+  font-weight: 500;
+  text-align: center;
+}
+
+.input {
+  margin-bottom: 12px;
+  padding: 7px;
+  width: 100%;
+
+  font-size: library.$text-large;
+}
+
+.submit {
+  margin-top: 10px;
+  padding: 5px;
+  width: 100%;
+}
