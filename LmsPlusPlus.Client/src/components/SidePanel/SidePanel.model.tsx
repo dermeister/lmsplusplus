@@ -27,11 +27,6 @@ export class SidePanelModel extends ObservableObject {
     }
 
     @transaction
-    close(): void {
-        this._isOpened = false
-    }
-
-    @transaction
     open(): void {
         this._isOpened = true
     }

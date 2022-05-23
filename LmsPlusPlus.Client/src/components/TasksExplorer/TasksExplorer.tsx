@@ -1,5 +1,6 @@
 import React from "react"
 import { reaction, Ref, Transaction, unobservable } from "reactronic"
+import { DatabaseContext } from "../../database"
 import * as domain from "../../domain"
 import { Explorer, GroupNode, ItemNode } from "../../models"
 import { IContextMenuService } from "../ContextMenuService"
@@ -25,11 +26,13 @@ export class TopicNode extends GroupNode {
 }
 
 export class TasksExplorer extends Explorer<domain.Task, TopicNode> {
+    @unobservable readonly context: DatabaseContext
     @unobservable private readonly _tasksService: ITasksService
     @unobservable private readonly _topics: Ref<readonly domain.Topic[]>
 
-    constructor(topics: Ref<readonly domain.Topic[]>, tasksSerivce: ITasksService, contextMenuService: IContextMenuService) {
+    constructor(topics: Ref<readonly domain.Topic[]>, tasksSerivce: ITasksService, contextMenuService: IContextMenuService, context: DatabaseContext) {
         super(TasksExplorer.createChildren(topics.value), contextMenuService)
+        this.context = context
         this._tasksService = tasksSerivce
         this._topics = topics
     }

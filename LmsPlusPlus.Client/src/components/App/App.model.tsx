@@ -1,14 +1,14 @@
-import React from "react";
-import { reaction, Transaction, unobservable } from "reactronic";
-import { DatabaseContext } from "../../database";
-import { ObservableObject } from "../../ObservableObject";
-import { AuthService } from "../AuthService";
-import { EmptyScreen } from "../EmptyScreen";
-import { IComponent } from "../IComponent";
-import { IScreen } from "../IScreen";
-import { SignInScreenModel } from "../SignInScreen/SignInScreen.model";
+import React from "react"
+import { reaction, Transaction, unobservable } from "reactronic"
+import { DatabaseContext } from "../../database"
+import { ObservableObject } from "../../ObservableObject"
+import { AuthService } from "../AuthService"
+import { EmptyScreen } from "../EmptyScreen"
+import { IComponent } from "../IComponent"
+import { IScreen } from "../IScreen"
+import { SignInScreenModel } from "../SignInScreen/SignInScreen.model"
 import { WorkbenchScreen } from "../WorkbenchScreen"
-import { AppView } from "./App.view";
+import { AppView } from "./App.view"
 
 export class AppModel extends ObservableObject implements IComponent {
     @unobservable private _context: DatabaseContext | null = null

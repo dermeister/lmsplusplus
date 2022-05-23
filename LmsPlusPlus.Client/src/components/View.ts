@@ -1,4 +1,4 @@
-import { ObservableObject, Ref, unobservable } from "reactronic"
+import { ObservableObject, unobservable } from "reactronic"
 
 export abstract class View extends ObservableObject {
     @unobservable readonly id: string

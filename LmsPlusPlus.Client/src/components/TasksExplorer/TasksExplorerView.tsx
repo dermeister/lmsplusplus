@@ -5,7 +5,6 @@ import { autorender } from "../autorender"
 import { ContextMenuView } from "../ContextMenu"
 import { Explorer } from "../Explorer"
 import { ITasksService } from "../ITasksService"
-import { usePermissions } from "../permissions"
 import { TasksExplorer, TopicNode } from "./TasksExplorer"
 
 interface TasksExplorerViewProps {
@@ -14,11 +13,9 @@ interface TasksExplorerViewProps {
 }
 
 export function TasksExplorerView({ model, tasksService }: TasksExplorerViewProps): JSX.Element {
-    const permissions = usePermissions()
-
     return autorender(() => (
-        <Explorer model={model}>{topics(tasksService, model.children, permissions)}</Explorer>
-    ), [model, permissions])
+        <Explorer model={model}>{topics(tasksService, model.children, model.context.permissions)}</Explorer>
+    ), [model])
 }
 
 function topics(model: ITasksService, topics: readonly TopicNode[], permissions: domain.Permissions): JSX.Element[] {

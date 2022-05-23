@@ -34,7 +34,7 @@ export class TasksViewModel extends View implements ITasksService {
         super(id)
         this._context = context
         this._viewGroup = viewGroup
-        this.tasksExplorer = new TasksExplorer(new Ref(this, "topics"), this, contextMenuService)
+        this.tasksExplorer = new TasksExplorer(new Ref(this, "topics"), this, contextMenuService, this._context)
     }
 
     override renderSidePanelContent(): JSX.Element {

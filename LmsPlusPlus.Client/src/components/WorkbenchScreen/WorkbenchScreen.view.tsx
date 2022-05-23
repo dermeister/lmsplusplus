@@ -1,30 +1,25 @@
 import React from "react"
+import { Transaction } from "reactronic"
 import { autorender } from "../autorender"
 import { Button } from "../Button"
-import { Permissions } from "../permissions"
 import { ViewGroup } from "../ViewGroup"
-import styles from "./WorkbenchScreen.module.scss"
 import { WorkbenchScreenModel } from "./WorkbenchScreen.model"
-import { Transaction } from "reactronic"
+import styles from "./WorkbenchScreen.module.scss"
 
-interface AppViewProps {
+interface WorkbenchScreenViewProps {
     model: WorkbenchScreenModel
 }
 
-export function WorkbenchView({ model }: AppViewProps): JSX.Element {
-    return autorender(() => {
-        return (
-            <Permissions permissions={model.context.permissions}>
-                <div className={styles.screen}>
-                    <div className={styles.viewSwitch}>{renderViewGroupSwitch(model)}</div>
-                    <div className={styles.sidePanel}>
-                        {model.sidePanel.render(model.currentViewGroup.currentView.renderSidePanelContent())}
-                    </div>
-                    <div className={styles.content}>{model.currentViewGroup.currentView.renderMainPanelContent()}</div>
-                </div>
-            </Permissions>
-        )
-    })
+export function WorkbenchScreenView({ model }: WorkbenchScreenViewProps): JSX.Element {
+    return autorender(() => (
+        <div className={styles.workbenchScreen}>
+            <div className={styles.viewGroupSwitch}>{renderViewGroupSwitch(model)}</div>
+            <div className={styles.sidePanel}>
+                {model.sidePanel.render(model.currentViewGroup.currentView.renderSidePanelContent())}
+            </div>
+            <div className={styles.mainPanelContent}>{model.currentViewGroup.currentView.renderMainPanelContent()}</div>
+        </div>
+    ))
 }
 
 function renderViewGroupSwitch(model: WorkbenchScreenModel): JSX.Element[] {
@@ -34,19 +29,19 @@ function renderViewGroupSwitch(model: WorkbenchScreenModel): JSX.Element[] {
             <Button key={v.id}
                 variant={variant}
                 onClick={() => onViewGroupSwitchButtonClick(model, v)}
-                className={styles.viewSwitchButton}>
-                <img className={styles.viewSwitchButtonIcon} src={v.iconUrl} alt={v.id} />
+                className={styles.viewGroupSwitchButton}>
+                <img className={styles.viewGroupSwitchButtonIcon} src={v.iconUrl} alt={v.id} />
             </Button>
         )
     })
 }
 
 function onViewGroupSwitchButtonClick(model: WorkbenchScreenModel, viewGroup: ViewGroup): void {
-    if (model.currentViewGroup !== viewGroup) {
+    if (model.currentViewGroup !== viewGroup)
         Transaction.run(() => {
             model.showViewGroup(viewGroup)
             model.sidePanel.open()
         })
-    } else
+    else
         model.sidePanel.toggle()
 }

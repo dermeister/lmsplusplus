@@ -1,6 +1,6 @@
 @use "../library";
 
-.screen {
+.workbench-screen {
     @include library.full-size;
 
     display: grid;
@@ -8,7 +8,7 @@
     grid-template-columns: 74px auto 1fr;
 }
 
-.view-switch {
+.view-group-switch {
     @include library.shadow("right");
 
     grid-area: switch;
@@ -16,7 +16,7 @@
     z-index: 100;
 }
 
-.view-switch-button {
+.view-group-switch-button {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -31,7 +31,7 @@
     }
 }
 
-.view-switch-button-icon {
+.view-group-switch-button-icon {
     width: 30px;
     height: 30px;
 }
@@ -41,7 +41,7 @@
     z-index: 99;
 }
 
-.content {
+.main-panel-content {
     grid-area: content;
     z-index: 98;
 
@@ -50,7 +50,7 @@
     }
 }
 
-.content-hidden {
+.main-panel-content-hidden {
     position: absolute;
     clip: rect(0, 0, 0, 0);
 }
