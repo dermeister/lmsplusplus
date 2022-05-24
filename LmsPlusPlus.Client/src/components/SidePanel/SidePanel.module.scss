@@ -29,7 +29,7 @@
   border-bottom: 1px solid library.$text-secondary;
 }
 
-.header-pulsing::before {
+.header-showing-loader::before {
   content: "";
 
   position: absolute;
@@ -41,10 +41,10 @@
 
   background-color: library.$primary;
 
-  animation: header-pulsing 1s linear infinite normal none running;
+  animation: header-showing-loader 1s linear infinite normal none running;
 }
 
-@keyframes header-pulsing {
+@keyframes header-showing-loader {
   0% {
     left: 0;
     width: 0;

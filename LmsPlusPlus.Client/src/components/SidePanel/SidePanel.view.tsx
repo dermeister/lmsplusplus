@@ -6,14 +6,14 @@ import { SidePanelModel } from "./SidePanel.model"
 
 interface SidePanelProps {
     model: SidePanelModel
-    children?: React.ReactNode
+    children: React.ReactNode
 }
 
 export function SidePanel({ model, children }: SidePanelProps): JSX.Element {
     return autorender(() => {
         if (!model.isOpened)
             return <></>
-        const combinedHeaderClassName = combineClassNames(styles.header, maybeValue(styles.headerPulsing, Boolean(model.isPulsing)))
+        const combinedHeaderClassName = combineClassNames(styles.header, maybeValue(styles.headerShowingLoader, Boolean(model.shouldShowLoader)))
         return (
             <div className={styles.sidePanel}>
                 <header className={combinedHeaderClassName}>

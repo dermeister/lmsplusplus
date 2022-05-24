@@ -10,12 +10,12 @@ export class SidePanelModel extends ObservableObject {
 
     get title(): string { return this._title.value }
     get isOpened(): boolean { return this._isOpened }
-    get isPulsing(): boolean { return this._isPulsing.value }
+    get shouldShowLoader(): boolean { return this._isPulsing.value }
 
-    constructor(title: Ref<string>, isPulsing: Ref<boolean>) {
+    constructor(title: Ref<string>, shouldShowLoader: Ref<boolean>) {
         super()
         this._title = title
-        this._isPulsing = isPulsing
+        this._isPulsing = shouldShowLoader
     }
 
     override dispose(): void {
