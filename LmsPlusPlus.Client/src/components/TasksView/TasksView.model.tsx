@@ -1,40 +1,42 @@
-import React from "react"
-import { View } from "../View"
-import viewSwitchButtonIcon from "../../assets/tasks.svg"
-import { IViewService } from "../IViewService"
-import { DatabaseContext } from "../../database"
-import { cached, Ref, transaction, unobservable } from "reactronic"
-import { TasksExplorer } from "../TasksExplorer"
-import * as domain from "../../domain"
 import MarkdownIt from "markdown-it"
-import { TasksViewMainPanelContent, TasksViewSidePanelContent } from "./TasksView.view"
-import { ViewGroup } from "../ViewGroup"
+import React from "react"
+import { cached, Ref, Transaction, transaction, unobservable } from "reactronic"
+import { DatabaseContext } from "../../database"
+import * as domain from "../../domain"
+import { IContextMenuService } from "../ContextMenuService"
 import { ITasksService } from "../ITasksService"
-import { TaskEditorView } from "../TaskEditorView/TaskEditor"
 import { SolutionEditorView } from "../SolutionEditorView/SolutionEditor"
 import { SolutionRunner } from "../SolutionRunnerView/SolutionRunner"
-import { IContextMenuService } from "../ContextMenuService"
+import { TaskEditorView } from "../TaskEditorView/TaskEditor"
+import { TasksExplorer } from "../TasksExplorer"
+import { View } from "../View"
+import { ViewGroup } from "../ViewGroup"
+import { TasksViewMainPanelContent, TasksViewSidePanelContent } from "./TasksView.view"
 
 export class TasksViewModel extends View implements ITasksService {
     @unobservable readonly tasksExplorer: TasksExplorer
-    private static readonly s_markdown = new MarkdownIt()
+    @unobservable private static readonly s_markdown = new MarkdownIt()
     @unobservable private readonly _context: DatabaseContext
     @unobservable private readonly _viewGroup: ViewGroup
 
     override get title(): string { return "Tasks" }
     @cached get taskDescriptionHtml(): string | null {
         const description = this.tasksExplorer.selectedNode?.item.description
-        if (!description)
-            return null
-        return TasksViewModel.s_markdown.render(description)
+        return description ? TasksViewModel.s_markdown.render(description) : null
     }
-    private get topics(): readonly domain.Topic[] { return this._context.courses }
 
-    constructor(id: string, context: DatabaseContext, viewGroup: ViewGroup, contextMenuService: IContextMenuService) {
-        super(id)
+    constructor(context: DatabaseContext, viewGroup: ViewGroup, contextMenuService: IContextMenuService) {
+        super()
         this._context = context
         this._viewGroup = viewGroup
-        this.tasksExplorer = new TasksExplorer(new Ref(this, "topics"), this, contextMenuService, this._context)
+        this.tasksExplorer = new TasksExplorer(new Ref(this._context, "courses"), this, contextMenuService, this._context)
+    }
+
+    override dispose(): void {
+        Transaction.run(() => {
+            this.tasksExplorer.dispose()
+            super.dispose()
+        })
     }
 
     override renderSidePanelContent(): JSX.Element {
