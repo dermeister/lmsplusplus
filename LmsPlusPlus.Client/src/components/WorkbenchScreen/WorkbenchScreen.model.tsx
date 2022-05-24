@@ -4,6 +4,7 @@ import { DatabaseContext } from "../../database"
 import { ObservableObject } from "../../ObservableObject"
 import { IAuthService } from "../AuthService"
 import { ContextMenuService } from "../ContextMenuService"
+import { IScreen } from "../IScreen"
 import { OptionsService } from "../Options"
 import { OptionsViewGroup } from "../OptionsViewGroup"
 import { SidePanel } from "../SidePanel"
@@ -11,9 +12,8 @@ import { TasksViewGroup } from "../TasksViewGroup"
 import { ViewGroup } from "../ViewGroup"
 import { WorkbenchScreenView } from "./WorkbenchScreen.view"
 
-export class WorkbenchScreenModel extends ObservableObject {
+export class WorkbenchScreenModel extends ObservableObject implements IScreen {
     @unobservable readonly sidePanel: SidePanel
-    @unobservable private readonly _context: DatabaseContext
     @unobservable private readonly _tasksViewGroup: TasksViewGroup
     @unobservable private readonly _optionsViewGroup: OptionsViewGroup
     @unobservable private readonly _optionsService: OptionsService
@@ -27,9 +27,8 @@ export class WorkbenchScreenModel extends ObservableObject {
 
     constructor(context: DatabaseContext, authService: IAuthService) {
         super()
-        this._context = context
         this._contextMenuService = new ContextMenuService()
-        this._optionsService = new OptionsService(this._context)
+        this._optionsService = new OptionsService(context)
         this._tasksViewGroup = new TasksViewGroup("tasks-view-group", context, this._contextMenuService)
         this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, context, this._optionsService)
         this._currentViewGroup = this._tasksViewGroup

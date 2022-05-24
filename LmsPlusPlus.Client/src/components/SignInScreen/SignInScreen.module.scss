@@ -1,12 +1,12 @@
 @use "../library";
 
-.screen {
+.sign-in-screen {
   @include library.full-size;
 
   position: relative;
 }
 
-.screen-title {
+.sign-in-screen-title {
   position: absolute;
   left: 20px;
   top: 20px;

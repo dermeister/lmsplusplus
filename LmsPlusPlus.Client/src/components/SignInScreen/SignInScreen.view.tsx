@@ -25,8 +25,8 @@ export function SignInScreenView({ model }: SignInScreenViewProps): JSX.Element 
     }
 
     return autorender(() => (
-        <div className={styles.screen}>
-            <h1 className={styles.screenTitle}>LMS++</h1>
+        <div className={styles.signInScreen}>
+            <h1 className={styles.signInScreenTitle}>LMS++</h1>
             <form className={styles.form} onSubmit={onSubmit}>
                 <p className={styles.formHeading}>Welcome back!</p>
                 <Field label="Login">
