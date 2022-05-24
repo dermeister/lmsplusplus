@@ -1,11 +1,9 @@
-import { transaction, Transaction, unobservable } from "reactronic"
-import { ContextMenu } from "../../components/ContextMenuService"
+import { transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import { NodeVisitor } from "./NodeVisitor"
 
 export abstract class Node extends ObservableObject {
     @unobservable readonly key: string
-    @unobservable readonly contextMenu = new ContextMenu()
     private _title: string
 
     get title(): string { return this._title }
@@ -21,13 +19,6 @@ export abstract class Node extends ObservableObject {
     @transaction
     updateNode(title: string): void {
         this._title = title
-    }
-
-    override dispose(): void {
-        Transaction.run(() => {
-            this.contextMenu?.dispose()
-            super.dispose()
-        })
     }
 }
 

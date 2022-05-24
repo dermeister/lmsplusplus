@@ -5,7 +5,6 @@ import * as domain from "../../domain"
 import { Explorer, GroupNode, ItemNode } from "../../models"
 import { IContextMenuService } from "../ContextMenuService"
 import { ITasksService } from "../ITasksService"
-import { TasksViewModel } from "../TasksView/TasksView.model"
 import { TasksExplorerView } from "./TasksExplorerView"
 
 export class TopicNode extends GroupNode {
@@ -38,7 +37,7 @@ export class TasksExplorer extends Explorer<domain.Task, TopicNode> {
     }
 
     render(): JSX.Element {
-        return <TasksExplorerView model={this} tasksService={this._tasksService} />
+        return <TasksExplorerView model={this} tasksService={this._tasksService} contextMenuService={this.contextMenuService} />
     }
 
     private static createChildren(topics: readonly domain.Topic[]): readonly TopicNode[] {

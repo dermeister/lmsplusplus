@@ -1,0 +1,13 @@
+@use "../library";
+
+.context-menu-container {
+    @include library.shadow("all");
+
+    position: fixed;
+
+    margin: 0;
+    padding: 6px 0;
+    width: 200px;
+
+    background-color: library.$background-primary;
+}

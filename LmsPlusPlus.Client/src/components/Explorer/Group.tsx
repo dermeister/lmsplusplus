@@ -9,12 +9,12 @@ interface GroupProps {
     group: models.GroupNode
     contextMenu?: React.ReactNode
     children?: React.ReactNode
+    onContextMenu: (x: number, y: number) => void
 }
 
-export function Group({ group, children, contextMenu }: GroupProps): JSX.Element {
+export function Group({ group, children, contextMenu, onContextMenu }: GroupProps): JSX.Element {
     const offset = useOffset()
     const model = useExplorerModel()
-    // const onContextMenu = useContextMenu(group.contextMenu)
 
     function onClick(e: React.MouseEvent): void {
         if (e.target === e.currentTarget)
@@ -28,12 +28,13 @@ export function Group({ group, children, contextMenu }: GroupProps): JSX.Element
             <p onClick={onClick}
                 onContextMenu={(e) => {
                     e.preventDefault()
-                    model.contextMenuService.open(group.contextMenu, e.clientX, e.clientY)
+                    onContextMenu(e.clientX, e.clientY)
+                    // model.contextMenuService.open(group.contextMenu, e.clientX, e.clientY)
                 }}
                 className={className}
                 style={{ paddingLeft: offset }}>
                 {children}
-                {contextMenu}
+                {/* {contextMenu} */}
             </p>
         )
     }, [group, children, contextMenu])

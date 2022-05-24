@@ -1,0 +1,74 @@
+@use "../library";
+
+@mixin button-variant($background-color, $background-color-hover, $text-color, $text-color-hover) {
+    margin: 0 6px;
+    padding: 6px;
+    width: calc(100% - 12px);
+
+    color: $text-color;
+    font-weight: 500;
+    text-align: left;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    background-color: transparent;
+    box-shadow: none;
+    overflow: hidden;
+
+    &:hover,
+    &:focus-visible,
+    &.focused {
+        @include library.shadow("all");
+
+        color: $text-color-hover;
+        background-color: $background-color-hover;
+    }
+}
+
+.primary {
+    @include button-variant(library.$secondary, library.$secondary-hover, library.$text-secondary,
+        library.$text-secondary);
+}
+
+.danger {
+    @include button-variant(library.$danger, library.$danger-hover, library.$danger, library.$text-primary);
+}
+
+.submenu-container {
+    position: relative;
+}
+
+.submenu-button {
+    padding-right: 20px;
+
+    text-overflow: ellipsis;
+
+    background-image: var(--arrow-right-icon-url);
+    background-repeat: no-repeat;
+    background-size: 7px;
+    background-position: calc(100% - 4px) 8px;
+}
+
+.submenu-items-container {
+    position: absolute;
+    left: 100%;
+    top: 0;
+
+    padding-left: 4px;
+}
+
+.submenu-items {
+    @include library.shadow("all");
+
+    width: 200px;
+    padding: 6px 0;
+
+    background-color: library.$background-primary;
+}
+
+.radio-button-active {
+    background-image: var(--check-icon-url);
+    background-repeat: no-repeat;
+    background-size: 10px;
+    background-position: calc(100% - 6px) 8px;
+}

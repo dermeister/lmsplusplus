@@ -1,16 +1,15 @@
-import { ObservableObject } from "../../ObservableObject"
-import * as domain from "../../domain"
-import { Monitor, options, reaction, Ref, Transaction, unobservable } from "reactronic"
-import { Service } from "./service/Service"
-import { ServicesExplorer } from "../ServicesExplorer/ServicesExplorer"
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr"
-import { ServiceView } from "./service/ServiceView"
-import serviceWorkerUrl from "../../../service-worker?url"
-import { View } from "../View"
-import { SolutionRunnerMainPanelContent, SolutionRunnerSidePanelContent } from "./SolutionRunnerView"
 import React from "react"
+import { Monitor, options, reaction, Ref, Transaction, unobservable } from "reactronic"
+import serviceWorkerUrl from "../../../service-worker?url"
+import * as domain from "../../domain"
 import { ITasksService } from "../ITasksService"
+import { ServicesExplorer } from "../ServicesExplorer/ServicesExplorer"
+import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
+import { Service } from "./service/Service"
+import { ServiceView } from "./service/ServiceView"
+import { SolutionRunnerMainPanelContent, SolutionRunnerSidePanelContent } from "./SolutionRunnerView"
 
 interface ServiceConfiguration {
     name: string
@@ -41,7 +40,7 @@ export class SolutionRunner extends View {
     get serviceView(): ServiceView | null { return this._serviceView }
 
     constructor(id: string, solution: domain.Solution, tasksSerivce: ITasksService, viewGroup: ViewGroup) {
-        super(id)
+        super()
         this._solution = solution
         this._tasksService = tasksSerivce
         this._viewGroup = viewGroup

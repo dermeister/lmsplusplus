@@ -1,3 +1,3 @@
-export { ContextMenuServiceModel as ContextMenuService } from "./ContextMenuService.model"
-export type { IContextMenuService } from "./ContextMenuService.model"
+export { ContextMenuService as ContextMenuService } from "./ContextMenuService"
+export type { IContextMenuService } from "./ContextMenuService"
 export { ContextMenu } from "./ContextMenu"

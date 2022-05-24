@@ -9,9 +9,10 @@ interface ItemProps<T> {
     item: models.ItemNode<T>
     contextMenu?: React.ReactNode
     children?: React.ReactNode
+    onContextMenu?: (x: number, y: number) => void
 }
 
-export function Item<T>({ item, children, contextMenu }: ItemProps<T>): JSX.Element {
+export function Item<T>({ item, children, contextMenu, onContextMenu }: ItemProps<T>): JSX.Element {
     const model = useExplorerModel<models.Explorer<T>>()
     const offset = useOffset()
 
@@ -28,12 +29,11 @@ export function Item<T>({ item, children, contextMenu }: ItemProps<T>): JSX.Elem
                 <p onClick={onClick}
                     onContextMenu={e => {
                         e.preventDefault()
-                        model.contextMenuService.open(item.contextMenu, e.clientX, e.clientY)
+                        onContextMenu?.(e.clientX, e.clientY)
                     }}
                     className={className}
                     style={{ paddingLeft: offset }}>
                     {children}
-                    {contextMenu}
                 </p>
             </li>
         )

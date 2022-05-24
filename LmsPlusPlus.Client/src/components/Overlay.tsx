@@ -4,6 +4,7 @@ import { combineClassNames, maybeValue } from "./utils"
 
 interface OverlayProps {
     trapFocus?: boolean
+
     children: React.ReactNode
 
     onClick?(): void
@@ -74,8 +75,7 @@ export function Overlay(props: OverlayProps): JSX.Element {
         }
     }
 
-    const className = combineClassNames(styles.overlay,
-        maybeValue(styles.trapFocusOverlay, Boolean(props.trapFocus)))
+    const className = combineClassNames(styles.overlay, maybeValue(styles.trapFocusOverlay, Boolean(props.trapFocus)))
     return <div ref={ref} className={className} tabIndex={-1}>{props.children}</div>
 }
 
