@@ -10,7 +10,7 @@ import { TaskEditorMainPanelContent, TaskEditorSidePanelContent } from "./TaskEd
 export class TaskEditorView extends View {
     @unobservable readonly description: monaco.editor.ITextModel
     @unobservable readonly availableTechnologies: readonly domain.Technology[]
-    @unobservable private static readonly s_monitor = Monitor.create("task-editor", 0, 0)
+    @unobservable private static readonly s_monitor = Monitor.create("task-editor-view", 0, 0)
     @unobservable private readonly _id: number
     @unobservable private readonly _topic: domain.Topic
     @unobservable private readonly _solutions: domain.Solution[]

@@ -56,7 +56,7 @@ export class TasksViewModel extends View implements ITasksService {
     @transaction
     createSolution(task: domain.Task): void {
         const solution = new domain.Solution(domain.Solution.NO_ID, task, "", null)
-        const solutionEditorView = new SolutionEditorView("solution-editor", solution, this._context, this._viewGroup)
+        const solutionEditorView = new SolutionEditorView(solution, this._context, this._viewGroup)
         this._viewGroup.openView(solutionEditorView)
     }
 
