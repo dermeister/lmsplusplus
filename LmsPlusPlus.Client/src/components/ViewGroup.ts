@@ -35,6 +35,7 @@ export abstract class ViewGroup extends ObservableObject {
         const closedView = views.pop() as View
         this._currentView = views[views.length - 1]
         this._views = views
+        setTimeout(() => closedView.dispose(), 0)
         return closedView
     }
 }

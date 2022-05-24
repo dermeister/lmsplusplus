@@ -7,7 +7,7 @@ import { IContextMenuService } from "../ContextMenuService"
 import { ITasksService } from "../ITasksService"
 import { SolutionEditorView } from "../SolutionEditorView/SolutionEditor"
 import { SolutionRunner } from "../SolutionRunnerView/SolutionRunner"
-import { TaskEditorView } from "../TaskEditorView/TaskEditor"
+import { TaskEditorView } from "../TaskEditorView/TaskEditor.model"
 import { TasksExplorer } from "../TasksExplorer"
 import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
@@ -49,7 +49,7 @@ export class TasksViewModel extends View implements ITasksService {
 
     @transaction
     updateTask(task: domain.Task): void {
-        const taskEditorView = new TaskEditorView("task-editor", task, this._context.technologies, this._context, this._viewGroup)
+        const taskEditorView = new TaskEditorView(task, this._context.technologies, this._context, this._viewGroup)
         this._viewGroup.openView(taskEditorView)
     }
 
