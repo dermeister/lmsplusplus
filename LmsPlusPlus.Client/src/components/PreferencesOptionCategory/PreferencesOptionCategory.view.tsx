@@ -1,12 +1,11 @@
 import React from "react"
-import * as models from "../../models"
 import { autorender } from "../autorender"
 import { Dropdown } from "../Dropdown"
 import { Field } from "../Field"
-import { PreferencesOptionCategory } from "./PreferencesOptionCategory"
+import { PreferencesOptionCategoryModel } from "./PreferencesOptionCategory.model"
 
 interface PreferencesViewProps {
-    model: PreferencesOptionCategory
+    model: PreferencesOptionCategoryModel
 }
 
 const themes = [
@@ -17,10 +16,10 @@ const themes = [
 export function PreferencesOptionCategoryView({ model }: PreferencesViewProps): JSX.Element {
     return autorender(() => (
         <Field label="Theme">
-            <Dropdown selectedValue={model.optionsService.darkMode ? "Dark" : "Light"}
+            <Dropdown selectedValue={model.darkMode ? "Dark" : "Light"}
                 items={themes}
-                onValueChange={i => model.optionsService.setDarkMode(i === "Dark")}
-                createPlaceholder={() => model.optionsService.darkMode ? "Dark" : "Light"} />
+                onValueChange={i => model.setDarkMode(i === "Dark")}
+                createPlaceholder={() => model.darkMode ? "Dark" : "Light"} />
         </Field>
     ), [model])
 }

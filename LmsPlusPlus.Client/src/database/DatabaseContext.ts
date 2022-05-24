@@ -1,12 +1,9 @@
 import { reaction, transaction } from "reactronic"
+import bitbucketIcon from "../assets/bitbucket.svg"
+import githubIcon from "../assets/github.svg"
+import gitlabIcon from "../assets/gitlab.svg"
 import * as domain from "../domain"
 import { ObservableObject } from "../ObservableObject"
-import { Api } from "./Api"
-import { VcsAccountRegisteringModal } from "./VcsAccountRegisteringModal"
-import githubIcon from "../assets/github.svg"
-import bitbucketIcon from "../assets/bitbucket.svg"
-import gitlabIcon from "../assets/gitlab.svg"
-import * as response from "./response"
 
 export class DatabaseContext extends ObservableObject {
     private static s_nextId = 1
@@ -84,7 +81,7 @@ export class DatabaseContext extends ObservableObject {
 
     @transaction
     async updatePreferences(preferences: domain.Preferences): Promise<void> {
-        await new Promise(r => setTimeout(r, 0))
+        await new Promise(r => setTimeout(r, 1000))
 
         this._preferences = preferences
     }

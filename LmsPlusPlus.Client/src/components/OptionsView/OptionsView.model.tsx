@@ -2,50 +2,50 @@ import React from "react"
 import { reaction, Ref, unobservable } from "reactronic"
 import { DatabaseContext } from "../../database"
 import { IAuthService } from "../AuthService"
-import { IOptionCategory } from "../IOptionCategory"
 import { OptionCategoriesExplorer } from "../OptionCategoriesExplorer"
-import { OptionCategory } from "../OptionCategoriesExplorer/OptionCategoriesExplorer.model"
-import { IOptionsService } from "../Options"
-import { PreferencesOptionCategory } from "../PreferencesOptionCategory/PreferencesOptionCategory"
-import { VcsOptionCategory } from "../VcsOptionCategory/VcsOptionCategory"
+import { OptionCategoryKind } from "../OptionCategoriesExplorer/OptionCategoriesExplorer.model"
+import { OptionCategory } from "../OptionCategory"
+import { PreferencesOptionCategory } from "../PreferencesOptionCategory"
+import { VcsOptionCategory } from "../VcsOptionCategory"
 import { View } from "../View"
-import { MainContent, SidePanelContent } from "./OptionsView.view"
+import { MainContent as MainPanelContent, SidePanelContent } from "./OptionsView.view"
 
 export class OptionsViewModel extends View {
     @unobservable readonly categoriesExplorer: OptionCategoriesExplorer
-    @unobservable readonly authService: IAuthService
-    private readonly _preferencesOptionCategory: PreferencesOptionCategory
-    private readonly _vcsOptionCategory: VcsOptionCategory
-    private _currentOptionCategory: IOptionCategory
+    @unobservable private readonly _authService: IAuthService
+    @unobservable private readonly _preferencesOptionCategory: PreferencesOptionCategory
+    @unobservable private readonly _vcsOptionCategory: VcsOptionCategory
+    private _currentOptionCategory: OptionCategory
 
+    override get isPulsing(): boolean { return this._currentOptionCategory.isPerformingOperation }
     override get title(): string { return "Options" }
-    get currentOptionCategory(): IOptionCategory { return this._currentOptionCategory }
+    get currentOptionCategory(): OptionCategory { return this._currentOptionCategory }
 
-    constructor(id: string, authService: IAuthService, context: DatabaseContext, optionsService: IOptionsService) {
-        super(id)
+    constructor(authService: IAuthService, context: DatabaseContext) {
+        super()
         this.categoriesExplorer = new OptionCategoriesExplorer(new Ref(context, "permissions"))
-        this._preferencesOptionCategory = new PreferencesOptionCategory(optionsService)
-        this._vcsOptionCategory = new VcsOptionCategory(optionsService)
+        this._preferencesOptionCategory = new PreferencesOptionCategory(context)
+        this._vcsOptionCategory = new VcsOptionCategory(context)
         this._currentOptionCategory = this._preferencesOptionCategory
-        this.authService = authService
+        this._authService = authService
     }
 
     override renderSidePanelContent(): JSX.Element {
-        return <SidePanelContent model={this} />
+        return <SidePanelContent model={this} authService={this._authService} />
     }
 
     override renderMainPanelContent(): JSX.Element {
-        return <MainContent model={this} />
+        return <MainPanelContent model={this} />
     }
 
     @reaction
     private updateCurrentCategory() {
         const item = this.categoriesExplorer.selectedNode?.item
         switch (item) {
-            case OptionCategory.Preferences:
+            case OptionCategoryKind.Preferences:
                 this._currentOptionCategory = this._preferencesOptionCategory
                 break
-            case OptionCategory.Vcs:
+            case OptionCategoryKind.Vcs:
                 this._currentOptionCategory = this._vcsOptionCategory
                 break
             default:

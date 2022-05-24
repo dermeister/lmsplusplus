@@ -3,37 +3,35 @@ import * as domain from "../../domain"
 import { autorender } from "../autorender"
 import { Dropdown, DropdownItem } from "../Dropdown"
 import { Field } from "../Field"
-import { IOptionsService } from "../Options"
-import styles from "./Vcs.module.scss"
-import { VcsOptionCategory } from "./VcsOptionCategory"
+import { VcsOptionCategoryModel } from "./VcsOptionCategory.model"
+import styles from "./VcsOptionCategory.module.scss"
 
 interface VcsOptionCategoryViewProps {
-    model: VcsOptionCategory
+    model: VcsOptionCategoryModel
 }
 
 export function VcsOptionCategoryView({ model }: VcsOptionCategoryViewProps): JSX.Element {
     return autorender(() => {
-        if (model.optionsService.vcsProviders.length === 0)
+        if (model.vcsProviders.length === 0)
             return <h2 className={styles.noVcsProviders}>There are no available VCS providers</h2>
-        else
-            return (
-                <div>
-                    <Field label="Current account" className={styles.currentAccountField}>
-                        {accountDropdown(model.optionsService)}
-                    </Field>
-                    {providerList(model.optionsService)}
-                </div>
-            )
+        return (
+            <div>
+                <Field label="Current account" className={styles.currentAccountField}>
+                    {accountDropdown(model)}
+                </Field>
+                {providerList(model)}
+            </div>
+        )
     }, [model])
 }
 
-function accountDropdown(optionsService: IOptionsService): JSX.Element {
-    const accounts = optionsService.vcsAccounts.map(createAccountDropdownItem)
+function accountDropdown(model: VcsOptionCategoryModel): JSX.Element {
+    const accounts = model.vcsAccounts.map(createAccountDropdownItem)
     return (
         <Dropdown items={accounts}
-            onValueChange={a => optionsService.setCurrentAccount(a)}
-            selectedValue={optionsService.vcsCurrentAccount}
-            createPlaceholder={() => optionsService.vcsCurrentAccount?.username ?? "Choose account"} />
+            onValueChange={a => model.setCurrentAccount(a)}
+            selectedValue={model.vcsCurrentAccount}
+            createPlaceholder={() => model.vcsCurrentAccount?.username ?? "Choose account"} />
     )
 }
 
@@ -41,10 +39,10 @@ function createAccountDropdownItem(account: domain.Account): DropdownItem<domain
     return { value: account, title: `${account.username} (${account.provider.name})` }
 }
 
-function providerList(optioinsService: IOptionsService): JSX.Element {
+function providerList(model: VcsOptionCategoryModel): JSX.Element {
     return (
         <ul>
-            {optioinsService.vcsProviders.map(provider => (
+            {model.vcsProviders.map(provider => (
                 <li key={provider.id} className={styles.provider}>
                     <div className={styles.providerHeading}>
                         <h2 className={styles.providerName}>
@@ -55,21 +53,21 @@ function providerList(optioinsService: IOptionsService): JSX.Element {
                                 className={styles.providerIcon} />
                             {provider.name}
                         </h2>
-                        <button className={styles.addAccount} onClick={() => optioinsService.addAccount(provider)} />
+                        <button className={styles.addAccount} onClick={() => model.addAccount(provider)} />
                     </div>
-                    {accountList(optioinsService, provider)}
+                    {accountList(model, provider)}
                 </li>
             ))}
         </ul>
     )
 }
 
-function accountList(optionsService: IOptionsService, provider: domain.Provider): JSX.Element {
+function accountList(model: VcsOptionCategoryModel, provider: domain.Provider): JSX.Element {
     return (
         <ul>
-            {optionsService.vcsAccounts.filter(account => account.provider === provider).map(account => (
+            {model.vcsAccounts.filter(account => account.provider === provider).map(account => (
                 <li key={account.id} className={styles.account}>
-                    <button onClick={() => optionsService.deleteAccount(account)} className={styles.deleteAccount} />
+                    <button onClick={() => model.deleteAccount(account)} className={styles.deleteAccount} />
                     <span className={styles.accountName}>{account.username}</span>
                 </li>
             ))}

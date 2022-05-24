@@ -4,12 +4,12 @@ import React from "react"
 import { Explorer, ItemNode } from "../../models"
 import { OptionCategoriesExplorerView } from "./OptionCategoriesExplorer.view"
 
-export enum OptionCategory {
+export enum OptionCategoryKind {
     Preferences,
     Vcs
 }
 
-export class OptionCategoriesExplorerModel extends Explorer<OptionCategory, ItemNode<OptionCategory>> {
+export class OptionCategoriesExplorerModel extends Explorer<OptionCategoryKind, ItemNode<OptionCategoryKind>> {
     @unobservable private readonly _permissions: Ref<domain.Permissions>
 
     constructor(permissions: Ref<domain.Permissions>) {
@@ -29,11 +29,11 @@ export class OptionCategoriesExplorerModel extends Explorer<OptionCategory, Item
         return <OptionCategoriesExplorerView model={this} />
     }
 
-    private static createChildren(permissions: domain.Permissions): readonly ItemNode<OptionCategory>[] {
-        const preferences = new ItemNode("Preferences", "0", OptionCategory.Preferences)
+    private static createChildren(permissions: domain.Permissions): readonly ItemNode<OptionCategoryKind>[] {
+        const preferences = new ItemNode("Preferences", "0", OptionCategoryKind.Preferences)
         const nodes = [preferences]
         if (permissions.canUpdateVcsConfiguration) {
-            const vcs = new ItemNode("VCS", "1", OptionCategory.Vcs)
+            const vcs = new ItemNode("VCS", "1", OptionCategoryKind.Vcs)
             nodes.push(vcs)
         }
         return nodes

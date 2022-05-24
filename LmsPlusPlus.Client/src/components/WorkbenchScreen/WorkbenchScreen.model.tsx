@@ -5,7 +5,6 @@ import { ObservableObject } from "../../ObservableObject"
 import { IAuthService } from "../AuthService"
 import { ContextMenuService } from "../ContextMenuService"
 import { IScreen } from "../IScreen"
-import { OptionsService } from "../Options"
 import { OptionsViewGroup } from "../OptionsViewGroup"
 import { SidePanel } from "../SidePanel"
 import { TasksViewGroup } from "../TasksViewGroup"
@@ -16,7 +15,6 @@ export class WorkbenchScreenModel extends ObservableObject implements IScreen {
     @unobservable readonly sidePanel: SidePanel
     @unobservable private readonly _tasksViewGroup: TasksViewGroup
     @unobservable private readonly _optionsViewGroup: OptionsViewGroup
-    @unobservable private readonly _optionsService: OptionsService
     @unobservable private readonly _contextMenuService: ContextMenuService
     private _currentViewGroup: ViewGroup
     private _sidePanelTitle: string
@@ -28,9 +26,8 @@ export class WorkbenchScreenModel extends ObservableObject implements IScreen {
     constructor(context: DatabaseContext, authService: IAuthService) {
         super()
         this._contextMenuService = new ContextMenuService()
-        this._optionsService = new OptionsService(context)
         this._tasksViewGroup = new TasksViewGroup("tasks-view-group", context, this._contextMenuService)
-        this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, context, this._optionsService)
+        this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, context)
         this._currentViewGroup = this._tasksViewGroup
         this._sidePanelTitle = this._currentViewGroup.currentView.title
         this._sidePanelIsPulsing = this._currentViewGroup.currentView.isPulsing
@@ -44,7 +41,6 @@ export class WorkbenchScreenModel extends ObservableObject implements IScreen {
             this.sidePanel.dispose()
             this._tasksViewGroup.dispose()
             this._optionsViewGroup.dispose()
-            this._optionsService.dispose()
             super.dispose()
         })
     }
