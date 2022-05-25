@@ -2,7 +2,6 @@ import React from "react"
 import * as models from "../../models"
 import { ItemNode } from "../../models"
 import { autorender } from "../autorender"
-import { Explorer } from "../Explorer"
 import { Service } from "../SolutionRunnerView/service/Service"
 import { ServiceView } from "../SolutionRunnerView/service/ServiceView"
 import { ServicesExplorer } from "./ServicesExplorer"
@@ -13,15 +12,16 @@ interface ServicesExplorerProps {
 
 export function ServicesExplorerView({ model }: ServicesExplorerProps): JSX.Element {
     return autorender(() => (
-        <Explorer model={model}>
-            {model.children.map(c => (
-                <Explorer.Item key={c.key}
-                    item={c}
-                    contextMenu={contextMenu(c)}>
-                    {c.title}
-                </Explorer.Item>
-            ))}
-        </Explorer>
+        <div>TODO</div>
+        // <Explorer model={model}>
+        //     {model.children.map(c => (
+        //         <Explorer.Item key={c.key}
+        //             item={c}
+        //             contextMenu={contextMenu(c)}>
+        //             {c.title}
+        //         </Explorer.Item>
+        //     ))}
+        // </Explorer>
     ), [model])
 }
 

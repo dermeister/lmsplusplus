@@ -1,1 +1,1 @@
-export { PreferencesOptionCategoryModel as PreferencesOptionCategory } from "./PreferencesOptionCategory.model"
+export { PreferencesOptionCategory } from "./PreferencesOptionCategory.model"

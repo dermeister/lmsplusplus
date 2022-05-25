@@ -1,10 +1,10 @@
-import { autorender } from "../autorender";
-import { AppModel } from "./App.model";
+import { autorender } from "../autorender"
+import { IScreen } from "../IScreen"
 
-interface AppViewProps {
-    model: AppModel
+interface AppProps {
+    currentScreen: IScreen
 }
 
-export function AppView({ model }: AppViewProps) {
-    return autorender(() => model.currentScreen.render())
+export function App({ currentScreen }: AppProps) {
+    return autorender(() => currentScreen.render(), [currentScreen])
 }

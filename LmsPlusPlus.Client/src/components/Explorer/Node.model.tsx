@@ -1,38 +1,40 @@
 import React from "react"
-import { transaction, unobservable } from "reactronic"
+import { cached, transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import { IContextMenuService } from "../ContextMenuService"
-import { NodeView } from "./Node.view"
+import * as view from "./Node.view"
 
-export class NodeModel<T> extends ObservableObject {
+export class Node<T> extends ObservableObject {
     @unobservable readonly key: string
-    @unobservable readonly contextMenuService: IContextMenuService | null
+    @unobservable private readonly _contextMenuService: IContextMenuService | null
     private _title: string
-    private _children: NodeModel<unknown>[] | null
+    private _children: Node<unknown>[] | null
     private _isOpened = false
     private _item: T
 
     get title(): string { return this._title }
-    get children(): NodeModel<unknown>[] | null { return this._children }
+    get children(): Node<unknown>[] | null { return this._children }
     get isGroupNode(): boolean { return this._children !== null }
     get isOpened(): boolean { return this._isOpened }
     get item(): T { return this._item }
+    protected get contextMenuService(): IContextMenuService | null { return this._contextMenuService }
 
-    constructor(key: string, item: T, title: string, contextMenuService: IContextMenuService | null = null, children: NodeModel<unknown>[] | null = null) {
+    constructor(key: string, item: T, title: string, contextMenuService: IContextMenuService | null = null, children: Node<unknown>[] | null = null) {
         super()
         this.key = key
         this._item = item
         this._title = title
         this._children = children
-        this.contextMenuService = contextMenuService
+        this._contextMenuService = contextMenuService
     }
 
+    @cached
     render(): JSX.Element {
-        return <NodeView model={this} />
+        return <view.Node node={this} contextMenuService={this._contextMenuService} />
     }
 
     @transaction
-    updateNode(title: string, item: T, children: NodeModel<unknown>[] | null): void {
+    update(title: string, item: T, children: Node<unknown>[] | null): void {
         this._title = title
         this._item = item
         if (children) {

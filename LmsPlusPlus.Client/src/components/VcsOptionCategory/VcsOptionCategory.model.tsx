@@ -1,11 +1,11 @@
 import React from "react"
-import { transaction, unobservable } from "reactronic"
+import { cached, transaction, unobservable } from "reactronic"
 import { DatabaseContext } from "../../database"
 import * as domain from "../../domain"
 import { OptionCategory } from "../OptionCategory"
-import { VcsOptionCategoryView } from "./VcsOptionCategory.view"
+import * as view from "./VcsOptionCategory.view"
 
-export class VcsOptionCategoryModel extends OptionCategory {
+export class VcsOptionCategory extends OptionCategory {
     @unobservable private readonly _context: DatabaseContext
 
     get darkMode(): boolean { return this._context?.preferences.darkMode ?? true }
@@ -18,8 +18,9 @@ export class VcsOptionCategoryModel extends OptionCategory {
         this._context = context
     }
 
+    @cached
     render(): JSX.Element {
-        return <VcsOptionCategoryView model={this} />
+        return <view.VcsOptionCategory category={this} />
     }
 
     @transaction

@@ -19,7 +19,7 @@ export class ContextMenuService extends ObservableObject implements IContextMenu
     open(contextMenuDelegate: ContextMenuDelegate): void {
         this._contextMenuDelegate = contextMenuDelegate
         const container = (
-            <ContextMenuContainer model={this}
+            <ContextMenuContainer contextMenuService={this}
                 contextMenu={contextMenuDelegate.contextMenu}
                 x={contextMenuDelegate.x}
                 y={contextMenuDelegate.y} />

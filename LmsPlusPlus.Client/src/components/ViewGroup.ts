@@ -1,6 +1,6 @@
-import { transaction, unobservable } from "reactronic"
-import { View } from "./View"
+import { Transaction, transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
+import { View } from "./View"
 
 export abstract class ViewGroup extends ObservableObject {
     @unobservable readonly id: string
@@ -17,6 +17,18 @@ export abstract class ViewGroup extends ObservableObject {
     constructor(id: string) {
         super()
         this.id = id
+    }
+
+    override dispose(): void {
+        Transaction.run(() => {
+            const views = this._views.toMutable()
+            while (views.length > 0) {
+                const view = views.pop() as View
+                view.dispose()
+            }
+            this._views = views
+            super.dispose()
+        })
     }
 
     @transaction

@@ -1,1 +1,1 @@
-export { SidePanelModel as SidePanel } from "./SidePanel.model"
+export { SidePanel } from "./SidePanel.model"

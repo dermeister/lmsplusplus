@@ -9,61 +9,61 @@ import { OptionsViewGroup } from "../OptionsViewGroup"
 import { SidePanel } from "../SidePanel"
 import { TasksViewGroup } from "../TasksViewGroup"
 import { ViewGroup } from "../ViewGroup"
-import { WorkbenchScreenView } from "./WorkbenchScreen.view"
+import * as view from "./WorkbenchScreen.view"
 
-export class WorkbenchScreenModel extends ObservableObject implements IScreen {
-    @unobservable readonly sidePanel: SidePanel
+export class WorkbenchScreen extends ObservableObject implements IScreen {
+    @unobservable private readonly _sidePanel: SidePanel
     @unobservable private readonly _tasksViewGroup: TasksViewGroup
     @unobservable private readonly _optionsViewGroup: OptionsViewGroup
     @unobservable private readonly _contextMenuService: ContextMenuService
+    @unobservable private readonly _context: DatabaseContext
     private _currentViewGroup: ViewGroup
     private _sidePanelTitle: string
-    private _sidePanelIsPulsing: boolean
+    private _sidePanelShouldShowLoader: boolean
 
-    get currentViewGroup(): ViewGroup { return this._currentViewGroup }
-    @cached get viewGroups(): readonly ViewGroup[] { return [this._tasksViewGroup, this._optionsViewGroup] }
-
-    constructor(context: DatabaseContext, authService: IAuthService) {
+    constructor(authService: IAuthService) {
         super()
         this._contextMenuService = new ContextMenuService()
-        this._tasksViewGroup = new TasksViewGroup("tasks-view-group", context, this._contextMenuService)
-        this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, context)
+        this._context = new DatabaseContext()
+        this._tasksViewGroup = new TasksViewGroup("tasks-view-group", this._context, this._contextMenuService)
+        this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, this._context)
         this._currentViewGroup = this._tasksViewGroup
         this._sidePanelTitle = this._currentViewGroup.currentView.title
-        this._sidePanelIsPulsing = this._currentViewGroup.currentView.isPulsing
+        this._sidePanelShouldShowLoader = this._currentViewGroup.currentView.isPulsing
         const titleRef = new Ref(this, "_sidePanelTitle")
-        const isPulsingRef = new Ref(this, "_sidePanelIsPulsing")
-        this.sidePanel = new SidePanel(titleRef, isPulsingRef)
+        const isPulsingRef = new Ref(this, "_sidePanelShouldShowLoader")
+        this._sidePanel = new SidePanel(titleRef, isPulsingRef)
     }
 
     override dispose(): void {
         Transaction.run(() => {
-            this.sidePanel.dispose()
+            this._sidePanel.dispose()
             this._tasksViewGroup.dispose()
             this._optionsViewGroup.dispose()
+            this._context.dispose()
             super.dispose()
         })
     }
 
+    @cached
     render(): JSX.Element {
-        return <WorkbenchScreenView model={this} />
+        const viewGroups = [this._tasksViewGroup, this._optionsViewGroup]
+        return (
+            <view.WorkbenchScreen currentViewGroup={this._currentViewGroup}
+                sidePanel={this._sidePanel}
+                viewGroups={viewGroups}
+                onShowViewGroup={v => this.showViewGroup(v)} />
+        )
     }
 
     @transaction
-    showViewGroup(viewGroup: ViewGroup): void {
+    private showViewGroup(viewGroup: ViewGroup): void {
         this._currentViewGroup = viewGroup
     }
 
     @reaction
     private updateSidePanelRefs(): void {
         this._sidePanelTitle = this._currentViewGroup.currentView.title
-        this._sidePanelIsPulsing = this._currentViewGroup.currentView.isPulsing
+        this._sidePanelShouldShowLoader = this._currentViewGroup.currentView.isPulsing
     }
 }
-
-
-
-
-
-
-

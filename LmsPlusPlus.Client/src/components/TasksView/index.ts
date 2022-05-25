@@ -1,1 +1,1 @@
-export { TasksViewModel as TasksView } from "./TasksView.model"
+export { TasksView } from "./TasksView.model"

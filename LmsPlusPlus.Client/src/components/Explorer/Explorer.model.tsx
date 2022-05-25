@@ -1,29 +1,30 @@
 import React from "react"
-import { transaction, Transaction } from "reactronic"
+import { cached, transaction, Transaction } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
-import { ExplorerView } from "./Explorer.view"
-import { NodeModel } from "./Node.model"
+import * as view from "./Explorer.view"
+import { Node } from "./Node.model"
 
-export abstract class ExplorerModel<T> extends ObservableObject {
-    private _oldNodes = new Map<string, NodeModel<unknown>>()
-    private _newNodes = new Map<string, NodeModel<unknown>>()
-    private _selectedNode: NodeModel<T> | null = null
-    private _children: readonly NodeModel<unknown>[] = []
+export abstract class Explorer<T> extends ObservableObject {
+    private _oldNodes = new Map<string, Node<unknown>>()
+    private _newNodes = new Map<string, Node<unknown>>()
+    private _selectedNode: Node<T> | null = null
+    private _children: readonly Node<unknown>[] = []
 
-    get children(): readonly NodeModel<unknown>[] { return this._children }
-    get selectedNode(): NodeModel<T> | null { return this._selectedNode }
+    get selectedNode(): Node<T> | null { return this._selectedNode }
+    protected get children(): readonly Node<unknown>[] { return this._children }
 
-    protected constructor(children: readonly NodeModel<unknown>[]) {
+    protected constructor(children: readonly Node<unknown>[]) {
         super()
         this._children = this.reconcileChildren(children)
     }
 
+    @cached
     render(): JSX.Element {
-        return <ExplorerView model={this} />
+        return <view.ExplorerView explorer={this} children={this._children} />
     }
 
     @transaction
-    setSelectedNode(node: NodeModel<T> | null): void {
+    setSelectedNode(node: Node<T> | null): void {
         this._selectedNode = node
     }
 
@@ -31,17 +32,16 @@ export abstract class ExplorerModel<T> extends ObservableObject {
         Transaction.run(() => {
             this._oldNodes.forEach(n => n.dispose())
             this._oldNodes.toMutable().clear()
-            this._newNodes.toMutable().clear()
             super.dispose()
         })
     }
 
     @transaction
-    protected updateChildren<K>(newChildren: readonly NodeModel<K>[]): void {
+    protected updateChildren<K>(newChildren: readonly Node<K>[]): void {
         this._children = this.reconcileChildren(newChildren)
     }
 
-    private reconcileChildren<K>(nodes: readonly NodeModel<K>[]): readonly NodeModel<K>[] {
+    private reconcileChildren<K>(nodes: readonly Node<K>[]): readonly Node<K>[] {
         const newChildren = this.visitNodes(nodes)
         for (const node of this._oldNodes.values()) {
             if (node === this._selectedNode)
@@ -50,15 +50,15 @@ export abstract class ExplorerModel<T> extends ObservableObject {
         }
         this._oldNodes = this._newNodes
         this._newNodes = new Map()
-        return newChildren as readonly NodeModel<K>[]
+        return newChildren as readonly Node<K>[]
     }
 
-    private visitNode<K>(node: NodeModel<K>): NodeModel<K> {
+    private visitNode<K>(node: Node<K>): Node<K> {
         let result = node
         if (this._oldNodes.has(node.key)) {
-            const oldNode = this._oldNodes.get(node.key) as NodeModel<K>
+            const oldNode = this._oldNodes.get(node.key) as Node<K>
             const children = node.children ? this.visitNodes(node.children) : null
-            oldNode.updateNode(node.title, node.item, children)
+            oldNode.update(node.title, node.item, children)
             const oldNodes = this._oldNodes.toMutable()
             oldNodes.delete(oldNode.key)
             this._oldNodes = oldNodes
@@ -71,7 +71,7 @@ export abstract class ExplorerModel<T> extends ObservableObject {
         return result
     }
 
-    private visitNodes<K>(nodes: readonly NodeModel<K>[]): NodeModel<K>[] {
+    private visitNodes<K>(nodes: readonly Node<K>[]): Node<K>[] {
         return nodes.map(node => this.visitNode(node))
     }
 }

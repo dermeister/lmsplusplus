@@ -1,31 +1,33 @@
 import React, { createContext, useContext } from "react"
 import { autorender } from "../autorender"
-import { ExplorerModel } from "./Explorer.model"
+import * as model from "./Explorer.model"
 import explorerStyles from "./Explorer.module.scss"
+import { Node } from "./Node.model"
 import { OffsetContext } from "./Offset"
 import offsetStyles from "./Offset.module.scss"
 
 interface ExplorerProps<T> {
-    model: ExplorerModel<T>
+    explorer: model.Explorer<T>
+    children: readonly Node<T>[]
 }
 
-const ExplorerModelContext = createContext<ExplorerModel<unknown> | null>(null)
+const ExplorerModelContext = createContext<model.Explorer<unknown> | null>(null)
 
-export function useExplorerModel<T extends ExplorerModel<unknown>>(): T {
-    const model = useContext(ExplorerModelContext as React.Context<T | null>)
-    if (!model)
+export function useExplorer<T extends model.Explorer<unknown>>(): T {
+    const explorer = useContext(ExplorerModelContext as React.Context<T | null>)
+    if (!explorer)
         throw new Error("Explorer model not provided.")
-    return model
+    return explorer
 }
 
-export function ExplorerView<T>({ model }: ExplorerProps<T>): JSX.Element {
+export function ExplorerView<T>({ explorer, children }: ExplorerProps<T>): JSX.Element {
     return autorender(() => (
-        <ExplorerModelContext.Provider value={model}>
+        <ExplorerModelContext.Provider value={explorer}>
             <OffsetContext.Provider value={Number(offsetStyles.offsetBase)}>
-                <ul className={explorerStyles.list}>
-                    {model.children.map(c => <li key={c.key}>{c.render()}</li>)}
+                <ul className={explorerStyles.items}>
+                    {children.map(c => <li key={c.key}>{c.render()}</li>)}
                 </ul>
             </OffsetContext.Provider>
         </ExplorerModelContext.Provider>
-    ), [model])
+    ), [explorer, children])
 }

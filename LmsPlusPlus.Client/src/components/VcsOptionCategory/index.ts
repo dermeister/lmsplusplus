@@ -1,1 +1,1 @@
-export { VcsOptionCategoryModel as VcsOptionCategory } from "./VcsOptionCategory.model"
+export { VcsOptionCategory } from "./VcsOptionCategory.model"

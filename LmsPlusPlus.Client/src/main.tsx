@@ -1,11 +1,18 @@
+import React from "react"
 import ReactDOM from "react-dom"
 import { Transaction } from "reactronic"
 import "xterm/css/xterm.css"
 import { App } from "./components/App"
+import { autorender } from "./components/autorender"
 import "./components/index.scss"
 
 const app = Transaction.run(() => new App())
-ReactDOM.render(app.render(), document.getElementById("root"))
+
+function Root(): JSX.Element {
+    return autorender(() => app.render(), [app])
+}
+
+ReactDOM.render(<Root />, document.getElementById("root"))
 
 window.onbeforeunload = () => {
     app.dispose()

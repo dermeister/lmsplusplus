@@ -15,7 +15,6 @@ interface ContextMenuButtonProps {
     variant: "primary" | "danger"
     children?: React.ReactNode
     className?: string
-
     onClick?(): void
 }
 
@@ -74,7 +73,6 @@ export interface RadioItem<T> {
 interface ContextMenuRadioGroup<T> {
     items: readonly RadioItem<T>[]
     selectedValue?: T
-
     onValueChange?(active: T): void
 }
 

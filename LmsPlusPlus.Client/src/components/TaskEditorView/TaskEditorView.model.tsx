@@ -1,15 +1,15 @@
 import * as monaco from "monaco-editor"
 import React from "react"
-import { Monitor, options, standalone, Transaction, transaction, unobservable } from "reactronic"
+import { cached, Monitor, options, standalone, Transaction, transaction, unobservable } from "reactronic"
 import { DatabaseContext } from "../../database"
 import * as domain from "../../domain"
 import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
-import { TaskEditorMainPanelContent, TaskEditorSidePanelContent } from "./TaskEditor.view"
+import * as view from "./TaskEditorView.view"
 
 export class TaskEditorView extends View {
-    @unobservable readonly description: monaco.editor.ITextModel
     @unobservable readonly availableTechnologies: readonly domain.Technology[]
+    @unobservable private readonly description: monaco.editor.ITextModel
     @unobservable private static readonly s_monitor = Monitor.create("task-editor-view", 0, 0)
     @unobservable private readonly _id: number
     @unobservable private readonly _topic: domain.Topic
@@ -43,12 +43,14 @@ export class TaskEditorView extends View {
         })
     }
 
+    @cached
     override renderSidePanelContent(): JSX.Element {
-        return <TaskEditorSidePanelContent model={this} />
+        return <view.TaskEditorSidePanelContent taskEditorView={this} />
     }
 
+    @cached
     override renderMainPanelContent(): JSX.Element {
-        return <TaskEditorMainPanelContent model={this} />
+        return <view.TaskEditorMainPanelContent description={this.description} />
     }
 
     @transaction

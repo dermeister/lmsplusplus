@@ -1,24 +1,24 @@
 import React from "react"
 import { autorender } from "../autorender"
-import { TasksViewModel } from "./TasksView.model"
+import { TasksExplorer } from "../TasksExplorer"
 import styles from "./TasksView.module.scss"
 
 interface TasksViewSidePanelProps {
-    model: TasksViewModel
+    explorer: TasksExplorer
 }
 
-export function TasksViewSidePanelContent({ model }: TasksViewSidePanelProps): JSX.Element {
-    return autorender(() => model.tasksExplorer.render(), [model])
+export function TasksViewSidePanelContent({ explorer }: TasksViewSidePanelProps): JSX.Element {
+    return autorender(() => explorer.render(), [explorer])
 }
 
 interface TasksViewMainPanelProps {
-    model: TasksViewModel
+    taskDescriptionHtml: string | null
 }
 
-export function TasksViewMainPanelContent({ model }: TasksViewMainPanelProps): JSX.Element {
+export function TasksViewMainPanelContent({ taskDescriptionHtml }: TasksViewMainPanelProps): JSX.Element {
     return autorender(() => {
-        if (!model.taskDescriptionHtml)
+        if (!taskDescriptionHtml)
             return <p className={styles.noTask}>No task selected</p>
-        return <div className={styles.description} dangerouslySetInnerHTML={{ __html: model.taskDescriptionHtml }} />
-    }, [model])
+        return <div className={styles.description} dangerouslySetInnerHTML={{ __html: taskDescriptionHtml }} />
+    }, [taskDescriptionHtml])
 }

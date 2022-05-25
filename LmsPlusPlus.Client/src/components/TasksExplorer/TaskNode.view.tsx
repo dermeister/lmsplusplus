@@ -1,83 +1,89 @@
 import React from "react"
+import * as domain from "../../domain"
 import { autorender } from "../autorender"
-import { ContextMenu } from "../ContextMenuService"
-import { TaskNodeModel } from "./TaskNode.model"
+import { ContextMenu, IContextMenuService } from "../ContextMenuService"
+import { ITasksService } from "../ITasksService"
+import * as model from "./TaskNode.model"
 
 interface TaskContextMenuProps {
-    model: TaskNodeModel
+    node: model.TaskNode
+    permissions: domain.Permissions
+    tasksService: ITasksService
+    contextMenuService: IContextMenuService
 }
 
-export function TaskContextMenu({ model }: TaskContextMenuProps): JSX.Element {
+export function TaskContextMenu({ permissions, node, tasksService, contextMenuService }: TaskContextMenuProps): JSX.Element {
+    function onRunSolution(): void {
+        contextMenuService.close()
+        tasksService.runSolution(node.item.solutions[0])
+    }
+
+    function onUpdateTask(): void {
+        contextMenuService.close()
+        tasksService.updateTask(node.item)
+    }
+
+    async function onDeleteTask(): Promise<void> {
+        contextMenuService.close()
+        tasksService.deleteTask(node.item)
+    }
+
+    function onCreateSolution(): void {
+        contextMenuService.close()
+        tasksService.createSolution(node.item)
+    }
+
+    async function onDeleteSolution(): Promise<void> {
+        contextMenuService.close()
+        tasksService.deleteSolution(node.item.solutions[0])
+    }
+
     return autorender(() => {
         let contextMenuBody
-        if (model.context.permissions.canUpdateTask)
+        if (permissions.canUpdateTask)
             contextMenuBody = (
-                <ContextMenu.Button variant="primary" onClick={() => onUpdateTask(model)}>
+                <ContextMenu.Button variant="primary" onClick={() => onUpdateTask()}>
                     Edit Task
                 </ContextMenu.Button>
             )
-        if (model.context.permissions.canDeleteTask)
+        if (permissions.canDeleteTask)
             contextMenuBody = (
                 <>
                     {contextMenuBody}
-                    <ContextMenu.Button variant="danger" onClick={() => onDeleteTask(model)}>
+                    <ContextMenu.Button variant="danger" onClick={() => onDeleteTask()}>
                         Delete Task
                     </ContextMenu.Button>
                 </>
             )
-        if (model.context.permissions.canCreateSolution && model.item.solutions.length === 0)
+        if (permissions.canCreateSolution && node.item.solutions.length === 0)
             contextMenuBody = (
                 <>
                     {contextMenuBody}
-                    <ContextMenu.Button variant="primary" onClick={() => onCreateSolution(model)}>
+                    <ContextMenu.Button variant="primary" onClick={() => onCreateSolution()}>
                         New Solution
                     </ContextMenu.Button>
                 </>
             )
-        if (model.item.solutions.length === 1) {
+        if (node.item.solutions.length === 1) {
             contextMenuBody = (
                 <>
                     {contextMenuBody}
-                    <ContextMenu.Button variant="primary" onClick={() => onRunSolution(model)}>
+                    <ContextMenu.Button variant="primary" onClick={() => onRunSolution()}>
                         Run solution
                     </ContextMenu.Button>
                 </>
             )
-            if (model.context.permissions.canDeleteSolution)
+            if (permissions.canDeleteSolution)
                 contextMenuBody = (
                     <>
                         {contextMenuBody}
-                        <ContextMenu.Button variant="danger" onClick={() => onDeleteSolution(model)}>
+                        <ContextMenu.Button variant="danger" onClick={() => onDeleteSolution()}>
                             Delete Solution
                         </ContextMenu.Button>
                     </>
                 )
         }
         return <ContextMenu>{contextMenuBody}</ContextMenu>
-    }, [model])
+    }, [node, permissions, tasksService, contextMenuService])
 }
 
-function onRunSolution(model: TaskNodeModel): void {
-    model.contextMenuService.close()
-    model.tasksService.runSolution(model.item.solutions[0])
-}
-
-function onUpdateTask(model: TaskNodeModel): void {
-    model.contextMenuService.close()
-    model.tasksService.updateTask(model.item)
-}
-
-async function onDeleteTask(model: TaskNodeModel): Promise<void> {
-    model.contextMenuService.close()
-    // await model.tasksService.deleteTask(model.item)
-}
-
-function onCreateSolution(model: TaskNodeModel): void {
-    model.contextMenuService.close()
-    model.tasksService.createSolution(model.item)
-}
-
-async function onDeleteSolution(model: TaskNodeModel): Promise<void> {
-    model.contextMenuService.close()
-    // await model.deleteSolution(task.item.solutions[0])
-}

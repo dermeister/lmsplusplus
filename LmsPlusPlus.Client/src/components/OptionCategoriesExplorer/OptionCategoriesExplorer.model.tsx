@@ -7,14 +7,16 @@ export enum OptionCategoryKind {
     Vcs
 }
 
-export class OptionCategoriesExplorerModel extends Explorer<OptionCategoryKind> {
+export class OptionCategoriesExplorer extends Explorer<OptionCategoryKind> {
     @unobservable private readonly _permissions: Ref<domain.Permissions>
-    override get children(): readonly Node<OptionCategoryKind>[] { return super.children as readonly Node<OptionCategoryKind>[] }
+
+    protected override get children(): readonly Node<OptionCategoryKind>[] { return super.children as readonly Node<OptionCategoryKind>[] }
 
     constructor(permissions: Ref<domain.Permissions>) {
-        super(OptionCategoriesExplorerModel.createChildren(permissions.value))
+        super(OptionCategoriesExplorer.createChildren(permissions.value))
         this._permissions = permissions
-        this.setSelectedNode(this.children[0])
+        if (this.children.length > 0)
+            this.setSelectedNode(this.children[0])
     }
 
     override dispose(): void {
@@ -36,7 +38,9 @@ export class OptionCategoriesExplorerModel extends Explorer<OptionCategoryKind> 
 
     @reaction
     private updateExplorer(): void {
-        const newChildren = OptionCategoriesExplorerModel.createChildren(this._permissions.value)
+        const newChildren = OptionCategoriesExplorer.createChildren(this._permissions.value)
         this.updateChildren(newChildren)
+        if (!this.selectedNode && this.children.length > 0)
+            this.setSelectedNode(this.children[0])
     }
 }

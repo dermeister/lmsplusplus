@@ -1,23 +1,28 @@
 import React from "react"
-import { unobservable } from "reactronic"
-import { DatabaseContext } from "../../database"
+import { cached, unobservable } from "reactronic"
 import * as domain from "../../domain"
 import { IContextMenuService } from "../ContextMenuService"
 import { Node } from "../Explorer"
 import { ITasksService } from "../ITasksService"
-import { TaskContextMenu } from "./TaskNode.view"
+import * as view from "./TaskNode.view"
 
-export class TaskNodeModel extends Node<domain.Task> {
-    @unobservable readonly context: DatabaseContext
-    @unobservable readonly tasksService: ITasksService
+export class TaskNode extends Node<domain.Task> {
+    @unobservable private readonly _permissions: domain.Permissions
+    @unobservable private readonly _tasksService: ITasksService
 
-    constructor(task: domain.Task, contextMenuService: IContextMenuService, context: DatabaseContext, tasksService: ITasksService) {
+    protected override get contextMenuService(): IContextMenuService { return super.contextMenuService as IContextMenuService }
+
+    constructor(task: domain.Task, contextMenuService: IContextMenuService, permissions: domain.Permissions, tasksService: ITasksService) {
         super(`task-${task.id}`, task, task.title, contextMenuService)
-        this.context = context
-        this.tasksService = tasksService
+        this._permissions = permissions
+        this._tasksService = tasksService
     }
 
+    @cached
     override renderContextMenu(): JSX.Element | null {
-        return <TaskContextMenu model={this} />
+        return (
+            <view.TaskContextMenu node={this} tasksService={this._tasksService} permissions={this._permissions}
+                contextMenuService={this.contextMenuService} />
+        )
     }
 }

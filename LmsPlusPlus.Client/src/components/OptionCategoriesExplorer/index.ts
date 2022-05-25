@@ -1,1 +1,1 @@
-export { OptionCategoriesExplorerModel as OptionCategoriesExplorer } from "./OptionCategoriesExplorer.model"
+export { OptionCategoriesExplorer } from "./OptionCategoriesExplorer.model"

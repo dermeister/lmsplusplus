@@ -3,25 +3,25 @@ import { autorender } from "../autorender"
 import { Button } from "../Button"
 import { Field } from "../Field"
 import { Input } from "../Input"
-import { SignInScreenModel } from "./SignInScreen.model"
+import * as model from "./SignInScreen.model"
 import styles from "./SignInScreen.module.scss"
 
-interface SignInScreenViewProps {
-    model: SignInScreenModel
+interface SignInScreenProps {
+    screen: model.SignInScreen
 }
 
-export function SignInScreenView({ model }: SignInScreenViewProps): JSX.Element {
+export function SignInScreen({ screen }: SignInScreenProps): JSX.Element {
     function onLogin(e: React.ChangeEvent<HTMLInputElement>): void {
-        model.setLogin(e.target.value)
+        screen.setLogin(e.target.value)
     }
 
     function onPassword(e: React.ChangeEvent<HTMLInputElement>): void {
-        model.setPassword(e.target.value)
+        screen.setPassword(e.target.value)
     }
 
     function onSubmit(e: React.FormEvent<HTMLFormElement>): void {
         e.preventDefault()
-        model.signIn()
+        screen.signIn()
     }
 
     return autorender(() => (
@@ -31,13 +31,13 @@ export function SignInScreenView({ model }: SignInScreenViewProps): JSX.Element 
                 <p className={styles.formHeading}>Welcome back!</p>
                 <Field label="Login">
                     <Input id="sign-in-login"
-                        value={model.login}
+                        value={screen.login}
                         onChange={onLogin}
                         className={styles.input} />
                 </Field>
                 <Field label="Password">
                     <Input id="sign-in-password"
-                        value={model.password}
+                        value={screen.password}
                         onChange={onPassword}
                         type="password"
                         className={styles.input} />
@@ -45,5 +45,5 @@ export function SignInScreenView({ model }: SignInScreenViewProps): JSX.Element 
                 <Button className={styles.submit} variant="primary">Sign in</Button>
             </form>
         </div>
-    ), [model])
+    ), [screen])
 }

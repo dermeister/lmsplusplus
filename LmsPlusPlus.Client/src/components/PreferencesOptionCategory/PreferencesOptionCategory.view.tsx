@@ -2,24 +2,24 @@ import React from "react"
 import { autorender } from "../autorender"
 import { Dropdown } from "../Dropdown"
 import { Field } from "../Field"
-import { PreferencesOptionCategoryModel } from "./PreferencesOptionCategory.model"
-
-interface PreferencesViewProps {
-    model: PreferencesOptionCategoryModel
-}
+import * as model from "./PreferencesOptionCategory.model"
 
 const themes = [
     { value: "Dark", title: "Dark" },
     { value: "Light", title: "Light" }
 ]
 
-export function PreferencesOptionCategoryView({ model }: PreferencesViewProps): JSX.Element {
+interface PreferencesOptionCategoryProps {
+    category: model.PreferencesOptionCategory
+}
+
+export function PreferencesOptionCategory({ category }: PreferencesOptionCategoryProps): JSX.Element {
     return autorender(() => (
         <Field label="Theme">
-            <Dropdown selectedValue={model.darkMode ? "Dark" : "Light"}
+            <Dropdown selectedValue={category.darkMode ? "Dark" : "Light"}
                 items={themes}
-                onValueChange={i => model.setDarkMode(i === "Dark")}
-                createPlaceholder={() => model.darkMode ? "Dark" : "Light"} />
+                onValueChange={i => category.setDarkMode(i === "Dark")}
+                createPlaceholder={() => category.darkMode ? "Dark" : "Light"} />
         </Field>
-    ), [model])
+    ), [category])
 }

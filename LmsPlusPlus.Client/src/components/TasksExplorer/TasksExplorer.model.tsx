@@ -1,32 +1,40 @@
-import { reaction, Ref, unobservable } from "reactronic"
-import { DatabaseContext } from "../../database"
+import { reaction, Ref, Rx, Transaction, unobservable } from "reactronic"
 import * as domain from "../../domain"
 import { IContextMenuService } from "../ContextMenuService"
 import { Explorer } from "../Explorer"
 import { ITasksService } from "../ITasksService"
-import { TopicNodeModel } from "./TopicNode.model"
+import { TopicNode } from "./TopicNode.model"
 
-export class TasksExplorerModel extends Explorer<domain.Task> {
-    @unobservable readonly context: DatabaseContext
+export class TasksExplorer extends Explorer<domain.Task> {
+    @unobservable private readonly _permissions: Ref<domain.Permissions>
     @unobservable private readonly _tasksService: ITasksService
     @unobservable private readonly _topics: Ref<readonly domain.Topic[]>
     @unobservable private readonly _contextMenuService: IContextMenuService
 
-    constructor(topics: Ref<readonly domain.Topic[]>, tasksSerivce: ITasksService, contextMenuService: IContextMenuService, context: DatabaseContext) {
-        super(TasksExplorerModel.createChildren(topics.value, contextMenuService, context, tasksSerivce))
-        this.context = context
+    constructor(topics: Ref<readonly domain.Topic[]>, tasksSerivce: ITasksService, contextMenuService: IContextMenuService,
+        permissions: Ref<domain.Permissions>) {
+        super(TasksExplorer.createChildren(topics.value, contextMenuService, permissions.value, tasksSerivce))
+        this._permissions = permissions
         this._tasksService = tasksSerivce
         this._topics = topics
         this._contextMenuService = contextMenuService
     }
 
-    private static createChildren(topics: readonly domain.Topic[], contextMenuService: IContextMenuService, context: DatabaseContext, tasksSerivce: ITasksService): readonly TopicNodeModel[] {
-        return topics.map(c => new TopicNodeModel(c, contextMenuService, context, tasksSerivce))
+    override dispose(): void {
+        Transaction.run(() => {
+            Rx.dispose(this._permissions)
+            super.dispose()
+        })
+    }
+
+    private static createChildren(topics: readonly domain.Topic[], contextMenuService: IContextMenuService, permissions: domain.Permissions,
+        tasksSerivce: ITasksService): readonly TopicNode[] {
+        return topics.map(c => new TopicNode(c, contextMenuService, permissions, tasksSerivce))
     }
 
     @reaction
     private updateExplorer(): void {
-        const newChildren = TasksExplorerModel.createChildren(this._topics.value, this._contextMenuService, this.context, this._tasksService)
+        const newChildren = TasksExplorer.createChildren(this._topics.value, this._contextMenuService, this._permissions.value, this._tasksService)
         this.updateChildren(newChildren)
     }
 }

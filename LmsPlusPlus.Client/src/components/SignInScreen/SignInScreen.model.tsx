@@ -1,12 +1,12 @@
 import React from "react"
-import { transaction, unobservable } from "reactronic"
+import { cached, transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import { IAuthService } from "../AuthService"
 import { IScreen } from "../IScreen"
-import { SignInScreenView } from "./SignInScreen.view"
+import * as view from "./SignInScreen.view"
 
-export class SignInScreenModel extends ObservableObject implements IScreen {
-    @unobservable readonly _authService: IAuthService
+export class SignInScreen extends ObservableObject implements IScreen {
+    @unobservable private readonly _authService: IAuthService
     private _login = ""
     private _password = ""
 
@@ -36,7 +36,8 @@ export class SignInScreenModel extends ObservableObject implements IScreen {
         }
     }
 
+    @cached
     render(): JSX.Element {
-        return <SignInScreenView model={this} />
+        return <view.SignInScreen screen={this} />
     }
 }

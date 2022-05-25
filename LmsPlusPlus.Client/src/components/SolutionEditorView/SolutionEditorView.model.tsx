@@ -4,7 +4,7 @@ import { DatabaseContext } from "../../database"
 import * as domain from "../../domain"
 import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
-import { SolutionEditorMainPanelContent, SolutionEditorSidePanelContent } from "./SolutionEditorView"
+import * as view from "./SolutionEditorView.view"
 
 export class SolutionEditorView extends View {
     @unobservable readonly availableTechnologies: readonly domain.Technology[]
@@ -32,11 +32,11 @@ export class SolutionEditorView extends View {
     }
 
     override renderSidePanelContent(): JSX.Element {
-        return <SolutionEditorSidePanelContent model={this} />
+        return <view.SolutionEditorSidePanelContent solutionEditorView={this} />
     }
 
     override renderMainPanelContent(): JSX.Element {
-        return <SolutionEditorMainPanelContent model={this} />
+        return <view.SolutionEditorMainPanelContent />
     }
 
     @transaction

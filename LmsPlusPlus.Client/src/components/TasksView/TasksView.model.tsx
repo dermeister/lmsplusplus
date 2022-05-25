@@ -5,46 +5,52 @@ import { DatabaseContext } from "../../database"
 import * as domain from "../../domain"
 import { IContextMenuService } from "../ContextMenuService"
 import { ITasksService } from "../ITasksService"
-import { SolutionEditorView } from "../SolutionEditorView/SolutionEditor"
+import { SolutionEditorView } from "../SolutionEditorView"
 import { SolutionRunner } from "../SolutionRunnerView/SolutionRunner"
-import { TaskEditorView } from "../TaskEditorView/TaskEditor.model"
+import { TaskEditorView } from "../TaskEditorView"
 import { TasksExplorer } from "../TasksExplorer"
 import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
-import { TasksViewMainPanelContent, TasksViewSidePanelContent } from "./TasksView.view"
+import * as view from "./TasksView.view"
 
-export class TasksViewModel extends View implements ITasksService {
-    @unobservable readonly tasksExplorer: TasksExplorer
+export class TasksView extends View implements ITasksService {
     @unobservable private static readonly s_markdown = new MarkdownIt()
+    @unobservable private readonly _tasksExplorer: TasksExplorer
     @unobservable private readonly _context: DatabaseContext
     @unobservable private readonly _viewGroup: ViewGroup
 
     override get title(): string { return "Tasks" }
-    @cached get taskDescriptionHtml(): string | null {
-        const description = this.tasksExplorer.selectedNode?.item.description
-        return description ? TasksViewModel.s_markdown.render(description) : null
-    }
 
     constructor(context: DatabaseContext, viewGroup: ViewGroup, contextMenuService: IContextMenuService) {
         super()
         this._context = context
         this._viewGroup = viewGroup
-        this.tasksExplorer = new TasksExplorer(new Ref(this._context, "courses"), this, contextMenuService, this._context)
+        this._tasksExplorer = new TasksExplorer(new Ref(this._context, "courses"), this, contextMenuService, new Ref(this._context, "permissions"))
     }
 
     override dispose(): void {
         Transaction.run(() => {
-            this.tasksExplorer.dispose()
+            this._tasksExplorer.dispose()
             super.dispose()
         })
     }
 
+    @cached
     override renderSidePanelContent(): JSX.Element {
-        return <TasksViewSidePanelContent model={this} />
+        return <view.TasksViewSidePanelContent explorer={this._tasksExplorer} />
     }
 
+    @cached
     override renderMainPanelContent(): JSX.Element {
-        return <TasksViewMainPanelContent model={this} />
+        const taskDescription = this._tasksExplorer.selectedNode?.item.description
+        const taskDescriptionHtml = taskDescription ? TasksView.s_markdown.render(taskDescription) : null
+        return <view.TasksViewMainPanelContent taskDescriptionHtml={taskDescriptionHtml} />
+    }
+
+    @transaction
+    createTask(topic: domain.Topic): void {
+        throw new Error("Method not implemented.")
+
     }
 
     @transaction
@@ -54,10 +60,20 @@ export class TasksViewModel extends View implements ITasksService {
     }
 
     @transaction
+    deleteTask(task: domain.Task): void {
+        throw new Error("Method not implemented.")
+    }
+
+    @transaction
     createSolution(task: domain.Task): void {
         const solution = new domain.Solution(domain.Solution.NO_ID, task, "", null)
         const solutionEditorView = new SolutionEditorView(solution, this._context, this._viewGroup)
         this._viewGroup.openView(solutionEditorView)
+    }
+
+    @transaction
+    deleteSolution(solution: domain.Solution): void {
+        throw new Error("Method not implemented.")
     }
 
     @transaction

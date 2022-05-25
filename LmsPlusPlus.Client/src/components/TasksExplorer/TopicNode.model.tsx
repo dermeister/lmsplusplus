@@ -1,33 +1,39 @@
 import React from "react"
-import { Transaction, unobservable } from "reactronic"
-import { DatabaseContext } from "../../database"
+import { cached, Transaction, unobservable } from "reactronic"
 import * as domain from "../../domain"
 import { IContextMenuService } from "../ContextMenuService"
 import { Node } from "../Explorer"
 import { ITasksService } from "../ITasksService"
-import { TaskNodeModel } from "./TaskNode.model"
-import { TopicContextMenu } from "./TopicNode.view"
+import { TaskNode } from "./TaskNode.model"
+import * as view from "./TopicNode.view"
 
-export class TopicNodeModel extends Node<domain.Topic> {
-    @unobservable readonly context: DatabaseContext
-    @unobservable readonly tasksService: ITasksService
+export class TopicNode extends Node<domain.Topic> {
+    @unobservable private readonly _tasksService: ITasksService
+    @unobservable private readonly _permissions: domain.Permissions
 
     override get children(): Node<domain.Task>[] { return super.children as Node<domain.Task>[] }
+    protected override get contextMenuService(): IContextMenuService { return super.contextMenuService as IContextMenuService }
 
-    constructor(topic: domain.Topic, contextMenuService: IContextMenuService, context: DatabaseContext, tasksService: ITasksService) {
+    constructor(topic: domain.Topic, contextMenuService: IContextMenuService, permissions: domain.Permissions, tasksService: ITasksService) {
         super(`topic-${topic.id}`, topic, topic.name, contextMenuService,
-            TopicNodeModel.createTaskNodes(topic.tasks, contextMenuService, context, tasksService))
-        this.context = context
-        this.tasksService = tasksService
+            TopicNode.createTaskNodes(topic.tasks, contextMenuService, permissions, tasksService))
+        this._permissions = permissions
+        this._tasksService = tasksService
     }
 
-    private static createTaskNodes(tasks: readonly domain.Task[], contextMenuService: IContextMenuService, context: DatabaseContext,
+    private static createTaskNodes(tasks: readonly domain.Task[], contextMenuService: IContextMenuService, permissions: domain.Permissions,
         tasksService: ITasksService): Node<domain.Task>[] {
-        return Transaction.run(() => tasks.map(task => new TaskNodeModel(task, contextMenuService, context, tasksService)))
+        return Transaction.run(() => tasks.map(task => new TaskNode(task, contextMenuService, permissions, tasksService)))
     }
 
+    @cached
     override renderContextMenu(): JSX.Element | null {
-        return <TopicContextMenu model={this} />
+        return (
+            <view.TopicContextMenu node={this}
+                contextMenuService={this.contextMenuService}
+                permissions={this._permissions}
+                tasksService={this._tasksService} />
+        )
     }
 }
 

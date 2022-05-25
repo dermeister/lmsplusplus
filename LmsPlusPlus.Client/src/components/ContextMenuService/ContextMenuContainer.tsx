@@ -6,11 +6,11 @@ import { ContextMenuService } from "./ContextMenuService"
 interface ContextMenuProps {
     x: number
     y: number
-    model: ContextMenuService
+    contextMenuService: ContextMenuService
     contextMenu: JSX.Element | null
 }
 
-export function ContextMenuContainer({ model, contextMenu, x, y }: ContextMenuProps): JSX.Element {
+export function ContextMenuContainer({ contextMenuService, contextMenu, x, y }: ContextMenuProps): JSX.Element {
     function positionMenu(menu: HTMLElement | null): void {
         if (menu) {
             const offset = 10
@@ -25,8 +25,13 @@ export function ContextMenuContainer({ model, contextMenu, x, y }: ContextMenuPr
         }
     }
 
+    function onContextMenu(e: React.MouseEvent): void {
+        e.preventDefault()
+        e.stopPropagation()
+    }
+
     return (
-        <Overlay onClick={() => model.close()} trapFocus>
+        <Overlay onClick={() => contextMenuService.close()} trapFocus>
             <menu ref={positionMenu} onContextMenu={onContextMenu} className={styles.contextMenuContainer}>
                 {contextMenu}
             </menu>
@@ -34,7 +39,3 @@ export function ContextMenuContainer({ model, contextMenu, x, y }: ContextMenuPr
     )
 }
 
-function onContextMenu(e: React.MouseEvent): void {
-    e.preventDefault()
-    e.stopPropagation()
-}

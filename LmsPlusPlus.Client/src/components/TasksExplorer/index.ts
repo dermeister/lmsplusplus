@@ -1,1 +1,1 @@
-export { TasksExplorerModel as TasksExplorer } from "./TasksExplorer.model"
+export { TasksExplorer as TasksExplorer } from "./TasksExplorer.model"

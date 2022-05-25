@@ -1,1 +1,1 @@
-export { OptionsViewModel as OptionsView } from "./OptionsView.model"
+export { OptionsView as OptionsView } from "./OptionsView.model"

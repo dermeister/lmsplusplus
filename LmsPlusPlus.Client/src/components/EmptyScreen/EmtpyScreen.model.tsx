@@ -1,11 +1,13 @@
 import React from "react"
+import { cached } from "reactronic"
 import { IScreen } from "../IScreen"
-import { EmptyScreenView } from "./EmptyScreen.view"
+import * as view from "./EmptyScreen.view"
 
-export class EmptyScreenModel implements IScreen {
+export class EmptyScreen implements IScreen {
     dispose(): void { }
 
+    @cached
     render(): JSX.Element {
-        return <EmptyScreenView />
+        return <view.EmptyScreen />
     }
 }

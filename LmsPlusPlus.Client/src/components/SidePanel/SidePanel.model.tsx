@@ -1,27 +1,23 @@
 import React from "react"
-import { Ref, Rx, Transaction, transaction, unobservable } from "reactronic"
+import { cached, Ref, Rx, Transaction, transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
-import { SidePanel } from "./SidePanel.view"
+import * as view from "./SidePanel.view"
 
-export class SidePanelModel extends ObservableObject {
+export class SidePanel extends ObservableObject {
     @unobservable private readonly _title: Ref<string>
-    @unobservable private readonly _isPulsing: Ref<boolean>
+    @unobservable private readonly _shouldShowLoader: Ref<boolean>
     private _isOpened = true
-
-    get title(): string { return this._title.value }
-    get isOpened(): boolean { return this._isOpened }
-    get shouldShowLoader(): boolean { return this._isPulsing.value }
 
     constructor(title: Ref<string>, shouldShowLoader: Ref<boolean>) {
         super()
         this._title = title
-        this._isPulsing = shouldShowLoader
+        this._shouldShowLoader = shouldShowLoader
     }
 
     override dispose(): void {
         Transaction.run(() => {
             Rx.dispose(this._title)
-            Rx.dispose(this._isPulsing)
+            Rx.dispose(this._shouldShowLoader)
             super.dispose()
         })
     }
@@ -36,7 +32,14 @@ export class SidePanelModel extends ObservableObject {
         this._isOpened = !this._isOpened
     }
 
+    @cached
     render(content: JSX.Element): JSX.Element {
-        return <SidePanel model={this}>{content}</SidePanel>
+        return (
+            <view.SidePanel isOpened={this._isOpened}
+                shouldShowLoader={this._shouldShowLoader.value}
+                title={this._title.value}>
+                {content}
+            </view.SidePanel>
+        )
     }
 }
