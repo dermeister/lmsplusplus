@@ -3,83 +3,88 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
 
 :root {
-  /* Colors */
-  --background-primary: #212529;
-  --background-secondary: #2e3338;
-  --background-secondary-hover: #40474f;
-  --text-primary: #e9ecef;
-  --text-primary-hover: #ffffff;
-  --text-secondary: #e9ecef;
-  --text-secondary-hover: #ffffff;
-  --primary: #167cca;
-  --primary-hover: #1887dc;
-  --secondary: #495057;
-  --secondary-hover: #545c64;
-  --danger: #cb1b16;
-  --danger-hover: #dc1f18;
-  --shadow-primary: #090a0b;
-  --shadow-secondary: #1c1f22;
+    color-scheme: dark;
+    /* Colors */
+    --background-primary: #212529;
+    --background-secondary: #2e3338;
+    --background-secondary-hover: #40474f;
+    --text-primary: #e9ecef;
+    --text-primary-hover: #ffffff;
+    --text-secondary: #e9ecef;
+    --text-secondary-hover: #ffffff;
+    --primary: #167cca;
+    --primary-hover: #1887dc;
+    --secondary: #495057;
+    --secondary-hover: #545c64;
+    --danger: #cb1b16;
+    --danger-hover: #dc1f18;
+    --shadow-primary: #090a0b;
+    --shadow-secondary: #1c1f22;
 
-  /* Icons */
-  --tasks-icon-url: url("../assets/tasks.svg");
-  --solutions-icon-url: url("../assets/code.svg");
-  --demo-icon-url: url("../assets/desktop.svg");
-  --options-icon-url: url("../assets/cog.svg");
-  --arrow-down-icon-url: url("../assets/chevron-down.svg");
-  --arrow-right-icon-url: url("../assets/chevron-right.svg");
-  --plus-icon-url: url("../assets/plus.svg");
-  --plus-hovered-icon-url: url("../assets/plus-hovered.svg");
-  --tarsh-danger-icon-url: url("../assets/trash-danger.svg");
-  --tarsh-danger-hovered-icon-url: url("../assets/trash-danger-hovered.svg");
-  --check-icon-url: url("../assets/check.svg");
+    /* Icons */
+    --tasks-icon-url: url("../assets/tasks.svg");
+    --solutions-icon-url: url("../assets/code.svg");
+    --demo-icon-url: url("../assets/desktop.svg");
+    --options-icon-url: url("../assets/cog.svg");
+    --arrow-down-icon-url: url("../assets/chevron-down.svg");
+    --arrow-right-icon-url: url("../assets/chevron-right.svg");
+    --plus-icon-url: url("../assets/plus.svg");
+    --plus-hovered-icon-url: url("../assets/plus-hovered.svg");
+    --tarsh-danger-icon-url: url("../assets/trash-danger.svg");
+    --tarsh-danger-hovered-icon-url: url("../assets/trash-danger-hovered.svg");
+    --check-icon-url: url("../assets/check.svg");
 }
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body {
-  margin: 0;
-  width: 100vw;
-  height: 100vh;
-
-  overflow: hidden;
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
 }
 
-h1, h2, h3, h4, h5, h6, p {
-  margin: 0;
-  font-size: inherit;
-  font-weight: normal;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+    margin: 0;
+    font-size: inherit;
+    font-weight: normal;
 }
 
 p {
-  margin: 0;
+    margin: 0;
 }
 
 ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
 button {
-  padding: 0;
-  border: none;
-  cursor: pointer;
-  outline: none;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    outline: none;
 }
 
 input {
-  border: none;
-  outline: none;
+    border: none;
+    outline: none;
 }
 
 
 #root {
-  @include library.full-size;
-  @include library.apply-theme("primary");
+    @include library.full-size;
+    @include library.apply-theme("primary");
 
-  font-size: library.$text-regular;
-  font-family: "Roboto", sans-serif;
-  user-select: none;
+    font-size: library.$text-regular;
+    font-family: "Roboto", sans-serif;
+    user-select: none;
 }

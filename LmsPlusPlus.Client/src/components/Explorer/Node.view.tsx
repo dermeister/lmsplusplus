@@ -80,5 +80,5 @@ export function Node<T>({ node, contextMenuService }: NodeProps<T>): JSX.Element
         }
 
         return node.isGroupNode ? renderGroupNode() : renderItemNode()
-    }, [node])
+    }, [node, contextMenuService])
 }

@@ -54,10 +54,10 @@ export abstract class Explorer<T> extends ObservableObject {
     }
 
     private visitNode<K>(node: Node<K>): Node<K> {
+        const children = node.children ? this.visitNodes(node.children) : null
         let result = node
         if (this._oldNodes.has(node.key)) {
             const oldNode = this._oldNodes.get(node.key) as Node<K>
-            const children = node.children ? this.visitNodes(node.children) : null
             oldNode.update(node.title, node.item, children)
             const oldNodes = this._oldNodes.toMutable()
             oldNodes.delete(oldNode.key)

@@ -44,6 +44,7 @@
 .main-panel-content {
     grid-area: content;
     z-index: 98;
+    overflow-y: auto;
 
     &>div {
         @include library.full-size;
