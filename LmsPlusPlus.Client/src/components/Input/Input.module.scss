@@ -1,4 +1,4 @@
-@use "library";
+@use "../library";
 
 .input {
   @include library.rounded-corners("all");

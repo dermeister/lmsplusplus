@@ -1,7 +1,7 @@
 import React, { useState } from "react"
+import { Overlay } from "../Overlay"
+import { combineClassNames, maybeValue } from "../utils"
 import styles from "./Dropdown.module.scss"
-import { Overlay } from "./Overlay"
-import { combineClassNames, maybeValue } from "./utils"
 
 export interface DropdownItem<T> {
     value: T

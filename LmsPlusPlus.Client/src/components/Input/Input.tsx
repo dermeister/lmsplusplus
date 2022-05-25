@@ -1,6 +1,6 @@
 import React from "react"
+import { combineClassNames } from "../utils"
 import styles from "./Input.module.scss"
-import { combineClassNames } from "./utils"
 
 export function Input(props: React.ComponentProps<"input">): JSX.Element {
     const className = combineClassNames(styles.input, props.className)

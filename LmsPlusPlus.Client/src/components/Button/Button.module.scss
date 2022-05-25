@@ -1,4 +1,4 @@
-@use "library";
+@use "../library";
 
 .button {
   @include library.rounded-corners("all");
@@ -15,7 +15,8 @@
   color: $text-color;
   background-color: $background-color;
 
-  &:hover, &:focus-visible {
+  &:hover,
+  &:focus-visible {
     background-color: $background-color-hover;
   }
 }

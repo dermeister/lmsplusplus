@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import styles from "./MultiselectDropdown.module.scss"
-import { Overlay } from "./Overlay"
-import { combineClassNames, maybeValue } from "./utils"
+import { Overlay } from "../Overlay"
+import { combineClassNames, maybeValue } from "../utils"
 
 export interface MultiselectDropdownItem<T> {
     value: T

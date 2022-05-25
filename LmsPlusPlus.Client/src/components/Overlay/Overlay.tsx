@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react"
+import { combineClassNames, maybeValue } from "../utils"
 import styles from "./Overlay.module.scss"
-import { combineClassNames, maybeValue } from "./utils"
 
 interface OverlayProps {
     trapFocus?: boolean

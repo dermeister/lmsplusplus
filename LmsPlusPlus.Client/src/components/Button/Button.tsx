@@ -1,6 +1,6 @@
 import React from "react"
+import { combineClassNames } from "../utils"
 import styles from "./Button.module.scss"
-import { combineClassNames } from "./utils"
 
 interface ButtonProps extends React.ComponentProps<"button"> {
     variant: "primary" | "secondary" | "danger"

@@ -1,6 +1,6 @@
 import React from "react"
+import { combineClassNames } from "../utils"
 import styles from "./Field.module.scss"
-import { combineClassNames } from "./utils"
 
 interface FieldProps {
     label: string

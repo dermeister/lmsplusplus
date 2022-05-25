@@ -1,6 +1,5 @@
-import { Disposable } from "../Disposable";
-import { IComponent } from "./IComponent";
+import { Disposable } from "../Disposable"
 
-export interface IScreen extends IComponent, Disposable {
-
+export interface IScreen extends Disposable {
+    render(): JSX.Element
 }

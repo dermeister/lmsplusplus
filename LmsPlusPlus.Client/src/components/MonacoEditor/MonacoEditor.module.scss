@@ -1,0 +1,6 @@
+@use "../library";
+
+.container,
+.editor {
+  @include library.full-size;
+}
