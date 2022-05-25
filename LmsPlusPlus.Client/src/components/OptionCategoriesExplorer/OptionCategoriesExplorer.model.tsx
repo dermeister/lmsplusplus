@@ -1,19 +1,18 @@
 import { reaction, Ref, Rx, Transaction, unobservable } from "reactronic"
 import * as domain from "../../domain"
-import React from "react"
-import { Explorer, ItemNode } from "../../models"
-import { OptionCategoriesExplorerView } from "./OptionCategoriesExplorer.view"
+import { Explorer, Node } from "../Explorer"
 
 export enum OptionCategoryKind {
     Preferences,
     Vcs
 }
 
-export class OptionCategoriesExplorerModel extends Explorer<OptionCategoryKind, ItemNode<OptionCategoryKind>> {
+export class OptionCategoriesExplorerModel extends Explorer<OptionCategoryKind> {
     @unobservable private readonly _permissions: Ref<domain.Permissions>
+    override get children(): readonly Node<OptionCategoryKind>[] { return super.children as readonly Node<OptionCategoryKind>[] }
 
     constructor(permissions: Ref<domain.Permissions>) {
-        super(OptionCategoriesExplorerModel.createChildren(permissions.value), null!)
+        super(OptionCategoriesExplorerModel.createChildren(permissions.value))
         this._permissions = permissions
         this.setSelectedNode(this.children[0])
     }
@@ -25,15 +24,11 @@ export class OptionCategoriesExplorerModel extends Explorer<OptionCategoryKind, 
         })
     }
 
-    render(): JSX.Element {
-        return <OptionCategoriesExplorerView model={this} />
-    }
-
-    private static createChildren(permissions: domain.Permissions): readonly ItemNode<OptionCategoryKind>[] {
-        const preferences = new ItemNode("Preferences", "0", OptionCategoryKind.Preferences)
+    private static createChildren(permissions: domain.Permissions): readonly Node<OptionCategoryKind>[] {
+        const preferences = new Node<OptionCategoryKind>("0", OptionCategoryKind.Preferences, "Preferences")
         const nodes = [preferences]
         if (permissions.canUpdateVcsConfiguration) {
-            const vcs = new ItemNode("VCS", "1", OptionCategoryKind.Vcs)
+            const vcs = new Node<OptionCategoryKind>("1", OptionCategoryKind.Vcs, "VCS")
             nodes.push(vcs)
         }
         return nodes
