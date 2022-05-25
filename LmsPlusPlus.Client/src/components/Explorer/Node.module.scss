@@ -1,0 +1,45 @@
+@use "../library";
+
+.node {
+    padding: 3px;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+
+    overflow: hidden;
+
+    &:hover:not(.selected) {
+        background-color: library.$secondary-hover;
+    }
+}
+
+.selected {
+    background-color: library.$secondary;
+}
+
+.context-menu-opened {
+    background-color: library.$secondary-hover;
+}
+
+.group {
+    display: flex;
+
+    &::before {
+        content: "";
+
+        display: block;
+        margin: 3px 6px 0 2px;
+        width: 5px;
+        height: 9px;
+
+        background: var(--arrow-right-icon-url) no-repeat;
+        background-size: 6px;
+
+        transition: transform 0.15s;
+    }
+}
+
+.opened::before {
+    transform: rotate(90deg);
+}

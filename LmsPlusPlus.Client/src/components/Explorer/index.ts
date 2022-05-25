@@ -1,2 +1,3 @@
-export { useExplorerModel } from "./common"
-export { Explorer } from "./Explorer"
+export { ExplorerModel as Explorer } from "./Explorer.model"
+export { NodeModel as Node } from "./Node.model"
+
