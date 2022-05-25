@@ -1,8 +1,8 @@
 import { ServiceView } from "./ServiceView"
 import { Ref, Rx } from "reactronic"
-import { Disposable } from "../../../Disposable"
+import { IDisposable } from "../../../IDisposable"
 
-export class WebServiceViewModel implements ServiceView, Disposable {
+export class WebServiceViewModel implements ServiceView, IDisposable {
     private static readonly _iframeContainer = document.getElementById("webview") as HTMLDivElement
     private readonly _isBackendLoading: Ref<boolean>
     private readonly _virtualPort: number

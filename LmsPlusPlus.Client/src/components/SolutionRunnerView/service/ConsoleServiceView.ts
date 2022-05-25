@@ -2,9 +2,9 @@ import { ITheme, Terminal } from "xterm"
 import { FitAddon } from "xterm-addon-fit"
 import { ServiceView } from "./ServiceView"
 import { ServiceBuildOutput } from "./ServiceBuildOutput"
-import { Disposable } from "../../../Disposable"
+import { IDisposable } from "../../../IDisposable"
 
-export class ConsoleServiceViewModel implements ServiceView, Disposable {
+export class ConsoleServiceViewModel implements ServiceView, IDisposable {
     private readonly _terminal: Terminal
     private readonly _fitAddon = new FitAddon()
     private readonly _terminalContainer = document.createElement("div")

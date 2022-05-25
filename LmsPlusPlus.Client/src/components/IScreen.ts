@@ -1,5 +1,5 @@
-import { Disposable } from "../Disposable"
+import { IDisposable } from "../IDisposable"
 
-export interface IScreen extends Disposable {
+export interface IScreen extends IDisposable {
     render(): JSX.Element
 }
