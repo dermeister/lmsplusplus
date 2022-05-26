@@ -1,6 +1,6 @@
 namespace LmsPlusPlus.Api.Infrastructure;
 
-public record Repository
+public record UserRepository
 {
     public long Id { get; set; }
     public string CloneUrl { get; set; } = null!;

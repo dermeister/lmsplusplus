@@ -14,11 +14,13 @@ export class Account {
     readonly id: number
     readonly provider: Provider
     readonly username: string
+    readonly isActive: boolean
 
-    constructor(id: number, provider: Provider, username: string) {
+    constructor(id: number, provider: Provider, username: string, isActive: boolean) {
         this.id = id
         this.provider = provider
         this.username = username
+        this.isActive = isActive
     }
 }
 
@@ -28,20 +30,19 @@ export class VcsConfiguration {
     readonly accounts: readonly Account[]
     readonly currentAccount: Account | null = null
 
-    constructor(providers: readonly Provider[], accounts: readonly Account[], selectedAccount: Account | null) {
+    constructor(providers: readonly Provider[], accounts: readonly Account[]) {
         this.providers = providers
         this.accounts = accounts
-        this.currentAccount = selectedAccount
+        this.currentAccount = accounts.find(a => a.isActive) ?? null
     }
 
     update(values: Partial<VcsConfiguration>): VcsConfiguration {
         const providers = values.providers !== undefined ? values.providers : this.providers
         const accounts = values.accounts !== undefined ? values.accounts : this.accounts
-        const currentAccount = values.currentAccount !== undefined ? values.currentAccount : this.currentAccount
-        return new VcsConfiguration(providers, accounts, currentAccount)
+        return new VcsConfiguration(providers, accounts)
     }
 
     private static createDefaultConfiguration(): VcsConfiguration {
-        return new VcsConfiguration([], [], null)
+        return new VcsConfiguration([], [])
     }
 }

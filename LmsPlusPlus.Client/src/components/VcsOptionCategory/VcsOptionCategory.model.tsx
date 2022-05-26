@@ -8,7 +8,7 @@ import * as view from "./VcsOptionCategory.view"
 export class VcsOptionCategory extends OptionCategory {
     @unobservable private readonly _context: DatabaseContext
 
-    get darkMode(): boolean { return this._context?.preferences.darkMode ?? true }
+    get darkMode(): boolean { return this._context?.preferences.theme ?? true }
     get vcsProviders(): readonly domain.Provider[] { return this._context?.vcsConfiguration.providers ?? [] }
     get vcsAccounts(): readonly domain.Account[] { return this._context?.vcsConfiguration.accounts ?? [] }
     get vcsCurrentAccount(): domain.Account | null { return this._context?.vcsConfiguration.currentAccount }

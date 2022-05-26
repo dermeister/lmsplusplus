@@ -16,10 +16,10 @@ interface PreferencesOptionCategoryProps {
 export function PreferencesOptionCategory({ category }: PreferencesOptionCategoryProps): JSX.Element {
     return autorender(() => (
         <Field label="Theme">
-            <Dropdown selectedValue={category.darkMode ? "Dark" : "Light"}
+            <Dropdown selectedValue={category.theme}
                 items={themes}
-                onValueChange={i => category.setDarkMode(i === "Dark")}
-                createPlaceholder={() => category.darkMode ? "Dark" : "Light"} />
+                onValueChange={i => category.setDarkMode(i)}
+                createPlaceholder={() => category.theme} />
         </Field>
     ), [category])
 }

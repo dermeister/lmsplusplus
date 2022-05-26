@@ -1,6 +1,5 @@
 export class Permissions {
     static readonly default = Permissions.createDefaultPermissions()
-    readonly id: number
     readonly canCreateTask: boolean
     readonly canUpdateTask: boolean
     readonly canDeleteTask: boolean
@@ -9,9 +8,8 @@ export class Permissions {
     readonly canCreateSolution: boolean
     readonly canDeleteSolution: boolean
 
-    constructor(id: number, canCreateTask: boolean, canUpdateTask: boolean, canDeleteTask: boolean,
+    constructor(canCreateTask: boolean, canUpdateTask: boolean, canDeleteTask: boolean,
         canUpdateVcsConfiguration: boolean, canUpdateUser: boolean, canCreateSolution: boolean, canDeleteSolution: boolean) {
-        this.id = id
         this.canCreateTask = canCreateTask
         this.canUpdateTask = canUpdateTask
         this.canDeleteTask = canDeleteTask
@@ -22,6 +20,6 @@ export class Permissions {
     }
 
     private static createDefaultPermissions(): Permissions {
-        return new Permissions(0, false, false, false, false, false, false, false)
+        return new Permissions(false, false, false, false, false, false, false)
     }
 }

@@ -13,7 +13,7 @@ class TestData
     internal Infrastructure.Topic Topic { get; set; } = null!;
     internal Infrastructure.Group Group { get; set; } = null!;
     internal Infrastructure.VcsAccount Account { get; set; } = null!;
-    internal Infrastructure.Repository TemplateRepository { get; set; } = null!;
+    internal Infrastructure.TemplateRepository TemplateRepository { get; set; } = null!;
     internal Infrastructure.Technology Technology { get; set; } = null!;
     internal Infrastructure.Task Task { get; set; } = null!;
 
@@ -95,11 +95,9 @@ class TestData
             HostingProvider = vcsHostingProvider,
             UserId = admin.Id
         };
-        Infrastructure.Repository templateRepository = new()
+        Infrastructure.TemplateRepository templateRepository = new()
         {
             CloneUrl = "Url",
-            WebsiteUrl = "Url",
-            VcsAccount = templateAccount
         };
         Infrastructure.Technology technology = new()
         {

@@ -26,8 +26,8 @@ export function TaskEditorSidePanelContent({ taskEditorView }: TaskEditorSidePan
             <Field label="Title" className={styles.field}>
                 <Input id="task-title"
                     className={styles.input}
-                    value={taskEditorView.title}
-                    onChange={e => taskEditorView.setTitle(e.target.value)} />
+                    value={taskEditorView.taskTitle}
+                    onChange={e => taskEditorView.setTaskTitle(e.target.value)} />
             </Field>
             <Field label="Technologies" className={styles.field}>
                 <MultiselectDropdown items={taskEditorView.availableTechnologies.map(t => ({ title: t.name, value: t }))}

@@ -1,21 +1,24 @@
 import React from "react"
 import { cached, transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
-import { IAuthService } from "../AuthService"
+import { AuthError, IAuthService } from "../AuthService"
+import { IErrorService } from "../ErrorService"
 import { IScreen } from "../IScreen"
 import * as view from "./SignInScreen.view"
 
 export class SignInScreen extends ObservableObject implements IScreen {
     @unobservable private readonly _authService: IAuthService
+    @unobservable private readonly _errorService: IErrorService
     private _login = ""
     private _password = ""
 
     get login(): string { return this._login }
     get password(): string { return this._password }
 
-    constructor(authService: IAuthService) {
+    constructor(authService: IAuthService, errorService: IErrorService) {
         super()
         this._authService = authService
+        this._errorService = errorService
     }
 
     @transaction
@@ -28,11 +31,12 @@ export class SignInScreen extends ObservableObject implements IScreen {
         this._password = password
     }
 
-    @transaction
     async signIn(): Promise<void> {
-        const success = await this._authService.signIn(this.login, this.password)
-        if (!success) {
-            // TODO: handle
+        try {
+            await this._authService.signIn(this.login, this.password)
+        } catch (e) {
+            if (e instanceof AuthError)
+                this._errorService.showError(e)
         }
     }
 

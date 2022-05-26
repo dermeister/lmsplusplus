@@ -1,12 +1,10 @@
 export class Preferences {
     static readonly default = Preferences.createDefaultPreferences()
-    readonly id: number
-    readonly darkMode: boolean
+    readonly theme: string
 
-    constructor(id: number, darkMode: boolean) {
-        this.id = id
-        this.darkMode = darkMode
+    constructor(darkMode: string) {
+        this.theme = darkMode
     }
 
-    private static createDefaultPreferences(): Preferences { return new Preferences(0, false) }
+    private static createDefaultPreferences(): Preferences { return new Preferences("Dark") }
 }

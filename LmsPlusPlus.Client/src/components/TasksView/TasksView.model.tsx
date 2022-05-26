@@ -49,8 +49,9 @@ export class TasksView extends View implements ITasksService {
 
     @transaction
     createTask(topic: domain.Topic): void {
-        throw new Error("Method not implemented.")
-
+        const task = new domain.Task(domain.Task.NO_ID, topic, "", "", [])
+        const taskEditorView = new TaskEditorView(task, this._context.technologies, this._context, this._viewGroup)
+        this._viewGroup.openView(taskEditorView)
     }
 
     @transaction
@@ -60,8 +61,8 @@ export class TasksView extends View implements ITasksService {
     }
 
     @transaction
-    deleteTask(task: domain.Task): void {
-        throw new Error("Method not implemented.")
+    async deleteTask(task: domain.Task): Promise<void> {
+        await this._context.deleteTask(task)
     }
 
     @transaction

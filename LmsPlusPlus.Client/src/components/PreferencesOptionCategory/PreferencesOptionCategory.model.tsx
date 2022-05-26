@@ -10,7 +10,7 @@ export class PreferencesOptionCategory extends OptionCategory {
     @unobservable private readonly _context: DatabaseContext
 
     override get isPerformingOperation(): boolean { return PreferencesOptionCategory._monitor.isActive }
-    get darkMode(): boolean { return this._context?.preferences.darkMode ?? true }
+    get theme(): string { return this._context.preferences.theme }
 
     constructor(context: DatabaseContext) {
         super()
@@ -24,8 +24,8 @@ export class PreferencesOptionCategory extends OptionCategory {
 
     @transaction
     @options({ monitor: PreferencesOptionCategory._monitor })
-    async setDarkMode(darkMode: boolean): Promise<void> {
-        const updatedPreferences = new domain.Preferences(this._context.preferences.id, darkMode)
+    async setDarkMode(theme: string): Promise<void> {
+        const updatedPreferences = new domain.Preferences(theme)
         await this._context.updatePreferences(updatedPreferences)
     }
 }

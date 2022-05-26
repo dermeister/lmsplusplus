@@ -1,3 +1,4 @@
+import { Axios } from "axios"
 import React from "react"
 import { cached, reaction, Ref, Transaction, transaction, unobservable } from "reactronic"
 import { DatabaseContext } from "../../database"
@@ -21,10 +22,10 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
     private _sidePanelTitle: string
     private _sidePanelShouldShowLoader: boolean
 
-    constructor(authService: IAuthService) {
+    constructor(api: Axios, authService: IAuthService) {
         super()
         this._contextMenuService = new ContextMenuService()
-        this._context = new DatabaseContext()
+        this._context = new DatabaseContext(api)
         this._tasksViewGroup = new TasksViewGroup("tasks-view-group", this._context, this._contextMenuService)
         this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, this._context)
         this._currentViewGroup = this._tasksViewGroup

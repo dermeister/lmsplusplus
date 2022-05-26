@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "build",
+      "label": "Build API",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -17,13 +17,39 @@
       "problemMatcher": "$msCompile"
     },
     {
+      "label": "Lint Client",
       "type": "npm",
       "script": "lint",
       "path": "LmsPlusPlus.Client",
       "problemMatcher": [
         "$eslint-stylish"
+      ]
+    },
+    {
+      "label": "Run Client",
+      "type": "npm",
+      "script": "dev",
+      "path": "LmsPlusPlus.Client",
+      "problemMatcher": [],
+      "isBackground": true
+    },
+    {
+      "label": "Run TSC",
+      "type": "npm",
+      "script": "tsc",
+      "path": "LmsPlusPlus.Client",
+      "problemMatcher": [
+        "$tsc",
       ],
-      "label": "lint",
+      "isBackground": true
+    },
+    {
+      "label": "Run Client with TSC",
+      "dependsOn": [
+        "Run Client",
+        "Run TSC",
+      ],
+      "problemMatcher": []
     }
   ]
 }

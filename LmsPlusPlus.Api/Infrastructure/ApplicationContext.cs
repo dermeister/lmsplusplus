@@ -15,7 +15,7 @@ public class ApplicationContext : DbContext
     public DbSet<Technology> Technologies { get; set; } = null!;
     public DbSet<Solution> Solutions { get; set; } = null!;
     public DbSet<VcsAccount> VcsAccounts { get; set; } = null!;
-    public DbSet<ActiveVcsAccount> ActiveVcsAccounts { get; set; } = null!;
+    public DbSet<TemplateRepository> TemplateRepositories { get; set; } = null!;
 
     static ApplicationContext() => NpgsqlConnection.GlobalTypeMapper.MapEnum<Role>();
 
@@ -45,10 +45,10 @@ public class ApplicationContext : DbContext
         ConfigureTaskEntity(modelBuilder);
         ConfigureVcsHostingProviderEntity(modelBuilder);
         ConfigureVcsAccountEntity(modelBuilder);
-        ConfigureRepositoryEntity(modelBuilder);
+        ConfigureUserRepositoryEntity(modelBuilder);
+        ConfigureTemplateRepositoryEntity(modelBuilder);
         ConfigureTechnologyEntity(modelBuilder);
         ConfigureSolutionEntity(modelBuilder);
-        ConfigureActiveVcsAccountEntity(modelBuilder);
         base.OnModelCreating(modelBuilder);
     }
 
@@ -303,12 +303,12 @@ public class ApplicationContext : DbContext
         });
     }
 
-    static void ConfigureRepositoryEntity(ModelBuilder modelBuilder)
+    static void ConfigureUserRepositoryEntity(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Repository>(entity =>
+        modelBuilder.Entity<UserRepository>(entity =>
         {
-            entity.ToTable("repositories");
-            entity.HasKey(r => r.Id).HasName("pk_repositories_id");
+            entity.ToTable("user_repositories");
+            entity.HasKey(r => r.Id).HasName("pk_user_repositories_id");
             entity.Property(r => r.Id)
                 .HasColumnName("id")
                 .UseIdentityAlwaysColumn();
@@ -323,11 +323,28 @@ public class ApplicationContext : DbContext
                 .WithMany()
                 .HasForeignKey(r => r.VcsAccountId)
                 .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("fk_repositories_vcs_account_id");
-            entity.HasIndex(r => r.CloneUrl, name: "unq_repositories_clone_url").IsUnique();
-            entity.HasIndex(r => r.WebsiteUrl, name: "unq_repositories_website_url").IsUnique();
+                .HasConstraintName("fk_user_repositories_vcs_account_id");
+            entity.HasIndex(r => r.CloneUrl, name: "unq_user_repositories_clone_url").IsUnique();
+            entity.HasIndex(r => r.WebsiteUrl, name: "unq_user_repositories_website_url").IsUnique();
         });
     }
+
+    static void ConfigureTemplateRepositoryEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<TemplateRepository>(entity =>
+        {
+            entity.ToTable("template_repositories");
+            entity.HasKey(r => r.Id).HasName("pk_template_repositories_id");
+            entity.Property(r => r.Id)
+                .HasColumnName("id")
+                .UseIdentityAlwaysColumn();
+            entity.Property(r => r.CloneUrl)
+                .HasMaxLength(1000)
+                .HasColumnName("clone_url");
+            entity.HasIndex(r => r.CloneUrl, name: "unq_repositories_clone_url").IsUnique();
+        });
+    }
+
 
     static void ConfigureSolutionEntity(ModelBuilder modelBuilder)
     {
@@ -379,27 +396,6 @@ public class ApplicationContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_technologies_template_repository_id");
             entity.HasIndex(t => new { t.Name, t.TemplateRepositoryId }, name: "unq_technologies_name_template_repository_id").IsUnique();
-        });
-    }
-
-    static void ConfigureActiveVcsAccountEntity(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<ActiveVcsAccount>(entity =>
-        {
-            entity.ToTable("active_vcs_accounts");
-            entity.HasKey(a => a.UserId).HasName("pk_active_vcs_accounts_user_id");
-            entity.Property(a => a.UserId).HasColumnName("user_id");
-            entity.Property(a => a.VcsAccountId).HasColumnName("vcs_account_id");
-            entity.HasOne(a => a.User)
-                .WithOne()
-                .HasForeignKey<ActiveVcsAccount>(a => a.UserId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("fk_active_vcs_accounts_user_id");
-            entity.HasOne(a => a.VcsAccount)
-                .WithOne()
-                .HasForeignKey<ActiveVcsAccount>(a => a.VcsAccountId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("fk_active_vcs_accounts_vcs_account_id");
         });
     }
 }

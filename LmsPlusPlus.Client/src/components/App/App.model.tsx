@@ -1,8 +1,10 @@
+import axios from "axios"
 import React from "react"
 import { cached, nonreactive, reaction, Transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import { AuthService } from "../AuthService"
 import { EmptyScreen } from "../EmptyScreen"
+import { ErrorService } from "../ErrorService"
 import { IScreen } from "../IScreen"
 import { SignInScreen } from "../SignInScreen/SignInScreen.model"
 import { WorkbenchScreen } from "../WorkbenchScreen"
@@ -10,11 +12,13 @@ import * as view from "./App.view"
 
 export class App extends ObservableObject {
     @unobservable private readonly _authService: AuthService
+    @unobservable private readonly _errorService = new ErrorService()
     private _currentScreen: IScreen = new EmptyScreen()
 
     constructor() {
         super()
-        this._authService = new AuthService("app-token")
+        const unauthorizedApi = axios.create()
+        this._authService = new AuthService(unauthorizedApi, "app-token")
     }
 
     @cached
@@ -32,9 +36,10 @@ export class App extends ObservableObject {
     @reaction
     private updateCurrentScreen(): void {
         nonreactive(() => this._currentScreen.dispose())
-        if (this._authService.jwtToken)
-            this._currentScreen = new WorkbenchScreen(this._authService)
-        else
-            this._currentScreen = new SignInScreen(this._authService)
+        if (this._authService.jwtToken) {
+            const api = axios.create({ headers: { Authorization: `Bearer ${this._authService.jwtToken}` } })
+            this._currentScreen = new WorkbenchScreen(api, this._authService)
+        } else
+            this._currentScreen = new SignInScreen(this._authService, this._errorService)
     }
 }

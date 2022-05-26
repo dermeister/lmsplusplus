@@ -1,36 +1,46 @@
+import { Axios, AxiosError } from "axios"
 import { reaction, standalone, transaction } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
 
+export class AuthError extends Error {
+    readonly axiosError: AxiosError
+
+    constructor(axiosError: AxiosError) {
+        super()
+        this.axiosError = axiosError
+    }
+}
+
 export interface IAuthService {
-    signIn(login: string, password: string): Promise<boolean>
+    signIn(login: string, password: string): Promise<void>
 
     signOut(): void
 }
 
 export class AuthService extends ObservableObject implements IAuthService {
-    private _jwtToken: string | null = null
     private readonly _localStorageKey: string
+    private readonly _api: Axios
+    private _jwtToken: string | null = null
 
     get jwtToken(): string | null { return this._jwtToken }
 
-    constructor(localStorageKey: string) {
+    constructor(api: Axios, localStorageKey: string) {
         super()
         this._localStorageKey = localStorageKey
+        this._api = api
         this._jwtToken = this.loadJwtTokenFromLocalStorage()
     }
 
     @transaction
-    async signIn(login: string, password: string): Promise<boolean> {
+    async signIn(login: string, password: string): Promise<void> {
         if (this._jwtToken)
             standalone(() => this.signOut())
         try {
-            this._jwtToken = await Promise.resolve("token")
+            const result = await this._api.post<{ token: string }>("/api/sign-in", { login, password })
+            this._jwtToken = result.data.token
         } catch (e) {
-            if ((e as Error).message === "Bad Request")
-                return false
-            throw e
+            throw e instanceof AxiosError ? new AuthError(e) : e
         }
-        return true
     }
 
     @transaction
@@ -43,7 +53,7 @@ export class AuthService extends ObservableObject implements IAuthService {
         if (!this._jwtToken)
             localStorage.removeItem(this._localStorageKey)
         else if (!localStorage.getItem(this._localStorageKey))
-            localStorage.setItem(this._localStorageKey, JSON.stringify(this._jwtToken))
+            localStorage.setItem(this._localStorageKey, this._jwtToken)
     }
 
     private loadJwtTokenFromLocalStorage(): string | null {

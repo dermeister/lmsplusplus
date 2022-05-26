@@ -16,11 +16,12 @@ export class TaskEditorView extends View {
     @unobservable private readonly _solutions: domain.Solution[]
     @unobservable private readonly _context: DatabaseContext
     @unobservable private readonly _viewGroup: ViewGroup
-    private _title: string
+    private _taskTitle: string
     private _selectedTechnologies: readonly domain.Technology[]
 
     override get isPulsing(): boolean { return TaskEditorView._monitor.isActive }
-    get title(): string { return this._title }
+    override get title(): string { return "Task Editor" }
+    get taskTitle(): string { return this._taskTitle }
     get selectedTechnologies(): readonly domain.Technology[] { return this._selectedTechnologies }
 
     constructor(task: domain.Task, availableTechnologies: readonly domain.Technology[], context: DatabaseContext, viewGroup: ViewGroup) {
@@ -29,7 +30,7 @@ export class TaskEditorView extends View {
         this._viewGroup = viewGroup
         this._id = task.id
         this._topic = task.topic
-        this._title = task.title
+        this._taskTitle = task.title
         this.description = standalone(() => monaco.editor.createModel(task.description, "markdown"))
         this._selectedTechnologies = task.technologies
         this.availableTechnologies = availableTechnologies
@@ -54,8 +55,8 @@ export class TaskEditorView extends View {
     }
 
     @transaction
-    setTitle(title: string): void {
-        this._title = title
+    setTaskTitle(title: string): void {
+        this._taskTitle = title
     }
 
     @transaction
@@ -66,7 +67,7 @@ export class TaskEditorView extends View {
     @transaction
     @options({ monitor: TaskEditorView._monitor })
     async saveTask(): Promise<void> {
-        const task = new domain.Task(this._id, this._topic, this._title, this.description.getValue(), this._selectedTechnologies)
+        const task = new domain.Task(this._id, this._topic, this._taskTitle, this.description.getValue(), this._selectedTechnologies)
         task.solutions = this._solutions
         if (this._id === domain.Task.NO_ID)
             await this._context.createTask(task)
