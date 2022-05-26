@@ -1,72 +1,72 @@
 @use "../library";
 
 .side-panel {
-  @include library.shadow("right");
+    @include library.shadow("right");
 
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 
-  padding: 14px 0 0;
-  width: 280px;
-  height: 100%;
+    padding: 14px 0 0;
+    width: 280px;
+    height: 100%;
 
-  color: library.$text-secondary;
+    color: library.$text-secondary;
 
-  background-color: library.$background-secondary;
+    background-color: library.$background-secondary;
 
-  overflow: auto;
+    overflow: auto;
 }
 
 .header {
-  position: relative;
+    position: relative;
 
-  display: flex;
-  justify-content: space-between;
+    display: flex;
+    justify-content: space-between;
 
-  margin: 0 16px 10px;
-  padding-bottom: 2px;
+    margin: 0 16px 10px;
+    padding-bottom: 2px;
 
-  border-bottom: 1px solid library.$text-secondary;
+    border-bottom: 1px solid library.$text-secondary;
 }
 
 .header-showing-loader::before {
-  content: "";
+    content: "";
 
-  position: absolute;
-  right: 0;
-  bottom: -1px;
+    position: absolute;
+    right: 0;
+    bottom: -1px;
 
-  width: 100%;
-  height: 1px;
+    width: 100%;
+    height: 1px;
 
-  background-color: library.$primary;
+    background-color: library.$primary;
 
-  animation: header-showing-loader 1s linear infinite normal none running;
+    animation: header-showing-loader 1s linear infinite normal none running;
 }
 
 @keyframes header-showing-loader {
-  0% {
-    left: 0;
-    width: 0;
-  }
+    0% {
+        left: 0;
+        width: 0;
+    }
 
-  50% {
-    width: 100%;
-  }
+    50% {
+        width: 100%;
+    }
 
-  100% {
-    width: 0;
-  }
+    100% {
+        width: 0;
+    }
 }
 
 .title {
-  text-transform: uppercase;
+    text-transform: uppercase;
 }
 
 .children {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 
-  overflow: auto;
+    overflow: auto;
 }

@@ -49,5 +49,3 @@ export function WorkbenchScreen({ currentViewGroup, viewGroups, sidePanel, onSho
     ), [currentViewGroup, viewGroups, sidePanel, onShowViewGroup])
 }
 
-
-

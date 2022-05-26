@@ -16,5 +16,14 @@
       },
       "problemMatcher": "$msCompile"
     },
+    {
+      "type": "npm",
+      "script": "lint",
+      "path": "LmsPlusPlus.Client",
+      "problemMatcher": [
+        "$eslint-stylish"
+      ],
+      "label": "lint",
+    }
   ]
 }

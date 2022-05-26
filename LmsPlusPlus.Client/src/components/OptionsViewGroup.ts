@@ -5,11 +5,11 @@ import { OptionsView } from "./OptionsView"
 import { ViewGroup } from "./ViewGroup"
 
 export class OptionsViewGroup extends ViewGroup {
-  get iconUrl(): string { return viewSwitchButtonIcon }
+    get iconUrl(): string { return viewSwitchButtonIcon }
 
-  constructor(id: string, authSerivce: IAuthService, context: DatabaseContext) {
-    super(id)
-    const optionsView = new OptionsView(authSerivce, context)
-    this.openView(optionsView)
-  }
+    constructor(id: string, authSerivce: IAuthService, context: DatabaseContext) {
+        super(id)
+        const optionsView = new OptionsView(authSerivce, context)
+        this.openView(optionsView)
+    }
 }

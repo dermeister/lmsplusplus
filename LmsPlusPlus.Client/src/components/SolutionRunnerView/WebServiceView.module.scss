@@ -1,19 +1,19 @@
 @use "../library";
 
 .loading-placeholder {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
 
 .loading-spinner {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 .loading-text {
-  font-size: library.$text-large;
+    font-size: library.$text-large;
 }

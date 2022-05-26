@@ -20,40 +20,54 @@ $text-small: 0.75rem;
 
 // Mixins
 @mixin full-size {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
 
 @mixin apply-theme($variant) {
-  @if $variant == "primary" {
-    background-color: $background-primary;
-    color: $text-primary;
-  } @else if $variant == "secondary" {
-    background-color: $background-secondary;
-    color: $text-secondary;
-  } @else {
-    @error "Invalid theme variant";
-  }
+    @if $variant =="primary" {
+        background-color: $background-primary;
+        color: $text-primary;
+    }
+
+    @else if $variant =="secondary" {
+        background-color: $background-secondary;
+        color: $text-secondary;
+    }
+
+    @else {
+        @error "Invalid theme variant";
+    }
 }
 
 @mixin rounded-corners($side) {
-  @if $side == "bottom-left" {
-    border-bottom-left-radius: 2px;
-  } @else if $side == "bottom-right" {
-    border-bottom-right-radius: 2px;
-  } @else if $side == "all" {
-    border-radius: 2px;
-  }
+    @if $side =="bottom-left" {
+        border-bottom-left-radius: 2px;
+    }
+
+    @else if $side =="bottom-right" {
+        border-bottom-right-radius: 2px;
+    }
+
+    @else if $side =="all" {
+        border-radius: 2px;
+    }
 }
 
 @mixin shadow($side) {
-  @if $side == "all" {
-    box-shadow: 0 0 4px var(--shadow-primary);
-  } @else if $side == "right" {
-    box-shadow: 4px 0 4px -3px var(--shadow-primary);
-  } @else if $side == "bottom" {
-    box-shadow: 0 4px 4px -3px var(--shadow-primary);
-  } @else {
-    @error "Invalid side";
-  }
+    @if $side =="all" {
+        box-shadow: 0 0 4px var(--shadow-primary);
+    }
+
+    @else if $side =="right" {
+        box-shadow: 4px 0 4px -3px var(--shadow-primary);
+    }
+
+    @else if $side =="bottom" {
+        box-shadow: 0 4px 4px -3px var(--shadow-primary);
+    }
+
+    @else {
+        @error "Invalid side";
+    }
 }

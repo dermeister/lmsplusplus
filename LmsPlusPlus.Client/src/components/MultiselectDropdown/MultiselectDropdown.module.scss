@@ -1,70 +1,70 @@
 @use "../library";
 
 %base-item {
-  color: library.$text-secondary;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+    color: library.$text-secondary;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 
-  background-color: library.$secondary;
-  overflow: hidden;
-  cursor: pointer;
+    background-color: library.$secondary;
+    overflow: hidden;
+    cursor: pointer;
 
-  &:hover {
-    background-color: library.$secondary-hover;
-  }
+    &:hover {
+        background-color: library.$secondary-hover;
+    }
 }
 
 .preview {
-  @extend %base-item;
-  @include library.rounded-corners("all");
+    @extend %base-item;
+    @include library.rounded-corners("all");
 
-  padding: 3px 16px 3px 3px;
+    padding: 3px 16px 3px 3px;
 
-  background-image: var(--arrow-down-icon-url);
-  background-repeat: no-repeat;
-  background-size: 9px;
-  background-position: calc(100% - 4px) 6px;
+    background-image: var(--arrow-down-icon-url);
+    background-repeat: no-repeat;
+    background-size: 9px;
+    background-position: calc(100% - 4px) 6px;
 }
 
 .opened {
-  padding: 2px 15px 2px 2px;
+    padding: 2px 15px 2px 2px;
 
-  border: 1px solid library.$primary;
-  background-position: calc(100% - 3px) 5px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
+    border: 1px solid library.$primary;
+    background-position: calc(100% - 3px) 5px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .items-container {
-  position: relative;
+    position: relative;
 }
 
 .items {
-  position: absolute;
-  width: 100%;
+    position: absolute;
+    width: 100%;
 }
 
 .item {
-  @extend %base-item;
+    @extend %base-item;
 
-  padding: 2px;
+    padding: 2px;
 
-  $border: 1px solid library.$primary;
-  border-right: $border;
-  border-left: $border;
+    $border: 1px solid library.$primary;
+    border-right: $border;
+    border-left: $border;
 
-  &:last-child {
-    @include library.shadow("bottom");
-    @include library.rounded-corners("bottom-left");
-    @include library.rounded-corners("bottom-right");
+    &:last-child {
+        @include library.shadow("bottom");
+        @include library.rounded-corners("bottom-left");
+        @include library.rounded-corners("bottom-right");
 
-    border-bottom: $border;
-  }
+        border-bottom: $border;
+    }
 }
 
 .selected {
-  background-image: var(--check-icon-url);
-  background-repeat: no-repeat;
-  background-size: 10px;
-  background-position: calc(100% - 3px) 5px;
+    background-image: var(--check-icon-url);
+    background-repeat: no-repeat;
+    background-size: 10px;
+    background-position: calc(100% - 3px) 5px;
 }

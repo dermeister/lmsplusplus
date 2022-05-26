@@ -5,6 +5,6 @@ interface AppProps {
     currentScreen: IScreen
 }
 
-export function App({ currentScreen }: AppProps) {
+export function App({ currentScreen }: AppProps): JSX.Element {
     return autorender(() => currentScreen.render(), [currentScreen])
 }

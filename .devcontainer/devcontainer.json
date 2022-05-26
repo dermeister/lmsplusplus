@@ -6,7 +6,8 @@
 	"settings": {},
 	"extensions": [
 		"ms-dotnettools.csharp",
-		"Github.copilot"
+		"Github.copilot",
+		"EditorConfig.EditorConfig"
 	],
 	"forwardPorts": [
 		3000

@@ -1,13 +1,13 @@
 @use "../library";
 
 .input {
-  @include library.rounded-corners("all");
-  @include library.shadow("all");
+    @include library.rounded-corners("all");
+    @include library.shadow("all");
 
-  color: library.$text-secondary;
-  background-color: library.$secondary;
+    color: library.$text-secondary;
+    background-color: library.$secondary;
 
-  &:focus {
-    background-color: library.$secondary-hover;
-  }
+    &:focus {
+        background-color: library.$secondary-hover;
+    }
 }

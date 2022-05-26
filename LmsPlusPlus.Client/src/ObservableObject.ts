@@ -2,7 +2,7 @@ import { ObservableObject as NonDisposableObservableObject, Rx, Transaction } fr
 import { IDisposable } from "./IDisposable"
 
 export class ObservableObject extends NonDisposableObservableObject implements IDisposable {
-  dispose(): void {
-    Transaction.run(() => Rx.dispose(this))
-  }
+    dispose(): void {
+        Transaction.run(() => Rx.dispose(this))
+    }
 }

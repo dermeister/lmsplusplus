@@ -1,48 +1,48 @@
 @use "../library";
 
 .main-panel-content {
-  @include library.full-size;
-  
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  
-  font-size: 32px;
+    @include library.full-size;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 32px;
 }
 
 .form {
-  padding-left: 16px;
-  padding-right: 16px;
+    padding-left: 16px;
+    padding-right: 16px;
 }
 
 .field {
-  margin-bottom: 10px;
+    margin-bottom: 10px;
 }
 
 .input {
-  padding: 6px;
-  width: 100%;
+    padding: 6px;
+    width: 100%;
 }
 
 .buttons {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
 }
 
 %button {
-  @include library.shadow("all");
+    @include library.shadow("all");
 
-  padding-top: 4px;
-  padding-bottom: 4px;
+    padding-top: 4px;
+    padding-bottom: 4px;
 }
 
 .primary {
-  @extend %button;
-  flex-grow: 9;
+    @extend %button;
+    flex-grow: 9;
 }
 
 .danger {
-  @extend %button;
-  flex-grow: 1;
+    @extend %button;
+    flex-grow: 1;
 }

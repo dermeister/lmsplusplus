@@ -1,1 +1,1 @@
-export { EmptyScreen } from './EmtpyScreen.model'
+export { EmptyScreen } from "./EmtpyScreen.model"

@@ -52,14 +52,14 @@ export class OptionsView extends View {
     private updateCurrentCategory() {
         const item = this._categoriesExplorer.selectedNode?.item
         switch (item) {
-            case OptionCategoryKind.Preferences:
-                this._currentOptionCategory = this._preferencesOptionCategory
-                break
-            case OptionCategoryKind.Vcs:
-                this._currentOptionCategory = this._vcsOptionCategory
-                break
-            default:
-                break
+        case OptionCategoryKind.Preferences:
+            this._currentOptionCategory = this._preferencesOptionCategory
+            break
+        case OptionCategoryKind.Vcs:
+            this._currentOptionCategory = this._vcsOptionCategory
+            break
+        default:
+            break
         }
     }
 }

@@ -1,12 +1,12 @@
 @use "../library";
 
 .spinner {
-  width: 100px;
-  height: 100px;
+    width: 100px;
+    height: 100px;
 
-  shape-rendering: auto;
+    shape-rendering: auto;
 }
 
 .spinner circle {
-  stroke: library.$primary;
+    stroke: library.$primary;
 }

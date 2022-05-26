@@ -11,6 +11,10 @@
     "vite.config.ts"
   ],
   "rules": {
+    "indent": [
+      "error",
+      4
+    ],
     "eol-last": [
       "error",
       "always"
@@ -28,7 +32,7 @@
     "max-len": [
       "error",
       {
-        "code": 130
+        "code": 150
       }
     ],
     "@typescript-eslint/semi": [

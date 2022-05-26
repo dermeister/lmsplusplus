@@ -1,1 +1,1 @@
-export { SignInScreen } from './SignInScreen.model'
+export { SignInScreen } from "./SignInScreen.model"

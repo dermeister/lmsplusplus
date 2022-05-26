@@ -21,11 +21,6 @@ export class TopicNode extends Node<domain.Topic> {
         this._tasksService = tasksService
     }
 
-    private static createTaskNodes(tasks: readonly domain.Task[], contextMenuService: IContextMenuService, permissions: domain.Permissions,
-        tasksService: ITasksService): Node<domain.Task>[] {
-        return Transaction.run(() => tasks.map(task => new TaskNode(task, contextMenuService, permissions, tasksService)))
-    }
-
     @cached
     override renderContextMenu(): JSX.Element | null {
         return (
@@ -35,5 +30,9 @@ export class TopicNode extends Node<domain.Topic> {
                 tasksService={this._tasksService} />
         )
     }
-}
 
+    private static createTaskNodes(tasks: readonly domain.Task[], contextMenuService: IContextMenuService, permissions: domain.Permissions,
+        tasksService: ITasksService): Node<domain.Task>[] {
+        return Transaction.run(() => tasks.map(task => new TaskNode(task, contextMenuService, permissions, tasksService)))
+    }
+}

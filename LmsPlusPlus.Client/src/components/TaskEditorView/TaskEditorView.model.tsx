@@ -9,8 +9,8 @@ import * as view from "./TaskEditorView.view"
 
 export class TaskEditorView extends View {
     @unobservable readonly availableTechnologies: readonly domain.Technology[]
+    @unobservable private static readonly _monitor = Monitor.create("task-editor-view", 0, 0)
     @unobservable private readonly description: monaco.editor.ITextModel
-    @unobservable private static readonly s_monitor = Monitor.create("task-editor-view", 0, 0)
     @unobservable private readonly _id: number
     @unobservable private readonly _topic: domain.Topic
     @unobservable private readonly _solutions: domain.Solution[]
@@ -19,7 +19,7 @@ export class TaskEditorView extends View {
     private _title: string
     private _selectedTechnologies: readonly domain.Technology[]
 
-    override get isPulsing(): boolean { return TaskEditorView.s_monitor.isActive }
+    override get isPulsing(): boolean { return TaskEditorView._monitor.isActive }
     get title(): string { return this._title }
     get selectedTechnologies(): readonly domain.Technology[] { return this._selectedTechnologies }
 
@@ -64,7 +64,7 @@ export class TaskEditorView extends View {
     }
 
     @transaction
-    @options({ monitor: TaskEditorView.s_monitor })
+    @options({ monitor: TaskEditorView._monitor })
     async saveTask(): Promise<void> {
         const task = new domain.Task(this._id, this._topic, this._title, this.description.getValue(), this._selectedTechnologies)
         task.solutions = this._solutions

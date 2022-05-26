@@ -16,19 +16,19 @@ declare global {
 self.MonacoEnvironment = {
     getWorker(_workerId: string, label: string): Worker {
         switch (label) {
-            case "json":
-                return new jsonWorker()
-            case "css":
-                return new cssWorker()
-            case "html":
-            case "handlebars":
-            case "razor":
-                return new htmlWorker()
-            case "typescript":
-            case "javascript":
-                return new tsWorker()
-            default:
-                return new editorWorker()
+        case "json":
+            return new jsonWorker()
+        case "css":
+            return new cssWorker()
+        case "html":
+        case "handlebars":
+        case "razor":
+            return new htmlWorker()
+        case "typescript":
+        case "javascript":
+            return new tsWorker()
+        default:
+            return new editorWorker()
         }
     }
 }

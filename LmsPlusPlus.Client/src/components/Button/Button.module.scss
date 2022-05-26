@@ -1,34 +1,34 @@
 @use "../library";
 
 .button {
-  @include library.rounded-corners("all");
-  @include library.shadow("all");
+    @include library.rounded-corners("all");
+    @include library.shadow("all");
 
-  font-weight: bold;
+    font-weight: bold;
 
-  &:hover:active {
-    transform: scale(0.99);
-  }
+    &:hover:active {
+        transform: scale(0.99);
+    }
 }
 
 @mixin button-variant($background-color, $background-color-hover, $text-color) {
-  color: $text-color;
-  background-color: $background-color;
+    color: $text-color;
+    background-color: $background-color;
 
-  &:hover,
-  &:focus-visible {
-    background-color: $background-color-hover;
-  }
+    &:hover,
+    &:focus-visible {
+        background-color: $background-color-hover;
+    }
 }
 
 .primary {
-  @include button-variant(library.$primary, library.$primary-hover, library.$text-primary);
+    @include button-variant(library.$primary, library.$primary-hover, library.$text-primary);
 }
 
 .secondary {
-  @include button-variant(library.$secondary, library.$secondary-hover, library.$text-primary);
+    @include button-variant(library.$secondary, library.$secondary-hover, library.$text-primary);
 }
 
 .danger {
-  @include button-variant(library.$danger, library.$danger-hover, library.$text-primary);
+    @include button-variant(library.$danger, library.$danger-hover, library.$text-primary);
 }

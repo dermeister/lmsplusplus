@@ -43,4 +43,3 @@ export function SolutionRunnerMainPanelContent({ model }: SolutionRunnerProps): 
     }, [model])
 }
 
-

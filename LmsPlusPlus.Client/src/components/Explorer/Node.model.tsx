@@ -19,7 +19,8 @@ export class Node<T> extends ObservableObject {
     get item(): T { return this._item }
     protected get contextMenuService(): IContextMenuService | null { return this._contextMenuService }
 
-    constructor(key: string, item: T, title: string, contextMenuService: IContextMenuService | null = null, children: Node<unknown>[] | null = null) {
+    constructor(key: string, item: T, title: string, contextMenuService: IContextMenuService | null = null,
+        children: Node<unknown>[] | null = null) {
         super()
         this.key = key
         this._item = item

@@ -1,1 +1,1 @@
-export { App } from './App.model'
+export { App } from "./App.model"

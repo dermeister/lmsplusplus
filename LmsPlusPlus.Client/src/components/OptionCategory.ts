@@ -1,7 +1,7 @@
 import { ObservableObject } from "../ObservableObject"
 
 export abstract class OptionCategory extends ObservableObject {
-  get isPerformingOperation(): boolean { return false }
+    get isPerformingOperation(): boolean { return false }
 
-  abstract render(): JSX.Element
+    abstract render(): JSX.Element
 }
