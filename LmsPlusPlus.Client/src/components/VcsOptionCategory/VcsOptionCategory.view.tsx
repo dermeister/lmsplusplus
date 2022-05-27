@@ -15,14 +15,14 @@ export function VcsOptionCategory({ category }: VcsOptionCategoryProps): JSX.Ele
         const accounts = category.vcsAccounts.map(createAccountDropdownItem)
         return (
             <Dropdown items={accounts}
-                onValueChange={a => category.setCurrentAccount(a)}
+                onValueChange={a => category.setActiveAccount(a)}
                 selectedValue={category.vcsCurrentAccount}
-                createPlaceholder={() => category.vcsCurrentAccount?.username ?? "Choose account"} />
+                createPlaceholder={() => category.vcsCurrentAccount?.name ?? "Choose account"} />
         )
     }
 
     function createAccountDropdownItem(account: domain.Account): DropdownItem<domain.Account> {
-        return { value: account, title: `${account.username} (${account.provider.name})` }
+        return { value: account, title: `${account.name} (${account.provider.name})` }
     }
 
     function providerList(): JSX.Element {
@@ -54,7 +54,7 @@ export function VcsOptionCategory({ category }: VcsOptionCategoryProps): JSX.Ele
                 {category.vcsAccounts.filter(account => account.provider === provider).map(account => (
                     <li key={account.id} className={styles.account}>
                         <button onClick={() => category.deleteAccount(account)} className={styles.deleteAccount} />
-                        <span className={styles.accountName}>{account.username}</span>
+                        <span className={styles.accountName}>{account.name}</span>
                     </li>
                 ))}
             </ul>

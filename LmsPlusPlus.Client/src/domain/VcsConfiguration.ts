@@ -13,13 +13,13 @@ export class Provider {
 export class Account {
     readonly id: number
     readonly provider: Provider
-    readonly username: string
+    readonly name: string
     readonly isActive: boolean
 
-    constructor(id: number, provider: Provider, username: string, isActive: boolean) {
+    constructor(id: number, provider: Provider, name: string, isActive: boolean) {
         this.id = id
         this.provider = provider
-        this.username = username
+        this.name = name
         this.isActive = isActive
     }
 }

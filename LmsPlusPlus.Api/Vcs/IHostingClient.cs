@@ -2,7 +2,7 @@ namespace LmsPlusPlus.Api.Vcs;
 
 interface IHostingClient
 {
-    string CreateAuthorizationUrl(string clientId);
+    string CreateAuthorizationUrl(string clientId, long userId);
 
     Task<string> CreateAuthorizationAccessToken(string code, string clientId, string clientSecret);
 

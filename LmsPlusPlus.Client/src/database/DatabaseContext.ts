@@ -3,11 +3,13 @@ import { reaction, transaction, unobservable } from "reactronic"
 import githubIcon from "../assets/github.svg"
 import * as domain from "../domain"
 import { ObservableObject } from "../ObservableObject"
+import * as request from "./request"
+import * as response from "./response"
+import { VcsAccountRegisteringModal } from "./VcsAccountRegisteringModal"
 
 export class DatabaseContext extends ObservableObject {
     @unobservable private readonly _api: Axios
     private _topics: domain.Topic[] = []
-    private _vcsConfiguration = domain.VcsConfiguration.default
     private _preferences = domain.Preferences.default
     private _user = domain.User.default
     private _permissions = domain.Permissions.default
@@ -17,7 +19,6 @@ export class DatabaseContext extends ObservableObject {
 
     get courses(): readonly domain.Topic[] { return this._topics }
     get technologies(): readonly domain.Technology[] { return this._technologies }
-    get vcsConfiguration(): domain.VcsConfiguration { return this._vcsConfiguration }
     get preferences(): domain.Preferences { return this._preferences }
     get user(): domain.User { return this._user }
     get permissions(): domain.Permissions { return this._permissions }
@@ -33,20 +34,7 @@ export class DatabaseContext extends ObservableObject {
     async createTask(task: domain.Task): Promise<void> {
         if (!this._permissions.canCreateTask)
             throw this.permissionError()
-        interface RequestTaskData {
-            title: string
-            description: string
-            topicId: number
-            technologyIds: number[]
-        }
-        interface ResponseTaskData {
-            id: number
-            title: string
-            description: string
-            topicId: number
-            technologyIds: number[]
-        }
-        const { data } = await this._api.post<ResponseTaskData, AxiosResponse<ResponseTaskData>, RequestTaskData>("/api/tasks", {
+        const { data } = await this._api.post<response.Task, AxiosResponse<response.Task>, request.CreateTask>("/api/tasks", {
             title: task.title,
             description: task.description,
             topicId: task.topic.id,
@@ -59,7 +47,7 @@ export class DatabaseContext extends ObservableObject {
             const technologies = data.technologyIds.map(id => {
                 const technology = this._technologies.find(t => t.id === id)
                 if (!technology)
-                    throw new Error(`Technology with id ${id} not found`)
+                    throw new Error(`Technology with id ${id} not found.`)
                 return technology
             })
             const newTask = new domain.Task(data.id, task.topic, data.title, data.description, technologies)
@@ -72,23 +60,9 @@ export class DatabaseContext extends ObservableObject {
     async updateTask(task: domain.Task): Promise<void> {
         if (!this._permissions.canUpdateTask)
             throw this.permissionError()
-        interface RequestTaskData {
-            title: string
-            description: string
-            topicId: number
-            technologyIds: number[]
-        }
-        interface ResponseTaskData {
-            id: number
-            title: string
-            description: string
-            topicId: number
-            technologyIds: number[]
-        }
-        const { data } = await this._api.put<ResponseTaskData, AxiosResponse<ResponseTaskData>, RequestTaskData>(`/api/tasks/${task.id}`, {
+        const { data } = await this._api.put<response.Task, AxiosResponse<response.Task>, request.UpdateTask>(`/api/tasks/${task.id}`, {
             title: task.title,
             description: task.description,
-            topicId: task.topic.id,
             technologyIds: task.technologies.map(t => t.id)
         })
         this._topics = this._topics.map(t => {
@@ -98,7 +72,7 @@ export class DatabaseContext extends ObservableObject {
             const technologies = data.technologyIds.map(id => {
                 const technology = this._technologies.find(t => t.id === id)
                 if (!technology)
-                    throw new Error(`Technology with id ${id} not found`)
+                    throw new Error(`Technology with id ${id} not found.`)
                 return technology
             })
             const newTask = new domain.Task(data.id, task.topic, data.title, data.description, technologies)
@@ -123,13 +97,18 @@ export class DatabaseContext extends ObservableObject {
 
     @transaction
     async updatePreferences(preferences: domain.Preferences): Promise<void> {
-        interface PreferencesData {
-            theme: string
-        }
-        const { data } = await this._api.put<PreferencesData, AxiosResponse<PreferencesData>, PreferencesData>("/api/preferences", {
+        const { data } = await this._api.put<response.Preferences, AxiosResponse<response.Preferences>, request.Preferences>("/api/preferences", {
             theme: preferences.theme
         })
         this._preferences = new domain.Preferences(data.theme)
+    }
+
+    @transaction
+    async addAccount(provider: domain.Provider): Promise<void> {
+        const vcsAccountRegisteringModal = new VcsAccountRegisteringModal()
+        const { data: authorizationUrl } = await this._api.get<string>(`/api/oauth/authorization-url/${provider.id}`)
+        await vcsAccountRegisteringModal.registerAccount(authorizationUrl)
+        this._accounts = await this.fetchVcsAccounts(this._providers)
     }
 
     @transaction
@@ -144,19 +123,15 @@ export class DatabaseContext extends ObservableObject {
     async setActiveAccount(account: domain.Account): Promise<void> {
         if (!this._permissions.canUpdateVcsConfiguration)
             throw this.permissionError()
-        interface AccountData {
-            isActive: boolean
-        }
-        const { data } = await this._api.put<AccountData, AxiosResponse<AccountData>, AccountData>(`/api/vcs-accounts/${account.id}`, {
-            isActive: true
-        })
+        const { data } = await this._api.put<response.VcsAccount, AxiosResponse<response.VcsAccount>, request.VcsAccount>(
+            `/api/vcs-accounts/${account.id}`, { isActive: true })
         if (data.isActive)
             this._accounts = this._accounts.map(a => {
                 if (a.isActive)
-                    return new domain.Account(a.id, a.provider, a.username, false)
+                    return new domain.Account(a.id, a.provider, a.name, false)
                 if (a.id !== account.id)
                     return a
-                return new domain.Account(a.id, a.provider, a.username, true)
+                return new domain.Account(a.id, a.provider, a.name, true)
             })
     }
 
@@ -209,7 +184,7 @@ export class DatabaseContext extends ObservableObject {
 
     @transaction
     private permissionError(): Error {
-        return new Error("Permission error")
+        return new Error("Permission error.")
     }
 
     @reaction
@@ -220,15 +195,16 @@ export class DatabaseContext extends ObservableObject {
         this._permissions = permissions
         if (permissions.canUpdateVcsConfiguration) {
             const providers = await this.fetchVcsHostingProviders()
+            this._providers = providers
             const accounts = await this.fetchVcsAccounts(providers)
-            this._vcsConfiguration = new domain.VcsConfiguration(Array.from(providers.values()), accounts)
+            this._accounts = accounts
         }
         const technologies = await this.fetchTechnologies()
-        this._technologies = Array.from(technologies.values())
+        this._technologies = technologies
         const topics = await this.fetchTopics()
         const tasks = await this.fetchTasks(topics, technologies)
-        for (const topic of topics.values()) {
-            const topicTasks = Array.from(tasks.values()).filter(t => t.topic.id === topic.id)
+        for (const topic of topics) {
+            const topicTasks = tasks.filter(t => t.topic.id === topic.id)
             topic.tasks = topicTasks
         }
         this._topics = topics
@@ -245,80 +221,46 @@ export class DatabaseContext extends ObservableObject {
     }
 
     private async fetchPermissions(): Promise<domain.Permissions> {
-        interface PermissionsData {
-            canCreateTask: boolean
-            canUpdateTask: boolean
-            canDeleteTask: boolean
-            canUpdateVcsConfiguration: boolean
-            canUpdateUser: boolean
-            canCreateSolution: boolean
-            canDeleteSolution: boolean
-        }
-        const { data } = await this._api.get<PermissionsData>("/api/permissions")
-        return new domain.Permissions(data.canCreateTask, data.canUpdateTask, data.canDeleteTask, data.canUpdateVcsConfiguration, data.canUpdateUser,
-            data.canCreateSolution, data.canDeleteSolution)
+        const { data } = await this._api.get<response.Permissions>("/api/permissions")
+        return new domain.Permissions(data.canCreateTask, data.canUpdateTask, data.canDeleteTask, data.canUpdateVcsConfiguration,
+            data.canUpdateUser, data.canCreateSolution, data.canDeleteSolution)
     }
 
     private async fetchVcsHostingProviders(): Promise<domain.Provider[]> {
-        interface VcsHostingProviderData {
-            id: string
-            name: string
-        }
-        const { data } = await this._api.get<VcsHostingProviderData[]>("/api/vcs-hosting-providers")
+        const { data } = await this._api.get<response.VcsHostingProvider[]>("/api/vcs-hosting-providers")
         return data.map(p => new domain.Provider(p.id, p.name, githubIcon))
     }
 
     private async fetchVcsAccounts(providers: domain.Provider[]): Promise<domain.Account[]> {
-        interface VcsAccountData {
-            id: number
-            providerId: string
-            username: string
-            isActive: boolean
-        }
-        const { data } = await this._api.get<VcsAccountData[]>("/api/vcs-accounts")
+        const { data } = await this._api.get<response.VcsAccount[]>("/api/vcs-accounts")
         return data.map(a => {
-            const provider = providers.find(p => p.id === a.providerId)
+            const provider = providers.find(p => p.id === a.hostingProviderId)
             if (!provider)
-                throw new Error(`Unknown provider with id ${a.providerId}.`)
-            return new domain.Account(a.id, provider, a.username, a.isActive)
+                throw new Error(`Provider with id ${a.hostingProviderId} not found.`)
+            return new domain.Account(a.id, provider, a.name, a.isActive)
         })
     }
 
-    private async fetchTechnologies(): Promise<Map<number, domain.Technology>> {
-        interface TechnologyData {
-            id: number
-            name: string
-        }
-        const { data } = await this._api.get<TechnologyData[]>("/api/technologies")
-        return new Map(data.map(t => [t.id, new domain.Technology(t.id, t.name)]))
+    private async fetchTechnologies(): Promise<domain.Technology[]> {
+        const { data } = await this._api.get<response.Technology[]>("/api/technologies")
+        return data.map(t => new domain.Technology(t.id, t.name))
     }
 
     private async fetchTopics(): Promise<domain.Topic[]> {
-        interface TopicData {
-            id: number
-            name: string
-        }
-        const { data } = await this._api.get<TopicData[]>("/api/topics")
+        const { data } = await this._api.get<response.Topic[]>("/api/topics")
         return data.map(t => new domain.Topic(t.id, t.name))
     }
 
-    private async fetchTasks(topics: domain.Topic[], allTechnologies: Map<number, domain.Technology>): Promise<domain.Task[]> {
-        interface TaskData {
-            id: number
-            topicId: number
-            title: string
-            description: string
-            technologyIds: number[]
-        }
-        const { data } = await this._api.get<TaskData[]>("/api/tasks")
+    private async fetchTasks(topics: domain.Topic[], allTechnologies: domain.Technology[]): Promise<domain.Task[]> {
+        const { data } = await this._api.get<response.Task[]>("/api/tasks")
         return data.map(t => {
             const topic = topics.find(topic => topic.id === t.topicId)
             if (!topic)
-                throw new Error(`Unknown topic with id ${t.topicId}.`)
+                throw new Error(`Topic with id ${t.topicId} not found.`)
             const taskTechnologies = t.technologyIds.map(id => {
-                const technology = allTechnologies.get(id)
+                const technology = allTechnologies.find(technology => technology.id === id)
                 if (!technology)
-                    throw new Error(`Unknown technology with id ${id}.`)
+                    throw new Error(`Technology with id ${id} not found.`)
                 return technology
             })
             const task = new domain.Task(t.id, topic, t.title, t.description, taskTechnologies)

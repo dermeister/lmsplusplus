@@ -266,6 +266,12 @@ public class ApplicationContext : DbContext
             entity.Property(v => v.Name)
                 .HasMaxLength(500)
                 .HasColumnName("name");
+            entity.Property(v => v.OauthClientId)
+                .HasMaxLength(200)
+                .HasColumnName("oauth_client_id");
+            entity.Property(v => v.OauthClientSecret)
+                .HasMaxLength(200)
+                .HasColumnName("oauth_client_secret");
             entity.HasIndex(v => v.Name, "unq_vcs_hosting_providers_name").IsUnique();
         });
     }
@@ -308,24 +314,24 @@ public class ApplicationContext : DbContext
         modelBuilder.Entity<UserRepository>(entity =>
         {
             entity.ToTable("user_repositories");
-            entity.HasKey(r => r.Id).HasName("pk_user_repositories_id");
-            entity.Property(r => r.Id)
+            entity.HasKey(u => u.Id).HasName("pk_user_repositories_id");
+            entity.Property(u => u.Id)
                 .HasColumnName("id")
                 .UseIdentityAlwaysColumn();
-            entity.Property(r => r.CloneUrl)
+            entity.Property(u => u.CloneUrl)
                 .HasMaxLength(1000)
                 .HasColumnName("clone_url");
-            entity.Property(r => r.VcsAccountId).HasColumnName("vcs_account_id");
-            entity.Property(r => r.WebsiteUrl)
+            entity.Property(u => u.VcsAccountId).HasColumnName("vcs_account_id");
+            entity.Property(u => u.WebsiteUrl)
                 .HasMaxLength(1000)
                 .HasColumnName("website_url");
-            entity.HasOne(r => r.VcsAccount)
+            entity.HasOne(u => u.VcsAccount)
                 .WithMany()
-                .HasForeignKey(r => r.VcsAccountId)
+                .HasForeignKey(u => u.VcsAccountId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_user_repositories_vcs_account_id");
-            entity.HasIndex(r => r.CloneUrl, name: "unq_user_repositories_clone_url").IsUnique();
-            entity.HasIndex(r => r.WebsiteUrl, name: "unq_user_repositories_website_url").IsUnique();
+            entity.HasIndex(u => u.CloneUrl, name: "unq_user_repositories_clone_url").IsUnique();
+            entity.HasIndex(u => u.WebsiteUrl, name: "unq_user_repositories_website_url").IsUnique();
         });
     }
 
@@ -334,14 +340,14 @@ public class ApplicationContext : DbContext
         modelBuilder.Entity<TemplateRepository>(entity =>
         {
             entity.ToTable("template_repositories");
-            entity.HasKey(r => r.Id).HasName("pk_template_repositories_id");
-            entity.Property(r => r.Id)
+            entity.HasKey(t => t.Id).HasName("pk_template_repositories_id");
+            entity.Property(t => t.Id)
                 .HasColumnName("id")
                 .UseIdentityAlwaysColumn();
-            entity.Property(r => r.CloneUrl)
+            entity.Property(t => t.CloneUrl)
                 .HasMaxLength(1000)
                 .HasColumnName("clone_url");
-            entity.HasIndex(r => r.CloneUrl, name: "unq_repositories_clone_url").IsUnique();
+            entity.HasIndex(t => t.CloneUrl, name: "unq_repositories_clone_url").IsUnique();
         });
     }
 
