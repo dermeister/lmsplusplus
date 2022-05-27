@@ -136,50 +136,49 @@ export class DatabaseContext extends ObservableObject {
     }
 
     @transaction
-    async createSolution(solution: domain.Solution): Promise<void> {
+    async createSolution(solution: domain.Solution, technology: domain.Technology): Promise<void> {
         if (!this._permissions.canCreateSolution)
             throw this.permissionError()
-
-        await new Promise(r => setTimeout(r, 1000))
-
-        solution = new domain.Solution(1, solution.task, solution.name, solution.technology)
-        const courses = this._topics.toMutable()
-        const course = courses.find(c => c.id === solution.task.topic.id)
-        if (course) {
-            const oldTask = course.tasks.find(t => t.id === solution.task.id)
-            if (oldTask) {
-                const updatedTask = new domain.Task(oldTask.id, oldTask.topic, oldTask.title, oldTask.description,
-                    oldTask.technologies)
-                updatedTask.solutions = oldTask.solutions.concat(solution)
-                const updatedCourse = new domain.Topic(course.id, course.name)
-                updatedCourse.tasks = course.tasks.map(t => t === oldTask ? updatedTask : t)
-                courses.splice(courses.indexOf(course), 1, updatedCourse)
-            }
-        }
-        this._topics = courses
+        const { data } = await this._api.post<response.Solution, AxiosResponse<response.Solution>, request.Solution>("/api/solutions", {
+            repositoryName: solution.name,
+            taskId: solution.task.id,
+            technologyId: technology.id
+        })
+        this._topics = this._topics.map(topic => {
+            if (topic.id !== solution.task.topic.id)
+                return topic
+            const newTopic = new domain.Topic(topic.id, topic.name)
+            newTopic.tasks = topic.tasks.map(task => {
+                if (task.id !== solution.task.id)
+                    return task
+                const newTask = new domain.Task(solution.task.id, newTopic, solution.task.title, solution.task.description,
+                    solution.task.technologies)
+                const newSolution = new domain.Solution(data.id, newTask, data.repositoryName)
+                newTask.solutions = task.solutions.concat(newSolution)
+                return newTask
+            })
+            return newTopic
+        })
     }
 
     @transaction
     async deleteSolution(solution: domain.Solution): Promise<void> {
         if (!this._permissions.canDeleteSolution)
             throw this.permissionError()
-
-        await new Promise(r => setTimeout(r, 1000))
-
-        const courses = this._topics.toMutable()
-        const course = courses.find(c => c.id === solution.task.topic.id)
-        if (course) {
-            const oldTask = course.tasks.find(t => t.id === solution.task.id)
-            if (oldTask) {
-                const updatedTask = new domain.Task(oldTask.id, oldTask.topic, oldTask.title, oldTask.description,
-                    oldTask.technologies)
-                updatedTask.solutions = oldTask.solutions.filter(s => s.id !== solution.id)
-                const updatedCourse = new domain.Topic(course.id, course.name)
-                updatedCourse.tasks = course.tasks.map(t => t === oldTask ? updatedTask : t)
-                courses.splice(courses.indexOf(course), 1, updatedCourse)
-            }
-        }
-        this._topics = courses
+        await this._api.delete(`/api/solutions/${solution.id}`)
+        this._topics = this._topics.map(topic => {
+            if (topic.id !== solution.task.topic.id)
+                return topic
+            const newTopic = new domain.Topic(topic.id, topic.name)
+            newTopic.tasks = topic.tasks.map(task => {
+                if (task.id !== solution.task.id)
+                    return task
+                const newTask = new domain.Task(task.id, newTopic, task.title, task.description, task.technologies)
+                newTask.solutions = task.solutions.filter(s => s.id !== solution.id)
+                return newTask
+            })
+            return newTopic
+        })
     }
 
     @transaction
@@ -201,10 +200,13 @@ export class DatabaseContext extends ObservableObject {
         }
         const technologies = await this.fetchTechnologies()
         this._technologies = technologies
-        const topics = await this.fetchTopics()
-        const tasks = await this.fetchTasks(topics, technologies)
+        let topics = await this.fetchTopics()
+        let tasks = await this.fetchTasks(topics, technologies)
+        const solutions = await this.fetchSolutions(tasks)
         for (const topic of topics) {
             const topicTasks = tasks.filter(t => t.topic.id === topic.id)
+            for (const task of topicTasks)
+                task.solutions = solutions.filter(s => s.task.id === task.id)
             topic.tasks = topicTasks
         }
         this._topics = topics
@@ -265,6 +267,16 @@ export class DatabaseContext extends ObservableObject {
             })
             const task = new domain.Task(t.id, topic, t.title, t.description, taskTechnologies)
             return task
+        })
+    }
+
+    private async fetchSolutions(tasks: domain.Task[]): Promise<domain.Solution[]> {
+        const { data } = await this._api.get<response.Solution[]>("/api/solutions")
+        return data.map(s => {
+            const task = tasks.find(t => t.id === s.taskId)
+            if (!task)
+                throw new Error(`Task with id ${s.taskId} not found.`)
+            return new domain.Solution(s.id, task, s.repositoryName)
         })
     }
 }

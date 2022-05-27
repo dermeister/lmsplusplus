@@ -18,12 +18,12 @@ public class SolutionsController : ControllerBase
         AuthorizationCredentials credentials = new(User);
         return credentials.UserRole switch
         {
-            Infrastructure.Role.Author => await (from solution in _context.Solutions
+            Infrastructure.Role.Author => await (from solution in _context.Solutions.Include(s => s.Repository)
                                                  join task in _context.Tasks on solution.TaskId equals task.Id
                                                  join topic in _context.Topics on task.TopicId equals topic.Id
                                                  where topic.Id == credentials.UserId
                                                  select (Response.Solution)solution).ToArrayAsync(),
-            Infrastructure.Role.Solver => await (from solution in _context.Solutions
+            Infrastructure.Role.Solver => await (from solution in _context.Solutions.Include(s => s.Repository)
                                                  join user in _context.Users on solution.SolverId equals user.Id
                                                  where user.Id == credentials.UserId
                                                  select (Response.Solution)solution).ToArrayAsync(),
@@ -56,7 +56,7 @@ public class SolutionsController : ControllerBase
             return ValidationProblem();
         }
         Vcs.IHostingClient hostingClient = Vcs.HostingClientFactory.CreateClient(activeAccount.HostingProviderId);
-        Vcs.Repository vcsTemplateRepository = new(databaseTemplateRepository.CloneUrl, websiteUrl: null, "");
+        Vcs.Repository vcsTemplateRepository = new(databaseTemplateRepository.CloneUrl, websiteUrl: null, null, null);
         Vcs.Repository vcsCreatedRepository;
         try
         {

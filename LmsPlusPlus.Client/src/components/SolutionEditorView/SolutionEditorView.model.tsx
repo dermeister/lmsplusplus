@@ -52,8 +52,10 @@ export class SolutionEditorView extends View {
     @transaction
     @options({ monitor: SolutionEditorView.s_monitor })
     async saveSolution(): Promise<void> {
-        const solution = new domain.Solution(this._id, this._task, this._name, this._selectedTechnology)
-        await this._context.createSolution(solution)
+        const solution = new domain.Solution(this._id, this._task, this._name)
+        if (!this._selectedTechnology)
+            throw new Error("No technology selected.")
+        await this._context.createSolution(solution, this._selectedTechnology)
         this._viewGroup.returnToPreviousView()
     }
 

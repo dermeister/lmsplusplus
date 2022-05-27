@@ -38,8 +38,8 @@ export class App extends ObservableObject {
         nonreactive(() => this._currentScreen.dispose())
         if (this._authService.jwtToken) {
             const api = axios.create({ headers: { Authorization: `Bearer ${this._authService.jwtToken}` } })
-            this._currentScreen = new WorkbenchScreen(api, this._authService)
+            this._currentScreen = nonreactive(() => new WorkbenchScreen(api, this._authService))
         } else
-            this._currentScreen = new SignInScreen(this._authService, this._errorService)
+            this._currentScreen = nonreactive(() => new SignInScreen(this._authService, this._errorService))
     }
 }

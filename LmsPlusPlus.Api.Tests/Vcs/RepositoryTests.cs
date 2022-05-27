@@ -18,8 +18,10 @@ public class RepositoryTests : IClassFixture<RepositoryFixture>
     public async Task CopyTest()
     {
         // Arrange
-        Vcs.Repository sourceRepository = new(_repositoryFixture.SourceRepositoryPath, websiteUrl: null, accessToken: null);
-        Vcs.Repository destinationRepository = new(_repositoryFixture.DestinationRepositoryPath, websiteUrl: null, accessToken: null);
+        Vcs.Repository sourceRepository = new(_repositoryFixture.SourceRepositoryPath, websiteUrl: null, ownerUsername: null,
+            accessToken: null);
+        Vcs.Repository destinationRepository = new(_repositoryFixture.DestinationRepositoryPath, websiteUrl: null, ownerUsername: null,
+            accessToken: null);
 
         // Act
         await sourceRepository.CopyTo(destinationRepository);

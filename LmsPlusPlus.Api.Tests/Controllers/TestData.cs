@@ -79,7 +79,9 @@ class TestData
         Infrastructure.VcsHostingProvider vcsHostingProvider = new()
         {
             Id = "provider",
-            Name = "Provider"
+            Name = "Provider",
+            OauthClientId = "Client ID",
+            OauthClientSecret = "Client Secret",
         };
         Infrastructure.VcsAccount account = new()
         {

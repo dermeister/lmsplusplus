@@ -5,15 +5,17 @@ namespace LmsPlusPlus.Api.Vcs;
 class Repository
 {
     readonly string? _accessToken;
+    readonly string? _ownerUsername;
 
     internal string? WebsiteUrl { get; }
     internal string CloneUrl { get; }
 
-    internal Repository(string cloneUrl, string? websiteUrl, string? accessToken)
+    internal Repository(string cloneUrl, string? websiteUrl, string? ownerUsername, string? accessToken)
     {
         WebsiteUrl = websiteUrl;
         CloneUrl = cloneUrl;
         _accessToken = accessToken;
+        _ownerUsername = ownerUsername;
     }
 
     internal async Task CopyTo(Repository repository)
@@ -29,7 +31,11 @@ class Repository
             destinationRepositoryOnFileSystem.Commit(message: "Initial commit", signature, signature);
             destinationRepositoryOnFileSystem.Network.Push(destinationRepositoryOnFileSystem.Head, new PushOptions
             {
-                CredentialsProvider = (_, _, _) => new UsernamePasswordCredentials { Password = repository._accessToken }
+                CredentialsProvider = (_, _, _) => new UsernamePasswordCredentials
+                {
+                    Username = repository._ownerUsername,
+                    Password = repository._accessToken
+                }
             });
         }
         finally
