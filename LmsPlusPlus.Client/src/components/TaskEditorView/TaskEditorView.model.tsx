@@ -19,7 +19,7 @@ export class TaskEditorView extends View {
     private _taskTitle: string
     private _selectedTechnologies: readonly domain.Technology[]
 
-    override get isPulsing(): boolean { return TaskEditorView._monitor.isActive }
+    override get shouldShowLoader(): boolean { return TaskEditorView._monitor.isActive }
     override get title(): string { return "Task Editor" }
     get taskTitle(): string { return this._taskTitle }
     get selectedTechnologies(): readonly domain.Technology[] { return this._selectedTechnologies }

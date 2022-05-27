@@ -2,8 +2,7 @@ import React from "react"
 import * as models from "../../models"
 import { ItemNode } from "../../models"
 import { autorender } from "../autorender"
-import { Service } from "../SolutionRunnerView/service/Service"
-import { ServiceView } from "../SolutionRunnerView/service/ServiceView"
+import { ServiceView } from "../SolutionRunnerView/ServiceView.model"
 import { ServicesExplorer } from "./ServicesExplorer"
 
 interface ServicesExplorerProps {
@@ -25,7 +24,7 @@ export function ServicesExplorerView({ model }: ServicesExplorerProps): JSX.Elem
     ), [model])
 }
 
-function contextMenu(service: models.ItemNode<Service>): JSX.Element {
+function contextMenu(service: models.ItemNode<ServiceView>): JSX.Element {
     if (service.item.virtualPorts.length == 0)
         return <></>
     return (
@@ -46,8 +45,8 @@ function contextMenu(service: models.ItemNode<Service>): JSX.Element {
 //     return items
 // }
 
-function onServiceViewChange(service: ItemNode<Service>, value: ServiceView): void {
-    // service.contextMenu.close()
-    service.item.setServiceView(value)
-}
+// function onServiceViewChange(service: ItemNode<ServiceView>, value: ServiceView1): void {
+//     // service.contextMenu.close()
+//     service.item.setServiceView(value)
+// }
 

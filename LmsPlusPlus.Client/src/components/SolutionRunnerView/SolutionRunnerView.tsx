@@ -1,45 +1,38 @@
 import React from "react"
 import { autorender } from "../autorender"
-import * as models from "../../models"
-import { ServicesExplorerView } from "../ServicesExplorer/ServicesExplorerView"
 import { Button } from "../Button"
+import { ServiceView } from "./ServiceView.model"
+import { SolutionRunnerView } from "./SolutionRunner.model"
 import styles from "./SolutionRunner.module.scss"
-import { ConsoleServiceViewModel } from "./service/ConsoleServiceView"
-import { WebServiceViewModel } from "./service/WebServiceView"
-import { SolutionRunner } from "./SolutionRunner"
-import { ITasksService } from "../ITasksService"
-import { ConsoleServiceView } from "./ConsoleServiceView"
-import { WebServiceView } from "./WebServiceView"
 
 interface SolutionRunnerProps {
-    model: SolutionRunner
-    tasksService: ITasksService
+    model: SolutionRunnerView
 }
 
-export function SolutionRunnerSidePanelContent({ model, tasksService }: SolutionRunnerProps): JSX.Element {
+export function SolutionRunnerSidePanelContent({ model }: SolutionRunnerProps): JSX.Element {
     return autorender(() => {
-        let body: JSX.Element = <></>
-        if (model.isLoadingApplication)
-            body = <p className={styles.loadingPlaceholder}>Wait for application to load</p>
-        else if (model.servicesExplorer)
-            body = <ServicesExplorerView model={model.servicesExplorer} />
+        // let body: JSX.Element = <></>
+        // if (model.isLoadingApplication)
+        //     body = <p className={styles.loadingPlaceholder}>Wait for application to load</p>
+        // else if (model.servicesExplorer)
+        //     body = <ServicesExplorerView model={model.servicesExplorer} />
         return (
             <div className={styles.sidePanelContent}>
-                {body}
+                {/* {body} */}
                 <Button className={styles.stopButton} variant="danger" onClick={() => model.stopSolution()}>Stop</Button>
             </div>
         )
     }, [model])
 }
 
-export function SolutionRunnerMainPanelContent({ model }: SolutionRunnerProps): JSX.Element {
+interface SolutionRunnerMainPanelContentProps {
+    services: ServiceView[] | null
+    currentService: ServiceView | null
+}
+
+export function SolutionRunnerMainPanelContent({ currentService, services }: SolutionRunnerMainPanelContentProps): JSX.Element {
     return autorender(() => {
-        if (model.serviceView instanceof ConsoleServiceViewModel)
-            return <ConsoleServiceView model={model.serviceView} />
-        else if (model.serviceView instanceof WebServiceViewModel)
-            return <WebServiceView model={model.serviceView} />
-        else
-            return <></>
-    }, [model])
+        return <>{services?.map((s, i) => <React.Fragment key={i}>{s.render()}</React.Fragment>)}</>
+    }, [currentService])
 }
 

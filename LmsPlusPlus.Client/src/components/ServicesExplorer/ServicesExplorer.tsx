@@ -1,16 +1,16 @@
-import { Service } from "../SolutionRunnerView/service/Service"
+import { ServiceView } from "../SolutionRunnerView/ServiceView.model"
 import { reaction, Ref, unobservable } from "reactronic"
 import { Explorer, ItemNode } from "../../models"
 
-export class ServicesExplorer extends Explorer<Service, ItemNode<Service>> {
-    @unobservable private readonly _services: Ref<readonly Service[]>
+export class ServicesExplorer extends Explorer<ServiceView, ItemNode<ServiceView>> {
+    @unobservable private readonly _services: Ref<readonly ServiceView[]>
 
-    constructor(services: Ref<readonly Service[]>) {
+    constructor(services: Ref<readonly ServiceView[]>) {
         super(ServicesExplorer.createChildren(services.value), null!)
         this._services = services
     }
 
-    private static createChildren(services: readonly Service[]): readonly ItemNode<Service>[] {
+    private static createChildren(services: readonly ServiceView[]): readonly ItemNode<ServiceView>[] {
         return services.map(s => new ItemNode(s.name, s.name, s))
     }
 

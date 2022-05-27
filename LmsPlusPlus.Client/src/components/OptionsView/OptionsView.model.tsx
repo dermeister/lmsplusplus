@@ -17,7 +17,7 @@ export class OptionsView extends View {
     @unobservable private readonly _vcsOptionCategory: VcsOptionCategory
     private _currentOptionCategory: OptionCategory
 
-    override get isPulsing(): boolean { return this._currentOptionCategory.isPerformingOperation }
+    override get shouldShowLoader(): boolean { return this._currentOptionCategory.isPerformingOperation }
     override get title(): string { return "Options" }
 
     constructor(authService: IAuthService, context: DatabaseContext) {
@@ -52,14 +52,14 @@ export class OptionsView extends View {
     private updateCurrentCategory() {
         const item = this._categoriesExplorer.selectedNode?.item
         switch (item) {
-        case OptionCategoryKind.Preferences:
-            this._currentOptionCategory = this._preferencesOptionCategory
-            break
-        case OptionCategoryKind.Vcs:
-            this._currentOptionCategory = this._vcsOptionCategory
-            break
-        default:
-            break
+            case OptionCategoryKind.Preferences:
+                this._currentOptionCategory = this._preferencesOptionCategory
+                break
+            case OptionCategoryKind.Vcs:
+                this._currentOptionCategory = this._vcsOptionCategory
+                break
+            default:
+                break
         }
     }
 }

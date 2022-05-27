@@ -6,7 +6,7 @@ import * as domain from "../../domain"
 import { IContextMenuService } from "../ContextMenuService"
 import { ITasksService } from "../ITasksService"
 import { SolutionEditorView } from "../SolutionEditorView"
-import { SolutionRunner } from "../SolutionRunnerView/SolutionRunner"
+import { SolutionRunnerView } from "../SolutionRunnerView"
 import { TaskEditorView } from "../TaskEditorView"
 import { TasksExplorer } from "../TasksExplorer"
 import { View } from "../View"
@@ -20,7 +20,7 @@ export class TasksView extends View implements ITasksService {
     @unobservable private readonly _context: DatabaseContext
     @unobservable private readonly _viewGroup: ViewGroup
 
-    override get isPulsing(): boolean { return TasksView._monitor.isActive }
+    override get shouldShowLoader(): boolean { return TasksView._monitor.isActive }
     override get title(): string { return "Tasks" }
 
     constructor(context: DatabaseContext, viewGroup: ViewGroup, contextMenuService: IContextMenuService) {
@@ -81,8 +81,8 @@ export class TasksView extends View implements ITasksService {
     }
 
     @transaction
-    runSolution(solutoin: domain.Solution): void {
-        const solutionRunnerView = new SolutionRunner("solution-runner", solutoin, this, this._viewGroup)
+    runSolution(solution: domain.Solution): void {
+        const solutionRunnerView = new SolutionRunnerView(solution, this._viewGroup)
         this._viewGroup.openView(solutionRunnerView)
     }
 }

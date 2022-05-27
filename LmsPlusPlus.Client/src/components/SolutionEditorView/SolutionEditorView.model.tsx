@@ -16,7 +16,7 @@ export class SolutionEditorView extends View {
     private _name: string
     private _selectedTechnology: domain.Technology | null = null
 
-    override get isPulsing(): boolean { return SolutionEditorView.s_monitor.isActive }
+    override get shouldShowLoader(): boolean { return SolutionEditorView.s_monitor.isActive }
     override get title(): string { return "Solution" }
     get name(): string { return this._name }
     get selectedTechnology(): domain.Technology | null { return this._selectedTechnology }

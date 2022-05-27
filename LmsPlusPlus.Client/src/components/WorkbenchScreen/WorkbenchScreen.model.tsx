@@ -30,7 +30,7 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
         this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, this._context)
         this._currentViewGroup = this._tasksViewGroup
         this._sidePanelTitle = this._currentViewGroup.currentView.title
-        this._sidePanelShouldShowLoader = this._currentViewGroup.currentView.isPulsing
+        this._sidePanelShouldShowLoader = this._currentViewGroup.currentView.shouldShowLoader
         const titleRef = new Ref(this, "_sidePanelTitle")
         const isPulsingRef = new Ref(this, "_sidePanelShouldShowLoader")
         this._sidePanel = new SidePanel(titleRef, isPulsingRef)
@@ -65,6 +65,6 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
     @reaction
     private updateSidePanelRefs(): void {
         this._sidePanelTitle = this._currentViewGroup.currentView.title
-        this._sidePanelShouldShowLoader = this._currentViewGroup.currentView.isPulsing
+        this._sidePanelShouldShowLoader = this._currentViewGroup.currentView.shouldShowLoader
     }
 }

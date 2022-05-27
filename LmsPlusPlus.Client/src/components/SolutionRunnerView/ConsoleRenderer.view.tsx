@@ -1,12 +1,11 @@
 import React, { useEffect, useRef } from "react"
-import * as models from "../../models"
-import { ConsoleServiceViewModel } from "./service/ConsoleServiceView"
+import * as model from "./ConsoleRenderer.model"
 
-interface ConsoleServiceViewProps {
-    model: ConsoleServiceViewModel
+interface ConsoleRendererProps {
+    model: model.ConsoleRenderer
 }
 
-export function ConsoleServiceView({ model }: ConsoleServiceViewProps): JSX.Element {
+export function ConsoleRenderer({ model }: ConsoleRendererProps): JSX.Element {
     const ref = useRef<HTMLDivElement>(null)
 
     useEffect(() => {

@@ -1,8 +1,10 @@
-import { ServiceView } from "./ServiceView"
+import React from "react"
 import { Ref, Rx } from "reactronic"
-import { IDisposable } from "../../../IDisposable"
+import { IDisposable } from "../../IDisposable"
+import { IRenderer } from "./IRenderer"
+import * as view from "./WebRenderer.view"
 
-export class WebServiceViewModel implements ServiceView, IDisposable {
+export class WebRenderer implements IRenderer, IDisposable {
     private static readonly _iframeContainer = document.getElementById("webview") as HTMLDivElement
     private readonly _isBackendLoading: Ref<boolean>
     private readonly _virtualPort: number
@@ -20,16 +22,20 @@ export class WebServiceViewModel implements ServiceView, IDisposable {
 
     dispose(): void {
         this.unmount()
-        if (WebServiceViewModel._iframeContainer.contains(this._iframe))
-            WebServiceViewModel._iframeContainer.removeChild(this._iframe as HTMLIFrameElement)
+        if (WebRenderer._iframeContainer.contains(this._iframe))
+            WebRenderer._iframeContainer.removeChild(this._iframe as HTMLIFrameElement)
         Rx.dispose(this._isBackendLoading)
+    }
+
+    render(): JSX.Element {
+        return <view.WebRenderer model={this} />
     }
 
     mount(element: HTMLElement): void {
         this._mountContainer = element
         if (!this._iframe) {
-            this._iframe = WebServiceViewModel.createIframe(this._virtualPort)
-            WebServiceViewModel._iframeContainer.appendChild(this._iframe)
+            this._iframe = WebRenderer.createIframe(this._virtualPort)
+            WebRenderer._iframeContainer.appendChild(this._iframe)
         }
         this._mountContainerResizeObserver = new ResizeObserver(entries => {
             const element = entries[0].target as HTMLElement

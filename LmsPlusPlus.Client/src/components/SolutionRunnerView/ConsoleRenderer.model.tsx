@@ -1,10 +1,16 @@
+import React from "react"
 import { ITheme, Terminal } from "xterm"
 import { FitAddon } from "xterm-addon-fit"
-import { ServiceView } from "./ServiceView"
-import { ServiceBuildOutput } from "./ServiceBuildOutput"
-import { IDisposable } from "../../../IDisposable"
+import { IDisposable } from "../../IDisposable"
+import * as view from "./ConsoleRenderer.view"
+import { IRenderer } from "./IRenderer"
 
-export class ConsoleServiceViewModel implements ServiceView, IDisposable {
+export interface ServiceBuildOutput {
+    text: string
+    anchor: string | null
+}
+
+export class ConsoleRenderer implements IRenderer, IDisposable {
     private readonly _terminal: Terminal
     private readonly _fitAddon = new FitAddon()
     private readonly _terminalContainer = document.createElement("div")
@@ -22,13 +28,17 @@ export class ConsoleServiceViewModel implements ServiceView, IDisposable {
 
     constructor() {
         this._terminal = new Terminal({
-            theme: ConsoleServiceViewModel.terminalTheme,
+            theme: ConsoleRenderer.terminalTheme,
             disableStdin: true,
             convertEol: true,
             fontSize: 14
         })
         this._terminal.loadAddon(this._fitAddon)
         this.styleTerminalContainer()
+    }
+
+    render(): JSX.Element {
+        return <view.ConsoleRenderer model={this} />
     }
 
     mount(element: HTMLElement): void {
@@ -108,7 +118,7 @@ export class ConsoleServiceViewModel implements ServiceView, IDisposable {
     private styleTerminalContainer(): void {
         this._terminalContainer.style.width = "100%"
         this._terminalContainer.style.height = "100%"
-        this._terminalContainer.style.backgroundColor = ConsoleServiceViewModel.terminalTheme.background ?? "black"
+        this._terminalContainer.style.backgroundColor = ConsoleRenderer.terminalTheme.background ?? "black"
     }
 
     private styleTerminalElement(): void {

@@ -1,15 +1,14 @@
 import React, { useEffect, useRef } from "react"
-import * as models from "../../models"
 import { autorender } from "../autorender"
 import { Spinner } from "../Spinner"
-import { WebServiceViewModel } from "./service/WebServiceView"
-import styles from "./WebServiceView.module.scss"
+import * as model from "./WebRenderer.model"
+import styles from "./WebRenderer.module.scss"
 
-interface WebServiceViewProps {
-    model: WebServiceViewModel
+interface WebRendererProps {
+    model: model.WebRenderer
 }
 
-export function WebServiceView({ model }: WebServiceViewProps): JSX.Element {
+export function WebRenderer({ model }: WebRendererProps): JSX.Element {
     const ref = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
