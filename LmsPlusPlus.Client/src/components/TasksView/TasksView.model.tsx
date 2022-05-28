@@ -4,6 +4,7 @@ import { cached, Monitor, options, Ref, Transaction, transaction, unobservable }
 import { DatabaseContext } from "../../database"
 import * as domain from "../../domain"
 import { IContextMenuService } from "../ContextMenuService"
+import { IErrorService } from "../ErrorService"
 import { ITasksService } from "../ITasksService"
 import { SolutionEditorView } from "../SolutionEditorView"
 import { SolutionRunnerView } from "../SolutionRunnerView"
@@ -19,14 +20,16 @@ export class TasksView extends View implements ITasksService {
     @unobservable private readonly _tasksExplorer: TasksExplorer
     @unobservable private readonly _context: DatabaseContext
     @unobservable private readonly _viewGroup: ViewGroup
+    @unobservable private readonly _errorService: IErrorService
 
     override get shouldShowLoader(): boolean { return TasksView._monitor.isActive }
     override get title(): string { return "Tasks" }
 
-    constructor(context: DatabaseContext, viewGroup: ViewGroup, contextMenuService: IContextMenuService) {
+    constructor(context: DatabaseContext, viewGroup: ViewGroup, contextMenuService: IContextMenuService, errorService: IErrorService) {
         super()
         this._context = context
         this._viewGroup = viewGroup
+        this._errorService = errorService
         this._tasksExplorer = new TasksExplorer(new Ref(this._context, "courses"), this, contextMenuService, new Ref(this._context, "permissions"))
     }
 
@@ -52,13 +55,13 @@ export class TasksView extends View implements ITasksService {
     @transaction
     createTask(topic: domain.Topic): void {
         const task = new domain.Task(domain.Task.NO_ID, topic, "", "", [])
-        const taskEditorView = new TaskEditorView(task, this._context.technologies, this._context, this._viewGroup)
+        const taskEditorView = new TaskEditorView(task, this._context.technologies, this._context, this._viewGroup, this._errorService)
         this._viewGroup.openView(taskEditorView)
     }
 
     @transaction
     updateTask(task: domain.Task): void {
-        const taskEditorView = new TaskEditorView(task, this._context.technologies, this._context, this._viewGroup)
+        const taskEditorView = new TaskEditorView(task, this._context.technologies, this._context, this._viewGroup, this._errorService)
         this._viewGroup.openView(taskEditorView)
     }
 

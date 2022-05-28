@@ -5,6 +5,7 @@ import { DatabaseContext } from "../../database"
 import { ObservableObject } from "../../ObservableObject"
 import { IAuthService } from "../AuthService"
 import { ContextMenuService } from "../ContextMenuService"
+import { IErrorService } from "../ErrorService"
 import { IScreen } from "../IScreen"
 import { OptionsViewGroup } from "../OptionsViewGroup"
 import { SidePanel } from "../SidePanel"
@@ -18,15 +19,17 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
     @unobservable private readonly _optionsViewGroup: OptionsViewGroup
     @unobservable private readonly _contextMenuService: ContextMenuService
     @unobservable private readonly _context: DatabaseContext
+    @unobservable private readonly _errorService: IErrorService
     private _currentViewGroup: ViewGroup
     private _sidePanelTitle: string
     private _sidePanelShouldShowLoader: boolean
 
-    constructor(api: Axios, authService: IAuthService) {
+    constructor(api: Axios, authService: IAuthService, errorService: IErrorService) {
         super()
         this._contextMenuService = new ContextMenuService()
+        this._errorService = errorService
         this._context = new DatabaseContext(api)
-        this._tasksViewGroup = new TasksViewGroup("tasks-view-group", this._context, this._contextMenuService)
+        this._tasksViewGroup = new TasksViewGroup("tasks-view-group", this._context, this._contextMenuService, this._errorService)
         this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, this._context)
         this._currentViewGroup = this._tasksViewGroup
         this._sidePanelTitle = this._currentViewGroup.currentView.title

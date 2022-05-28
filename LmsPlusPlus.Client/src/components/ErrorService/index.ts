@@ -1,2 +1,2 @@
-export { ErrorService } from "./ErrorService"
-export type { IErrorService } from "./ErrorService"
+export { ErrorService } from "./ErrorService.model"
+export type { IErrorService } from "./ErrorService.model"

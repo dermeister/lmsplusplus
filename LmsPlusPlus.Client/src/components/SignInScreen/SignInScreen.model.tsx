@@ -36,7 +36,7 @@ export class SignInScreen extends ObservableObject implements IScreen {
             await this._authService.signIn(this.login, this.password)
         } catch (e) {
             if (e instanceof AuthError)
-                this._errorService.showError(e)
+                this._errorService.showError(e.axiosError)
         }
     }
 

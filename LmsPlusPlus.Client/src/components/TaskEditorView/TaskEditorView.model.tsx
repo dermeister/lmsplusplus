@@ -3,6 +3,7 @@ import React from "react"
 import { cached, Monitor, options, standalone, Transaction, transaction, unobservable } from "reactronic"
 import { DatabaseContext } from "../../database"
 import * as domain from "../../domain"
+import { IErrorService } from "../ErrorService"
 import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
 import * as view from "./TaskEditorView.view"
@@ -16,6 +17,7 @@ export class TaskEditorView extends View {
     @unobservable private readonly _solutions: domain.Solution[]
     @unobservable private readonly _context: DatabaseContext
     @unobservable private readonly _viewGroup: ViewGroup
+    @unobservable private readonly _errorService: IErrorService
     private _taskTitle: string
     private _selectedTechnologies: readonly domain.Technology[]
 
@@ -24,8 +26,10 @@ export class TaskEditorView extends View {
     get taskTitle(): string { return this._taskTitle }
     get selectedTechnologies(): readonly domain.Technology[] { return this._selectedTechnologies }
 
-    constructor(task: domain.Task, availableTechnologies: readonly domain.Technology[], context: DatabaseContext, viewGroup: ViewGroup) {
+    constructor(task: domain.Task, availableTechnologies: readonly domain.Technology[], context: DatabaseContext, viewGroup: ViewGroup,
+        errorService: IErrorService) {
         super()
+        this._errorService = errorService
         this._context = context
         this._viewGroup = viewGroup
         this._id = task.id
@@ -69,10 +73,15 @@ export class TaskEditorView extends View {
     async saveTask(): Promise<void> {
         const task = new domain.Task(this._id, this._topic, this._taskTitle, this.description.getValue(), this._selectedTechnologies)
         task.solutions = this._solutions
-        if (this._id === domain.Task.NO_ID)
-            await this._context.createTask(task)
-        else
-            await this._context.updateTask(task)
+        try {
+            if (this._id === domain.Task.NO_ID)
+                await this._context.createTask(task)
+            else
+                await this._context.updateTask(task)
+        } catch (error) {
+            if (error instanceof Error)
+                this._errorService.showError(error)
+        }
         this._viewGroup.returnToPreviousView()
     }
 
