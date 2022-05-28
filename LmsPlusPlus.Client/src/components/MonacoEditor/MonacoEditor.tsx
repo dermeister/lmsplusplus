@@ -44,9 +44,19 @@ export function MonacoEditor({ model }: MonacoEditorProps): JSX.Element {
     useEffect(() => {
         let observer: ResizeObserver | null = null
         if (ref.current) {
+            const style = getComputedStyle(document.documentElement)
+            monaco.editor.defineTheme("lmsplusplus-dark", {
+                base: "vs-dark",
+                inherit: true,
+                rules: [],
+                colors: {
+                    "editor.background": style.getPropertyValue("--background-primary"),
+                    "minimap.background": style.getPropertyValue("--background-secondary"),
+                }
+            })
             editor.current = monaco.editor.create(ref.current, {
                 model,
-                theme: "vs-dark",
+                theme: "lmsplusplus-dark",
                 cursorSmoothCaretAnimation: true,
                 padding: { top: 10 }
             })
