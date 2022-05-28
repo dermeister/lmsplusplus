@@ -1,6 +1,6 @@
 import MarkdownIt from "markdown-it"
 import React from "react"
-import { cached, Monitor, options, Ref, Transaction, transaction, unobservable } from "reactronic"
+import { cached, isnonreactive, Monitor, options, Ref, Transaction, transaction } from "reactronic"
 import { DatabaseContext } from "../../database"
 import * as domain from "../../domain"
 import { IContextMenuService } from "../ContextMenuService"
@@ -15,12 +15,12 @@ import { ViewGroup } from "../ViewGroup"
 import * as view from "./TasksView.view"
 
 export class TasksView extends View implements ITasksService {
-    @unobservable private static readonly _monitor = Monitor.create("tasks-view", 0, 0)
-    @unobservable private static readonly _markdown = new MarkdownIt()
-    @unobservable private readonly _tasksExplorer: TasksExplorer
-    @unobservable private readonly _context: DatabaseContext
-    @unobservable private readonly _viewGroup: ViewGroup
-    @unobservable private readonly _errorService: IErrorService
+    @isnonreactive private static readonly _monitor = Monitor.create("tasks-view", 0, 0, 0)
+    @isnonreactive private static readonly _markdown = new MarkdownIt()
+    @isnonreactive private readonly _tasksExplorer: TasksExplorer
+    @isnonreactive private readonly _context: DatabaseContext
+    @isnonreactive private readonly _viewGroup: ViewGroup
+    @isnonreactive private readonly _errorService: IErrorService
 
     override get shouldShowLoader(): boolean { return TasksView._monitor.isActive }
     override get title(): string { return "Tasks" }
@@ -34,7 +34,7 @@ export class TasksView extends View implements ITasksService {
     }
 
     override dispose(): void {
-        Transaction.run(() => {
+        Transaction.run(null, () => {
             this._tasksExplorer.dispose()
             super.dispose()
         })
@@ -67,13 +67,20 @@ export class TasksView extends View implements ITasksService {
 
     @transaction
     async deleteTask(task: domain.Task): Promise<void> {
-        await this._context.deleteTask(task)
+        try {
+            await this._context.deleteTask(task)
+        } catch (error) {
+            Transaction.off(() => {
+                if (error instanceof Error)
+                    this._errorService.showError(error)
+            })
+        }
     }
 
     @transaction
     createSolution(task: domain.Task): void {
         const solution = new domain.Solution(domain.Solution.NO_ID, task, "")
-        const solutionEditorView = new SolutionEditorView(solution, this._context, this._viewGroup)
+        const solutionEditorView = new SolutionEditorView(solution, this._context, this._viewGroup, this._errorService)
         this._viewGroup.openView(solutionEditorView)
     }
 
@@ -85,7 +92,7 @@ export class TasksView extends View implements ITasksService {
 
     @transaction
     runSolution(solution: domain.Solution): void {
-        const solutionRunnerView = new SolutionRunnerView(solution, this._viewGroup)
+        const solutionRunnerView = new SolutionRunnerView(solution, this._viewGroup, this._errorService)
         this._viewGroup.openView(solutionRunnerView)
     }
 }

@@ -1,11 +1,9 @@
 import { HubConnection, ISubscription } from "@microsoft/signalr"
-import React from "react"
-import { cached, Transaction, transaction, unobservable } from "reactronic"
+import { cached, isnonreactive, Transaction, transaction } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import { ConsoleRenderer, ServiceBuildOutput } from "./ConsoleRenderer.model"
 import { IRenderer } from "./IRenderer"
 import { IServiceWorkerService } from "./IServiceWorkerService"
-import * as view from "./ServiceView.view"
 import { WebRenderer } from "./WebRenderer.model"
 
 interface PortMapping {
@@ -14,16 +12,15 @@ interface PortMapping {
 }
 
 export class ServiceView extends ObservableObject {
-    @unobservable readonly name: string
-    @unobservable readonly stdin: boolean
-    @unobservable readonly virtualPorts: readonly number[]
-    @unobservable private readonly _consoleRenderer: ConsoleRenderer
-    @unobservable private readonly _webRenderers: Map<number, WebRenderer>
-    @unobservable private readonly _connection: HubConnection
-    @unobservable private readonly _buildOutputSubscription: ISubscription<ServiceBuildOutput>
+    @isnonreactive readonly name: string
+    @isnonreactive readonly stdin: boolean
+    @isnonreactive readonly virtualPorts: readonly number[]
+    @isnonreactive private readonly _consoleRenderer: ConsoleRenderer
+    @isnonreactive private readonly _webRenderers: Map<number, WebRenderer>
+    @isnonreactive private readonly _connection: HubConnection
+    @isnonreactive private readonly _buildOutputSubscription: ISubscription<ServiceBuildOutput>
+    @isnonreactive private readonly _serviceWorkerService: IServiceWorkerService
     private _outputSubscription: ISubscription<string> | null = null
-    private _currentRenderer: IRenderer
-    private _serviceWorkerService: IServiceWorkerService
 
     @cached get renderers(): readonly IRenderer[] { return [this._consoleRenderer, ...this._webRenderers.values()] }
 
@@ -36,7 +33,6 @@ export class ServiceView extends ObservableObject {
         this._serviceWorkerService = serviceWorkerService
         this._consoleRenderer = new ConsoleRenderer()
         this._webRenderers = new Map(virtualPorts.map(v => [v, new WebRenderer(v)]))
-        this._currentRenderer = this._consoleRenderer
         this._connection = connection
         const stream = this._connection.stream<ServiceBuildOutput>("ReadBuildOutput", this.name)
         this._buildOutputSubscription = stream.subscribe({
@@ -47,7 +43,7 @@ export class ServiceView extends ObservableObject {
     }
 
     override dispose(): void {
-        Transaction.run(() => {
+        Transaction.run(null, () => {
             this._buildOutputSubscription.dispose()
             this._outputSubscription?.dispose()
             this._consoleRenderer.dispose()
@@ -55,12 +51,6 @@ export class ServiceView extends ObservableObject {
             this._webRenderers.toMutable().clear()
             super.dispose()
         })
-    }
-
-    @cached
-    render(): JSX.Element {
-        const renderes = [this._consoleRenderer, ...this._webRenderers.values()]
-        return <view.ServiceView renderers={renderes} currentRenderer={this._currentRenderer} />
     }
 
     private static onBuildError(error: Error): void {
@@ -88,10 +78,12 @@ export class ServiceView extends ObservableObject {
         })
         const portMappings = await this._connection.invoke<PortMapping[]>("GetOpenedPorts", this.name)
         const worker = await this._serviceWorkerService.startServiceWorker()
-        worker.postMessage(JSON.stringify(portMappings))
-        for (const portMapping of portMappings) {
-            const webRenderer = this._webRenderers.get(portMapping.virtualPort)
-            webRenderer?.connectToBackend()
+        if (worker) {
+            worker.postMessage(JSON.stringify(portMappings))
+            for (const portMapping of portMappings) {
+                const webRenderer = this._webRenderers.get(portMapping.virtualPort)
+                webRenderer?.connectToBackend()
+            }
         }
     }
 

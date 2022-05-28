@@ -1,12 +1,12 @@
 import React from "react"
-import { cached, transaction, unobservable } from "reactronic"
+import { cached, transaction, isnonreactive } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import { IContextMenuService } from "../ContextMenuService"
 import * as view from "./Node.view"
 
 export class Node<T> extends ObservableObject {
-    @unobservable readonly key: string
-    @unobservable private readonly _contextMenuService: IContextMenuService | null
+    @isnonreactive readonly key: string
+    @isnonreactive private readonly _contextMenuService: IContextMenuService | null
     private _title: string
     private _children: Node<unknown>[] | null
     private _isOpened = false

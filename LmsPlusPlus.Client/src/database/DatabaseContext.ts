@@ -1,6 +1,7 @@
 import { Axios, AxiosResponse } from "axios"
-import { reaction, transaction, unobservable } from "reactronic"
+import { isnonreactive, reaction, transaction, Transaction } from "reactronic"
 import githubIcon from "../assets/github.svg"
+import { IErrorService } from "../components/ErrorService"
 import * as domain from "../domain"
 import { ObservableObject } from "../ObservableObject"
 import * as request from "./request"
@@ -8,7 +9,8 @@ import * as response from "./response"
 import { VcsAccountRegisteringModal } from "./VcsAccountRegisteringModal"
 
 export class DatabaseContext extends ObservableObject {
-    @unobservable private readonly _api: Axios
+    @isnonreactive private readonly _api: Axios
+    @isnonreactive private readonly _errorService: IErrorService
     private _topics: domain.Topic[] = []
     private _preferences = domain.Preferences.default
     private _user = domain.User.default
@@ -25,9 +27,10 @@ export class DatabaseContext extends ObservableObject {
     get accounts(): readonly domain.Account[] { return this._accounts }
     get providers(): readonly domain.Provider[] { return this._providers }
 
-    constructor(api: Axios) {
+    constructor(api: Axios, errorService: IErrorService) {
         super()
         this._api = api
+        this._errorService = errorService
     }
 
     @transaction
@@ -188,28 +191,35 @@ export class DatabaseContext extends ObservableObject {
 
     @reaction
     private async fetchDataFromApi(): Promise<void> {
-        this._user = await this.fetchUser()
-        this._preferences = await this.fetchPreferences()
-        const permissions = await this.fetchPermissions()
-        this._permissions = permissions
-        if (permissions.canUpdateVcsConfiguration) {
-            const providers = await this.fetchVcsHostingProviders()
-            this._providers = providers
-            const accounts = await this.fetchVcsAccounts(providers)
-            this._accounts = accounts
+        try {
+            this._user = await this.fetchUser()
+            this._preferences = await this.fetchPreferences()
+            const permissions = await this.fetchPermissions()
+            this._permissions = permissions
+            if (permissions.canUpdateVcsConfiguration) {
+                const providers = await this.fetchVcsHostingProviders()
+                this._providers = providers
+                const accounts = await this.fetchVcsAccounts(providers)
+                this._accounts = accounts
+            }
+            const technologies = await this.fetchTechnologies()
+            this._technologies = technologies
+            let topics = await this.fetchTopics()
+            let tasks = await this.fetchTasks(topics, technologies)
+            const solutions = await this.fetchSolutions(tasks)
+            for (const topic of topics) {
+                const topicTasks = tasks.filter(t => t.topic.id === topic.id)
+                for (const task of topicTasks)
+                    task.solutions = solutions.filter(s => s.task.id === task.id)
+                topic.tasks = topicTasks
+            }
+            this._topics = topics
+        } catch (error) {
+            Transaction.off(() => {
+                if (error instanceof Error)
+                    this._errorService.showError(error)
+            })
         }
-        const technologies = await this.fetchTechnologies()
-        this._technologies = technologies
-        let topics = await this.fetchTopics()
-        let tasks = await this.fetchTasks(topics, technologies)
-        const solutions = await this.fetchSolutions(tasks)
-        for (const topic of topics) {
-            const topicTasks = tasks.filter(t => t.topic.id === topic.id)
-            for (const task of topicTasks)
-                task.solutions = solutions.filter(s => s.task.id === task.id)
-            topic.tasks = topicTasks
-        }
-        this._topics = topics
     }
 
     private async fetchUser(): Promise<domain.User> {

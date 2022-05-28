@@ -29,7 +29,7 @@ export abstract class Explorer<T> extends ObservableObject {
     }
 
     override dispose(): void {
-        Transaction.run(() => {
+        Transaction.run(null, () => {
             this._oldNodes.forEach(n => n.dispose())
             this._oldNodes.toMutable().clear()
             super.dispose()

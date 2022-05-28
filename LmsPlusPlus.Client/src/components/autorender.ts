@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { cached, ObservableObject, options, reaction, Rx, standalone, Transaction, unobservable } from "reactronic"
+import { cached, ReactiveObject, options, reaction, Rx, Transaction, isnonreactive } from "reactronic"
 
 export function autorender(jsx: () => JSX.Element, deps: unknown[] = []): JSX.Element {
     const [state, refresh] = useState(createReactState)
@@ -11,20 +11,20 @@ export function autorender(jsx: () => JSX.Element, deps: unknown[] = []): JSX.El
 
 type ReactState = { rx: RxComponent }
 
-class RxComponent extends ObservableObject {
-    @unobservable refresh: ((rx: ReactState) => void) | null = null
-    @unobservable unmount: () => void = () => standalone(Transaction.run, () => Rx.dispose(this))
+class RxComponent extends ReactiveObject {
+    @isnonreactive refresh: ((rx: ReactState) => void) | null = null
+    @isnonreactive unmount: () => void = () => Transaction.run(null, Rx.dispose, this)
 
-    @cached @options({ sensitiveArgs: true })
+    @cached @options({ triggeringArgs: true })
     render(jsx: () => JSX.Element): JSX.Element { return jsx() }
 
     @reaction
     private ensureUpToDate(): void {
         if (!Rx.getController(this.render).isUpToDate)
-            standalone(() => this.refresh?.({ rx: this }))
+            Transaction.off(() => this.refresh?.({ rx: this }))
     }
 }
 
 function createReactState(): ReactState {
-    return { rx: Transaction.run(() => new RxComponent()) }
+    return { rx: Transaction.run(null, () => new RxComponent()) }
 }

@@ -1,4 +1,4 @@
-import { reaction, Ref, Rx, Transaction, unobservable } from "reactronic"
+import { reaction, Ref, Rx, Transaction, isnonreactive } from "reactronic"
 import * as domain from "../../domain"
 import { Explorer, Node } from "../Explorer"
 
@@ -8,7 +8,7 @@ export enum OptionCategoryKind {
 }
 
 export class OptionCategoriesExplorer extends Explorer<OptionCategoryKind> {
-    @unobservable private readonly _permissions: Ref<domain.Permissions>
+    @isnonreactive private readonly _permissions: Ref<domain.Permissions>
 
     constructor(permissions: Ref<domain.Permissions>) {
         super(OptionCategoriesExplorer.createChildren(permissions.value))
@@ -18,7 +18,7 @@ export class OptionCategoriesExplorer extends Explorer<OptionCategoryKind> {
     }
 
     override dispose(): void {
-        Transaction.run(() => {
+        Transaction.run(null, () => {
             Rx.dispose(this._permissions)
             super.dispose()
         })

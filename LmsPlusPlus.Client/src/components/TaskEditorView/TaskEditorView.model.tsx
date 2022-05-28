@@ -1,6 +1,6 @@
 import * as monaco from "monaco-editor"
 import React from "react"
-import { cached, Monitor, options, standalone, Transaction, transaction, unobservable } from "reactronic"
+import { cached, isnonreactive, Monitor, options, nonreactive, Transaction, transaction } from "reactronic"
 import { DatabaseContext } from "../../database"
 import * as domain from "../../domain"
 import { IErrorService } from "../ErrorService"
@@ -9,15 +9,15 @@ import { ViewGroup } from "../ViewGroup"
 import * as view from "./TaskEditorView.view"
 
 export class TaskEditorView extends View {
-    @unobservable readonly availableTechnologies: readonly domain.Technology[]
-    @unobservable private static readonly _monitor = Monitor.create("task-editor-view", 0, 0)
-    @unobservable private readonly description: monaco.editor.ITextModel
-    @unobservable private readonly _id: number
-    @unobservable private readonly _topic: domain.Topic
-    @unobservable private readonly _solutions: domain.Solution[]
-    @unobservable private readonly _context: DatabaseContext
-    @unobservable private readonly _viewGroup: ViewGroup
-    @unobservable private readonly _errorService: IErrorService
+    @isnonreactive readonly availableTechnologies: readonly domain.Technology[]
+    @isnonreactive private static readonly _monitor = Monitor.create("task-editor-view", 0, 0, 0)
+    @isnonreactive private readonly description: monaco.editor.ITextModel
+    @isnonreactive private readonly _id: number
+    @isnonreactive private readonly _topic: domain.Topic
+    @isnonreactive private readonly _solutions: domain.Solution[]
+    @isnonreactive private readonly _context: DatabaseContext
+    @isnonreactive private readonly _viewGroup: ViewGroup
+    @isnonreactive private readonly _errorService: IErrorService
     private _taskTitle: string
     private _selectedTechnologies: readonly domain.Technology[]
 
@@ -35,15 +35,15 @@ export class TaskEditorView extends View {
         this._id = task.id
         this._topic = task.topic
         this._taskTitle = task.title
-        this.description = standalone(() => monaco.editor.createModel(task.description, "markdown"))
+        this.description = nonreactive(() => monaco.editor.createModel(task.description, "markdown"))
         this._selectedTechnologies = task.technologies
         this.availableTechnologies = availableTechnologies
         this._solutions = task.solutions
     }
 
     override dispose(): void {
-        Transaction.run(() => {
-            standalone(() => this.description.dispose())
+        Transaction.run(null, () => {
+            Transaction.off(() => this.description.dispose())
             super.dispose()
         })
     }
@@ -78,11 +78,13 @@ export class TaskEditorView extends View {
                 await this._context.createTask(task)
             else
                 await this._context.updateTask(task)
+            this._viewGroup.returnToPreviousView()
         } catch (error) {
-            if (error instanceof Error)
-                this._errorService.showError(error)
+            Transaction.off(() => {
+                if (error instanceof Error)
+                    return this._errorService.showError(error)
+            })
         }
-        this._viewGroup.returnToPreviousView()
     }
 
     @transaction

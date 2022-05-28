@@ -1,11 +1,11 @@
 import React from "react"
-import { cached, Ref, Rx, Transaction, transaction, unobservable } from "reactronic"
+import { cached, Ref, Rx, Transaction, transaction, isnonreactive } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import * as view from "./SidePanel.view"
 
 export class SidePanel extends ObservableObject {
-    @unobservable private readonly _title: Ref<string>
-    @unobservable private readonly _shouldShowLoader: Ref<boolean>
+    @isnonreactive private readonly _title: Ref<string>
+    @isnonreactive private readonly _shouldShowLoader: Ref<boolean>
     private _isOpened = true
 
     constructor(title: Ref<string>, shouldShowLoader: Ref<boolean>) {
@@ -15,7 +15,7 @@ export class SidePanel extends ObservableObject {
     }
 
     override dispose(): void {
-        Transaction.run(() => {
+        Transaction.run(null, () => {
             Rx.dispose(this._title)
             Rx.dispose(this._shouldShowLoader)
             super.dispose()

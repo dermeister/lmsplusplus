@@ -1,5 +1,5 @@
 import React from "react"
-import { cached, Transaction, unobservable } from "reactronic"
+import { cached, Transaction, isnonreactive } from "reactronic"
 import * as domain from "../../domain"
 import { IContextMenuService } from "../ContextMenuService"
 import { Node } from "../Explorer"
@@ -8,8 +8,8 @@ import { TaskNode } from "./TaskNode.model"
 import * as view from "./TopicNode.view"
 
 export class TopicNode extends Node<domain.Topic> {
-    @unobservable private readonly _tasksService: ITasksService
-    @unobservable private readonly _permissions: domain.Permissions
+    @isnonreactive private readonly _tasksService: ITasksService
+    @isnonreactive private readonly _permissions: domain.Permissions
 
     override get children(): Node<domain.Task>[] { return super.children as Node<domain.Task>[] }
     protected override get contextMenuService(): IContextMenuService { return super.contextMenuService as IContextMenuService }
@@ -33,6 +33,6 @@ export class TopicNode extends Node<domain.Topic> {
 
     private static createTaskNodes(tasks: readonly domain.Task[], contextMenuService: IContextMenuService, permissions: domain.Permissions,
         tasksService: ITasksService): Node<domain.Task>[] {
-        return Transaction.run(() => tasks.map(task => new TaskNode(task, contextMenuService, permissions, tasksService)))
+        return Transaction.run(null, () => tasks.map(task => new TaskNode(task, contextMenuService, permissions, tasksService)))
     }
 }

@@ -1,6 +1,6 @@
 import { Axios } from "axios"
 import React from "react"
-import { cached, reaction, Ref, Transaction, transaction, unobservable } from "reactronic"
+import { cached, isnonreactive, reaction, Ref, Transaction, transaction } from "reactronic"
 import { DatabaseContext } from "../../database"
 import { ObservableObject } from "../../ObservableObject"
 import { IAuthService } from "../AuthService"
@@ -14,12 +14,12 @@ import { ViewGroup } from "../ViewGroup"
 import * as view from "./WorkbenchScreen.view"
 
 export class WorkbenchScreen extends ObservableObject implements IScreen {
-    @unobservable private readonly _sidePanel: SidePanel
-    @unobservable private readonly _tasksViewGroup: TasksViewGroup
-    @unobservable private readonly _optionsViewGroup: OptionsViewGroup
-    @unobservable private readonly _contextMenuService: ContextMenuService
-    @unobservable private readonly _context: DatabaseContext
-    @unobservable private readonly _errorService: IErrorService
+    @isnonreactive private readonly _sidePanel: SidePanel
+    @isnonreactive private readonly _tasksViewGroup: TasksViewGroup
+    @isnonreactive private readonly _optionsViewGroup: OptionsViewGroup
+    @isnonreactive private readonly _contextMenuService: ContextMenuService
+    @isnonreactive private readonly _context: DatabaseContext
+    @isnonreactive private readonly _errorService: IErrorService
     private _currentViewGroup: ViewGroup
     private _sidePanelTitle: string
     private _sidePanelShouldShowLoader: boolean
@@ -28,9 +28,9 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
         super()
         this._contextMenuService = new ContextMenuService()
         this._errorService = errorService
-        this._context = new DatabaseContext(api)
+        this._context = new DatabaseContext(api, errorService)
         this._tasksViewGroup = new TasksViewGroup("tasks-view-group", this._context, this._contextMenuService, this._errorService)
-        this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, this._context)
+        this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, this._context, this._errorService)
         this._currentViewGroup = this._tasksViewGroup
         this._sidePanelTitle = this._currentViewGroup.currentView.title
         this._sidePanelShouldShowLoader = this._currentViewGroup.currentView.shouldShowLoader
@@ -40,7 +40,7 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
     }
 
     override dispose(): void {
-        Transaction.run(() => {
+        Transaction.run(null, () => {
             this._sidePanel.dispose()
             this._tasksViewGroup.dispose()
             this._optionsViewGroup.dispose()

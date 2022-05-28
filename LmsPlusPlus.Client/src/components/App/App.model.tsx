@@ -1,6 +1,6 @@
 import axios from "axios"
 import React from "react"
-import { cached, nonreactive, reaction, Transaction, unobservable } from "reactronic"
+import { cached, nonreactive, reaction, Transaction, isnonreactive } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import { AuthService } from "../AuthService"
 import { EmptyScreen } from "../EmptyScreen"
@@ -11,8 +11,8 @@ import { WorkbenchScreen } from "../WorkbenchScreen"
 import * as view from "./App.view"
 
 export class App extends ObservableObject {
-    @unobservable private readonly _authService: AuthService
-    @unobservable private readonly _errorService = new ErrorService()
+    @isnonreactive private readonly _authService: AuthService
+    @isnonreactive private readonly _errorService = new ErrorService()
     private _currentScreen: IScreen = new EmptyScreen()
 
     constructor() {
@@ -27,7 +27,7 @@ export class App extends ObservableObject {
     }
 
     override dispose(): void {
-        Transaction.run(() => {
+        Transaction.run(null, () => {
             this._currentScreen.dispose()
             super.dispose()
         })

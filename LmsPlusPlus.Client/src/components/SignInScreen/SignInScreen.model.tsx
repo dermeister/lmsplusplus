@@ -1,5 +1,5 @@
 import React from "react"
-import { cached, transaction, unobservable } from "reactronic"
+import { cached, isnonreactive, transaction } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import { AuthError, IAuthService } from "../AuthService"
 import { IErrorService } from "../ErrorService"
@@ -7,8 +7,8 @@ import { IScreen } from "../IScreen"
 import * as view from "./SignInScreen.view"
 
 export class SignInScreen extends ObservableObject implements IScreen {
-    @unobservable private readonly _authService: IAuthService
-    @unobservable private readonly _errorService: IErrorService
+    @isnonreactive private readonly _authService: IAuthService
+    @isnonreactive private readonly _errorService: IErrorService
     private _login = ""
     private _password = ""
 

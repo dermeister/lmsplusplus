@@ -1,5 +1,5 @@
 import { Axios, AxiosError } from "axios"
-import { reaction, standalone, transaction } from "reactronic"
+import { reaction, Transaction, transaction } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
 
 export class AuthError extends Error {
@@ -34,7 +34,7 @@ export class AuthService extends ObservableObject implements IAuthService {
     @transaction
     async signIn(login: string, password: string): Promise<void> {
         if (this._jwtToken)
-            standalone(() => this.signOut())
+            Transaction.off(() => this.signOut())
         try {
             const result = await this._api.post<{ token: string }>("/api/sign-in", { login, password })
             this._jwtToken = result.data.token

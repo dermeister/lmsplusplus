@@ -6,7 +6,7 @@ import { App } from "./components/App"
 import { autorender } from "./components/autorender"
 import "./components/index.scss"
 
-const app = Transaction.run(() => new App())
+const app = Transaction.run(null, () => new App())
 
 function Root(): JSX.Element {
     return autorender(() => app.render(), [app])

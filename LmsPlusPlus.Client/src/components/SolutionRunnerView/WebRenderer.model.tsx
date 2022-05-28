@@ -1,13 +1,13 @@
 import React from "react"
-import { cached, Transaction, transaction, unobservable } from "reactronic"
+import { cached, Transaction, transaction, isnonreactive } from "reactronic"
 import { IDisposable } from "../../IDisposable"
 import { ObservableObject } from "../../ObservableObject"
 import { IRenderer } from "./IRenderer"
 import * as view from "./WebRenderer.view"
 
 export class WebRenderer extends ObservableObject implements IRenderer, IDisposable {
-    @unobservable private static readonly _iframeContainer = document.getElementById("webview") as HTMLDivElement
-    @unobservable private readonly _virtualPort: number
+    @isnonreactive private static readonly _iframeContainer = document.getElementById("webview") as HTMLDivElement
+    @isnonreactive private readonly _virtualPort: number
     private _iframe: HTMLIFrameElement | null = null
     private _mountContainer: HTMLElement | null = null
     private _mountContainerResizeObserver: ResizeObserver | null = null
@@ -25,7 +25,7 @@ export class WebRenderer extends ObservableObject implements IRenderer, IDisposa
     }
 
     override dispose(): void {
-        Transaction.run(() => {
+        Transaction.run(null, () => {
             this.unmount()
             if (WebRenderer._iframeContainer.contains(this._iframe))
                 WebRenderer._iframeContainer.removeChild(this._iframe as HTMLIFrameElement)
@@ -46,7 +46,7 @@ export class WebRenderer extends ObservableObject implements IRenderer, IDisposa
             WebRenderer._iframeContainer.appendChild(this._iframe)
         }
         this._mountContainerResizeObserver = new ResizeObserver(entries => {
-            Transaction.run(() => {
+            Transaction.run(null, () => {
                 if (entries[0].borderBoxSize[0].inlineSize !== 0) {
                     const element = entries[0].target as HTMLElement
                     if (this._iframeWidth + 1 !== element.clientWidth) {

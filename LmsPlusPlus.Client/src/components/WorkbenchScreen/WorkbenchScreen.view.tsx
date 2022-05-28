@@ -30,7 +30,7 @@ export function WorkbenchScreen({ currentViewGroup, viewGroups, sidePanel, onSho
 
     function onViewGroupSwitchButtonClick(viewGroup: ViewGroup, currentViewGroup: ViewGroup): void {
         if (currentViewGroup !== viewGroup)
-            Transaction.run(() => {
+            Transaction.run(null, () => {
                 onShowViewGroup(viewGroup)
                 sidePanel.open()
             })

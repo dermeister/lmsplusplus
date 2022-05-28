@@ -1,9 +1,9 @@
-import { Transaction, transaction, unobservable } from "reactronic"
+import { Transaction, transaction, isnonreactive } from "reactronic"
 import { ObservableObject } from "../ObservableObject"
 import { View } from "./View"
 
 export abstract class ViewGroup extends ObservableObject {
-    @unobservable readonly id: string
+    @isnonreactive readonly id: string
     private _currentView: View | null = null
     private _views: View[] = []
 
@@ -20,7 +20,7 @@ export abstract class ViewGroup extends ObservableObject {
     }
 
     override dispose(): void {
-        Transaction.run(() => {
+        Transaction.run(null, () => {
             const views = this._views.toMutable()
             while (views.length > 0) {
                 const view = views.pop() as View

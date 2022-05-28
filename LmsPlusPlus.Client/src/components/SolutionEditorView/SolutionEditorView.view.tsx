@@ -29,7 +29,7 @@ export function SolutionEditorSidePanelContent({ solutionEditorView }: SolutionE
                 </Field>
                 <div className={styles.buttons}>
                     <Button variant="primary"
-                        onClick={() => solutionEditorView.saveSolution()}
+                        onClick={() => solutionEditorView.saveSolution().catch(() => { })}
                         className={styles.primary}>
                         Save
                     </Button>

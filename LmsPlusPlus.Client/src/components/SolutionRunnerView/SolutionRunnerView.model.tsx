@@ -1,6 +1,6 @@
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr"
 import React from "react"
-import { cached, Monitor, options, reaction, standalone, transaction, Transaction, unobservable } from "reactronic"
+import { cached, Monitor, options, reaction, transaction, Transaction, isnonreactive } from "reactronic"
 import * as domain from "../../domain"
 import { ServiceViewsExplorer } from "../ServicesViewExplorer"
 import { View } from "../View"
@@ -9,6 +9,7 @@ import { IServiceWorkerService } from "./IServiceWorkerService"
 import { ServiceView } from "./ServiceView.model"
 import { SolutionRunnerMainPanelContent, SolutionRunnerSidePanelContent } from "./SolutionRunnerView.view"
 import serviceWorkerUrl from "../../../service-worker?url"
+import { IErrorService } from "../ErrorService"
 
 interface ServiceConfiguration {
     name: string
@@ -17,9 +18,10 @@ interface ServiceConfiguration {
 }
 
 export class SolutionRunnerView extends View implements IServiceWorkerService {
-    private static readonly _monitor = Monitor.create("solution-runner", 0, 0)
-    @unobservable private readonly _solution: domain.Solution
-    @unobservable private readonly _viewGroup: ViewGroup
+    @isnonreactive private static readonly _monitor = Monitor.create("solution-runner", 0, 0, 0)
+    @isnonreactive private readonly _solution: domain.Solution
+    @isnonreactive private readonly _viewGroup: ViewGroup
+    @isnonreactive private readonly _errorService: IErrorService
     private _serviceViewsExplorer: ServiceViewsExplorer | null = null
     private _connection: HubConnection | null = null
     private _serviceViews: ServiceView[] | null = null
@@ -28,27 +30,29 @@ export class SolutionRunnerView extends View implements IServiceWorkerService {
     override get title(): string { return "Run Solution" }
     override get shouldShowLoader(): boolean { return SolutionRunnerView._monitor.isActive }
 
-    constructor(solution: domain.Solution, viewGroup: ViewGroup) {
+    constructor(solution: domain.Solution, viewGroup: ViewGroup, errorsService: IErrorService) {
         super()
         this._solution = solution
         this._viewGroup = viewGroup
+        this._errorService = errorsService
     }
 
     override dispose(): void {
-        return Transaction.run(() => {
+        return Transaction.run(null, () => {
             this._serviceViewsExplorer?.dispose()
             this._serviceViews?.forEach(s => s.dispose())
             this._connection?.stop()
             super.dispose()
-            standalone(() => this._serviceWorkerRegistration?.unregister())
+            Transaction.off(() => this._serviceWorkerRegistration?.unregister())
         })
     }
 
     @transaction
-    async startServiceWorker(): Promise<ServiceWorker> {
-        if (this._serviceWorkerRegistration)
-            throw new Error("Currently only one web view per solution is supported.")
-        if (navigator.serviceWorker) {
+    async startServiceWorker(): Promise<ServiceWorker | null> {
+        if (this._serviceWorkerRegistration) {
+            this._errorService.showError(new Error("Currently only one web view per solution is supported."))
+            return null
+        } else if (navigator.serviceWorker) {
             this._serviceWorkerRegistration = await navigator.serviceWorker.register(serviceWorkerUrl, { type: "module" })
             const { waiting, installing, active } = this._serviceWorkerRegistration
             const worker = waiting || installing || active
@@ -59,8 +63,10 @@ export class SolutionRunnerView extends View implements IServiceWorkerService {
                         resolve(worker)
                 })
             })
-        } else
-            throw new Error("Service workers are not supported in this browser.")
+        } else {
+            this._errorService.showError(new Error("Service workers are not supported in this browser."))
+            return null
+        }
     }
 
     @cached
@@ -87,7 +93,8 @@ export class SolutionRunnerView extends View implements IServiceWorkerService {
         const serviceConfigurations = await this._connection.invoke<ServiceConfiguration[]>("StartApplication", this._solution.id)
         this._serviceViews = serviceConfigurations.map(c => new ServiceView(c.name, c.stdin, c.virtualPorts, this._connection!, this))
         if (this._serviceViews.length === 0)
-            throw new Error("There are no services in solution.")
-        this._serviceViewsExplorer = new ServiceViewsExplorer(this._serviceViews)
+            this._errorService.showError(new Error("There are no services in solution."))
+        else
+            this._serviceViewsExplorer = new ServiceViewsExplorer(this._serviceViews)
     }
 }

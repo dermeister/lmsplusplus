@@ -1,4 +1,4 @@
-import { reaction, Ref, Rx, Transaction, unobservable } from "reactronic"
+import { reaction, Ref, Rx, Transaction, isnonreactive } from "reactronic"
 import * as domain from "../../domain"
 import { IContextMenuService } from "../ContextMenuService"
 import { Explorer } from "../Explorer"
@@ -6,10 +6,10 @@ import { ITasksService } from "../ITasksService"
 import { TopicNode } from "./TopicNode.model"
 
 export class TasksExplorer extends Explorer<domain.Task> {
-    @unobservable private readonly _permissions: Ref<domain.Permissions>
-    @unobservable private readonly _tasksService: ITasksService
-    @unobservable private readonly _topics: Ref<readonly domain.Topic[]>
-    @unobservable private readonly _contextMenuService: IContextMenuService
+    @isnonreactive private readonly _permissions: Ref<domain.Permissions>
+    @isnonreactive private readonly _tasksService: ITasksService
+    @isnonreactive private readonly _topics: Ref<readonly domain.Topic[]>
+    @isnonreactive private readonly _contextMenuService: IContextMenuService
 
     constructor(topics: Ref<readonly domain.Topic[]>, tasksSerivce: ITasksService, contextMenuService: IContextMenuService,
         permissions: Ref<domain.Permissions>) {
@@ -21,7 +21,7 @@ export class TasksExplorer extends Explorer<domain.Task> {
     }
 
     override dispose(): void {
-        Transaction.run(() => {
+        Transaction.run(null, () => {
             Rx.dispose(this._permissions)
             super.dispose()
         })

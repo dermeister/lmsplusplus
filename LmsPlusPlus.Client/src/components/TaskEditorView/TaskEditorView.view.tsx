@@ -37,7 +37,7 @@ export function TaskEditorSidePanelContent({ taskEditorView }: TaskEditorSidePan
             </Field>
             <div className={styles.buttons}>
                 <Button variant="primary"
-                    onClick={() => taskEditorView.saveTask()}
+                    onClick={() => taskEditorView.saveTask().catch(() => { })}
                     className={styles.primary}>
                     Save
                 </Button>

@@ -1,6 +1,6 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import { reaction, transaction, unobservable } from "reactronic"
+import { reaction, transaction, isnonreactive } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import * as view from "./ErrorService.view"
 
@@ -9,7 +9,7 @@ export interface IErrorService {
 }
 
 export class ErrorService extends ObservableObject implements IErrorService {
-    @unobservable private static readonly _container = document.getElementById("error") as HTMLDivElement
+    @isnonreactive private static readonly _container = document.getElementById("error") as HTMLDivElement
     private _errors: Error[] = []
 
     get errors(): Error[] { return this._errors }

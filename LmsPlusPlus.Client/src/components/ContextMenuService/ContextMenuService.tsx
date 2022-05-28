@@ -1,6 +1,6 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import { transaction, unobservable } from "reactronic"
+import { transaction, isnonreactive } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import { ContextMenuContainer } from "./ContextMenuContainer"
 import { ContextMenuDelegate } from "./ContextMenuDelegate"
@@ -12,7 +12,7 @@ export interface IContextMenuService {
 }
 
 export class ContextMenuService extends ObservableObject implements IContextMenuService {
-    @unobservable private static readonly contextMenuContainer = document.getElementById("context-menu") as Element
+    @isnonreactive private static readonly contextMenuContainer = document.getElementById("context-menu") as Element
     private _contextMenuDelegate: ContextMenuDelegate | null = null
 
     @transaction

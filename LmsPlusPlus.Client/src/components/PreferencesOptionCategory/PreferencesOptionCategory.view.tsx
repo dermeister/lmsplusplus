@@ -18,7 +18,7 @@ export function PreferencesOptionCategory({ category }: PreferencesOptionCategor
         <Field label="Theme">
             <Dropdown selectedValue={category.theme}
                 items={themes}
-                onValueChange={i => category.setDarkMode(i)}
+                onValueChange={i => category.setDarkMode(i).catch(() => { })}
                 createPlaceholder={() => category.theme} />
         </Field>
     ), [category])
