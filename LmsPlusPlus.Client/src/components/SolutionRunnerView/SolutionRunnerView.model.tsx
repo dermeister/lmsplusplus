@@ -1,6 +1,6 @@
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr"
 import React from "react"
-import { cached, Monitor, options, reaction, Transaction, unobservable } from "reactronic"
+import { cached, Monitor, options, reaction, standalone, transaction, Transaction, unobservable } from "reactronic"
 import * as domain from "../../domain"
 import { ServiceViewsExplorer } from "../ServicesViewExplorer"
 import { View } from "../View"
@@ -8,6 +8,7 @@ import { ViewGroup } from "../ViewGroup"
 import { IServiceWorkerService } from "./IServiceWorkerService"
 import { ServiceView } from "./ServiceView.model"
 import { SolutionRunnerMainPanelContent, SolutionRunnerSidePanelContent } from "./SolutionRunnerView.view"
+import serviceWorkerUrl from "../../../service-worker?url"
 
 interface ServiceConfiguration {
     name: string
@@ -22,7 +23,7 @@ export class SolutionRunnerView extends View implements IServiceWorkerService {
     private _serviceViewsExplorer: ServiceViewsExplorer | null = null
     private _connection: HubConnection | null = null
     private _serviceViews: ServiceView[] | null = null
-    // private _serviceWorkerRegistration: ServiceWorkerRegistration | null = null
+    private _serviceWorkerRegistration: ServiceWorkerRegistration | null = null
 
     override get title(): string { return "Run Solution" }
     override get shouldShowLoader(): boolean { return SolutionRunnerView._monitor.isActive }
@@ -39,12 +40,27 @@ export class SolutionRunnerView extends View implements IServiceWorkerService {
             this._serviceViews?.forEach(s => s.dispose())
             this._connection?.stop()
             super.dispose()
-            //         return this._serviceWorkerRegistration?.unregister().then() ?? Promise.resolve()
+            standalone(() => this._serviceWorkerRegistration?.unregister())
         })
     }
 
-    startServiceWorker(): void {
-        console.log("Started")
+    @transaction
+    async startServiceWorker(): Promise<ServiceWorker> {
+        if (this._serviceWorkerRegistration)
+            throw new Error("Currently only one web view per solution is supported.")
+        if (navigator.serviceWorker) {
+            this._serviceWorkerRegistration = await navigator.serviceWorker.register(serviceWorkerUrl, { type: "module" })
+            const { waiting, installing, active } = this._serviceWorkerRegistration
+            const worker = waiting || installing || active
+            return await new Promise<ServiceWorker>(resolve => {
+                worker?.addEventListener("statechange", ({ target }) => {
+                    const worker = target as ServiceWorker
+                    if (worker.state === "activated")
+                        resolve(worker)
+                })
+            })
+        } else
+            throw new Error("Service workers are not supported in this browser.")
     }
 
     @cached
@@ -69,30 +85,9 @@ export class SolutionRunnerView extends View implements IServiceWorkerService {
         this._connection = new HubConnectionBuilder().withUrl("/api/application").build()
         await this._connection.start()
         const serviceConfigurations = await this._connection.invoke<ServiceConfiguration[]>("StartApplication", this._solution.id)
-        this._serviceViews = serviceConfigurations.map(c => new ServiceView(c.name, c.stdin, c.virtualPorts, this._connection!))
+        this._serviceViews = serviceConfigurations.map(c => new ServiceView(c.name, c.stdin, c.virtualPorts, this._connection!, this))
         if (this._serviceViews.length === 0)
             throw new Error("There are no services in solution.")
         this._serviceViewsExplorer = new ServiceViewsExplorer(this._serviceViews)
-    }
-
-    @reaction
-    private async getOpenedPorts(): Promise<void> {
-        // if (this._areServicePortsBeingOpened) {
-        //     const portMappingsPromises =
-        //         this._services!.map(s => this._connection!.invoke<PortMapping[]>("GetOpenedPorts", s.name))
-        //     const portMappings = (await Promise.all(portMappingsPromises)).flat()
-        //     if (navigator.serviceWorker) {
-        //         this._serviceWorkerRegistration = await navigator.serviceWorker.register(serviceWorkerUrl, { type: "module" })
-        //         const { waiting, installing, active } = this._serviceWorkerRegistration
-        //         const worker = waiting || installing || active
-        //         worker?.addEventListener("statechange", ({ target }) => {
-        //             const worker = target as ServiceWorker
-        //             if (worker.state === "activated") {
-        //                 worker.postMessage(JSON.stringify(portMappings))
-        //                 Transaction.run(() => this._areServicePortsBeingOpened = false)
-        //             }
-        //         })
-        //     }
-        // }
     }
 }

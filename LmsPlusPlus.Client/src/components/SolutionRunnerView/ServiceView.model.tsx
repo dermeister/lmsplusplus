@@ -4,6 +4,7 @@ import { cached, Transaction, transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import { ConsoleRenderer, ServiceBuildOutput } from "./ConsoleRenderer.model"
 import { IRenderer } from "./IRenderer"
+import { IServiceWorkerService } from "./IServiceWorkerService"
 import * as view from "./ServiceView.view"
 import { WebRenderer } from "./WebRenderer.model"
 
@@ -22,15 +23,17 @@ export class ServiceView extends ObservableObject {
     @unobservable private readonly _buildOutputSubscription: ISubscription<ServiceBuildOutput>
     private _outputSubscription: ISubscription<string> | null = null
     private _currentRenderer: IRenderer
-    private f = true
+    private _serviceWorkerService: IServiceWorkerService
 
     @cached get renderers(): readonly IRenderer[] { return [this._consoleRenderer, ...this._webRenderers.values()] }
 
-    constructor(name: string, stdin: boolean, virtualPorts: readonly number[], connection: HubConnection) {
+    constructor(name: string, stdin: boolean, virtualPorts: readonly number[], connection: HubConnection,
+        serviceWorkerService: IServiceWorkerService) {
         super()
         this.name = name
         this.stdin = stdin
         this.virtualPorts = virtualPorts
+        this._serviceWorkerService = serviceWorkerService
         this._consoleRenderer = new ConsoleRenderer()
         this._webRenderers = new Map(virtualPorts.map(v => [v, new WebRenderer(v)]))
         this._currentRenderer = this._consoleRenderer
@@ -84,6 +87,8 @@ export class ServiceView extends ObservableObject {
             complete: () => this.onComplete()
         })
         const portMappings = await this._connection.invoke<PortMapping[]>("GetOpenedPorts", this.name)
+        const worker = await this._serviceWorkerService.startServiceWorker()
+        worker.postMessage(JSON.stringify(portMappings))
         for (const portMapping of portMappings) {
             const webRenderer = this._webRenderers.get(portMapping.virtualPort)
             webRenderer?.connectToBackend()

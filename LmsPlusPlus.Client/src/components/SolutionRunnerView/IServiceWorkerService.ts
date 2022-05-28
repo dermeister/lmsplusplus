@@ -1,3 +1,3 @@
 export interface IServiceWorkerService {
-    startServiceWorker(): void
+    startServiceWorker(): Promise<ServiceWorker>
 }
