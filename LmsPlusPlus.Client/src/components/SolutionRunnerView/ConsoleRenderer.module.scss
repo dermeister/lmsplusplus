@@ -1,0 +1,5 @@
+@use "../library";
+
+.console-renderer {
+    @include library.full-size;
+}

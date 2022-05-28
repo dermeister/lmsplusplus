@@ -10,13 +10,11 @@ export enum OptionCategoryKind {
 export class OptionCategoriesExplorer extends Explorer<OptionCategoryKind> {
     @unobservable private readonly _permissions: Ref<domain.Permissions>
 
-    protected override get children(): readonly Node<OptionCategoryKind>[] { return super.children as readonly Node<OptionCategoryKind>[] }
-
     constructor(permissions: Ref<domain.Permissions>) {
         super(OptionCategoriesExplorer.createChildren(permissions.value))
         this._permissions = permissions
         if (this.children.length > 0)
-            this.setSelectedNode(this.children[0])
+            this.setSelectedNode(this.children[0] as Node<OptionCategoryKind>)
     }
 
     override dispose(): void {
@@ -41,6 +39,6 @@ export class OptionCategoriesExplorer extends Explorer<OptionCategoryKind> {
         const newChildren = OptionCategoriesExplorer.createChildren(this._permissions.value)
         this.updateChildren(newChildren)
         if (!this.selectedNode && this.children.length > 0)
-            this.setSelectedNode(this.children[0])
+            this.setSelectedNode(this.children[0] as Node<OptionCategoryKind>)
     }
 }

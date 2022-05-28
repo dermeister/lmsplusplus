@@ -1,6 +1,6 @@
 import { HubConnection, ISubscription } from "@microsoft/signalr"
 import React from "react"
-import { cached, Transaction, transaction, unobservable } from "reactronic"
+import { cached, Ref, Transaction, transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import { ConsoleRenderer, ServiceBuildOutput } from "./ConsoleRenderer.model"
 import { IRenderer } from "./IRenderer"
@@ -17,6 +17,9 @@ export class ServiceView extends ObservableObject {
     @unobservable private readonly _buildOutputSubscription: ISubscription<ServiceBuildOutput>
     private _outputSubscription: ISubscription<string> | null = null
     private _currentRenderer: IRenderer
+    private f = true
+
+    get renderers(): readonly IRenderer[] { return [this._consoleRenderer, ...this._webRenderers.values()] }
 
     constructor(name: string, stdin: boolean, virtualPorts: readonly number[], connection: HubConnection) {
         super()
@@ -24,7 +27,7 @@ export class ServiceView extends ObservableObject {
         this.stdin = stdin
         this.virtualPorts = virtualPorts
         this._consoleRenderer = new ConsoleRenderer()
-        this._webRenderers = new Map()
+        this._webRenderers = new Map(virtualPorts.map(v => [v, new WebRenderer(v, new Ref(this, "f"))]))
         this._currentRenderer = this._consoleRenderer
         this._connection = connection
         const stream = this._connection.stream<ServiceBuildOutput>("ReadBuildOutput", this.name)

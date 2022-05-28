@@ -12,6 +12,7 @@ export class WebRenderer implements IRenderer, IDisposable {
     private _mountContainer: HTMLElement | null = null
     private _mountContainerResizeObserver: ResizeObserver | null = null
 
+    get title(): string { return `Port ${this._virtualPort}` }
     get isBackendLoading(): boolean { return this._isBackendLoading.value }
     get virtualPort(): number { return this._virtualPort }
 

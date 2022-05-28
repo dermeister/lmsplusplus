@@ -18,6 +18,7 @@ export class ConsoleRenderer implements IRenderer, IDisposable {
     private readonly _anchoredLineOffsets = new Map<string, number>()
     private _mountContainer: HTMLElement | null = null
 
+    get title(): string { return "Console" }
     private static get terminalTheme(): ITheme {
         const style = getComputedStyle(document.documentElement)
         return {

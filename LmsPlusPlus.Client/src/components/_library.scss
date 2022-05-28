@@ -71,3 +71,10 @@ $text-small: 0.75rem;
         @error "Invalid side";
     }
 }
+
+@mixin hidden {
+    position: absolute;
+    left: -100%;
+    top: -100%;
+    clip: rect(0, 0, 0, 0);
+}

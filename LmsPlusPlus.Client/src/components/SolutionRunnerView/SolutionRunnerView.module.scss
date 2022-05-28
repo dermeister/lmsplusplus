@@ -1,0 +1,45 @@
+@use "../library";
+
+.side-panel-content {
+    @include library.full-size;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.side-panel-loading-placeholder {
+    margin-right: 16px;
+    margin-left: 16px;
+}
+
+.stop-button {
+    @include library.shadow("all");
+
+    margin: auto 16px 14px;
+    padding: 4px;
+}
+
+.main-panel-loading-placeholder {
+    @include library.full-size;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.loading-spinner {
+    margin-bottom: 20px;
+}
+
+.loading-text {
+    font-size: library.$text-large;
+}
+
+.main-panel-content {
+    @include library.full-size;
+}
+
+.hidden {
+    @include library.hidden;
+}

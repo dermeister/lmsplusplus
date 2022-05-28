@@ -2,11 +2,11 @@ import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr"
 import React from "react"
 import { cached, Monitor, options, reaction, Transaction, unobservable } from "reactronic"
 import * as domain from "../../domain"
-import { ServicesExplorer } from "../ServicesExplorer/ServicesExplorer"
+import { ServiceViewsExplorer } from "../ServicesViewExplorer"
 import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
 import { ServiceView } from "./ServiceView.model"
-import { SolutionRunnerMainPanelContent, SolutionRunnerSidePanelContent } from "./SolutionRunnerView"
+import { SolutionRunnerMainPanelContent, SolutionRunnerSidePanelContent } from "./SolutionRunnerView.view"
 
 interface ServiceConfiguration {
     name: string
@@ -23,9 +23,9 @@ export class SolutionRunnerView extends View {
     private static readonly _monitor = Monitor.create("solution-runner", 0, 0)
     @unobservable private readonly _solution: domain.Solution
     @unobservable private readonly _viewGroup: ViewGroup
-    private _servicesExplorer: ServicesExplorer | null = null
+    private _serviceViewsExplorer: ServiceViewsExplorer | null = null
     private _connection: HubConnection | null = null
-    private _services: ServiceView[] | null = null
+    private _serviceViews: ServiceView[] | null = null
     private _currentService: ServiceView | null = null
     // private _serviceView: ServiceView | null = null
     // private _serviceWorkerRegistration: ServiceWorkerRegistration | null = null
@@ -33,7 +33,7 @@ export class SolutionRunnerView extends View {
 
     override get title(): string { return "Run Solution" }
     override get shouldShowLoader(): boolean { return SolutionRunnerView._monitor.isActive }
-    get servicesExplorer(): ServicesExplorer | null { return this._servicesExplorer }
+    // get servicesExplorer(): ServicesExplorer | null { return this._serviceViewsExplorer }
     // get isLoadingApplication(): boolean { return SolutionRunner.s_monitor.isActive
     // get serviceView(): ServiceView | null { return this._serviceView }
 
@@ -45,23 +45,24 @@ export class SolutionRunnerView extends View {
 
     override dispose(): void {
         return Transaction.run(() => {
-            this._services?.forEach(s => s.dispose())
+            this._serviceViewsExplorer?.dispose()
+            this._serviceViews?.forEach(s => s.dispose())
             this._connection?.stop()
             super.dispose()
-            //         this._servicesExplorer?.dispose()
-            //         this._services?.forEach(s => s.dispose())
             //         return this._serviceWorkerRegistration?.unregister().then() ?? Promise.resolve()
         })
     }
 
     @cached
     override renderSidePanelContent(): JSX.Element {
-        return <SolutionRunnerSidePanelContent model={this} />
+        return <SolutionRunnerSidePanelContent model={this} serviceViewsExplorer={this._serviceViewsExplorer} />
     }
 
     @cached
     override renderMainPanelContent(): JSX.Element {
-        return <SolutionRunnerMainPanelContent currentService={this._currentService} services={this._services} />
+        const currentRenderer = this._serviceViewsExplorer?.selectedNode?.item ?? null
+        const renderers = this._serviceViews?.flatMap(v => v.renderers) ?? null
+        return <SolutionRunnerMainPanelContent renderers={renderers} currentRenderer={currentRenderer} />
     }
 
     stopSolution(): void {
@@ -76,9 +77,9 @@ export class SolutionRunnerView extends View {
         this._connection = new HubConnectionBuilder().withUrl("/api/application").build()
         await this._connection.start()
         const serviceConfigurations = await this._connection.invoke<ServiceConfiguration[]>("StartApplication", this._solution.id)
-        this._services = serviceConfigurations.map(c => new ServiceView(c.name, c.stdin, c.virtualPorts, this._connection!))
-        if (this._services.length > 0) {
-            this._currentService = this._services[0]
+        this._serviceViews = serviceConfigurations.map(c => new ServiceView(c.name, c.stdin, c.virtualPorts, this._connection!))
+        if (this._serviceViews.length > 0) {
+            this._serviceViewsExplorer = new ServiceViewsExplorer(this._serviceViews)
         } else
             throw new Error("There are no services in solution.")
     }

@@ -45,13 +45,8 @@
     grid-area: content;
     z-index: 98;
     overflow-y: auto;
-
-    &>div {
-        @include library.full-size;
-    }
 }
 
 .main-panel-content-hidden {
-    position: absolute;
-    clip: rect(0, 0, 0, 0);
+    @include library.hidden;
 }

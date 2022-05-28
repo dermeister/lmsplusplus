@@ -8,7 +8,7 @@ import styles from "./WorkbenchScreen.module.scss"
 
 interface WorkbenchScreenProps {
     currentViewGroup: ViewGroup
-    viewGroups: readonly ViewGroup[]
+    viewGroups: ViewGroup[]
     sidePanel: SidePanel
     onShowViewGroup: (viewGroup: ViewGroup) => void
 }
@@ -44,7 +44,12 @@ export function WorkbenchScreen({ currentViewGroup, viewGroups, sidePanel, onSho
             <div className={styles.sidePanel}>
                 {sidePanel.render(currentViewGroup.currentView.renderSidePanelContent())}
             </div>
-            <div className={styles.mainPanelContent}>{currentViewGroup.currentView.renderMainPanelContent()}</div>
+            <>
+                {viewGroups.map(v => {
+                    const className = v === currentViewGroup ? styles.mainPanelContent : styles.mainPanelContentHidden
+                    return <div key={v.id} className={className}>{v.currentView.renderMainPanelContent()}</div>
+                })}
+            </>
         </div>
     ), [currentViewGroup, viewGroups, sidePanel, onShowViewGroup])
 }

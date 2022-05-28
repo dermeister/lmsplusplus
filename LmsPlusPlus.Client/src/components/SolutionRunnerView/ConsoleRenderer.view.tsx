@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react"
 import * as model from "./ConsoleRenderer.model"
+import styles from "./ConsoleRenderer.module.scss"
 
 interface ConsoleRendererProps {
     model: model.ConsoleRenderer
@@ -14,5 +15,5 @@ export function ConsoleRenderer({ model }: ConsoleRendererProps): JSX.Element {
         return () => model.unmount()
     }, [model])
 
-    return <div ref={ref} />
+    return <div className={styles.consoleRenderer} ref={ref} />
 }
