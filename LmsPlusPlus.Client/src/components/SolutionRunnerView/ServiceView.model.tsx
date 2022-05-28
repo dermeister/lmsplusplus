@@ -1,11 +1,16 @@
 import { HubConnection, ISubscription } from "@microsoft/signalr"
 import React from "react"
-import { cached, Ref, Transaction, transaction, unobservable } from "reactronic"
+import { cached, Transaction, transaction, unobservable } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import { ConsoleRenderer, ServiceBuildOutput } from "./ConsoleRenderer.model"
 import { IRenderer } from "./IRenderer"
 import * as view from "./ServiceView.view"
 import { WebRenderer } from "./WebRenderer.model"
+
+interface PortMapping {
+    port: number
+    virtualPort: number
+}
 
 export class ServiceView extends ObservableObject {
     @unobservable readonly name: string
@@ -19,7 +24,7 @@ export class ServiceView extends ObservableObject {
     private _currentRenderer: IRenderer
     private f = true
 
-    get renderers(): readonly IRenderer[] { return [this._consoleRenderer, ...this._webRenderers.values()] }
+    @cached get renderers(): readonly IRenderer[] { return [this._consoleRenderer, ...this._webRenderers.values()] }
 
     constructor(name: string, stdin: boolean, virtualPorts: readonly number[], connection: HubConnection) {
         super()
@@ -27,7 +32,7 @@ export class ServiceView extends ObservableObject {
         this.stdin = stdin
         this.virtualPorts = virtualPorts
         this._consoleRenderer = new ConsoleRenderer()
-        this._webRenderers = new Map(virtualPorts.map(v => [v, new WebRenderer(v, new Ref(this, "f"))]))
+        this._webRenderers = new Map(virtualPorts.map(v => [v, new WebRenderer(v)]))
         this._currentRenderer = this._consoleRenderer
         this._connection = connection
         const stream = this._connection.stream<ServiceBuildOutput>("ReadBuildOutput", this.name)
@@ -40,11 +45,11 @@ export class ServiceView extends ObservableObject {
 
     override dispose(): void {
         Transaction.run(() => {
+            this._buildOutputSubscription.dispose()
+            this._outputSubscription?.dispose()
             this._consoleRenderer.dispose()
             this._webRenderers.forEach(r => r.dispose())
             this._webRenderers.toMutable().clear()
-            this._buildOutputSubscription.dispose()
-            this._outputSubscription?.dispose()
             super.dispose()
         })
     }
@@ -68,7 +73,7 @@ export class ServiceView extends ObservableObject {
     }
 
     @transaction
-    private onBuildComplete(): void {
+    private async onBuildComplete(): Promise<void> {
         this._consoleRenderer.clear()
         if (this.stdin)
             this._consoleRenderer.enableStdin(input => this.onInput(input))
@@ -78,6 +83,11 @@ export class ServiceView extends ObservableObject {
             error: error => ServiceView.onError(error),
             complete: () => this.onComplete()
         })
+        const portMappings = await this._connection.invoke<PortMapping[]>("GetOpenedPorts", this.name)
+        for (const portMapping of portMappings) {
+            const webRenderer = this._webRenderers.get(portMapping.virtualPort)
+            webRenderer?.connectToBackend()
+        }
     }
 
     private onOutput(text: string): void {

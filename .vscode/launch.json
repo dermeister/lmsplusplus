@@ -2,10 +2,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch API",
+      "name": "Launch Api",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "Build API",
+      "preLaunchTask": "Build Api",
       "program": "${workspaceFolder}/LmsPlusPlus.Api/bin/Debug/net6.0/LmsPlusPlus.Api.dll",
       "args": [],
       "cwd": "${workspaceFolder}/LmsPlusPlus.Api",

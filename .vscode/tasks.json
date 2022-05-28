@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Build API",
+      "label": "Build Api",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -15,6 +15,20 @@
         "isDefault": true
       },
       "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Run Api",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "run",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary",
+        "--project",
+        "LmsPlusPlus.Api/LmsPlusPlus.Api.csproj"
+      ],
+      "problemMatcher": "$msCompile",
+      "isBackground": true
     },
     {
       "label": "Lint Client",
@@ -34,20 +48,10 @@
       "isBackground": true
     },
     {
-      "label": "Run TSC",
-      "type": "npm",
-      "script": "tsc",
-      "path": "LmsPlusPlus.Client",
-      "problemMatcher": [
-        "$tsc",
-      ],
-      "isBackground": true
-    },
-    {
-      "label": "Run Client with TSC",
+      "label": "Run App",
       "dependsOn": [
-        "Run Client",
-        "Run TSC",
+        "Run Api",
+        "Run Client"
       ],
       "problemMatcher": []
     }

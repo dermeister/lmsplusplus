@@ -3,7 +3,6 @@ import { autorender } from "../autorender"
 import { Button } from "../Button"
 import { ServiceViewsExplorer } from "../ServicesViewExplorer"
 import { Spinner } from "../Spinner"
-import { combineClassNames, maybeValue } from "../utils"
 import { IRenderer } from "./IRenderer"
 import { SolutionRunnerView } from "./SolutionRunnerView.model"
 import styles from "./SolutionRunnerView.module.scss"
@@ -43,14 +42,7 @@ export function SolutionRunnerMainPanelContent({ renderers, currentRenderer }: S
                     <p className={styles.loadingText}>Wait for application to load</p>
                 </div>
             )
-        return (
-            <>
-                {renderers.map((r, i) => {
-                    const className = combineClassNames(styles.mainPanelContent, maybeValue(styles.hidden, currentRenderer !== r))
-                    return <div className={className} key={i}>{r.render()}</div>
-                })}
-            </>
-        )
+        return <div className={styles.mainPanelContent}>{currentRenderer.render()}</div>
     }, [renderers, currentRenderer])
 }
 

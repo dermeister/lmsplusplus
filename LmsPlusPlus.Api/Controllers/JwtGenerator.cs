@@ -23,7 +23,7 @@ public class JwtGenerator
         SymmetricSecurityKey key = new(Encoding.Default.GetBytes(_secret));
         Claim[] claims = { new(type: "role", userRole), new(type: "id", userId) };
         SigningCredentials credentials = new(key, SecurityAlgorithms.HmacSha256);
-        JwtSecurityToken token = new(_issuer, _audience, claims, notBefore: null, DateTime.UtcNow.AddHours(1), credentials);
+        JwtSecurityToken token = new(_issuer, _audience, claims, notBefore: null, DateTime.UtcNow.AddDays(1), credentials);
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

@@ -16,3 +16,7 @@
 .loading-text {
     font-size: library.$text-large;
 }
+
+.web-renderer {
+    @include library.full-size;
+}

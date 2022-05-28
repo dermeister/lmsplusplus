@@ -44,12 +44,9 @@ export function WorkbenchScreen({ currentViewGroup, viewGroups, sidePanel, onSho
             <div className={styles.sidePanel}>
                 {sidePanel.render(currentViewGroup.currentView.renderSidePanelContent())}
             </div>
-            <>
-                {viewGroups.map(v => {
-                    const className = v === currentViewGroup ? styles.mainPanelContent : styles.mainPanelContentHidden
-                    return <div key={v.id} className={className}>{v.currentView.renderMainPanelContent()}</div>
-                })}
-            </>
+            <div className={styles.mainPanelContent}>
+                {currentViewGroup.currentView.renderMainPanelContent()}
+            </div>
         </div>
     ), [currentViewGroup, viewGroups, sidePanel, onShowViewGroup])
 }
