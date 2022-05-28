@@ -30,7 +30,7 @@ export class TasksView extends View implements ITasksService {
         this._context = context
         this._viewGroup = viewGroup
         this._errorService = errorService
-        this._tasksExplorer = new TasksExplorer(new Ref(this._context, "courses"), this, contextMenuService, new Ref(this._context, "permissions"))
+        this._tasksExplorer = new TasksExplorer(new Ref(this._context, "topics"), this, contextMenuService, new Ref(this._context, "permissions"))
     }
 
     override dispose(): void {

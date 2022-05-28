@@ -19,7 +19,7 @@ export class DatabaseContext extends ObservableObject {
     private _accounts: domain.Account[] = []
     private _providers: domain.Provider[] = []
 
-    get courses(): readonly domain.Topic[] { return this._topics }
+    get topics(): readonly domain.Topic[] { return this._topics }
     get technologies(): readonly domain.Technology[] { return this._technologies }
     get preferences(): domain.Preferences { return this._preferences }
     get user(): domain.User { return this._user }

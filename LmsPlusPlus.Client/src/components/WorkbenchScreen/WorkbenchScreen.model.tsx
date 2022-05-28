@@ -10,6 +10,7 @@ import { IScreen } from "../IScreen"
 import { OptionsViewGroup } from "../OptionsViewGroup"
 import { SidePanel } from "../SidePanel"
 import { TasksViewGroup } from "../TasksViewGroup"
+import { ThemeService } from "../ThemeService"
 import { ViewGroup } from "../ViewGroup"
 import * as view from "./WorkbenchScreen.view"
 
@@ -20,9 +21,12 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
     @isnonreactive private readonly _contextMenuService: ContextMenuService
     @isnonreactive private readonly _context: DatabaseContext
     @isnonreactive private readonly _errorService: IErrorService
+    @isnonreactive private readonly _themeService: ThemeService
     private _currentViewGroup: ViewGroup
     private _sidePanelTitle: string
     private _sidePanelShouldShowLoader: boolean
+
+    private get theme(): string { return this._context.preferences.theme }
 
     constructor(api: Axios, authService: IAuthService, errorService: IErrorService) {
         super()
@@ -37,6 +41,7 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
         const titleRef = new Ref(this, "_sidePanelTitle")
         const isPulsingRef = new Ref(this, "_sidePanelShouldShowLoader")
         this._sidePanel = new SidePanel(titleRef, isPulsingRef)
+        this._themeService = new ThemeService(new Ref(this, "theme"))
     }
 
     override dispose(): void {
