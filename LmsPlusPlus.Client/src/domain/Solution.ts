@@ -1,15 +1,18 @@
 import { Task } from "./Task"
-import { Technology } from "./Technology"
 
 export class Solution {
     static readonly NO_ID = -1
     readonly id: number
     readonly task: Task
-    readonly name: string
+    readonly repositoryName: string | null
+    readonly cloneUrl: string | null
+    readonly websiteUrl: string | null
 
-    constructor(id: number, task: Task, name: string) {
+    constructor(id: number, task: Task, repositoryName: string | null, cloneUrl: string | null, websiteUrl: string | null) {
         this.id = id
         this.task = task
-        this.name = name
+        this.repositoryName = repositoryName
+        this.cloneUrl = cloneUrl
+        this.websiteUrl = websiteUrl
     }
 }

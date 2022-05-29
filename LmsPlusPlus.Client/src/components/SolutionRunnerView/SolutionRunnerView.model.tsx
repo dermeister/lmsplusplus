@@ -92,7 +92,8 @@ export class SolutionRunnerView extends View implements IServiceWorkerService {
         this._connection = new HubConnectionBuilder().withUrl("/api/application").build()
         await this._connection.start()
         const serviceConfigurations = await this._connection.invoke<ServiceConfiguration[]>("StartApplication", this._solution.id)
-        this._serviceViews = serviceConfigurations.map(c => new ServiceView(c.name, c.stdin, c.virtualPorts, this._connection!, this))
+        this._serviceViews = serviceConfigurations.map(c => new ServiceView(c.name, c.stdin, c.virtualPorts, this._connection!, this,
+            this._errorService))
         if (this._serviceViews.length === 0)
             this._errorService.showError(new Error("There are no services in solution."))
         else

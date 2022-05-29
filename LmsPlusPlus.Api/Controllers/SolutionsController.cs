@@ -32,7 +32,7 @@ public class SolutionsController : ControllerBase
     }
 
     [HttpPost, Authorize(Roles = "Solver")]
-    public async Task<ActionResult<Response.Solution>> Create(Request.Solution requestSolution)
+    public async Task<ActionResult<Response.Solution>> Create(Request.CreateSolution requestSolution)
     {
         AuthorizationCredentials credentials = new(User);
         bool solverCanCreateSolutionForTask = await (from task in _context.Tasks

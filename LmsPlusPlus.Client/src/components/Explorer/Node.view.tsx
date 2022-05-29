@@ -30,10 +30,10 @@ export function Node<T>({ node, contextMenuService }: NodeProps<T>): JSX.Element
 
         function onContextMenu(e: React.MouseEvent): void {
             e.preventDefault()
-            const contextMenu = node.renderContextMenu()
-            if (contextMenu && contextMenuService) {
+            const contextMenuItems = node.renderContextMenuItems()
+            if (contextMenuItems && contextMenuItems.length > 0 && contextMenuService) {
                 const onClose = () => ref.current?.classList.remove(nodeStyles.contextMenuOpened)
-                const contextMenuDelegate = new ContextMenuDelegate(contextMenu, e.clientX, e.clientY, onClose)
+                const contextMenuDelegate = new ContextMenuDelegate(contextMenuItems, e.clientX, e.clientY, onClose)
                 contextMenuService.open(contextMenuDelegate)
                 ref.current?.classList.add(nodeStyles.contextMenuOpened)
             }

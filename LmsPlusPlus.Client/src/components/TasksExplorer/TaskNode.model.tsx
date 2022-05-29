@@ -19,10 +19,16 @@ export class TaskNode extends Node<domain.Task> {
     }
 
     @cached
-    override renderContextMenu(): JSX.Element | null {
-        return (
-            <view.TaskContextMenu node={this} tasksService={this._tasksService} permissions={this._permissions}
-                contextMenuService={this.contextMenuService} />
-        )
+    override renderContextMenuItems(): JSX.Element[] | null {
+        return view.renderContextMenu({
+            node: this,
+            permissions: this._permissions,
+            tasksService: this._tasksService,
+            contextMenuService: this.contextMenuService
+        })
+        // return (
+        //     <view.renderContextMenu({}) node={this} tasksService={this._tasksService} permissions={this._permissions}
+        //         contextMenuService={this.contextMenuService} />
+        // )
     }
 }

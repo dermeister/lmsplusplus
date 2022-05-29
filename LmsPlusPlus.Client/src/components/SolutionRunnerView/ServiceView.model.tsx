@@ -1,6 +1,7 @@
 import { HubConnection, ISubscription } from "@microsoft/signalr"
 import { cached, isnonreactive, Transaction, transaction } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
+import { IErrorService } from "../ErrorService"
 import { ConsoleRenderer, ServiceBuildOutput } from "./ConsoleRenderer.model"
 import { IRenderer } from "./IRenderer"
 import { IServiceWorkerService } from "./IServiceWorkerService"
@@ -20,16 +21,18 @@ export class ServiceView extends ObservableObject {
     @isnonreactive private readonly _connection: HubConnection
     @isnonreactive private readonly _buildOutputSubscription: ISubscription<ServiceBuildOutput>
     @isnonreactive private readonly _serviceWorkerService: IServiceWorkerService
+    @isnonreactive private readonly _errorService: IErrorService
     private _outputSubscription: ISubscription<string> | null = null
 
     @cached get renderers(): readonly IRenderer[] { return [this._consoleRenderer, ...this._webRenderers.values()] }
 
     constructor(name: string, stdin: boolean, virtualPorts: readonly number[], connection: HubConnection,
-        serviceWorkerService: IServiceWorkerService) {
+        serviceWorkerService: IServiceWorkerService, errorService: IErrorService) {
         super()
         this.name = name
         this.stdin = stdin
         this.virtualPorts = virtualPorts
+        this._errorService = errorService
         this._serviceWorkerService = serviceWorkerService
         this._consoleRenderer = new ConsoleRenderer()
         this._webRenderers = new Map(virtualPorts.map(v => [v, new WebRenderer(v)]))
@@ -37,7 +40,7 @@ export class ServiceView extends ObservableObject {
         const stream = this._connection.stream<ServiceBuildOutput>("ReadBuildOutput", this.name)
         this._buildOutputSubscription = stream.subscribe({
             next: value => this.onBuildOutput(value),
-            error: error => ServiceView.onBuildError(error),
+            error: error => this.onBuildError(error),
             complete: () => this.onBuildComplete()
         })
     }
@@ -53,12 +56,12 @@ export class ServiceView extends ObservableObject {
         })
     }
 
-    private static onBuildError(error: Error): void {
-        console.error(`BUILD: ${error}`)
+    private onBuildError(error: Error): void {
+        this._errorService.showError(error)
     }
 
-    private static onError(error: Error): void {
-        console.error(`OUTPUT: ${error}`)
+    private onError(error: Error): void {
+        this._errorService.showError(error)
     }
 
     private onBuildOutput(output: ServiceBuildOutput): void {
@@ -73,7 +76,7 @@ export class ServiceView extends ObservableObject {
         const stream = this._connection.stream("ReadServiceOutput", this.name)
         this._outputSubscription = stream.subscribe({
             next: value => this.onOutput(value),
-            error: error => ServiceView.onError(error),
+            error: error => this.onError(error),
             complete: () => this.onComplete()
         })
         const portMappings = await this._connection.invoke<PortMapping[]>("GetOpenedPorts", this.name)

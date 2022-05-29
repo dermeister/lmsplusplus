@@ -22,13 +22,13 @@ export class TopicNode extends Node<domain.Topic> {
     }
 
     @cached
-    override renderContextMenu(): JSX.Element | null {
-        return (
-            <view.TopicContextMenu node={this}
-                contextMenuService={this.contextMenuService}
-                permissions={this._permissions}
-                tasksService={this._tasksService} />
-        )
+    override renderContextMenuItems(): JSX.Element[] | null {
+        return view.renderContextMenu({
+            node: this,
+            permissions: this._permissions,
+            tasksService: this._tasksService,
+            contextMenuService: this.contextMenuService
+        })
     }
 
     private static createTaskNodes(tasks: readonly domain.Task[], contextMenuService: IContextMenuService, permissions: domain.Permissions,

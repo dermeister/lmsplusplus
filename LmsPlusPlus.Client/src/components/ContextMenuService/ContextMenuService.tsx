@@ -17,14 +17,17 @@ export class ContextMenuService extends ObservableObject implements IContextMenu
 
     @transaction
     open(contextMenuDelegate: ContextMenuDelegate): void {
-        this._contextMenuDelegate = contextMenuDelegate
-        const container = (
-            <ContextMenuContainer contextMenuService={this}
-                contextMenu={contextMenuDelegate.contextMenu}
-                x={contextMenuDelegate.x}
-                y={contextMenuDelegate.y} />
-        )
-        ReactDOM.render(container, ContextMenuService.contextMenuContainer)
+        if (contextMenuDelegate.contextMenuItems.length > 0) {
+
+            this._contextMenuDelegate = contextMenuDelegate
+            const container = (
+                <ContextMenuContainer contextMenuService={this}
+                    contextMenuItems={contextMenuDelegate.contextMenuItems}
+                    x={contextMenuDelegate.x}
+                    y={contextMenuDelegate.y} />
+            )
+            ReactDOM.render(container, ContextMenuService.contextMenuContainer)
+        }
     }
 
     @transaction

@@ -50,7 +50,7 @@ export class Node<T> extends ObservableObject {
         this._isOpened = !this._isOpened
     }
 
-    renderContextMenu(): JSX.Element | null {
+    renderContextMenuItems(): JSX.Element[] | null {
         return null
     }
 

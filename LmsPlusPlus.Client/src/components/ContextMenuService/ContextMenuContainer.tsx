@@ -1,5 +1,6 @@
 import React from "react"
 import { Overlay } from "../Overlay"
+import { ContextMenu } from "./ContextMenu"
 import styles from "./ContextMenuContainer.module.scss"
 import { ContextMenuService } from "./ContextMenuService"
 
@@ -7,10 +8,10 @@ interface ContextMenuProps {
     x: number
     y: number
     contextMenuService: ContextMenuService
-    contextMenu: JSX.Element | null
+    contextMenuItems: JSX.Element[] | null
 }
 
-export function ContextMenuContainer({ contextMenuService, contextMenu, x, y }: ContextMenuProps): JSX.Element {
+export function ContextMenuContainer({ contextMenuService, contextMenuItems, x, y }: ContextMenuProps): JSX.Element {
     function positionMenu(menu: HTMLElement | null): void {
         if (menu) {
             const offset = 10
@@ -33,7 +34,9 @@ export function ContextMenuContainer({ contextMenuService, contextMenu, x, y }: 
     return (
         <Overlay onClick={() => contextMenuService.close()} trapFocus>
             <menu ref={positionMenu} onContextMenu={onContextMenu} className={styles.contextMenuContainer}>
-                {contextMenu}
+                <ContextMenu>
+                    {contextMenuItems}
+                </ContextMenu>
             </menu>
         </Overlay>
     )

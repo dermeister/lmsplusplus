@@ -12,7 +12,7 @@ interface TaskContextMenuProps {
     contextMenuService: IContextMenuService
 }
 
-export function TaskContextMenu({ permissions, node, tasksService, contextMenuService }: TaskContextMenuProps): JSX.Element {
+export function renderContextMenu({ permissions, node, tasksService, contextMenuService }: TaskContextMenuProps): JSX.Element[] {
     function onRunSolution(): void {
         contextMenuService.close()
         tasksService.runSolution(node.item.solutions[0])
@@ -38,52 +38,59 @@ export function TaskContextMenu({ permissions, node, tasksService, contextMenuSe
         tasksService.deleteSolution(node.item.solutions[0])
     }
 
-    return autorender(() => {
-        let contextMenuBody
-        if (permissions.canUpdateTask)
-            contextMenuBody = (
-                <ContextMenu.Button variant="primary" onClick={() => onUpdateTask()}>
-                    Edit Task
+    function onOpenSolution(): void {
+        contextMenuService.close()
+        window.open(node.item.solutions[0].websiteUrl as string, "_blank")
+    }
+
+    function onCopySolutionCopyUrl(): void {
+        contextMenuService.close()
+        navigator.clipboard.writeText(node.item.solutions[0].cloneUrl as string)
+    }
+
+    let key = 1
+    const contextMenuItems = []
+    if (permissions.canUpdateTask)
+        contextMenuItems.push(
+            <ContextMenu.Button key={key++} variant="primary" onClick={onUpdateTask}>
+                Edit Task
+            </ContextMenu.Button>
+        )
+    if (permissions.canDeleteTask)
+        contextMenuItems.push(
+            <ContextMenu.Button key={key++} variant="danger" onClick={onDeleteTask}>
+                Delete Task
+            </ContextMenu.Button>
+        )
+    if (permissions.canCreateSolution && node.item.solutions.length === 0)
+        contextMenuItems.push(
+            <ContextMenu.Button key={key++} variant="primary" onClick={onCreateSolution}>
+                New Solution
+            </ContextMenu.Button>
+        )
+    if (node.item.solutions.length === 1) {
+        contextMenuItems.push(
+            <ContextMenu.Button key={key++} variant="primary" onClick={onRunSolution}>
+                Run Solution
+            </ContextMenu.Button>
+        )
+        contextMenuItems.push(
+            <ContextMenu.Button key={key++} variant="primary" onClick={onOpenSolution}>
+                Open Solution
+            </ContextMenu.Button>
+        )
+        contextMenuItems.push(
+            <ContextMenu.Button key={key++} variant="primary" onClick={onCopySolutionCopyUrl}>
+                Copy Solution Clone URL
+            </ContextMenu.Button>
+        )
+        if (permissions.canDeleteSolution)
+            contextMenuItems.push(
+                <ContextMenu.Button key={key++} variant="danger" onClick={onDeleteSolution}>
+                    Delete Solution
                 </ContextMenu.Button>
             )
-        if (permissions.canDeleteTask)
-            contextMenuBody = (
-                <>
-                    {contextMenuBody}
-                    <ContextMenu.Button variant="danger" onClick={() => onDeleteTask()}>
-                        Delete Task
-                    </ContextMenu.Button>
-                </>
-            )
-        if (permissions.canCreateSolution && node.item.solutions.length === 0)
-            contextMenuBody = (
-                <>
-                    {contextMenuBody}
-                    <ContextMenu.Button variant="primary" onClick={() => onCreateSolution()}>
-                        New Solution
-                    </ContextMenu.Button>
-                </>
-            )
-        if (node.item.solutions.length === 1) {
-            contextMenuBody = (
-                <>
-                    {contextMenuBody}
-                    <ContextMenu.Button variant="primary" onClick={() => onRunSolution()}>
-                        Run solution
-                    </ContextMenu.Button>
-                </>
-            )
-            if (permissions.canDeleteSolution)
-                contextMenuBody = (
-                    <>
-                        {contextMenuBody}
-                        <ContextMenu.Button variant="danger" onClick={() => onDeleteSolution()}>
-                            Delete Solution
-                        </ContextMenu.Button>
-                    </>
-                )
-        }
-        return <ContextMenu>{contextMenuBody}</ContextMenu>
-    }, [node, permissions, tasksService, contextMenuService])
+    }
+    return contextMenuItems
 }
 

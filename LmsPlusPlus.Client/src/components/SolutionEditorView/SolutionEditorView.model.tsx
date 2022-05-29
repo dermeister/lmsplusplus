@@ -29,7 +29,7 @@ export class SolutionEditorView extends View {
         this._errorService = errorService
         this._id = solution.id
         this._task = solution.task
-        this._name = solution.name
+        this._name = solution.repositoryName
         this.availableTechnologies = this._task.technologies
         this._viewGroup = viewGroup
     }

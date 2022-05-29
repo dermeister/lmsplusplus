@@ -147,7 +147,7 @@ export class DatabaseContext extends ObservableObject {
         if (!this._permissions.canCreateSolution)
             throw this.permissionError()
         const { data } = await this._api.post<response.Solution, AxiosResponse<response.Solution>, request.Solution>("/api/solutions", {
-            repositoryName: solution.name,
+            repositoryName: solution.repositoryName as string,
             taskId: solution.task.id,
             technologyId: technology.id
         })
@@ -160,7 +160,7 @@ export class DatabaseContext extends ObservableObject {
                     return task
                 const newTask = new domain.Task(solution.task.id, newTopic, solution.task.title, solution.task.description,
                     solution.task.technologies)
-                const newSolution = new domain.Solution(data.id, newTask, data.repositoryName)
+                const newSolution = new domain.Solution(data.id, newTask, null, data.cloneUrl, data.websiteUrl)
                 newTask.solutions = task.solutions.concat(newSolution)
                 return newTask
             })
@@ -290,7 +290,7 @@ export class DatabaseContext extends ObservableObject {
             const task = tasks.find(t => t.id === s.taskId)
             if (!task)
                 throw new Error(`Task with id ${s.taskId} not found.`)
-            return new domain.Solution(s.id, task, s.repositoryName)
+            return new domain.Solution(s.id, task, null, s.cloneUrl, s.websiteUrl)
         })
     }
 }

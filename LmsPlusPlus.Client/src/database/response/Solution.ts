@@ -1,6 +1,6 @@
 export interface Solution {
     id: number
-    repositoryName: string
+    cloneUrl: string
+    websiteUrl: string | null
     taskId: number
-    technologyId: number
 }
