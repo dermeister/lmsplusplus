@@ -9,12 +9,14 @@ public record ServiceConfiguration
     public ReadOnlyCollection<VirtualPortMapping> VirtualPortMappings { get; internal init; }
     internal string ContextPath { get; }
     internal string? NetworkName { get; init; }
+    internal IEnumerable<string> Environment { get; }
 
-    internal ServiceConfiguration(string name, string contextPath)
+    internal ServiceConfiguration(string name, string contextPath, IEnumerable<string> environment)
     {
         Name = name;
         VirtualPortMappings = Array.AsReadOnly(Array.Empty<VirtualPortMapping>());
         ContextPath = contextPath;
+        Environment = environment;
     }
 }
 

@@ -1,6 +1,6 @@
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr"
 import React from "react"
-import { cached, Monitor, options, reaction, transaction, Transaction, isnonreactive } from "reactronic"
+import { cached, Monitor, options, reaction, transaction, Transaction, isnonreactive, Reentrance } from "reactronic"
 import * as domain from "../../domain"
 import { ServiceViewsExplorer } from "../ServicesViewExplorer"
 import { View } from "../View"
@@ -48,6 +48,7 @@ export class SolutionRunnerView extends View implements IServiceWorkerService {
     }
 
     @transaction
+    @options({ reentrance: Reentrance.WaitAndRestart })
     async startServiceWorker(): Promise<ServiceWorker | null> {
         if (this._serviceWorkerRegistration) {
             this._errorService.showError(new Error("Currently only one web view per solution is supported."))

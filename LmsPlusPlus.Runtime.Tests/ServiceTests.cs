@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Xunit;
@@ -14,7 +15,7 @@ public class ServiceTests
     public async Task ReadServiceBuildOutput()
     {
         // Arrange
-        ServiceConfiguration configuration = new(name: "EchoService", GetServiceContextPath("EchoService"));
+        ServiceConfiguration configuration = new(name: "EchoService", GetServiceContextPath("EchoService"), Enumerable.Empty<string>());
         await using Service service = new(configuration);
 
         // Act
@@ -29,7 +30,7 @@ public class ServiceTests
     public async Task ReadServiceRunOutput()
     {
         // Arrange
-        ServiceConfiguration configuration = new(name: "EchoService", GetServiceContextPath("EchoService"));
+        ServiceConfiguration configuration = new(name: "EchoService", GetServiceContextPath("EchoService"), Enumerable.Empty<string>());
         await using Service service = new(configuration);
         await service.Start();
 
@@ -48,7 +49,7 @@ public class ServiceTests
     public async Task ServiceMethodsThrowObjectDisposedException()
     {
         // Arrange
-        ServiceConfiguration configuration = new(name: "EchoService", GetServiceContextPath("EchoService"));
+        ServiceConfiguration configuration = new(name: "EchoService", GetServiceContextPath("EchoService"), Enumerable.Empty<string>());
         Service service = new(configuration);
 
         // Act
@@ -69,7 +70,7 @@ public class ServiceTests
     public async Task ServiceMethodsThrowInvalidOperationException()
     {
         // Arrange
-        ServiceConfiguration configuration = new(name: "EchoService", GetServiceContextPath("EchoService"));
+        ServiceConfiguration configuration = new(name: "EchoService", GetServiceContextPath("EchoService"), Enumerable.Empty<string>());
         await using Service service = new(configuration);
 
         // Act
@@ -87,7 +88,7 @@ public class ServiceTests
     public async Task WriteToServiceStdinAndReadFromStdout()
     {
         // Arrange
-        ServiceConfiguration configuration = new(name: "CatService", GetServiceContextPath("CatService"))
+        ServiceConfiguration configuration = new(name: "CatService", GetServiceContextPath("CatService"), Enumerable.Empty<string>())
         {
             Stdin = true
         };
@@ -107,7 +108,7 @@ public class ServiceTests
     {
         // Arrange
         VirtualPortMapping virtualPortMapping = new(PortType.Tcp, containerPort: 10_000, virtualHostPort: 10_000);
-        ServiceConfiguration configuration = new(name: "SocketService", GetServiceContextPath("SocketService"))
+        ServiceConfiguration configuration = new(name: "SocketService", GetServiceContextPath("SocketService"), Enumerable.Empty<string>())
         {
             VirtualPortMappings = new List<VirtualPortMapping> { virtualPortMapping }.AsReadOnly()
         };

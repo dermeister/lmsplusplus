@@ -150,7 +150,8 @@ public sealed class Application : IAsyncDisposable
                 let contextPath = Path.GetFullPath(Path.Combine(configurationDirectoryPath, pair.Value.Build!))
                 let stdin = pair.Value.StdinOpen
                 let virtualPortMappings = CreateVirtualPortMappings(pair.Value.Ports)
-                let serviceConfiguration = new ServiceConfiguration(name, contextPath)
+                let environment = pair.Value.Environment
+                let serviceConfiguration = new ServiceConfiguration(name, contextPath, environment)
                 {
                     Stdin = stdin,
                     VirtualPortMappings = virtualPortMappings,

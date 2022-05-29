@@ -214,7 +214,8 @@ sealed class Service : IAsyncDisposable
             Tty = true,
             ExposedPorts = CreateExposedPorts(),
             HostConfig = CreatHostConfig(),
-            NetworkingConfig = CreateNetworkingConfig()
+            NetworkingConfig = CreateNetworkingConfig(),
+            Env = _configuration.Environment.ToList()
         };
         CreateContainerResponse createContainerResponse = await _dockerClient.Containers.CreateContainerAsync(createContainerParameters);
         _containerId = createContainerResponse.ID;
