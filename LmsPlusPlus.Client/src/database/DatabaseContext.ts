@@ -79,7 +79,11 @@ export class DatabaseContext extends ObservableObject {
                 return technology
             })
             const newTask = new domain.Task(data.id, task.topic, data.title, data.description, technologies)
-            newTopic.tasks = task.topic.tasks.concat(newTask)
+            newTopic.tasks = task.topic.tasks.map(t => {
+                if (t.id !== task.id)
+                    return t
+                return newTask
+            })
             return newTopic
         })
     }

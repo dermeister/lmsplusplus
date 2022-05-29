@@ -50,6 +50,7 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
             this._tasksViewGroup.dispose()
             this._optionsViewGroup.dispose()
             this._context.dispose()
+            this._themeService.dispose()
             super.dispose()
         })
     }

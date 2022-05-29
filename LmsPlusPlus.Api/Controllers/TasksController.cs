@@ -77,7 +77,7 @@ public class TasksController : ControllerBase
             return Problem(detail: $"Task with id {taskId} does not exist.", statusCode: StatusCodes.Status400BadRequest, title: "Cannot update task.");
         if (databaseTask.Topic.AuthorId != credentials.UserId)
             return Forbid();
-        Infrastructure.Technology[] technologies = await _context.Technologies.Where(t => requestTask.TechnologyIds.Contains(t.Id)).ToArrayAsync();
+        List<Infrastructure.Technology> technologies = await _context.Technologies.Where(t => requestTask.TechnologyIds.Contains(t.Id)).ToListAsync();
         databaseTask.Title = requestTask.Title;
         databaseTask.Description = requestTask.Description;
         databaseTask.Technologies = technologies;
