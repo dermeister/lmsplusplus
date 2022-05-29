@@ -77,12 +77,16 @@ export class ServiceView extends ObservableObject {
             complete: () => this.onComplete()
         })
         const portMappings = await this._connection.invoke<PortMapping[]>("GetOpenedPorts", this.name)
-        const worker = await this._serviceWorkerService.startServiceWorker()
-        if (worker) {
-            worker.postMessage(JSON.stringify(portMappings))
-            for (const portMapping of portMappings) {
-                const webRenderer = this._webRenderers.get(portMapping.virtualPort)
-                webRenderer?.connectToBackend()
+        if (portMappings.length > 0) {
+            const worker = await this._serviceWorkerService.startServiceWorker()
+            if (worker) {
+                worker.postMessage(JSON.stringify(portMappings))
+                setTimeout(() => {
+                    for (const portMapping of portMappings) {
+                        const webRenderer = this._webRenderers.get(portMapping.virtualPort)
+                        webRenderer?.connectToBackend()
+                    }
+                }, 5000)
             }
         }
     }

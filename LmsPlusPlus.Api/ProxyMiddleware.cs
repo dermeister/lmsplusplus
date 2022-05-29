@@ -49,7 +49,7 @@ public class ServiceProxyMiddleware
         {
             HttpResponseMessage responseMessage = await _httpClient.SendAsync(CreateHttpRequestMessage(context.Request, targetPath, body));
             context.Response.StatusCode = (int)responseMessage.StatusCode;
-            foreach ((string key, IEnumerable<string> value) in responseMessage.Headers)
+            foreach ((string key, IEnumerable<string> value) in responseMessage.Headers.Where(h => h.Key is not "Transfer-Encoding"))
                 context.Response.Headers.Add(key, value.ToArray());
             foreach ((string key, IEnumerable<string> value) in responseMessage.Content.Headers)
                 context.Response.Headers.Add(key, value.ToArray());
