@@ -1,5 +1,5 @@
 import React from "react"
-import { cached, reaction, Ref, Transaction, isnonreactive } from "reactronic"
+import { cached, isnonreactive, reaction, Ref, Transaction } from "reactronic"
 import { DatabaseContext } from "../../database"
 import { IAuthService } from "../AuthService"
 import { IErrorService } from "../ErrorService"
@@ -12,8 +12,8 @@ import { View } from "../View"
 import * as view from "./OptionsView.view"
 
 export class OptionsView extends View {
-    @isnonreactive private readonly _categoriesExplorer: OptionCategoriesExplorer
-    @isnonreactive private readonly _authService: IAuthService
+    @isnonreactive readonly categoriesExplorer: OptionCategoriesExplorer
+    @isnonreactive readonly authService: IAuthService
     @isnonreactive private readonly _preferencesOptionCategory: PreferencesOptionCategory
     @isnonreactive private readonly _vcsOptionCategory: VcsOptionCategory
     @isnonreactive private readonly _errorService: IErrorService
@@ -21,20 +21,21 @@ export class OptionsView extends View {
 
     override get shouldShowLoader(): boolean { return this._currentOptionCategory.isPerformingOperation }
     override get title(): string { return "Options" }
+    get currentOptionCategory(): OptionCategory { return this._currentOptionCategory }
 
     constructor(authService: IAuthService, context: DatabaseContext, errorService: IErrorService) {
         super()
         this._errorService = errorService
-        this._categoriesExplorer = new OptionCategoriesExplorer(new Ref(context, "permissions"))
+        this.categoriesExplorer = new OptionCategoriesExplorer(new Ref(context, "permissions"))
         this._preferencesOptionCategory = new PreferencesOptionCategory(context, errorService)
         this._vcsOptionCategory = new VcsOptionCategory(context, errorService)
         this._currentOptionCategory = this._preferencesOptionCategory
-        this._authService = authService
+        this.authService = authService
     }
 
     override dispose(): void {
         Transaction.run(null, () => {
-            this._categoriesExplorer.dispose()
+            this.categoriesExplorer.dispose()
             this._preferencesOptionCategory.dispose()
             this._vcsOptionCategory.dispose()
             super.dispose()
@@ -43,26 +44,26 @@ export class OptionsView extends View {
 
     @cached
     override renderSidePanelContent(): JSX.Element {
-        return <view.SidePanelContent categoriesExplorer={this._categoriesExplorer} authService={this._authService} />
+        return <view.SidePanelContent view={this} />
     }
 
     @cached
     override renderMainPanelContent(): JSX.Element {
-        return <view.MainPanelContent currentOptionCategory={this._currentOptionCategory} />
+        return <view.MainPanelContent view={this} />
     }
 
     @reaction
     private updateCurrentCategory() {
-        const item = this._categoriesExplorer.selectedNode?.item
+        const item = this.categoriesExplorer.selectedNode?.item
         switch (item) {
-        case OptionCategoryKind.Preferences:
-            this._currentOptionCategory = this._preferencesOptionCategory
-            break
-        case OptionCategoryKind.Vcs:
-            this._currentOptionCategory = this._vcsOptionCategory
-            break
-        default:
-            break
+            case OptionCategoryKind.Preferences:
+                this._currentOptionCategory = this._preferencesOptionCategory
+                break
+            case OptionCategoryKind.Vcs:
+                this._currentOptionCategory = this._vcsOptionCategory
+                break
+            default:
+                break
         }
     }
 }

@@ -60,6 +60,7 @@ export function VcsOptionCategory({ category }: VcsOptionCategoryProps): JSX.Ele
             </ul>
         )
     }
+
     return autorender(() => {
         if (category.vcsProviders.length === 0)
             return <h2 className={styles.noVcsProviders}>There are no available VCS providers</h2>

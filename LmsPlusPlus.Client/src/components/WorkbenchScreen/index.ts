@@ -1,1 +1,1 @@
-export { WorkbenchScreen as WorkbenchScreen } from "./WorkbenchScreen.model"
+export { WorkbenchScreen } from "./WorkbenchScreen.model"

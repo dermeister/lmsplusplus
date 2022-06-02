@@ -2,25 +2,22 @@ import React from "react"
 import { Transaction } from "reactronic"
 import { autorender } from "../autorender"
 import { Button } from "../Button"
-import { SidePanel } from "../SidePanel"
 import { ViewGroup } from "../ViewGroup"
+import * as model from "./WorkbenchScreen.model"
 import styles from "./WorkbenchScreen.module.scss"
 
 interface WorkbenchScreenProps {
-    currentViewGroup: ViewGroup
-    viewGroups: ViewGroup[]
-    sidePanel: SidePanel
-    onShowViewGroup: (viewGroup: ViewGroup) => void
+    screen: model.WorkbenchScreen
 }
 
-export function WorkbenchScreen({ currentViewGroup, viewGroups, sidePanel, onShowViewGroup }: WorkbenchScreenProps): JSX.Element {
+export function WorkbenchScreen({ screen }: WorkbenchScreenProps): JSX.Element {
     function renderViewGroupSwitch(): JSX.Element[] {
-        return viewGroups.map(v => {
-            const variant = currentViewGroup === v ? "primary" : "secondary"
+        return screen.viewGroups.map(v => {
+            const variant = screen.currentViewGroup === v ? "primary" : "secondary"
             return (
                 <Button key={v.id}
                     variant={variant}
-                    onClick={() => onViewGroupSwitchButtonClick(v, currentViewGroup)}
+                    onClick={() => onViewGroupSwitchButtonClick(v, screen.currentViewGroup)}
                     className={styles.viewGroupSwitchButton}>
                     <img className={styles.viewGroupSwitchButtonIcon} src={v.iconUrl} alt={v.id} />
                 </Button>
@@ -31,23 +28,22 @@ export function WorkbenchScreen({ currentViewGroup, viewGroups, sidePanel, onSho
     function onViewGroupSwitchButtonClick(viewGroup: ViewGroup, currentViewGroup: ViewGroup): void {
         if (currentViewGroup !== viewGroup)
             Transaction.run(null, () => {
-                onShowViewGroup(viewGroup)
-                sidePanel.open()
+                screen.showViewGroup(viewGroup)
+                screen.sidePanel.open()
             })
         else
-            sidePanel.toggle()
+            screen.sidePanel.toggle()
     }
 
     return autorender(() => (
         <div className={styles.workbenchScreen}>
             <div className={styles.viewGroupSwitch}>{renderViewGroupSwitch()}</div>
             <div className={styles.sidePanel}>
-                {sidePanel.render(currentViewGroup.currentView.renderSidePanelContent())}
+                {screen.sidePanel.render(screen.currentViewGroup.currentView.renderSidePanelContent())}
             </div>
-            <div className={styles.mainPanelContent}>
-                {currentViewGroup.currentView.renderMainPanelContent()}
+            <div className={styles.mainPanel}>
+                {screen.currentViewGroup.currentView.renderMainPanelContent()}
             </div>
         </div>
-    ), [currentViewGroup, viewGroups, sidePanel, onShowViewGroup])
+    ), [screen])
 }
-

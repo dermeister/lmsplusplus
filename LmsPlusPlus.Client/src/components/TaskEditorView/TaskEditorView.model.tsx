@@ -1,6 +1,6 @@
 import * as monaco from "monaco-editor"
 import React from "react"
-import { cached, isnonreactive, Monitor, options, nonreactive, Transaction, transaction } from "reactronic"
+import { cached, isnonreactive, Monitor, nonreactive, options, Transaction, transaction } from "reactronic"
 import { DatabaseContext } from "../../database"
 import * as domain from "../../domain"
 import { IErrorService } from "../ErrorService"
@@ -10,8 +10,8 @@ import * as view from "./TaskEditorView.view"
 
 export class TaskEditorView extends View {
     @isnonreactive readonly availableTechnologies: readonly domain.Technology[]
+    @isnonreactive readonly description: monaco.editor.ITextModel
     @isnonreactive private static readonly _monitor = Monitor.create("task-editor-view", 0, 0, 0)
-    @isnonreactive private readonly description: monaco.editor.ITextModel
     @isnonreactive private readonly _id: number
     @isnonreactive private readonly _topic: domain.Topic
     @isnonreactive private readonly _solutions: domain.Solution[]
@@ -50,12 +50,12 @@ export class TaskEditorView extends View {
 
     @cached
     override renderSidePanelContent(): JSX.Element {
-        return <view.TaskEditorSidePanelContent taskEditorView={this} />
+        return <view.TaskEditorSidePanelContent view={this} />
     }
 
     @cached
     override renderMainPanelContent(): JSX.Element {
-        return <view.TaskEditorMainPanelContent description={this.description} />
+        return <view.TaskEditorMainPanelContent view={this} />
     }
 
     @transaction

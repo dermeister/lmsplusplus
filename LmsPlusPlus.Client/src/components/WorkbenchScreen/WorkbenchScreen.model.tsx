@@ -15,7 +15,7 @@ import { ViewGroup } from "../ViewGroup"
 import * as view from "./WorkbenchScreen.view"
 
 export class WorkbenchScreen extends ObservableObject implements IScreen {
-    @isnonreactive private readonly _sidePanel: SidePanel
+    @isnonreactive readonly sidePanel: SidePanel
     @isnonreactive private readonly _tasksViewGroup: TasksViewGroup
     @isnonreactive private readonly _optionsViewGroup: OptionsViewGroup
     @isnonreactive private readonly _contextMenuService: ContextMenuService
@@ -26,7 +26,8 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
     private _sidePanelTitle: string
     private _sidePanelShouldShowLoader: boolean
 
-    private get theme(): string { return this._context.preferences.theme }
+    get currentViewGroup(): ViewGroup { return this._currentViewGroup }
+    get viewGroups(): readonly ViewGroup[] { return [this._tasksViewGroup, this._optionsViewGroup] }
 
     constructor(api: Axios, authService: IAuthService, errorService: IErrorService) {
         super()
@@ -40,13 +41,13 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
         this._sidePanelShouldShowLoader = this._currentViewGroup.currentView.shouldShowLoader
         const titleRef = new Ref(this, "_sidePanelTitle")
         const isPulsingRef = new Ref(this, "_sidePanelShouldShowLoader")
-        this._sidePanel = new SidePanel(titleRef, isPulsingRef)
+        this.sidePanel = new SidePanel(titleRef, isPulsingRef)
         this._themeService = new ThemeService(new Ref(this, "theme"))
     }
 
     override dispose(): void {
         Transaction.run(null, () => {
-            this._sidePanel.dispose()
+            this.sidePanel.dispose()
             this._tasksViewGroup.dispose()
             this._optionsViewGroup.dispose()
             this._context.dispose()
@@ -57,17 +58,11 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
 
     @cached
     render(): JSX.Element {
-        const viewGroups = [this._tasksViewGroup, this._optionsViewGroup]
-        return (
-            <view.WorkbenchScreen currentViewGroup={this._currentViewGroup}
-                sidePanel={this._sidePanel}
-                viewGroups={viewGroups}
-                onShowViewGroup={v => this.showViewGroup(v)} />
-        )
+        return <view.WorkbenchScreen screen={this} />
     }
 
     @transaction
-    private showViewGroup(viewGroup: ViewGroup): void {
+    showViewGroup(viewGroup: ViewGroup): void {
         this._currentViewGroup = viewGroup
     }
 

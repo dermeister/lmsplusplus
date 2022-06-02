@@ -7,34 +7,34 @@ import { Input } from "../Input"
 import * as model from "./SolutionEditorView.model"
 import styles from "./SolutionEditorView.module.scss"
 
-interface SolutionEditorSidePanelContentProps {
-    solutionEditorView: model.SolutionEditorView
+interface SolutionEditorViewProps {
+    view: model.SolutionEditorView
 }
 
-export function SolutionEditorSidePanelContent({ solutionEditorView }: SolutionEditorSidePanelContentProps): JSX.Element {
+export function SolutionEditorSidePanelContent({ view }: SolutionEditorViewProps): JSX.Element {
     return autorender(() => {
         return (
-            <div className={styles.form}>
-                <Field label="Name" className={styles.field}>
+            <div className={styles.sidePanelContent}>
+                <Field label="Repository Name" className={styles.field}>
                     <Input id="solution-name"
                         className={styles.input}
-                        value={solutionEditorView.name}
-                        onChange={e => solutionEditorView.setName(e.target.value)} />
+                        value={view.repositoryName}
+                        onChange={e => view.setRepositoryName(e.target.value)} />
                 </Field>
                 <Field label="Technology" className={styles.field}>
-                    <Dropdown items={solutionEditorView.availableTechnologies.map(t => ({ title: t.name, value: t }))}
-                        selectedValue={solutionEditorView.selectedTechnology}
-                        onValueChange={t => solutionEditorView.setTechnology(t)}
-                        createPlaceholder={() => solutionEditorView.selectedTechnology?.name ?? "Select technology"} />
+                    <Dropdown items={view.availableTechnologies.map(t => ({ title: t.name, value: t }))}
+                        selectedValue={view.selectedTechnology}
+                        onValueChange={t => view.setTechnology(t)}
+                        createPlaceholder={() => view.selectedTechnology?.name ?? "Select technology"} />
                 </Field>
                 <div className={styles.buttons}>
                     <Button variant="primary"
-                        onClick={() => solutionEditorView.saveSolution().catch(() => { })}
+                        onClick={() => view.saveSolution().catch(() => { })}
                         className={styles.primary}>
                         Save
                     </Button>
                     <Button variant="danger"
-                        onClick={() => solutionEditorView.cancelSolutionEditing()}
+                        onClick={() => view.cancelSolutionEditing()}
                         className={styles.danger}>
                         Cancel
                     </Button>
@@ -47,4 +47,3 @@ export function SolutionEditorSidePanelContent({ solutionEditorView }: SolutionE
 export function SolutionEditorMainPanelContent(): JSX.Element {
     return <p className={styles.mainPanelContent}>Create your solution</p>
 }
-

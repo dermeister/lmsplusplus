@@ -4,14 +4,14 @@
     @include library.full-size;
 
     display: grid;
-    grid-template-areas: "switch side-panel content";
-    grid-template-columns: 74px auto 1fr;
+    grid-template-areas: "view-group-switch side-panel main-panel";
+    grid-template-columns: 74px 280px 1fr;
 }
 
 .view-group-switch {
     @include library.shadow("right");
 
-    grid-area: switch;
+    grid-area: view-group-switch;
     padding: 14px;
     z-index: 100;
 }
@@ -41,8 +41,8 @@
     z-index: 99;
 }
 
-.main-panel-content {
-    grid-area: content;
+.main-panel {
+    grid-area: main-panel;
     z-index: 98;
     overflow-y: auto;
 }

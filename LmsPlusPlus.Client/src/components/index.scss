@@ -79,12 +79,6 @@ input {
     outline: none;
 }
 
-
 #root {
     @include library.full-size;
-    @include library.apply-theme("primary");
-
-    font-size: library.$text-regular;
-    font-family: "Roboto", sans-serif;
-    user-select: none;
 }

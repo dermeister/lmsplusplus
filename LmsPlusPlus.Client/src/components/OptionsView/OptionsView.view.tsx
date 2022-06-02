@@ -1,29 +1,24 @@
 import React from "react"
-import { IAuthService } from "../AuthService"
 import { autorender } from "../autorender"
 import { Button } from "../Button"
-import { OptionCategoriesExplorer } from "../OptionCategoriesExplorer"
-import { OptionCategory } from "../OptionCategory"
+import * as model from "./OptionsView.model"
 import styles from "./OptionsView.module.scss"
 
-interface SidePanelContentProps {
-    categoriesExplorer: OptionCategoriesExplorer
-    authService: IAuthService
+interface OptionsViewProps {
+    view: model.OptionsView
 }
 
-export function SidePanelContent({ categoriesExplorer, authService }: SidePanelContentProps): JSX.Element {
+export function SidePanelContent({ view }: OptionsViewProps): JSX.Element {
     return autorender(() => (
         <div className={styles.sidePanelContent}>
-            {categoriesExplorer.render()}
-            <Button variant="danger" className={styles.signOut} onClick={() => authService.signOut()}>Sign out</Button>
+            {view.categoriesExplorer.render()}
+            <Button variant="danger" className={styles.signOut} onClick={() => view.authService.signOut()}>
+                Sign out
+            </Button>
         </div>
-    ), [categoriesExplorer, authService])
+    ), [view])
 }
 
-interface MainContentProps {
-    currentOptionCategory: OptionCategory
-}
-
-export function MainPanelContent({ currentOptionCategory }: MainContentProps): JSX.Element {
-    return autorender(() => <div className={styles.mainPanelContent}>{currentOptionCategory.render()}</div>, [currentOptionCategory])
+export function MainPanelContent({ view }: OptionsViewProps): JSX.Element {
+    return autorender(() => <div className={styles.mainPanelContent}>{view.currentOptionCategory.render()}</div>, [view])
 }

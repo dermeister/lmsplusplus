@@ -1,4 +1,3 @@
-import { editor } from "monaco-editor"
 import React from "react"
 import { autorender } from "../autorender"
 import { Button } from "../Button"
@@ -9,13 +8,13 @@ import { MultiselectDropdown } from "../MultiselectDropdown"
 import * as model from "./TaskEditorView.model"
 import styles from "./TaskEditorView.module.scss"
 
-interface TaskEditorSidePanelContentProps {
-    taskEditorView: model.TaskEditorView
+interface TaskEditorViewProps {
+    view: model.TaskEditorView
 }
 
-export function TaskEditorSidePanelContent({ taskEditorView }: TaskEditorSidePanelContentProps): JSX.Element {
+export function TaskEditorSidePanelContent({ view }: TaskEditorViewProps): JSX.Element {
     function createTechnologiesDropdownPlaceholder(): string {
-        const selectedTechnologies = taskEditorView.selectedTechnologies.map(t => t.name)
+        const selectedTechnologies = view.selectedTechnologies.map(t => t.name)
         if (selectedTechnologies.length === 1)
             return "1 technology selected"
         return `${selectedTechnologies.length} technologies selected`
@@ -26,39 +25,35 @@ export function TaskEditorSidePanelContent({ taskEditorView }: TaskEditorSidePan
             <Field label="Title" className={styles.field}>
                 <Input id="task-title"
                     className={styles.input}
-                    value={taskEditorView.taskTitle}
-                    onChange={e => taskEditorView.setTaskTitle(e.target.value)} />
+                    value={view.taskTitle}
+                    onChange={e => view.setTaskTitle(e.target.value)} />
             </Field>
             <Field label="Technologies" className={styles.field}>
-                <MultiselectDropdown items={taskEditorView.availableTechnologies.map(t => ({ title: t.name, value: t }))}
-                    selectedValues={taskEditorView.selectedTechnologies}
-                    onValuesChange={values => taskEditorView.setSelectedTechnologies(values)}
+                <MultiselectDropdown items={view.availableTechnologies.map(t => ({ title: t.name, value: t }))}
+                    selectedValues={view.selectedTechnologies}
+                    onValuesChange={values => view.setSelectedTechnologies(values)}
                     createPlaceholder={() => createTechnologiesDropdownPlaceholder()} />
             </Field>
             <div className={styles.buttons}>
                 <Button variant="primary"
-                    onClick={() => taskEditorView.saveTask().catch(() => { })}
+                    onClick={() => view.saveTask().catch(() => { })}
                     className={styles.primary}>
                     Save
                 </Button>
                 <Button variant="danger"
-                    onClick={() => taskEditorView.cancelTaskEditing()}
+                    onClick={() => view.cancelTaskEditing()}
                     className={styles.danger}>
                     Cancel
                 </Button>
             </div>
         </div>
-    ), [taskEditorView])
+    ), [view])
 }
 
-interface TaskEditorMainPanelContentProps {
-    description: editor.ITextModel
-}
-
-export function TaskEditorMainPanelContent({ description }: TaskEditorMainPanelContentProps): JSX.Element {
+export function TaskEditorMainPanelContent({ view }: TaskEditorViewProps): JSX.Element {
     return autorender(() => (
         <div className={styles.mainPanelContent}>
-            <MonacoEditor model={description} />
+            <MonacoEditor model={view.description} />
         </div>
-    ), [description])
+    ), [view])
 }

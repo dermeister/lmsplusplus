@@ -1,6 +1,13 @@
 @use "../library";
 
-.description {
+.side-panel-content,
+.main-panel-content {
+    @include library.full-size;
+}
+
+.task-description {
+    @include library.full-size;
+
     padding: 14px;
 
     user-select: text;
@@ -26,7 +33,7 @@
     }
 }
 
-.no-task {
+.no-task-selected {
     @include library.full-size;
 
     display: flex;

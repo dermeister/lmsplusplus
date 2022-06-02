@@ -1,5 +1,5 @@
 import React from "react"
-import { cached, Monitor, options, transaction, isnonreactive, Transaction } from "reactronic"
+import { cached, isnonreactive, Monitor, options, transaction, Transaction } from "reactronic"
 import { DatabaseContext } from "../../database"
 import * as domain from "../../domain"
 import { IErrorService } from "../ErrorService"
@@ -27,7 +27,7 @@ export class PreferencesOptionCategory extends OptionCategory {
 
     @transaction
     @options({ monitor: PreferencesOptionCategory._monitor })
-    async setDarkMode(theme: string): Promise<void> {
+    async setTheme(theme: string): Promise<void> {
         const updatedPreferences = new domain.Preferences(theme)
         try {
             await this._context.updatePreferences(updatedPreferences)

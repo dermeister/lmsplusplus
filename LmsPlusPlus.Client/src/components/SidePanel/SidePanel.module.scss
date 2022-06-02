@@ -1,14 +1,13 @@
 @use "../library";
 
 .side-panel {
+    @include library.full-size;
     @include library.shadow("right");
 
     display: flex;
     flex-direction: column;
 
     padding: 14px 0 0;
-    width: 280px;
-    height: 100%;
 
     color: library.$text-secondary;
 
@@ -63,7 +62,7 @@
     text-transform: uppercase;
 }
 
-.children {
+.side-panel-content {
     display: flex;
     flex-direction: column;
     flex-grow: 1;

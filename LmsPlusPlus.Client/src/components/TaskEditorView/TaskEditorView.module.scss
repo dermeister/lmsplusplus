@@ -5,6 +5,8 @@
 }
 
 .side-panel-content {
+    @include library.full-size;
+
     padding-left: 16px;
     padding-right: 16px;
 }

@@ -1,0 +1,12 @@
+@use "../library";
+
+.app {
+    @include library.full-size;
+
+    background-color: library.$background-primary;
+
+    color: library.$text-primary;
+    font-size: library.$text-regular;
+    font-family: "Roboto", sans-serif;
+    user-select: none;
+}

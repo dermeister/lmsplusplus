@@ -1,29 +1,17 @@
 import React from "react"
-import * as domain from "../../domain"
-import { autorender } from "../autorender"
-import { ContextMenu, IContextMenuService } from "../ContextMenuService"
-import { ITasksService } from "../ITasksService"
-import { TopicNode as TopicNode } from "./TopicNode.model"
+import { ContextMenu } from "../ContextMenuService"
+import * as model from "./TopicNode.model"
 
-interface TopicContextMenuProps {
-    node: TopicNode
-    permissions: domain.Permissions
-    tasksService: ITasksService
-    contextMenuService: IContextMenuService
-}
-
-export function renderContextMenu({ node, permissions, tasksService, contextMenuService }: TopicContextMenuProps): JSX.Element[] {
+export function renderContextMenu(node: model.TopicNode): JSX.Element[] {
     function onCreateTask(): void {
-        contextMenuService.close()
-        tasksService.createTask(node.item)
+        node.contextMenuService.close()
+        node.tasksService.createTask(node.item)
     }
 
     const contextMenuItems = []
-    if (permissions.canCreateTask)
+    if (node.permissions.canCreateTask)
         contextMenuItems.push(
-            <ContextMenu.Button variant="primary" onClick={() => onCreateTask()}>
-                New Task
-            </ContextMenu.Button>
+            <ContextMenu.Button variant="primary" onClick={() => onCreateTask()}>New Task</ContextMenu.Button>
         )
     return contextMenuItems
 }

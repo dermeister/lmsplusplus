@@ -20,7 +20,7 @@ export function SidePanel({ isOpened, shouldShowLoader, title, children }: SideP
                 <header className={combinedHeaderClassName}>
                     <h2 className={styles.title}>{title}</h2>
                 </header>
-                <div className={styles.children}>{children}</div>
+                <div className={styles.sidePanelContent}>{children}</div>
             </div>
         )
     }, [isOpened, shouldShowLoader, title, children])

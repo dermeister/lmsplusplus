@@ -1,10 +1,14 @@
+import React from "react"
 import { autorender } from "../autorender"
-import { IScreen } from "../IScreen"
+import * as model from "./App.model"
+import styles from "./App.module.scss"
 
 interface AppProps {
-    currentScreen: IScreen
+    app: model.App
 }
 
-export function App({ currentScreen }: AppProps): JSX.Element {
-    return autorender(() => currentScreen.render(), [currentScreen])
+export function App({ app }: AppProps): JSX.Element {
+    return autorender(() => (
+        <div className={styles.app}>{app.currentScreen.render()}</div>
+    ), [app])
 }

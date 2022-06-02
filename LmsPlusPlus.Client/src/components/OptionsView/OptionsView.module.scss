@@ -8,6 +8,8 @@
 }
 
 .main-panel-content {
+    @include library.full-size;
+
     padding: 14px 20% 0;
 }
 

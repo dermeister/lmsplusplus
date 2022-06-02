@@ -1,4 +1,4 @@
-import { reaction, Ref, Rx, Transaction, isnonreactive } from "reactronic"
+import { isnonreactive, reaction, Ref, Rx, Transaction } from "reactronic"
 import * as domain from "../../domain"
 import { IContextMenuService } from "../ContextMenuService"
 import { Explorer } from "../Explorer"

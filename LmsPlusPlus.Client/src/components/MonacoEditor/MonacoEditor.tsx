@@ -16,19 +16,19 @@ declare global {
 self.MonacoEnvironment = {
     getWorker(_workerId: string, label: string): Worker {
         switch (label) {
-        case "json":
-            return new jsonWorker()
-        case "css":
-            return new cssWorker()
-        case "html":
-        case "handlebars":
-        case "razor":
-            return new htmlWorker()
-        case "typescript":
-        case "javascript":
-            return new tsWorker()
-        default:
-            return new editorWorker()
+            case "json":
+                return new jsonWorker()
+            case "css":
+                return new cssWorker()
+            case "html":
+            case "handlebars":
+            case "razor":
+                return new htmlWorker()
+            case "typescript":
+            case "javascript":
+                return new tsWorker()
+            default:
+                return new editorWorker()
         }
     }
 }
@@ -50,8 +50,8 @@ export function MonacoEditor({ model }: MonacoEditorProps): JSX.Element {
                 inherit: true,
                 rules: [],
                 colors: {
-                    "editor.background": style.getPropertyValue("--background-primary"),
-                    "minimap.background": style.getPropertyValue("--background-secondary"),
+                    "editor.background": style.getPropertyValue("--background-primary").trim(),
+                    "minimap.background": style.getPropertyValue("--background-secondary").trim(),
                 }
             })
             editor.current = monaco.editor.create(ref.current, {

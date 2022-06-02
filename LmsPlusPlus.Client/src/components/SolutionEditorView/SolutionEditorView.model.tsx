@@ -15,12 +15,14 @@ export class SolutionEditorView extends View {
     @isnonreactive private readonly _viewGroup: ViewGroup
     @isnonreactive private readonly _errorService: IErrorService
     @isnonreactive private readonly _context: DatabaseContext
-    private _name: string
+    @isnonreactive private readonly _cloneUrl: string | null
+    @isnonreactive private readonly _websiteUrl: string | null
+    private _repositoryName: string | null
     private _selectedTechnology: domain.Technology | null = null
 
     override get shouldShowLoader(): boolean { return SolutionEditorView.s_monitor.isActive }
     override get title(): string { return "Solution" }
-    get name(): string { return this._name }
+    get repositoryName(): string { return this._repositoryName ?? "" }
     get selectedTechnology(): domain.Technology | null { return this._selectedTechnology }
 
     constructor(solution: domain.Solution, context: DatabaseContext, viewGroup: ViewGroup, errorService: IErrorService) {
@@ -29,13 +31,15 @@ export class SolutionEditorView extends View {
         this._errorService = errorService
         this._id = solution.id
         this._task = solution.task
-        this._name = solution.repositoryName
+        this._repositoryName = solution.repositoryName
+        this._cloneUrl = solution.cloneUrl
+        this._websiteUrl = solution.websiteUrl
         this.availableTechnologies = this._task.technologies
         this._viewGroup = viewGroup
     }
 
     override renderSidePanelContent(): JSX.Element {
-        return <view.SolutionEditorSidePanelContent solutionEditorView={this} />
+        return <view.SolutionEditorSidePanelContent view={this} />
     }
 
     override renderMainPanelContent(): JSX.Element {
@@ -43,8 +47,8 @@ export class SolutionEditorView extends View {
     }
 
     @transaction
-    setName(name: string): void {
-        this._name = name
+    setRepositoryName(name: string): void {
+        this._repositoryName = name
     }
 
     @transaction
@@ -55,7 +59,7 @@ export class SolutionEditorView extends View {
     @transaction
     @options({ monitor: SolutionEditorView.s_monitor })
     async saveSolution(): Promise<void> {
-        const solution = new domain.Solution(this._id, this._task, this._name)
+        const solution = new domain.Solution(this._id, this._task, this._repositoryName, this._cloneUrl, this._websiteUrl)
         if (!this._selectedTechnology)
             this._errorService.showError(new Error("No technology selected."))
         else

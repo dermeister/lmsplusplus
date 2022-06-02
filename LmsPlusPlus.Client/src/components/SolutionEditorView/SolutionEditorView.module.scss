@@ -1,5 +1,12 @@
 @use "../library";
 
+.side-panel-content {
+    @include library.full-size;
+
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
 .main-panel-content {
     @include library.full-size;
 
@@ -8,11 +15,6 @@
     align-items: center;
 
     font-size: 32px;
-}
-
-.form {
-    padding-left: 16px;
-    padding-right: 16px;
 }
 
 .field {
