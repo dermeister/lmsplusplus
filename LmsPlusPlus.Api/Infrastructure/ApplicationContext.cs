@@ -208,6 +208,7 @@ public class ApplicationContext : DbContext
                 .HasForeignKey(g => g.TopicId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_groups_topic_id");
+            entity.HasIndex(g => new { g.Name, g.TopicId }, name: "unq_groups_name_topic_id").IsUnique();
         });
     }
 
