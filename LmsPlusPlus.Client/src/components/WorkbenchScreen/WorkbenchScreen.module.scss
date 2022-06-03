@@ -5,7 +5,7 @@
 
     display: grid;
     grid-template-areas: "view-group-switch side-panel main-panel";
-    grid-template-columns: 74px 280px 1fr;
+    grid-template-columns: 74px auto 1fr;
 }
 
 .view-group-switch {

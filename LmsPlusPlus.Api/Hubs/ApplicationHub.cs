@@ -22,8 +22,7 @@ public class ApplicationHub : Hub
 
     public async Task<IEnumerable<ServiceConfiguration>> StartApplication(int solutionId)
     {
-        Infrastructure.Solution? solution = await _context.Solutions.Include(s => s.Repository)
-            .SingleOrDefaultAsync(s => s.Id == solutionId);
+        Infrastructure.Solution? solution = await _context.Solutions.Include(s => s.Repository).SingleOrDefaultAsync(s => s.Id == solutionId);
         if (solution is null)
             throw new ArgumentException(message: $"Invalid solution id {solution}", nameof(solutionId));
         ApplicationConfiguration applicationConfiguration = new(solution.Repository.CloneUrl, _workingDirectory);
@@ -41,13 +40,11 @@ public class ApplicationHub : Hub
     {
         if (!TryGetApplication(out Application? application))
             throw ApplicationNotStarted();
-        ReadOnlyCollection<LmsPlusPlus.Runtime.PortMapping> portMappings = await application.GetOpenedPortsAsync(serviceName);
-        return from portMapping in portMappings
-               select new PortMapping(portMapping.VirtualHostPort, portMapping.HostPort);
+        ReadOnlyCollection<Runtime.PortMapping> portMappings = await application.GetOpenedPortsAsync(serviceName);
+        return from portMapping in portMappings select new PortMapping(portMapping.VirtualHostPort, portMapping.HostPort);
     }
 
-    public async IAsyncEnumerable<ServiceBuildOutput> ReadBuildOutput(string serviceName,
-        [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<ServiceBuildOutput> ReadBuildOutput(string serviceName, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         if (!TryGetApplication(out Application? application))
             throw ApplicationNotStarted();
@@ -67,8 +64,7 @@ public class ApplicationHub : Hub
         while (buildOutput is not null);
     }
 
-    public async IAsyncEnumerable<string> ReadServiceOutput(string serviceName,
-        [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<string> ReadServiceOutput(string serviceName, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         if (!TryGetApplication(out Application? application))
             throw ApplicationNotStarted();
@@ -109,7 +105,7 @@ public class ApplicationHub : Hub
         if (TryGetApplication(out Application? application))
             try
             {
-                await _lock.WaitAsync();
+                _lock.Wait();
                 await application.DisposeAsync();
                 Context.Items.Remove(ApplicationItemKey);
             }

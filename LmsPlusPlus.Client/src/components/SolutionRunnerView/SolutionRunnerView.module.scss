@@ -7,33 +7,31 @@
     flex-direction: column;
 }
 
-.side-panel-loading-placeholder {
+.side-panel-text {
     margin-right: 16px;
     margin-left: 16px;
 }
 
-.stop-button {
+.close-button {
     @include library.shadow("all");
 
     margin: auto 16px 14px;
     padding: 4px;
 }
 
-.main-panel-loading-placeholder {
+.main-panel-content-text {
     @include library.full-size;
 
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    font-size: library.$text-large;
 }
 
 .loading-spinner {
     margin-bottom: 20px;
-}
-
-.loading-text {
-    font-size: library.$text-large;
 }
 
 .main-panel-content {

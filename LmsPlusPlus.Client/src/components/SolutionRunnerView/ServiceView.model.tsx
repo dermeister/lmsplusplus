@@ -24,6 +24,7 @@ export class ServiceView extends ObservableObject {
     @isnonreactive private readonly _serviceWorkerService: IServiceWorkerService
     @isnonreactive private readonly _messageService: IMessageService
     private _outputSubscription: ISubscription<string> | null = null
+    private _fisrtOutput = true
 
     @cached get renderers(): readonly IRenderer[] { return [this._consoleRenderer, ...this._webRenderers.values()] }
 
@@ -57,12 +58,12 @@ export class ServiceView extends ObservableObject {
         })
     }
 
-    private onBuildError(e: Error): void {
-        handleError(e, this._messageService)
+    private onBuildError(_e: Error): void {
+        this.writeError("\r\nThere was an error building the service.")
     }
 
-    private onError(e: Error): void {
-        handleError(e, this._messageService)
+    private onError(_e: Error): void {
+        this.writeError("\r\nThere was an error while running the service.")
     }
 
     private onBuildOutput(output: ServiceBuildOutput): void {
@@ -72,38 +73,52 @@ export class ServiceView extends ObservableObject {
     @transaction
     private async onBuildComplete(): Promise<void> {
         this._consoleRenderer.clear()
+        this.writeInfo("Waiting for other services to build.")
         if (this.stdin)
             this._consoleRenderer.enableStdin(input => this.onInput(input))
-        const stream = this._connection.stream("ReadServiceOutput", this.name)
-        this._outputSubscription = stream.subscribe({
-            next: value => this.onOutput(value),
-            error: error => this.onError(error),
-            complete: () => this.onComplete()
-        })
-        const portMappings = await this._connection.invoke<PortMapping[]>("GetOpenedPorts", this.name)
-        if (portMappings.length > 0) {
-            const worker = await this._serviceWorkerService.startServiceWorker()
-            if (worker) {
+        try {
+            const stream = this._connection.stream("ReadServiceOutput", this.name)
+            this._outputSubscription = stream.subscribe({
+                next: value => this.onOutput(value),
+                error: error => this.onError(error),
+                complete: () => this.onComplete()
+            })
+            const portMappings = await this._connection.invoke<PortMapping[]>("GetOpenedPorts", this.name)
+            if (portMappings.length > 0) {
+                const worker = await this._serviceWorkerService.startServiceWorker()
                 worker.postMessage(JSON.stringify(portMappings))
-                setTimeout(() => {
-                    for (const portMapping of portMappings) {
-                        const webRenderer = this._webRenderers.get(portMapping.virtualPort)
-                        webRenderer?.connectToBackend()
-                    }
-                }, 5000)
+                for (const portMapping of portMappings) {
+                    const webRenderer = this._webRenderers.get(portMapping.virtualPort)
+                    webRenderer?.connectToBackend()
+                }
             }
+        } catch (e) {
+            Transaction.off(() => handleError(e, this._messageService))
         }
     }
 
+    @transaction
     private onOutput(text: string): void {
+        if (this._fisrtOutput) {
+            this._fisrtOutput = false
+            this._consoleRenderer.clear()
+        }
         this._consoleRenderer.writeServiceOutput(text)
     }
 
     private onComplete(): void {
-        this._consoleRenderer.writeServiceOutput("\r\n\u001b[38;5;120m[INFO] Service stopped\r\n")
+        this.writeInfo("Service stopped.")
     }
 
     private async onInput(text: string): Promise<void> {
         await this._connection.invoke("WriteServiceInput", this.name, text)
+    }
+
+    private writeInfo(text: string): void {
+        this._consoleRenderer.writeServiceOutput(`\u001b[38;5;120m[INFO] ${text}\r\n\u001b[0m`)
+    }
+
+    private writeError(text: string): void {
+        this._consoleRenderer.writeServiceOutput(`\u001b[38;5;9m[ERROR] ${text}\r\n\u001b[0m`)
     }
 }

@@ -1,48 +1,46 @@
 import React from "react"
 import { autorender } from "../autorender"
 import { Button } from "../Button"
-import { ServiceViewsExplorer } from "../ServicesViewExplorer"
 import { Spinner } from "../Spinner"
-import { IRenderer } from "./IRenderer"
 import { SolutionRunnerView } from "./SolutionRunnerView.model"
 import styles from "./SolutionRunnerView.module.scss"
 
-interface SolutionRunnerProps {
-    model: SolutionRunnerView
-    serviceViewsExplorer: ServiceViewsExplorer | null
+interface SolutionRunnerViewProps {
+    view: SolutionRunnerView
 }
 
-export function SolutionRunnerSidePanelContent({ model, serviceViewsExplorer }: SolutionRunnerProps): JSX.Element {
+export function SolutionRunnerSidePanelContent({ view }: SolutionRunnerViewProps): JSX.Element {
     return autorender(() => {
-        let body: JSX.Element = <></>
-        if (serviceViewsExplorer)
-            body = serviceViewsExplorer.render()
+        let body: JSX.Element
+        if (view.serviceViewsExplorer)
+            body = view.serviceViewsExplorer.render()
+        else if (view.unableToStartApplication)
+            body = <div className={styles.sidePanelText}>Unable to start application.</div>
         else
-            body = <p className={styles.sidePanelLoadingPlaceholder}>Wait for application to load.</p>
+            body = <p className={styles.sidePanelText}>Wait for application to load.</p>
         return (
             <div className={styles.sidePanelContent}>
                 {body}
-                <Button className={styles.stopButton} variant="danger" onClick={() => model.stopSolution()}>Stop</Button>
+                <Button className={styles.closeButton} variant="danger" onClick={() => view.close()}>Close</Button>
             </div>
         )
-    }, [model, serviceViewsExplorer])
+    }, [view])
 }
 
-interface SolutionRunnerMainPanelContentProps {
-    renderers: IRenderer[] | null
-    currentRenderer: IRenderer | null
-}
-
-export function SolutionRunnerMainPanelContent({ renderers, currentRenderer }: SolutionRunnerMainPanelContentProps): JSX.Element {
+export function SolutionRunnerMainPanelContent({ view }: SolutionRunnerViewProps): JSX.Element {
     return autorender(() => {
-        if (!(renderers && currentRenderer))
-            return (
-                <div className={styles.mainPanelLoadingPlaceholder}>
+        let content: JSX.Element
+        if (view.unableToStartApplication)
+            content = <p className={styles.mainPanelContentText}>Unable to start application.</p>
+        else if (!(view.renderers && view.currentRenderer))
+            content = (
+                <div className={styles.mainPanelContentText}>
                     <Spinner className={styles.loadingSpinner} />
-                    <p className={styles.loadingText}>Wait for application to load</p>
+                    <p>Wait for application to load.</p>
                 </div>
             )
-        return <div className={styles.mainPanelContent}>{currentRenderer.render()}</div>
-    }, [renderers, currentRenderer])
+        else
+            content = view.currentRenderer.render()
+        return <div className={styles.mainPanelContent}>{content}</div>
+    }, [view])
 }
-
