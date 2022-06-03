@@ -28,4 +28,4 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - name: Run tests
-        run: dotnet test -c Release --environment "ASPNETCORE_ENVIRONMENT=CI" ./LmsPlusPlus.Api.Tests
+        run: dotnet test -c Release --environment "ASPNETCORE_ENVIRONMENT=CI"
