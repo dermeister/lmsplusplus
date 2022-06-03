@@ -1,7 +1,7 @@
 import React from "react"
 import { isnonreactive, Monitor, options, transaction, Transaction } from "reactronic"
 import { AppError } from "../../AppError"
-import { DatabaseContext } from "../../database"
+import { DatabaseContext } from "../../api"
 import * as domain from "../../domain"
 import { IMessageService } from "../MessageService"
 import { handleError } from "../utils"

@@ -1,7 +1,6 @@
 import React from "react"
 import { cached, isnonreactive, reaction, Ref, Transaction } from "reactronic"
-import { DatabaseContext } from "../../database"
-import { IAuthService } from "../AuthService"
+import { DatabaseContext, IAuthService } from "../../api"
 import { IMessageService } from "../MessageService"
 import { OptionCategoriesExplorer } from "../OptionCategoriesExplorer"
 import { OptionCategoryKind } from "../OptionCategoriesExplorer/OptionCategoriesExplorer.model"

@@ -1,8 +1,7 @@
 import React from "react"
 import { cached, isnonreactive, options, Reentrance, Transaction, transaction } from "reactronic"
-import { AppError } from "../../AppError"
+import { IAuthService } from "../../api"
 import { ObservableObject } from "../../ObservableObject"
-import { IAuthService } from "../AuthService"
 import { IScreen } from "../IScreen"
 import { IMessageService } from "../MessageService"
 import { handleError } from "../utils"
@@ -32,7 +31,6 @@ export class SignInScreen extends ObservableObject implements IScreen {
     setPassword(password: string): void {
         this._password = password
     }
-
 
     @transaction
     @options({ reentrance: Reentrance.WaitAndRestart })

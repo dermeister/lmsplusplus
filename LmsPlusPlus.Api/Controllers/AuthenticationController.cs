@@ -22,7 +22,7 @@ public class AuthenticationController : ControllerBase
                           where u.Login == signIn.Login && u.PasswordHash == signIn.Password
                           select new { u.Id, u.Role }).SingleOrDefaultAsync();
         if (user is null)
-            return BadRequest();
+            return Problem(title: "Cannot sign in.", statusCode: StatusCodes.Status400BadRequest, detail: "Invalid login or password.");
         return new Response.SignIn(_jwtGenerator.Generate(user.Id.ToString(), user.Role.ToString()));
     }
 }

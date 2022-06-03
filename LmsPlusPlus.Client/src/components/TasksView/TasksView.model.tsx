@@ -1,7 +1,7 @@
 import MarkdownIt from "markdown-it"
 import React from "react"
 import { cached, isnonreactive, Monitor, options, Ref, Transaction, transaction } from "reactronic"
-import { DatabaseContext } from "../../database"
+import { DatabaseContext } from "../../api"
 import * as domain from "../../domain"
 import { IContextMenuService } from "../ContextMenuService"
 import { IMessageService } from "../MessageService"

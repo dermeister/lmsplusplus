@@ -1,6 +1,6 @@
 import React from "react"
 import { cached, isnonreactive, Monitor, options, transaction, Transaction } from "reactronic"
-import { DatabaseContext } from "../../database"
+import { DatabaseContext } from "../../api"
 import * as domain from "../../domain"
 import { IMessageService } from "../MessageService"
 import { OptionCategory } from "../OptionCategory"

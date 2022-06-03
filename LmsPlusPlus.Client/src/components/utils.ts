@@ -10,10 +10,10 @@ export function maybeValue<T>(value: T, condition: boolean): T | undefined {
         return value
 }
 
-export function handleError(e: any, messageService: IMessageService): void {
+export function handleError(e: unknown, messageService: IMessageService): void {
     if (!(e instanceof AppError)) {
-        const message = e instanceof Error ? e.message : e.toString()
+        const message = e instanceof Error ? e.message : `${e}`
         e = new AppError("Something went wrong", message)
     }
-    messageService.showError(e)
+    messageService.showError(e as AppError)
 }

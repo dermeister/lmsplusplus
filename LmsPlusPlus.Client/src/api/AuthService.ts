@@ -2,6 +2,7 @@ import { Axios, AxiosError } from "axios"
 import { reaction, Transaction, transaction } from "reactronic"
 import { AppError } from "../AppError"
 import { ObservableObject } from "../ObservableObject"
+import * as response from "./response"
 
 export interface IAuthService {
     signIn(login: string, password: string): Promise<void>
@@ -31,8 +32,10 @@ export class AuthService extends ObservableObject implements IAuthService {
             const result = await this._api.post<{ token: string }>("/api/sign-in", { login, password })
             this._jwtToken = result.data.token
         } catch (e) {
-            if (e instanceof AxiosError && e.response?.status === 400)
-                throw new AppError("Unable to sign in.", "Invalid login or password.")
+            if (e instanceof AxiosError && e.response?.status === 400) {
+                const problemDetails = e.response.data as response.ProblemDetails
+                throw new AppError(problemDetails.title, problemDetails.detail)
+            }
             throw e
         }
     }

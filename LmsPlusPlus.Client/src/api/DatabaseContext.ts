@@ -8,7 +8,6 @@ import * as domain from "../domain"
 import { ObservableObject } from "../ObservableObject"
 import * as request from "./request"
 import * as response from "./response"
-import { ProblemDetails } from "./response/ProblemDetails"
 import { VcsAccountRegisteringModal } from "./VcsAccountRegisteringModal"
 
 export class DatabaseContext extends ObservableObject {
@@ -52,7 +51,7 @@ export class DatabaseContext extends ObservableObject {
         } catch (e) {
             if (e instanceof AxiosError) {
                 if (e.response?.status === 400) {
-                    const problemDetails = e.response.data as ProblemDetails
+                    const problemDetails = e.response.data as response.ProblemDetails
                     throw new AppError(problemDetails.title, problemDetails.detail)
                 }
             }
@@ -89,7 +88,7 @@ export class DatabaseContext extends ObservableObject {
         } catch (e) {
             if (e instanceof AxiosError) {
                 if (e.response?.status === 400) {
-                    const problemDetails = e.response.data as ProblemDetails
+                    const problemDetails = e.response.data as response.ProblemDetails
                     throw new AppError(problemDetails.title, problemDetails.detail)
                 }
             }
@@ -184,7 +183,7 @@ export class DatabaseContext extends ObservableObject {
         } catch (e) {
             if (e instanceof AxiosError) {
                 if (e.response?.status === 400) {
-                    const problemDetails = e.response.data as ProblemDetails
+                    const problemDetails = e.response.data as response.ProblemDetails
                     throw new AppError(problemDetails.title, problemDetails.detail)
                 }
             }

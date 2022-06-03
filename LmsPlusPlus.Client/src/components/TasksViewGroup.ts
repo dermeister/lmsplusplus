@@ -1,5 +1,5 @@
 import viewGroupSwitchButtonIcon from "../assets/tasks.svg"
-import { DatabaseContext } from "../database"
+import { DatabaseContext } from "../api"
 import { IContextMenuService } from "./ContextMenuService"
 import { IMessageService } from "./MessageService"
 import { TasksView } from "./TasksView"

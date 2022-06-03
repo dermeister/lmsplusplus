@@ -1,6 +1,5 @@
+import { DatabaseContext, IAuthService } from "../api"
 import viewSwitchButtonIcon from "../assets/cog.svg"
-import { DatabaseContext } from "../database"
-import { IAuthService } from "./AuthService"
 import { IMessageService } from "./MessageService"
 import { OptionsView } from "./OptionsView"
 import { ViewGroup } from "./ViewGroup"
