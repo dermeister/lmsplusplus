@@ -46,9 +46,9 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
-builder.Services.AddHttpClient();
 builder.Services.AddScoped<HostingClientFactory>();
 builder.Services.AddScoped<JwtGenerator>();
+builder.Services.AddHttpForwarder();
 WebApplication app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
