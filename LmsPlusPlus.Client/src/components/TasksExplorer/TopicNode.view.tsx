@@ -11,7 +11,7 @@ export function renderContextMenu(node: model.TopicNode): JSX.Element[] {
     const contextMenuItems = []
     if (node.permissions.canCreateTask)
         contextMenuItems.push(
-            <ContextMenu.Button variant="primary" onClick={() => onCreateTask()}>New Task</ContextMenu.Button>
+            <ContextMenu.Button key={1} variant="primary" onClick={() => onCreateTask()}>New Task</ContextMenu.Button>
         )
     return contextMenuItems
 }

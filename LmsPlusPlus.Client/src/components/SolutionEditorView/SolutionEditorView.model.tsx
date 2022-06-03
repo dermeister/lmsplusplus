@@ -1,8 +1,10 @@
 import React from "react"
 import { isnonreactive, Monitor, options, transaction, Transaction } from "reactronic"
+import { AppError } from "../../AppError"
 import { DatabaseContext } from "../../database"
 import * as domain from "../../domain"
-import { IErrorService } from "../ErrorService"
+import { IMessageService } from "../MessageService"
+import { handleError } from "../utils"
 import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
 import * as view from "./SolutionEditorView.view"
@@ -13,7 +15,7 @@ export class SolutionEditorView extends View {
     @isnonreactive private readonly _id: number
     @isnonreactive private readonly _task: domain.Task
     @isnonreactive private readonly _viewGroup: ViewGroup
-    @isnonreactive private readonly _errorService: IErrorService
+    @isnonreactive private readonly _messageService: IMessageService
     @isnonreactive private readonly _context: DatabaseContext
     @isnonreactive private readonly _cloneUrl: string | null
     @isnonreactive private readonly _websiteUrl: string | null
@@ -25,10 +27,10 @@ export class SolutionEditorView extends View {
     get repositoryName(): string { return this._repositoryName ?? "" }
     get selectedTechnology(): domain.Technology | null { return this._selectedTechnology }
 
-    constructor(solution: domain.Solution, context: DatabaseContext, viewGroup: ViewGroup, errorService: IErrorService) {
+    constructor(solution: domain.Solution, context: DatabaseContext, viewGroup: ViewGroup, messageService: IMessageService) {
         super()
         this._context = context
-        this._errorService = errorService
+        this._messageService = messageService
         this._id = solution.id
         this._task = solution.task
         this._repositoryName = solution.repositoryName
@@ -61,16 +63,13 @@ export class SolutionEditorView extends View {
     async saveSolution(): Promise<void> {
         const solution = new domain.Solution(this._id, this._task, this._repositoryName, this._cloneUrl, this._websiteUrl)
         if (!this._selectedTechnology)
-            this._errorService.showError(new Error("No technology selected."))
+            this._messageService.showError(new AppError("Cannot create solution.", "No technology selected."))
         else
             try {
                 await this._context.createSolution(solution, this._selectedTechnology)
                 this._viewGroup.returnToPreviousView()
-            } catch (error) {
-                Transaction.off(() => {
-                    if (error instanceof Error)
-                        this._errorService.showError(error)
-                })
+            } catch (e) {
+                Transaction.off(() => handleError(e, this._messageService))
             }
     }
 

@@ -5,7 +5,7 @@ import { DatabaseContext } from "../../database"
 import { ObservableObject } from "../../ObservableObject"
 import { IAuthService } from "../AuthService"
 import { ContextMenuService } from "../ContextMenuService"
-import { IErrorService } from "../ErrorService"
+import { IMessageService } from "../MessageService"
 import { IScreen } from "../IScreen"
 import { OptionsViewGroup } from "../OptionsViewGroup"
 import { SidePanel } from "../SidePanel"
@@ -20,7 +20,7 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
     @isnonreactive private readonly _optionsViewGroup: OptionsViewGroup
     @isnonreactive private readonly _contextMenuService: ContextMenuService
     @isnonreactive private readonly _context: DatabaseContext
-    @isnonreactive private readonly _errorService: IErrorService
+    @isnonreactive private readonly _messageService: IMessageService
     @isnonreactive private readonly _themeService: ThemeService
     private _currentViewGroup: ViewGroup
     private _sidePanelTitle: string
@@ -29,13 +29,13 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
     get currentViewGroup(): ViewGroup { return this._currentViewGroup }
     get viewGroups(): readonly ViewGroup[] { return [this._tasksViewGroup, this._optionsViewGroup] }
 
-    constructor(api: Axios, authService: IAuthService, errorService: IErrorService) {
+    constructor(api: Axios, authService: IAuthService, messageService: IMessageService) {
         super()
         this._contextMenuService = new ContextMenuService()
-        this._errorService = errorService
-        this._context = new DatabaseContext(api, errorService)
-        this._tasksViewGroup = new TasksViewGroup("tasks-view-group", this._context, this._contextMenuService, this._errorService)
-        this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, this._context, this._errorService)
+        this._messageService = messageService
+        this._context = new DatabaseContext(api, messageService)
+        this._tasksViewGroup = new TasksViewGroup("tasks-view-group", this._context, this._contextMenuService, this._messageService)
+        this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, this._context, this._messageService)
         this._currentViewGroup = this._tasksViewGroup
         this._sidePanelTitle = this._currentViewGroup.currentView.title
         this._sidePanelShouldShowLoader = this._currentViewGroup.currentView.shouldShowLoader

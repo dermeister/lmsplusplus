@@ -21,7 +21,7 @@ export function SignInScreen({ screen }: SignInScreenProps): JSX.Element {
 
     function onSubmit(e: React.FormEvent<HTMLFormElement>): void {
         e.preventDefault()
-        screen.signIn()
+        screen.signIn().catch(() => { })
     }
 
     return autorender(() => (

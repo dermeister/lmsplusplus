@@ -1,16 +1,16 @@
 import viewGroupSwitchButtonIcon from "../assets/tasks.svg"
 import { DatabaseContext } from "../database"
 import { IContextMenuService } from "./ContextMenuService"
-import { IErrorService } from "./ErrorService"
+import { IMessageService } from "./MessageService"
 import { TasksView } from "./TasksView"
 import { ViewGroup } from "./ViewGroup"
 
 export class TasksViewGroup extends ViewGroup {
     get iconUrl(): string { return viewGroupSwitchButtonIcon }
 
-    constructor(id: string, context: DatabaseContext, contextMenuService: IContextMenuService, errorService: IErrorService) {
+    constructor(id: string, context: DatabaseContext, contextMenuService: IContextMenuService, messageService: IMessageService) {
         super(id)
-        const tasksView = new TasksView(context, this, contextMenuService, errorService)
+        const tasksView = new TasksView(context, this, contextMenuService, messageService)
         this.openView(tasksView)
     }
 }

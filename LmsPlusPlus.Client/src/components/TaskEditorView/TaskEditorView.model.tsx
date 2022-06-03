@@ -1,9 +1,11 @@
 import * as monaco from "monaco-editor"
 import React from "react"
 import { cached, isnonreactive, Monitor, nonreactive, options, Transaction, transaction } from "reactronic"
+import { AppError } from "../../AppError"
 import { DatabaseContext } from "../../database"
 import * as domain from "../../domain"
-import { IErrorService } from "../ErrorService"
+import { IMessageService } from "../MessageService"
+import { handleError } from "../utils"
 import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
 import * as view from "./TaskEditorView.view"
@@ -17,7 +19,7 @@ export class TaskEditorView extends View {
     @isnonreactive private readonly _solutions: domain.Solution[]
     @isnonreactive private readonly _context: DatabaseContext
     @isnonreactive private readonly _viewGroup: ViewGroup
-    @isnonreactive private readonly _errorService: IErrorService
+    @isnonreactive private readonly _messageService: IMessageService
     private _taskTitle: string
     private _selectedTechnologies: readonly domain.Technology[]
 
@@ -27,9 +29,9 @@ export class TaskEditorView extends View {
     get selectedTechnologies(): readonly domain.Technology[] { return this._selectedTechnologies }
 
     constructor(task: domain.Task, availableTechnologies: readonly domain.Technology[], context: DatabaseContext, viewGroup: ViewGroup,
-        errorService: IErrorService) {
+        messageService: IMessageService) {
         super()
-        this._errorService = errorService
+        this._messageService = messageService
         this._context = context
         this._viewGroup = viewGroup
         this._id = task.id
@@ -80,10 +82,7 @@ export class TaskEditorView extends View {
                 await this._context.updateTask(task)
             this._viewGroup.returnToPreviousView()
         } catch (error) {
-            Transaction.off(() => {
-                if (error instanceof Error)
-                    return this._errorService.showError(error)
-            })
+            Transaction.off(() => handleError(error, this._messageService))
         }
     }
 

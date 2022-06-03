@@ -20,8 +20,13 @@ export function TaskEditorSidePanelContent({ view }: TaskEditorViewProps): JSX.E
         return `${selectedTechnologies.length} technologies selected`
     }
 
+    function onSubmit(e: React.FormEvent<HTMLFormElement>): void {
+        e.preventDefault()
+        view.saveTask().catch(() => { })
+    }
+
     return autorender(() => (
-        <div className={styles.sidePanelContent}>
+        <form className={styles.sidePanelContent} onSubmit={onSubmit}>
             <Field label="Title" className={styles.field}>
                 <Input id="task-title"
                     className={styles.input}
@@ -35,9 +40,7 @@ export function TaskEditorSidePanelContent({ view }: TaskEditorViewProps): JSX.E
                     createPlaceholder={() => createTechnologiesDropdownPlaceholder()} />
             </Field>
             <div className={styles.buttons}>
-                <Button variant="primary"
-                    onClick={() => view.saveTask().catch(() => { })}
-                    className={styles.primary}>
+                <Button variant="primary" className={styles.primary}>
                     Save
                 </Button>
                 <Button variant="danger"
@@ -46,7 +49,7 @@ export function TaskEditorSidePanelContent({ view }: TaskEditorViewProps): JSX.E
                     Cancel
                 </Button>
             </div>
-        </div>
+        </form>
     ), [view])
 }
 

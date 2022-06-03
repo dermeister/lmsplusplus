@@ -1,16 +1,19 @@
-import { Axios, AxiosResponse } from "axios"
+import { Axios, AxiosError, AxiosResponse } from "axios"
 import { isnonreactive, reaction, transaction, Transaction } from "reactronic"
+import { AppError } from "../AppError"
 import githubIcon from "../assets/github.svg"
-import { IErrorService } from "../components/ErrorService"
+import { IMessageService } from "../components/MessageService"
+import { handleError } from "../components/utils"
 import * as domain from "../domain"
 import { ObservableObject } from "../ObservableObject"
 import * as request from "./request"
 import * as response from "./response"
+import { ProblemDetails } from "./response/ProblemDetails"
 import { VcsAccountRegisteringModal } from "./VcsAccountRegisteringModal"
 
 export class DatabaseContext extends ObservableObject {
     @isnonreactive private readonly _api: Axios
-    @isnonreactive private readonly _errorService: IErrorService
+    @isnonreactive private readonly _messageService: IMessageService
     private _topics: domain.Topic[] = []
     private _preferences = domain.Preferences.default
     private _user = domain.User.default
@@ -27,22 +30,34 @@ export class DatabaseContext extends ObservableObject {
     get accounts(): readonly domain.Account[] { return this._accounts }
     get providers(): readonly domain.Provider[] { return this._providers }
 
-    constructor(api: Axios, errorService: IErrorService) {
+    constructor(api: Axios, messageService: IMessageService) {
         super()
         this._api = api
-        this._errorService = errorService
+        this._messageService = messageService
     }
 
     @transaction
     async createTask(task: domain.Task): Promise<void> {
         if (!this._permissions.canCreateTask)
             throw this.permissionError()
-        const { data } = await this._api.post<response.Task, AxiosResponse<response.Task>, request.CreateTask>("/api/tasks", {
-            title: task.title,
-            description: task.description,
-            topicId: task.topic.id,
-            technologyIds: task.technologies.map(t => t.id)
-        })
+        let data: response.Task
+        try {
+            const response = await this._api.post<response.Task, AxiosResponse<response.Task>, request.CreateTask>("/api/tasks", {
+                title: task.title,
+                description: task.description,
+                topicId: task.topic.id,
+                technologyIds: task.technologies.map(t => t.id)
+            })
+            data = response.data
+        } catch (e) {
+            if (e instanceof AxiosError) {
+                if (e.response?.status === 400) {
+                    const problemDetails = e.response.data as ProblemDetails
+                    throw new AppError(problemDetails.title, problemDetails.detail)
+                }
+            }
+            throw e
+        }
         this._topics = this._topics.map(t => {
             if (t.id !== task.topic.id)
                 return t
@@ -63,11 +78,23 @@ export class DatabaseContext extends ObservableObject {
     async updateTask(task: domain.Task): Promise<void> {
         if (!this._permissions.canUpdateTask)
             throw this.permissionError()
-        const { data } = await this._api.put<response.Task, AxiosResponse<response.Task>, request.UpdateTask>(`/api/tasks/${task.id}`, {
-            title: task.title,
-            description: task.description,
-            technologyIds: task.technologies.map(t => t.id)
-        })
+        let data: response.Task
+        try {
+            const response = await this._api.put<response.Task, AxiosResponse<response.Task>, request.UpdateTask>(`/api/tasks/${task.id}`, {
+                title: task.title,
+                description: task.description,
+                technologyIds: task.technologies.map(t => t.id)
+            })
+            data = response.data
+        } catch (e) {
+            if (e instanceof AxiosError) {
+                if (e.response?.status === 400) {
+                    const problemDetails = e.response.data as ProblemDetails
+                    throw new AppError(problemDetails.title, problemDetails.detail)
+                }
+            }
+            throw e
+        }
         this._topics = this._topics.map(t => {
             if (t.id !== task.topic.id)
                 return t
@@ -146,11 +173,23 @@ export class DatabaseContext extends ObservableObject {
     async createSolution(solution: domain.Solution, technology: domain.Technology): Promise<void> {
         if (!this._permissions.canCreateSolution)
             throw this.permissionError()
-        const { data } = await this._api.post<response.Solution, AxiosResponse<response.Solution>, request.Solution>("/api/solutions", {
-            repositoryName: solution.repositoryName as string,
-            taskId: solution.task.id,
-            technologyId: technology.id
-        })
+        let data: response.Solution
+        try {
+            const response = await this._api.post<response.Solution, AxiosResponse<response.Solution>, request.Solution>("/api/solutions", {
+                repositoryName: solution.repositoryName as string,
+                taskId: solution.task.id,
+                technologyId: technology.id
+            })
+            data = response.data
+        } catch (e) {
+            if (e instanceof AxiosError) {
+                if (e.response?.status === 400) {
+                    const problemDetails = e.response.data as ProblemDetails
+                    throw new AppError(problemDetails.title, problemDetails.detail)
+                }
+            }
+            throw e
+        }
         this._topics = this._topics.map(topic => {
             if (topic.id !== solution.task.topic.id)
                 return topic
@@ -189,8 +228,8 @@ export class DatabaseContext extends ObservableObject {
     }
 
     @transaction
-    private permissionError(): Error {
-        return new Error("Permission error.")
+    private permissionError(): AppError {
+        return new AppError("Permission denied.", "You don't have permission to perform this action.")
     }
 
     @reaction
@@ -218,11 +257,8 @@ export class DatabaseContext extends ObservableObject {
                 topic.tasks = topicTasks
             }
             this._topics = topics
-        } catch (error) {
-            Transaction.off(() => {
-                if (error instanceof Error)
-                    this._errorService.showError(error)
-            })
+        } catch (e) {
+            Transaction.off(() => handleError(e, this._messageService))
         }
     }
 

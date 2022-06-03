@@ -9,7 +9,8 @@ import { IServiceWorkerService } from "./IServiceWorkerService"
 import { ServiceView } from "./ServiceView.model"
 import { SolutionRunnerMainPanelContent, SolutionRunnerSidePanelContent } from "./SolutionRunnerView.view"
 import serviceWorkerUrl from "../../../service-worker?url"
-import { IErrorService } from "../ErrorService"
+import { IMessageService } from "../MessageService"
+import { AppError } from "../../AppError"
 
 interface ServiceConfiguration {
     name: string
@@ -21,7 +22,7 @@ export class SolutionRunnerView extends View implements IServiceWorkerService {
     @isnonreactive private static readonly _monitor = Monitor.create("solution-runner", 0, 0, 0)
     @isnonreactive private readonly _solution: domain.Solution
     @isnonreactive private readonly _viewGroup: ViewGroup
-    @isnonreactive private readonly _errorService: IErrorService
+    @isnonreactive private readonly _messageService: IMessageService
     private _serviceViewsExplorer: ServiceViewsExplorer | null = null
     private _connection: HubConnection | null = null
     private _serviceViews: ServiceView[] | null = null
@@ -30,11 +31,11 @@ export class SolutionRunnerView extends View implements IServiceWorkerService {
     override get title(): string { return "Run Solution" }
     override get shouldShowLoader(): boolean { return SolutionRunnerView._monitor.isActive }
 
-    constructor(solution: domain.Solution, viewGroup: ViewGroup, errorsService: IErrorService) {
+    constructor(solution: domain.Solution, viewGroup: ViewGroup, errorsService: IMessageService) {
         super()
         this._solution = solution
         this._viewGroup = viewGroup
-        this._errorService = errorsService
+        this._messageService = errorsService
     }
 
     override dispose(): void {
@@ -51,7 +52,7 @@ export class SolutionRunnerView extends View implements IServiceWorkerService {
     @options({ reentrance: Reentrance.WaitAndRestart })
     async startServiceWorker(): Promise<ServiceWorker | null> {
         if (this._serviceWorkerRegistration) {
-            this._errorService.showError(new Error("Currently only one web view per solution is supported."))
+            this._messageService.showError(new AppError("Cannot start solution.", "Currently only one web view per solution is supported."))
             return null
         } else if (navigator.serviceWorker) {
             this._serviceWorkerRegistration = await navigator.serviceWorker.register(serviceWorkerUrl, { type: "module" })
@@ -65,7 +66,7 @@ export class SolutionRunnerView extends View implements IServiceWorkerService {
                 })
             })
         } else {
-            this._errorService.showError(new Error("Service workers are not supported in this browser."))
+            this._messageService.showError(new AppError("Cannot start solution.", "Service workers are not supported in this browser."))
             return null
         }
     }
@@ -93,9 +94,9 @@ export class SolutionRunnerView extends View implements IServiceWorkerService {
         await this._connection.start()
         const serviceConfigurations = await this._connection.invoke<ServiceConfiguration[]>("StartApplication", this._solution.id)
         this._serviceViews = serviceConfigurations.map(c => new ServiceView(c.name, c.stdin, c.virtualPorts, this._connection!, this,
-            this._errorService))
+            this._messageService))
         if (this._serviceViews.length === 0)
-            this._errorService.showError(new Error("There are no services in solution."))
+            this._messageService.showError(new AppError("Cannot start solution.", "There are no services in solution."))
         else
             this._serviceViewsExplorer = new ServiceViewsExplorer(this._serviceViews)
     }

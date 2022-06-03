@@ -1,7 +1,8 @@
 import { HubConnection, ISubscription } from "@microsoft/signalr"
 import { cached, isnonreactive, Transaction, transaction } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
-import { IErrorService } from "../ErrorService"
+import { IMessageService } from "../MessageService"
+import { handleError } from "../utils"
 import { ConsoleRenderer, ServiceBuildOutput } from "./ConsoleRenderer.model"
 import { IRenderer } from "./IRenderer"
 import { IServiceWorkerService } from "./IServiceWorkerService"
@@ -21,18 +22,18 @@ export class ServiceView extends ObservableObject {
     @isnonreactive private readonly _connection: HubConnection
     @isnonreactive private readonly _buildOutputSubscription: ISubscription<ServiceBuildOutput>
     @isnonreactive private readonly _serviceWorkerService: IServiceWorkerService
-    @isnonreactive private readonly _errorService: IErrorService
+    @isnonreactive private readonly _messageService: IMessageService
     private _outputSubscription: ISubscription<string> | null = null
 
     @cached get renderers(): readonly IRenderer[] { return [this._consoleRenderer, ...this._webRenderers.values()] }
 
     constructor(name: string, stdin: boolean, virtualPorts: readonly number[], connection: HubConnection,
-        serviceWorkerService: IServiceWorkerService, errorService: IErrorService) {
+        serviceWorkerService: IServiceWorkerService, messageService: IMessageService) {
         super()
         this.name = name
         this.stdin = stdin
         this.virtualPorts = virtualPorts
-        this._errorService = errorService
+        this._messageService = messageService
         this._serviceWorkerService = serviceWorkerService
         this._consoleRenderer = new ConsoleRenderer()
         this._webRenderers = new Map(virtualPorts.map(v => [v, new WebRenderer(v)]))
@@ -56,12 +57,12 @@ export class ServiceView extends ObservableObject {
         })
     }
 
-    private onBuildError(error: Error): void {
-        this._errorService.showError(error)
+    private onBuildError(e: Error): void {
+        handleError(e, this._messageService)
     }
 
-    private onError(error: Error): void {
-        this._errorService.showError(error)
+    private onError(e: Error): void {
+        handleError(e, this._messageService)
     }
 
     private onBuildOutput(output: ServiceBuildOutput): void {

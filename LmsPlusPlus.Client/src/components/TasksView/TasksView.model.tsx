@@ -4,7 +4,7 @@ import { cached, isnonreactive, Monitor, options, Ref, Transaction, transaction 
 import { DatabaseContext } from "../../database"
 import * as domain from "../../domain"
 import { IContextMenuService } from "../ContextMenuService"
-import { IErrorService } from "../ErrorService"
+import { IMessageService } from "../MessageService"
 import { ITasksService } from "../ITasksService"
 import { SolutionEditorView } from "../SolutionEditorView"
 import { SolutionRunnerView } from "../SolutionRunnerView"
@@ -13,6 +13,7 @@ import { TasksExplorer } from "../TasksExplorer"
 import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
 import * as view from "./TasksView.view"
+import { handleError } from "../utils"
 
 export class TasksView extends View implements ITasksService {
     @isnonreactive readonly tasksExplorer: TasksExplorer
@@ -20,7 +21,7 @@ export class TasksView extends View implements ITasksService {
     @isnonreactive private static readonly _markdown = new MarkdownIt()
     @isnonreactive private readonly _context: DatabaseContext
     @isnonreactive private readonly _viewGroup: ViewGroup
-    @isnonreactive private readonly _errorService: IErrorService
+    @isnonreactive private readonly _messageService: IMessageService
 
     override get shouldShowLoader(): boolean { return TasksView._monitor.isActive }
     override get title(): string { return "Tasks" }
@@ -29,11 +30,11 @@ export class TasksView extends View implements ITasksService {
         return taskDescription ? TasksView._markdown.render(taskDescription) : null
     }
 
-    constructor(context: DatabaseContext, viewGroup: ViewGroup, contextMenuService: IContextMenuService, errorService: IErrorService) {
+    constructor(context: DatabaseContext, viewGroup: ViewGroup, contextMenuService: IContextMenuService, messageService: IMessageService) {
         super()
         this._context = context
         this._viewGroup = viewGroup
-        this._errorService = errorService
+        this._messageService = messageService
         this.tasksExplorer = new TasksExplorer(new Ref(this._context, "topics"), this, contextMenuService, new Ref(this._context, "permissions"))
     }
 
@@ -57,13 +58,13 @@ export class TasksView extends View implements ITasksService {
     @transaction
     createTask(topic: domain.Topic): void {
         const task = new domain.Task(domain.Task.NO_ID, topic, "", "", [])
-        const taskEditorView = new TaskEditorView(task, this._context.technologies, this._context, this._viewGroup, this._errorService)
+        const taskEditorView = new TaskEditorView(task, this._context.technologies, this._context, this._viewGroup, this._messageService)
         this._viewGroup.openView(taskEditorView)
     }
 
     @transaction
     updateTask(task: domain.Task): void {
-        const taskEditorView = new TaskEditorView(task, this._context.technologies, this._context, this._viewGroup, this._errorService)
+        const taskEditorView = new TaskEditorView(task, this._context.technologies, this._context, this._viewGroup, this._messageService)
         this._viewGroup.openView(taskEditorView)
     }
 
@@ -71,18 +72,15 @@ export class TasksView extends View implements ITasksService {
     async deleteTask(task: domain.Task): Promise<void> {
         try {
             await this._context.deleteTask(task)
-        } catch (error) {
-            Transaction.off(() => {
-                if (error instanceof Error)
-                    this._errorService.showError(error)
-            })
+        } catch (e) {
+            Transaction.off(() => handleError(e, this._messageService))
         }
     }
 
     @transaction
     createSolution(task: domain.Task): void {
         const solution = new domain.Solution(domain.Solution.NO_ID, task, "", null, null)
-        const solutionEditorView = new SolutionEditorView(solution, this._context, this._viewGroup, this._errorService)
+        const solutionEditorView = new SolutionEditorView(solution, this._context, this._viewGroup, this._messageService)
         this._viewGroup.openView(solutionEditorView)
     }
 
@@ -94,7 +92,7 @@ export class TasksView extends View implements ITasksService {
 
     @transaction
     runSolution(solution: domain.Solution): void {
-        const solutionRunnerView = new SolutionRunnerView(solution, this._viewGroup, this._errorService)
+        const solutionRunnerView = new SolutionRunnerView(solution, this._viewGroup, this._messageService)
         this._viewGroup.openView(solutionRunnerView)
     }
 }
