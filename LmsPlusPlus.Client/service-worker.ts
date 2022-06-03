@@ -35,6 +35,7 @@ self.addEventListener("fetch", event => {
             } else
                 newPort = portMappings.get(Number(url.port)) as number
             const headers = new Headers(request.headers)
+            headers.set("X-LmsPlusPlus-Scheme", "http")
             headers.set("X-LmsPlusPlus-Host", newHost)
             headers.set("X-LmsPlusPlus-Port", newPort.toString())
             let body: ArrayBuffer | null = null

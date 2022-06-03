@@ -30,14 +30,16 @@ public class ServiceProxyMiddleware
             });
             RequestTransformer transformer = new();
             ForwarderRequestConfig requestConfig = new() { ActivityTimeout = TimeSpan.FromSeconds(100) };
+            const string customSchemeHeader = "X-LmsPlusPlus-Scheme";
             const string customHostHeader = "X-LmsPlusPlus-Host";
             const string customPortHeader = "X-LmsPlusPlus-Port";
-            string schema = "http";
+            if (!context.Request.Headers.TryGetValue(customSchemeHeader, out StringValues scheme))
+                throw new ProxyException($"Header {customSchemeHeader} is not provided.");
             if (!context.Request.Headers.TryGetValue(customHostHeader, out StringValues host))
                 throw new ProxyException($"Header {customHostHeader} is not provided.");
             if (!context.Request.Headers.TryGetValue(customPortHeader, out StringValues port))
                 throw new ProxyException($"Header {customPortHeader} is not provided.");
-            string requestUri = $"{schema}://{host}:{port}";
+            string requestUri = $"{scheme}://{host}:{port}";
             await _forwarder.SendAsync(context, requestUri, httpClient, requestConfig, transformer);
         }
         else
