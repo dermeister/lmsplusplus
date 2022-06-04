@@ -1,18 +1,21 @@
 import { Axios, AxiosError, AxiosResponse } from "axios"
-import { isnonreactive, reaction, transaction, Transaction } from "reactronic"
+import { isnonreactive, Monitor, options, reaction, transaction, Transaction } from "reactronic"
 import { AppError } from "../AppError"
 import githubIcon from "../assets/github.svg"
 import * as domain from "../domain"
 import { ObservableObject } from "../ObservableObject"
 import { IMessageService } from "../ui/MessageService"
 import { handleError } from "../ui/utils"
+import { IAuthService } from "./AuthService"
 import * as request from "./request"
 import * as response from "./response"
 import { VcsAccountRegisteringModal } from "./VcsAccountRegisteringModal"
 
 export class Storage extends ObservableObject {
+    @isnonreactive private static readonly _monitor = Monitor.create("storage", 0, 0, 0)
     @isnonreactive private readonly _api: Axios
     @isnonreactive private readonly _messageService: IMessageService
+    @isnonreactive private readonly _authService: IAuthService
     private _topics: domain.Topic[] = []
     private _preferences = domain.Preferences.default
     private _user = domain.User.default
@@ -28,127 +31,174 @@ export class Storage extends ObservableObject {
     get permissions(): domain.Permissions { return this._permissions }
     get accounts(): readonly domain.Account[] { return this._accounts }
     get providers(): readonly domain.Provider[] { return this._providers }
+    get isLoadingData(): boolean { return Storage._monitor.isActive }
 
-    constructor(api: Axios, messageService: IMessageService) {
+    constructor(api: Axios, messageService: IMessageService, authService: IAuthService) {
         super()
         this._api = api
         this._messageService = messageService
+        this._authService = authService
     }
 
     @transaction
     async createTask(task: domain.Task): Promise<void> {
         if (!this._permissions.canCreateTask)
             throw this.permissionError()
-        let data: response.Task
         try {
-            const response = await this._api.post<response.Task, AxiosResponse<response.Task>, request.CreateTask>("/api/tasks", {
+            const { data } = await this._api.post<response.Task, AxiosResponse<response.Task>, request.CreateTask>("/api/tasks", {
                 title: task.title,
                 description: task.description,
                 topicId: task.topic.id,
                 technologyIds: task.technologies.map(t => t.id)
             })
-            data = response.data
+            this._topics = this._topics.map(t => {
+                if (t.id !== task.topic.id)
+                    return t
+                const newTopic = new domain.Topic(task.topic.id, task.topic.name)
+                const technologies = data.technologyIds.map(id => {
+                    const technology = this._technologies.find(t => t.id === id)
+                    if (!technology)
+                        throw new AppError("Cannot create task.", `Technology with id ${id} not found.`)
+                    return technology
+                })
+                const newTask = new domain.Task(data.id, task.topic, data.title, data.description, technologies)
+                newTopic.tasks = task.topic.tasks.concat(newTask)
+                return newTopic
+            })
         } catch (e) {
             if (e instanceof AxiosError) {
                 if (e.response?.status === 400) {
                     const problemDetails = e.response.data as response.ProblemDetails
                     throw new AppError(problemDetails.title, problemDetails.detail)
-                }
-            }
-            throw e
+                } else if (e.response?.status === 401) {
+                    this._authService.signOut()
+                    this._messageService.showError(new AppError("Cannot create task.", "Your session expired."))
+                } else
+                    throw e
+            } else
+                throw e
         }
-        this._topics = this._topics.map(t => {
-            if (t.id !== task.topic.id)
-                return t
-            const newTopic = new domain.Topic(task.topic.id, task.topic.name)
-            const technologies = data.technologyIds.map(id => {
-                const technology = this._technologies.find(t => t.id === id)
-                if (!technology)
-                    throw new AppError("Cannot create task.", `Technology with id ${id} not found.`)
-                return technology
-            })
-            const newTask = new domain.Task(data.id, task.topic, data.title, data.description, technologies)
-            newTopic.tasks = task.topic.tasks.concat(newTask)
-            return newTopic
-        })
     }
 
     @transaction
     async updateTask(task: domain.Task): Promise<void> {
         if (!this._permissions.canUpdateTask)
             throw this.permissionError()
-        let data: response.Task
         try {
-            const response = await this._api.put<response.Task, AxiosResponse<response.Task>, request.UpdateTask>(`/api/tasks/${task.id}`, {
+            const { data } = await this._api.put<response.Task, AxiosResponse<response.Task>, request.UpdateTask>(`/api/tasks/${task.id}`, {
                 title: task.title,
                 description: task.description,
                 technologyIds: task.technologies.map(t => t.id)
             })
-            data = response.data
+            this._topics = this._topics.map(t => {
+                if (t.id !== task.topic.id)
+                    return t
+                const newTopic = new domain.Topic(task.topic.id, task.topic.name)
+                const technologies = data.technologyIds.map(id => {
+                    const technology = this._technologies.find(t => t.id === id)
+                    if (!technology)
+                        throw new AppError("Cannot update task.", `Technology with id ${id} not found.`)
+                    return technology
+                })
+                const newTask = new domain.Task(data.id, task.topic, data.title, data.description, technologies)
+                newTopic.tasks = task.topic.tasks.map(t => {
+                    if (t.id !== task.id)
+                        return t
+                    return newTask
+                })
+                return newTopic
+            })
         } catch (e) {
             if (e instanceof AxiosError) {
                 if (e.response?.status === 400) {
                     const problemDetails = e.response.data as response.ProblemDetails
                     throw new AppError(problemDetails.title, problemDetails.detail)
-                }
-            }
-            throw e
+                } else if (e.response?.status === 401) {
+                    this._authService.signOut()
+                    this._messageService.showError(new AppError("Cannot update task.", "Your session expired."))
+                } else
+                    throw e
+            } else
+                throw e
         }
-        this._topics = this._topics.map(t => {
-            if (t.id !== task.topic.id)
-                return t
-            const newTopic = new domain.Topic(task.topic.id, task.topic.name)
-            const technologies = data.technologyIds.map(id => {
-                const technology = this._technologies.find(t => t.id === id)
-                if (!technology)
-                    throw new AppError("Cannot update task.", `Technology with id ${id} not found.`)
-                return technology
-            })
-            const newTask = new domain.Task(data.id, task.topic, data.title, data.description, technologies)
-            newTopic.tasks = task.topic.tasks.map(t => {
-                if (t.id !== task.id)
-                    return t
-                return newTask
-            })
-            return newTopic
-        })
     }
 
     @transaction
     async deleteTask(task: domain.Task): Promise<void> {
         if (!this._permissions.canDeleteTask)
             throw this.permissionError()
-        await this._api.delete(`/api/tasks/${task.id}`)
-        this._topics = this._topics.map(t => {
-            if (t.id !== task.topic.id)
-                return t
-            const newTopic = new domain.Topic(t.id, t.name)
-            newTopic.tasks = t.tasks.filter(t => t.id !== task.id)
-            return newTopic
-        })
+        try {
+            await this._api.delete(`/api/tasks/${task.id}`)
+            this._topics = this._topics.map(t => {
+                if (t.id !== task.topic.id)
+                    return t
+                const newTopic = new domain.Topic(t.id, t.name)
+                newTopic.tasks = t.tasks.filter(t => t.id !== task.id)
+                return newTopic
+            })
+        } catch (e) {
+            if (e instanceof AxiosError && e.response?.status === 401) {
+                this._authService.signOut()
+                this._messageService.showError(new AppError("Cannot delete task.", "Your session expired."))
+            } else
+                throw e
+        }
     }
 
     @transaction
     async updatePreferences(preferences: domain.Preferences): Promise<void> {
-        const { data } = await this._api.put<response.Preferences, AxiosResponse<response.Preferences>, request.Preferences>("/api/preferences", {
-            theme: preferences.theme
-        })
-        this._preferences = new domain.Preferences(data.theme)
+        try {
+            const { data } = await this._api.put<response.Preferences, AxiosResponse<response.Preferences>, request.Preferences>("/api/preferences", {
+                theme: preferences.theme
+            })
+            this._preferences = new domain.Preferences(data.theme)
+        } catch (e) {
+            if (e instanceof AxiosError && e.response?.status === 401) {
+                this._authService.signOut()
+                this._messageService.showError(new AppError("Cannot update preferences.", "Your session expired."))
+            } else
+                throw e
+        }
     }
 
     @transaction
     async addAccount(provider: domain.Provider): Promise<void> {
         const vcsAccountRegisteringModal = new VcsAccountRegisteringModal()
-        const { data: authorizationUrl } = await this._api.get<string>(`/api/oauth/authorization-url/${provider.id}`)
-        await vcsAccountRegisteringModal.registerAccount(authorizationUrl)
-        this._accounts = await this.fetchVcsAccounts(this._providers)
+        try {
+            const { data: authorizationUrl } = await this._api.get<string>(`/api/oauth/authorization-url/${provider.id}`)
+            await vcsAccountRegisteringModal.registerAccount(authorizationUrl)
+        } catch (e) {
+            if (e instanceof AxiosError && e.response?.status === 401) {
+                this._authService.signOut()
+                this._messageService.showError(new AppError("Cannot add account.", "Your session expired."))
+            } else
+                throw e
+        }
+        try {
+            this._accounts = await this.fetchVcsAccounts(this._providers)
+        } catch (e) {
+            if (e instanceof AxiosError && e.response?.status === 401) {
+                this._authService.signOut()
+                this._messageService.showError(new AppError("Cannot refresh account list.", "Your session expired."))
+            } else
+                throw e
+        }
     }
 
     @transaction
     async deleteAccount(account: domain.Account): Promise<void> {
         if (!this._permissions.canUpdateVcsConfiguration)
             throw this.permissionError()
-        await this._api.delete(`/api/vcs-accounts/${account.id}`)
+        try {
+
+            await this._api.delete(`/api/vcs-accounts/${account.id}`)
+        } catch (e) {
+            if (e instanceof AxiosError && e.response?.status === 401) {
+                this._authService.signOut()
+                this._messageService.showError(new AppError("Cannot delete task.", "Your session expired."))
+            } else
+                throw e
+        }
         this._accounts = this._accounts.filter(a => a.id !== account.id)
     }
 
@@ -156,74 +206,93 @@ export class Storage extends ObservableObject {
     async setActiveAccount(account: domain.Account): Promise<void> {
         if (!this._permissions.canUpdateVcsConfiguration)
             throw this.permissionError()
-        const { data } = await this._api.put<response.VcsAccount, AxiosResponse<response.VcsAccount>, request.VcsAccount>(
-            `/api/vcs-accounts/${account.id}`, { isActive: true })
-        if (data.isActive)
-            this._accounts = this._accounts.map(a => {
-                if (a.isActive)
-                    return new domain.Account(a.id, a.provider, a.name, false)
-                if (a.id !== account.id)
-                    return a
-                return new domain.Account(a.id, a.provider, a.name, true)
-            })
+        try {
+            const { data } = await this._api.put<response.VcsAccount, AxiosResponse<response.VcsAccount>, request.VcsAccount>(
+                `/api/vcs-accounts/${account.id}`, { isActive: true })
+            if (data.isActive)
+                this._accounts = this._accounts.map(a => {
+                    if (a.isActive)
+                        return new domain.Account(a.id, a.provider, a.name, false)
+                    if (a.id !== account.id)
+                        return a
+                    return new domain.Account(a.id, a.provider, a.name, true)
+                })
+
+        } catch (e) {
+            if (e instanceof AxiosError && e.response?.status === 401) {
+                this._authService.signOut()
+                this._messageService.showError(new AppError("Cannot set active account.", "Your session expired."))
+            } else
+                throw e
+        }
     }
 
     @transaction
     async createSolution(solution: domain.Solution, technology: domain.Technology): Promise<void> {
         if (!this._permissions.canCreateSolution)
             throw this.permissionError()
-        let data: response.Solution
         try {
-            const response = await this._api.post<response.Solution, AxiosResponse<response.Solution>, request.Solution>("/api/solutions", {
+            const { data } = await this._api.post<response.Solution, AxiosResponse<response.Solution>, request.Solution>("/api/solutions", {
                 repositoryName: solution.repositoryName as string,
                 taskId: solution.task.id,
                 technologyId: technology.id
             })
-            data = response.data
+            this._topics = this._topics.map(topic => {
+                if (topic.id !== solution.task.topic.id)
+                    return topic
+                const newTopic = new domain.Topic(topic.id, topic.name)
+                newTopic.tasks = topic.tasks.map(task => {
+                    if (task.id !== solution.task.id)
+                        return task
+                    const newTask = new domain.Task(solution.task.id, newTopic, solution.task.title, solution.task.description,
+                        solution.task.technologies)
+                    const newSolution = new domain.Solution(data.id, newTask, null, data.cloneUrl, data.websiteUrl)
+                    newTask.solutions = task.solutions.concat(newSolution)
+                    return newTask
+                })
+                return newTopic
+            })
         } catch (e) {
             if (e instanceof AxiosError) {
                 if (e.response?.status === 400) {
                     const problemDetails = e.response.data as response.ProblemDetails
                     throw new AppError(problemDetails.title, problemDetails.detail)
-                }
+                } else if (e.response?.status === 401) {
+                    this._authService.signOut()
+                    this._messageService.showError(new AppError("Cannot create solution.", "Your session expired."))
+                } else
+                    throw e
             }
             throw e
         }
-        this._topics = this._topics.map(topic => {
-            if (topic.id !== solution.task.topic.id)
-                return topic
-            const newTopic = new domain.Topic(topic.id, topic.name)
-            newTopic.tasks = topic.tasks.map(task => {
-                if (task.id !== solution.task.id)
-                    return task
-                const newTask = new domain.Task(solution.task.id, newTopic, solution.task.title, solution.task.description,
-                    solution.task.technologies)
-                const newSolution = new domain.Solution(data.id, newTask, null, data.cloneUrl, data.websiteUrl)
-                newTask.solutions = task.solutions.concat(newSolution)
-                return newTask
-            })
-            return newTopic
-        })
     }
 
     @transaction
     async deleteSolution(solution: domain.Solution): Promise<void> {
         if (!this._permissions.canDeleteSolution)
             throw this.permissionError()
-        await this._api.delete(`/api/solutions/${solution.id}`)
-        this._topics = this._topics.map(topic => {
-            if (topic.id !== solution.task.topic.id)
-                return topic
-            const newTopic = new domain.Topic(topic.id, topic.name)
-            newTopic.tasks = topic.tasks.map(task => {
-                if (task.id !== solution.task.id)
-                    return task
-                const newTask = new domain.Task(task.id, newTopic, task.title, task.description, task.technologies)
-                newTask.solutions = task.solutions.filter(s => s.id !== solution.id)
-                return newTask
+        try {
+            await this._api.delete(`/api/solutions/${solution.id}`)
+            this._topics = this._topics.map(topic => {
+                if (topic.id !== solution.task.topic.id)
+                    return topic
+                const newTopic = new domain.Topic(topic.id, topic.name)
+                newTopic.tasks = topic.tasks.map(task => {
+                    if (task.id !== solution.task.id)
+                        return task
+                    const newTask = new domain.Task(task.id, newTopic, task.title, task.description, task.technologies)
+                    newTask.solutions = task.solutions.filter(s => s.id !== solution.id)
+                    return newTask
+                })
+                return newTopic
             })
-            return newTopic
-        })
+        } catch (e) {
+            if (e instanceof AxiosError && e.response?.status === 401) {
+                this._authService.signOut()
+                this._messageService.showError(new AppError("Cannot delete solution.", "Your session expired."))
+            } else
+                throw e
+        }
     }
 
     @transaction
@@ -232,7 +301,8 @@ export class Storage extends ObservableObject {
     }
 
     @reaction
-    private async fetchDataFromApi(): Promise<void> {
+    @options({ monitor: Storage._monitor })
+    private async fetchData(): Promise<void> {
         try {
             const user = this.fetchUser()
             const preferences = this.fetchPreferences()
@@ -259,7 +329,11 @@ export class Storage extends ObservableObject {
             this._technologies = await technologies
             this._topics = await topics
         } catch (e) {
-            Transaction.off(() => handleError(e, this._messageService))
+            if (e instanceof AxiosError && e.response?.status === 401) {
+                this._authService.signOut()
+                this._messageService.showError(new AppError("Cannot fetch data.", "Your session expired."))
+            } else
+                Transaction.off(() => handleError(e, this._messageService))
         }
     }
 

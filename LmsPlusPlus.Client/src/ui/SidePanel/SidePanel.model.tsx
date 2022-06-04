@@ -1,5 +1,5 @@
 import React from "react"
-import { cached, Ref, Rx, Transaction, transaction, isnonreactive } from "reactronic"
+import { cached, isnonreactive, Ref, Rx, Transaction, transaction } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import * as view from "./SidePanel.view"
 

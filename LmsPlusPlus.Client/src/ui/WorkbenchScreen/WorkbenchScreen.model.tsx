@@ -27,20 +27,21 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
 
     get currentViewGroup(): ViewGroup { return this._currentViewGroup }
     get viewGroups(): readonly ViewGroup[] { return [this._tasksViewGroup, this._optionsViewGroup] }
+    private get sidePanelShouldShowLoader(): boolean { return this._sidePanelShouldShowLoader || this._storage.isLoadingData }
 
     constructor(api: Axios, authService: IAuthService, messageService: IMessageService) {
         super()
         this._contextMenuService = new ContextMenuService()
         this._messageService = messageService
-        this._storage = new Storage(api, messageService)
+        this._storage = new Storage(api, messageService, authService)
         this._tasksViewGroup = new TasksViewGroup("tasks-view-group", this._storage, this._contextMenuService, this._messageService)
         this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, this._storage, this._messageService)
         this._currentViewGroup = this._tasksViewGroup
         this._sidePanelTitle = this._currentViewGroup.currentView.title
         this._sidePanelShouldShowLoader = this._currentViewGroup.currentView.shouldShowLoader
         const titleRef = new Ref(this, "_sidePanelTitle")
-        const isPulsingRef = new Ref(this, "_sidePanelShouldShowLoader")
-        this.sidePanel = new SidePanel(titleRef, isPulsingRef)
+        const shouldShowLoaderRef = new Ref(this, "sidePanelShouldShowLoader")
+        this.sidePanel = new SidePanel(titleRef, shouldShowLoaderRef)
         this._themeService = new ThemeService(new Ref(this, "theme"))
     }
 

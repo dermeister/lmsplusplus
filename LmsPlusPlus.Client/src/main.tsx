@@ -4,7 +4,7 @@ import { Transaction } from "reactronic"
 import "xterm/css/xterm.css"
 import { App } from "./ui/App"
 import { autorender } from "./ui/autorender"
-import "./components/index.scss"
+import "./ui/index.scss"
 
 const app = Transaction.run(null, () => new App())
 
