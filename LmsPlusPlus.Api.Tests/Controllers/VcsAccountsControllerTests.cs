@@ -72,8 +72,7 @@ public class VcsAccountsControllerTests : IAsyncLifetime
     public async Task DeleteAccountUnauthorized()
     {
         // Arrange
-        HttpRequestMessage requestMessage =
-            Utils.CreateHttpRequestMessage($"vcs-accounts/{_data.Account.Id}", HttpMethod.Delete, jwt: null);
+        HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage($"vcs-accounts/{_data.Account.Id}", HttpMethod.Delete, jwt: null);
 
         // Act
         HttpResponseMessage responseMessage = await _app.Client.SendAsync(requestMessage);

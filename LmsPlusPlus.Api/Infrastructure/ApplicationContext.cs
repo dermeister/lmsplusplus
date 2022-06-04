@@ -19,20 +19,7 @@ public class ApplicationContext : DbContext
 
     static ApplicationContext() => NpgsqlConnection.GlobalTypeMapper.MapEnum<Role>();
 
-    public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
-    {
-        Database.Migrate();
-        var connection = (NpgsqlConnection)Database.GetDbConnection();
-        connection.Open();
-        try
-        {
-            connection.ReloadTypes();
-        }
-        finally
-        {
-            connection.Close();
-        }
-    }
+    public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

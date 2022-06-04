@@ -1,5 +1,5 @@
 import { defineConfig } from "vite"
-import reactRefresh from "@vitejs/plugin-react-refresh"
+import react from "@vitejs/plugin-react"
 import { readFileSync } from "fs"
 import { resolve } from "path"
 import { ServerOptions } from "https"
@@ -8,7 +8,7 @@ export default defineConfig({
     build: { target: "es2015" },
     esbuild: { target: "es2015" },
     css: { modules: { localsConvention: "camelCaseOnly" } },
-    plugins: [reactRefresh()],
+    plugins: [react({ babel: { parserOpts: { plugins: ["decorators-legacy"] } } })],
     server: {
         https: getHTTPSConfiguration(),
         proxy: {

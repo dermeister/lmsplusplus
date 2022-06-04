@@ -1,8 +1,7 @@
 import * as monaco from "monaco-editor"
 import React from "react"
 import { cached, isnonreactive, Monitor, nonreactive, options, Transaction, transaction } from "reactronic"
-import { AppError } from "../../AppError"
-import { DatabaseContext } from "../../api"
+import { Storage } from "../../api"
 import * as domain from "../../domain"
 import { IMessageService } from "../MessageService"
 import { handleError } from "../utils"
@@ -17,7 +16,7 @@ export class TaskEditorView extends View {
     @isnonreactive private readonly _id: number
     @isnonreactive private readonly _topic: domain.Topic
     @isnonreactive private readonly _solutions: domain.Solution[]
-    @isnonreactive private readonly _context: DatabaseContext
+    @isnonreactive private readonly _storage: Storage
     @isnonreactive private readonly _viewGroup: ViewGroup
     @isnonreactive private readonly _messageService: IMessageService
     private _taskTitle: string
@@ -28,11 +27,11 @@ export class TaskEditorView extends View {
     get taskTitle(): string { return this._taskTitle }
     get selectedTechnologies(): readonly domain.Technology[] { return this._selectedTechnologies }
 
-    constructor(task: domain.Task, availableTechnologies: readonly domain.Technology[], context: DatabaseContext, viewGroup: ViewGroup,
+    constructor(task: domain.Task, availableTechnologies: readonly domain.Technology[], storage: Storage, viewGroup: ViewGroup,
         messageService: IMessageService) {
         super()
         this._messageService = messageService
-        this._context = context
+        this._storage = storage
         this._viewGroup = viewGroup
         this._id = task.id
         this._topic = task.topic
@@ -77,9 +76,9 @@ export class TaskEditorView extends View {
         task.solutions = this._solutions
         try {
             if (this._id === domain.Task.NO_ID)
-                await this._context.createTask(task)
+                await this._storage.createTask(task)
             else
-                await this._context.updateTask(task)
+                await this._storage.updateTask(task)
             this._viewGroup.returnToPreviousView()
         } catch (error) {
             Transaction.off(() => handleError(error, this._messageService))

@@ -78,7 +78,7 @@ class Repository
                                              select subdirectory;
         enumerationOptions = new EnumerationOptions()
         {
-            AttributesToSkip = 0,
+            AttributesToSkip = 0, // Need to figure out if symbolic links will break this approach
             RecurseSubdirectories = true
         };
         foreach (string subdirectory in subdirectories)

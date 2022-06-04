@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using LmsPlusPlus.Api.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LmsPlusPlus.Api.Tests;

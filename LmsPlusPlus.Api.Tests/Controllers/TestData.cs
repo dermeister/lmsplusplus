@@ -88,7 +88,8 @@ class TestData
             Name = "account",
             AccessToken = "token",
             HostingProvider = vcsHostingProvider,
-            UserId = solver.Id
+            UserId = solver.Id,
+            IsActive = true
         };
         Infrastructure.VcsAccount templateAccount = new()
         {

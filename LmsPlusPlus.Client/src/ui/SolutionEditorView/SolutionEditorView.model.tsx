@@ -1,7 +1,7 @@
 import React from "react"
 import { isnonreactive, Monitor, options, transaction, Transaction } from "reactronic"
+import { Storage } from "../../api"
 import { AppError } from "../../AppError"
-import { DatabaseContext } from "../../api"
 import * as domain from "../../domain"
 import { IMessageService } from "../MessageService"
 import { handleError } from "../utils"
@@ -16,7 +16,7 @@ export class SolutionEditorView extends View {
     @isnonreactive private readonly _task: domain.Task
     @isnonreactive private readonly _viewGroup: ViewGroup
     @isnonreactive private readonly _messageService: IMessageService
-    @isnonreactive private readonly _context: DatabaseContext
+    @isnonreactive private readonly _storage: Storage
     @isnonreactive private readonly _cloneUrl: string | null
     @isnonreactive private readonly _websiteUrl: string | null
     private _repositoryName: string | null
@@ -27,9 +27,9 @@ export class SolutionEditorView extends View {
     get repositoryName(): string { return this._repositoryName ?? "" }
     get selectedTechnology(): domain.Technology | null { return this._selectedTechnology }
 
-    constructor(solution: domain.Solution, context: DatabaseContext, viewGroup: ViewGroup, messageService: IMessageService) {
+    constructor(solution: domain.Solution, storage: Storage, viewGroup: ViewGroup, messageService: IMessageService) {
         super()
-        this._context = context
+        this._storage = storage
         this._messageService = messageService
         this._id = solution.id
         this._task = solution.task
@@ -66,7 +66,7 @@ export class SolutionEditorView extends View {
             this._messageService.showError(new AppError("Cannot create solution.", "No technology selected."))
         else
             try {
-                await this._context.createSolution(solution, this._selectedTechnology)
+                await this._storage.createSolution(solution, this._selectedTechnology)
                 this._viewGroup.returnToPreviousView()
             } catch (e) {
                 Transaction.off(() => handleError(e, this._messageService))

@@ -2,15 +2,15 @@ import { Axios, AxiosError, AxiosResponse } from "axios"
 import { isnonreactive, reaction, transaction, Transaction } from "reactronic"
 import { AppError } from "../AppError"
 import githubIcon from "../assets/github.svg"
-import { IMessageService } from "../components/MessageService"
-import { handleError } from "../components/utils"
 import * as domain from "../domain"
 import { ObservableObject } from "../ObservableObject"
+import { IMessageService } from "../ui/MessageService"
+import { handleError } from "../ui/utils"
 import * as request from "./request"
 import * as response from "./response"
 import { VcsAccountRegisteringModal } from "./VcsAccountRegisteringModal"
 
-export class DatabaseContext extends ObservableObject {
+export class Storage extends ObservableObject {
     @isnonreactive private readonly _api: Axios
     @isnonreactive private readonly _messageService: IMessageService
     private _topics: domain.Topic[] = []
@@ -64,7 +64,7 @@ export class DatabaseContext extends ObservableObject {
             const technologies = data.technologyIds.map(id => {
                 const technology = this._technologies.find(t => t.id === id)
                 if (!technology)
-                    throw new Error(`Technology with id ${id} not found.`)
+                    throw new AppError("Cannot create task.", `Technology with id ${id} not found.`)
                 return technology
             })
             const newTask = new domain.Task(data.id, task.topic, data.title, data.description, technologies)
@@ -101,7 +101,7 @@ export class DatabaseContext extends ObservableObject {
             const technologies = data.technologyIds.map(id => {
                 const technology = this._technologies.find(t => t.id === id)
                 if (!technology)
-                    throw new Error(`Technology with id ${id} not found.`)
+                    throw new AppError("Cannot update task.", `Technology with id ${id} not found.`)
                 return technology
             })
             const newTask = new domain.Task(data.id, task.topic, data.title, data.description, technologies)
@@ -234,28 +234,30 @@ export class DatabaseContext extends ObservableObject {
     @reaction
     private async fetchDataFromApi(): Promise<void> {
         try {
-            this._user = await this.fetchUser()
-            this._preferences = await this.fetchPreferences()
-            const permissions = await this.fetchPermissions()
-            this._permissions = permissions
-            if (permissions.canUpdateVcsConfiguration) {
+            const user = this.fetchUser()
+            const preferences = this.fetchPreferences()
+            const permissions = this.fetchPermissions()
+            const technologies = this.fetchTechnologies()
+            const topics = this.fetchTopics()
+            await Promise.all([user, preferences, permissions, technologies, topics])
+            if ((await permissions).canUpdateVcsConfiguration) {
                 const providers = await this.fetchVcsHostingProviders()
                 this._providers = providers
                 const accounts = await this.fetchVcsAccounts(providers)
                 this._accounts = accounts
             }
-            const technologies = await this.fetchTechnologies()
-            this._technologies = technologies
-            let topics = await this.fetchTopics()
-            let tasks = await this.fetchTasks(topics, technologies)
+            const tasks = await this.fetchTasks(await topics, await technologies)
             const solutions = await this.fetchSolutions(tasks)
-            for (const topic of topics) {
-                const topicTasks = tasks.filter(t => t.topic.id === topic.id)
-                for (const task of topicTasks)
+            for (const topic of await topics) {
+                topic.tasks = tasks.filter(t => t.topic.id === topic.id)
+                for (const task of topic.tasks)
                     task.solutions = solutions.filter(s => s.task.id === task.id)
-                topic.tasks = topicTasks
             }
-            this._topics = topics
+            this._user = await user
+            this._preferences = await preferences
+            this._permissions = await permissions
+            this._technologies = await technologies
+            this._topics = await topics
         } catch (e) {
             Transaction.off(() => handleError(e, this._messageService))
         }
@@ -287,7 +289,7 @@ export class DatabaseContext extends ObservableObject {
         return data.map(a => {
             const provider = providers.find(p => p.id === a.hostingProviderId)
             if (!provider)
-                throw new Error(`Provider with id ${a.hostingProviderId} not found.`)
+                throw new AppError("Cannot fetch accounts.", `Provider with id ${a.hostingProviderId} not found.`)
             return new domain.Account(a.id, provider, a.name, a.isActive)
         })
     }
@@ -307,11 +309,11 @@ export class DatabaseContext extends ObservableObject {
         return data.map(t => {
             const topic = topics.find(topic => topic.id === t.topicId)
             if (!topic)
-                throw new Error(`Topic with id ${t.topicId} not found.`)
+                throw new AppError("Cannot fetch tasks.", `Topic with id ${t.topicId} not found.`)
             const taskTechnologies = t.technologyIds.map(id => {
                 const technology = allTechnologies.find(technology => technology.id === id)
                 if (!technology)
-                    throw new Error(`Technology with id ${id} not found.`)
+                    throw new AppError("Cannot fetch tasks.", `Technology with id ${id} not found.`)
                 return technology
             })
             const task = new domain.Task(t.id, topic, t.title, t.description, taskTechnologies)
@@ -324,7 +326,7 @@ export class DatabaseContext extends ObservableObject {
         return data.map(s => {
             const task = tasks.find(t => t.id === s.taskId)
             if (!task)
-                throw new Error(`Task with id ${s.taskId} not found.`)
+                throw new AppError("Cannot fetch solutions.", `Task with id ${s.taskId} not found.`)
             return new domain.Solution(s.id, task, null, s.cloneUrl, s.websiteUrl)
         })
     }

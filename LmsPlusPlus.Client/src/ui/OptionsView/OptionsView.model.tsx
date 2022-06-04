@@ -1,6 +1,6 @@
 import React from "react"
 import { cached, isnonreactive, reaction, Ref, Transaction } from "reactronic"
-import { DatabaseContext, IAuthService } from "../../api"
+import { IAuthService, Storage } from "../../api"
 import { IMessageService } from "../MessageService"
 import { OptionCategoriesExplorer } from "../OptionCategoriesExplorer"
 import { OptionCategoryKind } from "../OptionCategoriesExplorer/OptionCategoriesExplorer.model"
@@ -22,12 +22,12 @@ export class OptionsView extends View {
     override get title(): string { return "Options" }
     get currentOptionCategory(): OptionCategory { return this._currentOptionCategory }
 
-    constructor(authService: IAuthService, context: DatabaseContext, messageService: IMessageService) {
+    constructor(authService: IAuthService, storage: Storage, messageService: IMessageService) {
         super()
         this._messageService = messageService
-        this.categoriesExplorer = new OptionCategoriesExplorer(new Ref(context, "permissions"))
-        this._preferencesOptionCategory = new PreferencesOptionCategory(context, messageService)
-        this._vcsOptionCategory = new VcsOptionCategory(context, messageService)
+        this.categoriesExplorer = new OptionCategoriesExplorer(new Ref(storage, "permissions"))
+        this._preferencesOptionCategory = new PreferencesOptionCategory(storage, messageService)
+        this._vcsOptionCategory = new VcsOptionCategory(storage, messageService)
         this._currentOptionCategory = this._preferencesOptionCategory
         this.authService = authService
     }

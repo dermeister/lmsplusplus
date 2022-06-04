@@ -2,7 +2,13 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Build Api",
+      "label": "Restore dependencies",
+      "type": "shell",
+      "command": "npm i --prefix ./LmsPlusPlus.Client && dotnet restore && dotnet tool restore",
+      "problemMatcher": []
+    },
+    {
+      "label": "Build API",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -10,14 +16,10 @@
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Run Api",
+      "label": "Run API",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -27,33 +29,39 @@
         "--project",
         "LmsPlusPlus.Api/LmsPlusPlus.Api.csproj"
       ],
-      "problemMatcher": "$msCompile",
-      "isBackground": true
+      "problemMatcher": [],
     },
     {
-      "label": "Lint Client",
+      "label": "Run client",
+      "type": "npm",
+      "script": "dev",
+      "path": "LmsPlusPlus.Client",
+      "problemMatcher": [],
+    },
+    {
+      "label": "Run application",
+      "dependsOn": [
+        "Run API",
+        "Run client"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Run TSC",
+      "type": "npm",
+      "path": "LmsPlusPlus.Client",
+      "script": "tsc",
+      "isBackground": true,
+      "problemMatcher": "$tsc-watch"
+    },
+    {
+      "label": "Lint client",
       "type": "npm",
       "script": "lint",
       "path": "LmsPlusPlus.Client",
       "problemMatcher": [
         "$eslint-stylish"
       ]
-    },
-    {
-      "label": "Run Client",
-      "type": "npm",
-      "script": "dev",
-      "path": "LmsPlusPlus.Client",
-      "problemMatcher": [],
-      "isBackground": true
-    },
-    {
-      "label": "Run App",
-      "dependsOn": [
-        "Run Api",
-        "Run Client"
-      ],
-      "problemMatcher": []
     }
   ]
 }

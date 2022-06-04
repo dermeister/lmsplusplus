@@ -1,7 +1,7 @@
 import { Axios } from "axios"
 import React from "react"
 import { cached, isnonreactive, reaction, Ref, Transaction, transaction } from "reactronic"
-import { DatabaseContext, IAuthService } from "../../api"
+import { IAuthService, Storage } from "../../api"
 import { ObservableObject } from "../../ObservableObject"
 import { ContextMenuService } from "../ContextMenuService"
 import { IScreen } from "../IScreen"
@@ -18,7 +18,7 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
     @isnonreactive private readonly _tasksViewGroup: TasksViewGroup
     @isnonreactive private readonly _optionsViewGroup: OptionsViewGroup
     @isnonreactive private readonly _contextMenuService: ContextMenuService
-    @isnonreactive private readonly _context: DatabaseContext
+    @isnonreactive private readonly _storage: Storage
     @isnonreactive private readonly _messageService: IMessageService
     @isnonreactive private readonly _themeService: ThemeService
     private _currentViewGroup: ViewGroup
@@ -32,9 +32,9 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
         super()
         this._contextMenuService = new ContextMenuService()
         this._messageService = messageService
-        this._context = new DatabaseContext(api, messageService)
-        this._tasksViewGroup = new TasksViewGroup("tasks-view-group", this._context, this._contextMenuService, this._messageService)
-        this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, this._context, this._messageService)
+        this._storage = new Storage(api, messageService)
+        this._tasksViewGroup = new TasksViewGroup("tasks-view-group", this._storage, this._contextMenuService, this._messageService)
+        this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, this._storage, this._messageService)
         this._currentViewGroup = this._tasksViewGroup
         this._sidePanelTitle = this._currentViewGroup.currentView.title
         this._sidePanelShouldShowLoader = this._currentViewGroup.currentView.shouldShowLoader
@@ -49,7 +49,7 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
             this.sidePanel.dispose()
             this._tasksViewGroup.dispose()
             this._optionsViewGroup.dispose()
-            this._context.dispose()
+            this._storage.dispose()
             this._themeService.dispose()
             super.dispose()
         })

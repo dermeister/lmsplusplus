@@ -1,6 +1,6 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import { transaction, isnonreactive } from "reactronic"
+import { isnonreactive, transaction } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import { ContextMenuContainer } from "./ContextMenuContainer"
 import { ContextMenuDelegate } from "./ContextMenuDelegate"

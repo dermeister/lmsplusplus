@@ -1,25 +1,25 @@
 import MarkdownIt from "markdown-it"
 import React from "react"
 import { cached, isnonreactive, Monitor, options, Ref, Transaction, transaction } from "reactronic"
-import { DatabaseContext } from "../../api"
+import { Storage } from "../../api"
 import * as domain from "../../domain"
 import { IContextMenuService } from "../ContextMenuService"
-import { IMessageService } from "../MessageService"
 import { ITasksService } from "../ITasksService"
+import { IMessageService } from "../MessageService"
 import { SolutionEditorView } from "../SolutionEditorView"
 import { SolutionRunnerView } from "../SolutionRunnerView"
 import { TaskEditorView } from "../TaskEditorView"
 import { TasksExplorer } from "../TasksExplorer"
+import { handleError } from "../utils"
 import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
 import * as view from "./TasksView.view"
-import { handleError } from "../utils"
 
 export class TasksView extends View implements ITasksService {
     @isnonreactive readonly tasksExplorer: TasksExplorer
     @isnonreactive private static readonly _monitor = Monitor.create("tasks-view", 0, 0, 0)
     @isnonreactive private static readonly _markdown = new MarkdownIt()
-    @isnonreactive private readonly _context: DatabaseContext
+    @isnonreactive private readonly _storage: Storage
     @isnonreactive private readonly _viewGroup: ViewGroup
     @isnonreactive private readonly _messageService: IMessageService
 
@@ -30,12 +30,12 @@ export class TasksView extends View implements ITasksService {
         return taskDescription ? TasksView._markdown.render(taskDescription) : null
     }
 
-    constructor(context: DatabaseContext, viewGroup: ViewGroup, contextMenuService: IContextMenuService, messageService: IMessageService) {
+    constructor(storage: Storage, viewGroup: ViewGroup, contextMenuService: IContextMenuService, messageService: IMessageService) {
         super()
-        this._context = context
+        this._storage = storage
         this._viewGroup = viewGroup
         this._messageService = messageService
-        this.tasksExplorer = new TasksExplorer(new Ref(this._context, "topics"), this, contextMenuService, new Ref(this._context, "permissions"))
+        this.tasksExplorer = new TasksExplorer(new Ref(this._storage, "topics"), this, contextMenuService, new Ref(this._storage, "permissions"))
     }
 
     override dispose(): void {
@@ -58,20 +58,20 @@ export class TasksView extends View implements ITasksService {
     @transaction
     createTask(topic: domain.Topic): void {
         const task = new domain.Task(domain.Task.NO_ID, topic, "", "", [])
-        const taskEditorView = new TaskEditorView(task, this._context.technologies, this._context, this._viewGroup, this._messageService)
+        const taskEditorView = new TaskEditorView(task, this._storage.technologies, this._storage, this._viewGroup, this._messageService)
         this._viewGroup.openView(taskEditorView)
     }
 
     @transaction
     updateTask(task: domain.Task): void {
-        const taskEditorView = new TaskEditorView(task, this._context.technologies, this._context, this._viewGroup, this._messageService)
+        const taskEditorView = new TaskEditorView(task, this._storage.technologies, this._storage, this._viewGroup, this._messageService)
         this._viewGroup.openView(taskEditorView)
     }
 
     @transaction
     async deleteTask(task: domain.Task): Promise<void> {
         try {
-            await this._context.deleteTask(task)
+            await this._storage.deleteTask(task)
         } catch (e) {
             Transaction.off(() => handleError(e, this._messageService))
         }
@@ -80,14 +80,14 @@ export class TasksView extends View implements ITasksService {
     @transaction
     createSolution(task: domain.Task): void {
         const solution = new domain.Solution(domain.Solution.NO_ID, task, "", null, null)
-        const solutionEditorView = new SolutionEditorView(solution, this._context, this._viewGroup, this._messageService)
+        const solutionEditorView = new SolutionEditorView(solution, this._storage, this._viewGroup, this._messageService)
         this._viewGroup.openView(solutionEditorView)
     }
 
     @transaction
     @options({ monitor: TasksView._monitor })
     async deleteSolution(solution: domain.Solution): Promise<void> {
-        await this._context.deleteSolution(solution)
+        await this._storage.deleteSolution(solution)
     }
 
     @transaction

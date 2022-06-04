@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
+using Npgsql;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddInMemoryCollection(new Dictionary<string, string>
@@ -62,6 +63,22 @@ app.UseMiddleware<ServiceProxyMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.UseEndpoints(endpoints => { endpoints.MapHub<ApplicationHub>("/application"); });
+using (IServiceScope scope = app.Services.CreateScope())
+{
+    IServiceProvider services = scope.ServiceProvider;
+    ApplicationContext context = services.GetRequiredService<ApplicationContext>();
+    context.Database.Migrate();
+    var connection = (NpgsqlConnection)context.Database.GetDbConnection();
+    connection.Open();
+    try
+    {
+        connection.ReloadTypes();
+    }
+    finally
+    {
+        connection.Close();
+    }
+};
 app.Run();
 
 [SuppressMessage(category: "Design", checkId: "CA1050:Declare types in namespaces")]
