@@ -143,7 +143,7 @@ export class ConsoleRenderer extends ObservableObject implements IRenderer, IDis
     }
 
     @reaction
-    updateTerminalTheme(): void {
+    private updateTerminalTheme(): void {
         this._themeService.theme // subscribe
         this._terminal.setOption("theme", ConsoleRenderer.terminalTheme)
     }

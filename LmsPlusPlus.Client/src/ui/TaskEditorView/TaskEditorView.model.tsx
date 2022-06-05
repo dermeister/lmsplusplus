@@ -13,8 +13,8 @@ import * as view from "./TaskEditorView.view"
 export class TaskEditorView extends View {
     @isnonreactive readonly availableTechnologies: readonly domain.Technology[]
     @isnonreactive readonly description: monaco.editor.ITextModel
-    @isnonreactive private readonly _themeService: IThemeService
     @isnonreactive private static readonly _monitor = Monitor.create("task-editor-view", 0, 0, 0)
+    @isnonreactive private readonly _themeService: IThemeService
     @isnonreactive private readonly _id: number
     @isnonreactive private readonly _topic: domain.Topic
     @isnonreactive private readonly _solutions: domain.Solution[]

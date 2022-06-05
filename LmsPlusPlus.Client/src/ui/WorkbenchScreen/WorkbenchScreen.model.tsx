@@ -36,7 +36,8 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
         this._messageService = messageService
         this._storage = new Storage(api, messageService, authService)
         this._themeService = new ThemeService(new Ref(this, "theme"))
-        this._tasksViewGroup = new TasksViewGroup("tasks-view-group", this._storage, this._contextMenuService, this._messageService, this._themeService)
+        this._tasksViewGroup = new TasksViewGroup("tasks-view-group", this._storage, this._contextMenuService, this._messageService,
+            this._themeService)
         this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, this._storage, this._messageService, this._themeService)
         this._currentViewGroup = this._tasksViewGroup
         this._sidePanelTitle = this._currentViewGroup.currentView.title
