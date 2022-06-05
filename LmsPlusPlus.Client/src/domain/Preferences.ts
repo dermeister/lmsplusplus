@@ -6,5 +6,5 @@ export class Preferences {
         this.theme = darkMode
     }
 
-    private static createDefaultPreferences(): Preferences { return new Preferences("Dark") }
+    private static createDefaultPreferences(): Preferences { return new Preferences("Default") }
 }

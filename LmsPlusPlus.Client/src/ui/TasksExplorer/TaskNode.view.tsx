@@ -68,7 +68,7 @@ export function renderContextMenu(node: model.TaskNode): JSX.Element[] {
                 </>
             )
         if (contextMenuItems.length === 0)
-            contextMenuItems.push(submenuItems)
+            contextMenuItems.push(<React.Fragment key={key++}>{submenuItems}</React.Fragment>)
         else
             contextMenuItems.push((<ContextMenu.Submenu key={key++} title="Solution">{submenuItems}</ContextMenu.Submenu>))
     }

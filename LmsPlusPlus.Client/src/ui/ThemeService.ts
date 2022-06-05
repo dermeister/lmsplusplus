@@ -1,45 +1,54 @@
-import { isnonreactive, reaction, Ref } from "reactronic"
-import { ObservableObject } from "../ObservableObject"
-import arrowRightLightIcon from "../assets/chevron-right-light.svg"
-import arrowRightDarkIcon from "../assets/chevron-right-dark.svg"
-import arrowDownLightIcon from "../assets/chevron-down-light.svg"
-import arrowDownDarkIcon from "../assets/chevron-down-dark.svg"
-import plusLightIcon from "../assets/plus-light.svg"
-import plusDarkIcon from "../assets/plus-dark.svg"
-import plusHoveredLightIcon from "../assets/plus-hovered-light.svg"
-import plusHoveredDarkIcon from "../assets/plus-hovered-dark.svg"
-import errorLightIcon from "../assets/error-light.svg"
-import errorDarkIcon from "../assets/error-dark.svg"
-import closeLightIcon from "../assets/close-light.svg"
-import closeDarkIcon from "../assets/close-dark.svg"
-import closeHoveredLightIcon from "../assets/close-hovered-light.svg"
-import closeHoveredDarkIcon from "../assets/close-hovered-dark.svg"
-import checkLightIcon from "../assets/check-light.svg"
+import { isnonreactive, reaction, transaction } from "reactronic"
 import checkDark from "../assets/check-dark.svg"
-import trashDangerLightIcon from "../assets/trash-danger-light.svg"
+import checkLightIcon from "../assets/check-light.svg"
+import arrowDownDarkIcon from "../assets/chevron-down-dark.svg"
+import arrowDownLightIcon from "../assets/chevron-down-light.svg"
+import arrowRightDarkIcon from "../assets/chevron-right-dark.svg"
+import arrowRightLightIcon from "../assets/chevron-right-light.svg"
+import closeDarkIcon from "../assets/close-dark.svg"
+import closeHoveredDarkIcon from "../assets/close-hovered-dark.svg"
+import closeHoveredLightIcon from "../assets/close-hovered-light.svg"
+import closeLightIcon from "../assets/close-light.svg"
+import errorDarkIcon from "../assets/error-dark.svg"
+import errorLightIcon from "../assets/error-light.svg"
+import plusDarkIcon from "../assets/plus-dark.svg"
+import plusHoveredDarkIcon from "../assets/plus-hovered-dark.svg"
+import plusHoveredLightIcon from "../assets/plus-hovered-light.svg"
+import plusLightIcon from "../assets/plus-light.svg"
 import trashDangerDarkIcon from "../assets/trash-danger-dark.svg"
-import trashDangerHoveredLightIcon from "../assets/trash-danger-hovered-light.svg"
 import trashDangerHoveredDarkIcon from "../assets/trash-danger-hovered-dark.svg"
+import trashDangerHoveredLightIcon from "../assets/trash-danger-hovered-light.svg"
+import trashDangerLightIcon from "../assets/trash-danger-light.svg"
+import { ObservableObject } from "../ObservableObject"
 
 export interface IThemeService {
     readonly theme: string
+
+    setTheme(name: string): void
 }
 
 export class ThemeService extends ObservableObject implements IThemeService {
-    @isnonreactive private readonly _theme: Ref<string>
+    @isnonreactive private static readonly _themeLocalStorageKey = "recent-theme"
+    private _theme: string
 
-    get theme(): string { return this._theme.value }
+    get theme(): string { return this._theme }
 
-    constructor(theme: Ref<string>) {
+    constructor() {
         super()
+        this._theme = localStorage.getItem(ThemeService._themeLocalStorageKey) ?? "Dark"
+    }
+
+    @transaction
+    setTheme(theme: string): void {
         this._theme = theme
+        localStorage.setItem(ThemeService._themeLocalStorageKey, this._theme)
     }
 
     @reaction
-    private updateTheme(): void {
-        switch (this._theme.value) {
+    private updateStyles(): void {
+        switch (this._theme) {
             case "Dark":
-                document.documentElement.style.colorScheme = "dark"
+                (document.documentElement.style as unknown as { colorScheme: string }).colorScheme = "dark"
                 document.documentElement.style.setProperty("--background-primary", "#212529")
                 document.documentElement.style.setProperty("--background-secondary", "#2e3338")
                 document.documentElement.style.setProperty("--background-secondary-hover", "#40474f")
@@ -67,7 +76,7 @@ export class ThemeService extends ObservableObject implements IThemeService {
                 document.documentElement.style.setProperty("--trash-danger-hovered-icon-url", `url(${trashDangerHoveredDarkIcon})`)
                 break
             case "Light":
-                document.documentElement.style.colorScheme = "light"
+                (document.documentElement.style as unknown as { colorScheme: string }).colorScheme = "light"
                 document.documentElement.style.setProperty("--background-primary", "#FEFDF9")
                 document.documentElement.style.setProperty("--background-secondary", "#F3E8E0")
                 document.documentElement.style.setProperty("--background-secondary-hover", "#40474f")

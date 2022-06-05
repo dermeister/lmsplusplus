@@ -2,6 +2,7 @@ import { Axios } from "axios"
 import React from "react"
 import { cached, isnonreactive, reaction, Ref, Transaction, transaction } from "reactronic"
 import { IAuthService, Storage } from "../../api"
+import * as domain from "../../domain"
 import { ObservableObject } from "../../ObservableObject"
 import { ContextMenuService } from "../ContextMenuService"
 import { IScreen } from "../IScreen"
@@ -30,12 +31,12 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
     private get sidePanelShouldShowLoader(): boolean { return this._sidePanelShouldShowLoader || this._storage.isLoadingData }
     private get theme(): string { return this._storage.preferences.theme }
 
-    constructor(api: Axios, authService: IAuthService, messageService: IMessageService) {
+    constructor(api: Axios, authService: IAuthService, messageService: IMessageService, themeService: ThemeService) {
         super()
         this._contextMenuService = new ContextMenuService()
         this._messageService = messageService
         this._storage = new Storage(api, messageService, authService)
-        this._themeService = new ThemeService(new Ref(this, "theme"))
+        this._themeService = themeService
         this._tasksViewGroup = new TasksViewGroup("tasks-view-group", this._storage, this._contextMenuService, this._messageService,
             this._themeService)
         this._optionsViewGroup = new OptionsViewGroup("options-view-group", authService, this._storage, this._messageService, this._themeService)
@@ -53,7 +54,6 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
             this._tasksViewGroup.dispose()
             this._optionsViewGroup.dispose()
             this._storage.dispose()
-            this._themeService.dispose()
             this._contextMenuService.dispose()
             super.dispose()
         })
@@ -70,8 +70,14 @@ export class WorkbenchScreen extends ObservableObject implements IScreen {
     }
 
     @reaction
-    private updateSidePanelRefs(): void {
+    private updateSidePanel(): void {
         this._sidePanelTitle = this._currentViewGroup.currentView.title
         this._sidePanelShouldShowLoader = this._currentViewGroup.currentView.shouldShowLoader
+    }
+
+    @reaction
+    private updateTheme(): void {
+        if (this._storage.preferences !== domain.Preferences.default)
+            this._themeService.setTheme(this._storage.preferences.theme)
     }
 }
