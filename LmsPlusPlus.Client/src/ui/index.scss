@@ -4,6 +4,7 @@
 
 :root {
     color-scheme: dark;
+
     /* Colors */
     --background-primary: #212529;
     --background-secondary: #2e3338;
@@ -22,20 +23,16 @@
     --shadow-secondary: #1c1f22;
 
     /* Icons */
-    --tasks-icon-url: url("../assets/tasks.svg");
-    --solutions-icon-url: url("../assets/code.svg");
-    --demo-icon-url: url("../assets/desktop.svg");
-    --options-icon-url: url("../assets/cog.svg");
-    --arrow-down-icon-url: url("../assets/chevron-down.svg");
-    --arrow-right-icon-url: url("../assets/chevron-right.svg");
-    --plus-icon-url: url("../assets/plus.svg");
-    --plus-hovered-icon-url: url("../assets/plus-hovered.svg");
-    --tarsh-danger-icon-url: url("../assets/trash-danger.svg");
-    --tarsh-danger-hovered-icon-url: url("../assets/trash-danger-hovered.svg");
-    --check-icon-url: url("../assets/check.svg");
-    --error-icon-url: url("../assets/error.svg");
-    --close-icon-url: url("../assets/close.svg");
-    --close-hovered-icon-url: url("../assets/close-hovered.svg");
+    --arrow-down-icon-url: url("../assets/chevron-down-dark.svg");
+    --arrow-right-icon-url: url("../assets/chevron-right-dark.svg");
+    --plus-icon-url: url("../assets/plus-dark.svg");
+    --plus-hovered-icon-url: url("../assets/plus-hovered-dark.svg");
+    --trash-danger-icon-url: url("../assets/trash-danger-dark.svg");
+    --trash-danger-hovered-icon-url: url("../assets/trash-danger-hovered.svg");
+    --check-icon-url: url("../assets/check-dark.svg");
+    --error-icon-url: url("../assets/error-dark.svg");
+    --close-icon-url: url("../assets/close-dark.svg");
+    --close-hovered-icon-url: url("../assets/close-hovered-dark.svg");
 }
 
 * {

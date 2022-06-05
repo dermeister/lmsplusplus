@@ -10,6 +10,7 @@ import { SolutionEditorView } from "../SolutionEditorView"
 import { SolutionRunnerView } from "../SolutionRunnerView"
 import { TaskEditorView } from "../TaskEditorView"
 import { TasksExplorer } from "../TasksExplorer"
+import { IThemeService } from "../ThemeService"
 import { handleError } from "../utils"
 import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
@@ -22,6 +23,7 @@ export class TasksView extends View implements ITasksService {
     @isnonreactive private readonly _storage: Storage
     @isnonreactive private readonly _viewGroup: ViewGroup
     @isnonreactive private readonly _messageService: IMessageService
+    @isnonreactive private readonly _themeService: IThemeService
 
     override get shouldShowLoader(): boolean { return TasksView._monitor.isActive }
     override get title(): string { return "Tasks" }
@@ -30,12 +32,14 @@ export class TasksView extends View implements ITasksService {
         return taskDescription ? TasksView._markdown.render(taskDescription) : null
     }
 
-    constructor(storage: Storage, viewGroup: ViewGroup, contextMenuService: IContextMenuService, messageService: IMessageService) {
+    constructor(storage: Storage, viewGroup: ViewGroup, contextMenuService: IContextMenuService, messageService: IMessageService,
+        themeService: IThemeService) {
         super()
         this._storage = storage
         this._viewGroup = viewGroup
         this._messageService = messageService
         this.tasksExplorer = new TasksExplorer(new Ref(this._storage, "topics"), this, contextMenuService, new Ref(this._storage, "permissions"))
+        this._themeService = themeService
     }
 
     override dispose(): void {
@@ -58,13 +62,15 @@ export class TasksView extends View implements ITasksService {
     @transaction
     createTask(topic: domain.Topic): void {
         const task = new domain.Task(domain.Task.NO_ID, topic, "", "", [])
-        const taskEditorView = new TaskEditorView(task, this._storage.technologies, this._storage, this._viewGroup, this._messageService)
+        const taskEditorView = new TaskEditorView(task, this._storage.technologies, this._storage, this._viewGroup, this._messageService,
+            this._themeService)
         this._viewGroup.openView(taskEditorView)
     }
 
     @transaction
     updateTask(task: domain.Task): void {
-        const taskEditorView = new TaskEditorView(task, this._storage.technologies, this._storage, this._viewGroup, this._messageService)
+        const taskEditorView = new TaskEditorView(task, this._storage.technologies, this._storage, this._viewGroup, this._messageService,
+            this._themeService)
         this._viewGroup.openView(taskEditorView)
     }
 
@@ -92,7 +98,7 @@ export class TasksView extends View implements ITasksService {
 
     @transaction
     runSolution(solution: domain.Solution): void {
-        const solutionRunnerView = new SolutionRunnerView(solution, this._viewGroup, this._messageService)
+        const solutionRunnerView = new SolutionRunnerView(solution, this._viewGroup, this._messageService, this._themeService)
         this._viewGroup.openView(solutionRunnerView)
     }
 }

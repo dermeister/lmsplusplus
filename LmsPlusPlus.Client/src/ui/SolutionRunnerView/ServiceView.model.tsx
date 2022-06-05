@@ -2,6 +2,7 @@ import { HubConnection, ISubscription } from "@microsoft/signalr"
 import { cached, isnonreactive, Transaction, transaction } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import { IMessageService } from "../MessageService"
+import { IThemeService } from "../ThemeService"
 import { handleError } from "../utils"
 import { ConsoleRenderer, ServiceBuildOutput } from "./ConsoleRenderer.model"
 import { IRenderer } from "./IRenderer"
@@ -29,14 +30,14 @@ export class ServiceView extends ObservableObject {
     @cached get renderers(): readonly IRenderer[] { return [this._consoleRenderer, ...this._webRenderers.values()] }
 
     constructor(name: string, stdin: boolean, virtualPorts: readonly number[], connection: HubConnection,
-        serviceWorkerService: IServiceWorkerService, messageService: IMessageService) {
+        serviceWorkerService: IServiceWorkerService, messageService: IMessageService, themeService: IThemeService) {
         super()
         this.name = name
         this.stdin = stdin
         this.virtualPorts = virtualPorts
         this._messageService = messageService
         this._serviceWorkerService = serviceWorkerService
-        this._consoleRenderer = new ConsoleRenderer()
+        this._consoleRenderer = new ConsoleRenderer(themeService)
         this._webRenderers = new Map(virtualPorts.map(v => [v, new WebRenderer(v)]))
         this._connection = connection
         const stream = this._connection.stream<ServiceBuildOutput>("ReadBuildOutput", this.name)

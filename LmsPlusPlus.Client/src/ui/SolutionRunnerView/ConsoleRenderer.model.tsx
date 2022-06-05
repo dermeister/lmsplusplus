@@ -1,7 +1,10 @@
 import React from "react"
+import { cached, isnonreactive, reaction, Transaction, transaction } from "reactronic"
 import { ITheme, Terminal } from "xterm"
 import { FitAddon } from "xterm-addon-fit"
 import { IDisposable } from "../../IDisposable"
+import { ObservableObject } from "../../ObservableObject"
+import { IThemeService } from "../ThemeService"
 import * as view from "./ConsoleRenderer.view"
 import { IRenderer } from "./IRenderer"
 
@@ -10,38 +13,44 @@ export interface ServiceBuildOutput {
     anchor: string | null
 }
 
-export class ConsoleRenderer implements IRenderer, IDisposable {
-    private readonly _terminal: Terminal
-    private readonly _fitAddon = new FitAddon()
-    private readonly _terminalContainer = document.createElement("div")
-    private readonly _resizeObserver = new ResizeObserver(() => this.resizeTerminalContainer())
-    private readonly _anchoredLineOffsets = new Map<string, number>()
+export class ConsoleRenderer extends ObservableObject implements IRenderer, IDisposable {
+    @isnonreactive private readonly _terminal: Terminal
+    @isnonreactive private readonly _fitAddon = new FitAddon()
+    @isnonreactive private readonly _terminalContainer = document.createElement("div")
+    @isnonreactive private readonly _resizeObserver = new ResizeObserver(() => this.resizeTerminalContainer())
+    @isnonreactive private readonly _anchoredLineOffsets = new Map<string, number>()
+    @isnonreactive private readonly _themeService: IThemeService
     private _mountContainer: HTMLElement | null = null
 
     get title(): string { return "Console" }
     private static get terminalTheme(): ITheme {
         const style = getComputedStyle(document.documentElement)
         return {
-            background: style.getPropertyValue("--background-primary"),
-            foreground: style.getPropertyValue("--text-primary")
+            background: style.getPropertyValue("--background-primary").trim(),
+            foreground: style.getPropertyValue("--text-primary").trim()
         }
     }
 
-    constructor() {
+    constructor(themeService: IThemeService) {
+        super()
+        this._themeService = themeService
         this._terminal = new Terminal({
             theme: ConsoleRenderer.terminalTheme,
             disableStdin: true,
             convertEol: true,
             fontSize: 14
         })
+        this._terminal.setOption("theme", ConsoleRenderer.terminalTheme)
         this._terminal.loadAddon(this._fitAddon)
         this.styleTerminalContainer()
     }
 
+    @cached
     render(): JSX.Element {
         return <view.ConsoleRenderer model={this} />
     }
 
+    @transaction
     mount(element: HTMLElement): void {
         this._resizeObserver.observe(this._terminalContainer)
         this._mountContainer = element
@@ -52,6 +61,7 @@ export class ConsoleRenderer implements IRenderer, IDisposable {
         }
     }
 
+    @transaction
     unmount(): void {
         if (this._mountContainer?.contains(this._terminalContainer)) {
             this._mountContainer?.removeChild(this._terminalContainer)
@@ -60,13 +70,14 @@ export class ConsoleRenderer implements IRenderer, IDisposable {
         this._resizeObserver.unobserve(this._terminalContainer)
     }
 
+    @transaction
     writeBuildOutput({ anchor, text }: ServiceBuildOutput): void {
         if (anchor) {
             if (!this._anchoredLineOffsets.has(anchor)) {
-                /* 
+                /*
                    Offsets start from zero and each new offset is calculated as
                    previous offset incremented by one, which is equal to current
-                   size of _anchoredLineOffsets 
+                   size of _anchoredLineOffsets
                 */
                 const offset = this._anchoredLineOffsets.size
                 this._anchoredLineOffsets.set(anchor, offset)
@@ -77,7 +88,7 @@ export class ConsoleRenderer implements IRenderer, IDisposable {
                 this._terminal.write(`\u001b[${this._anchoredLineOffsets.size - offset}A`) // move cursor up
                 this._terminal.write("\u001b[0K") // clear line
                 this._terminal.write(text)
-                this._terminal.write("\u001b8") // restore cursor   
+                this._terminal.write("\u001b8") // restore cursor
             }
         } else {
             this._terminal.write(text)
@@ -101,12 +112,15 @@ export class ConsoleRenderer implements IRenderer, IDisposable {
         this._terminal.write("\u001b[H") // move cursor to beginning of screen
     }
 
-    dispose(): void {
-        if (this._mountContainer?.contains(this._terminalContainer))
-            this._mountContainer?.removeChild(this._terminalContainer)
-        this._terminal.dispose()
-        this._fitAddon.dispose()
-        this._resizeObserver.disconnect()
+    override dispose(): void {
+        Transaction.run(null, () => {
+            if (this._mountContainer?.contains(this._terminalContainer))
+                this._mountContainer?.removeChild(this._terminalContainer)
+            this._terminal.dispose()
+            this._fitAddon.dispose()
+            this._resizeObserver.disconnect()
+            super.dispose()
+        })
     }
 
     private resizeTerminalContainer(): void {
@@ -126,5 +140,11 @@ export class ConsoleRenderer implements IRenderer, IDisposable {
         const terminalElement = this._terminalContainer.querySelector(".terminal")
         if (terminalElement instanceof HTMLElement)
             terminalElement.style.padding = "14px"
+    }
+
+    @reaction
+    updateTerminalTheme(): void {
+        this._themeService.theme // subscribe
+        this._terminal.setOption("theme", ConsoleRenderer.terminalTheme)
     }
 }

@@ -1,9 +1,10 @@
 import * as monaco from "monaco-editor"
 import React from "react"
-import { cached, isnonreactive, Monitor, nonreactive, options, Transaction, transaction } from "reactronic"
+import { cached, isnonreactive, Monitor, options, Transaction, transaction } from "reactronic"
 import { Storage } from "../../api"
 import * as domain from "../../domain"
 import { IMessageService } from "../MessageService"
+import { IThemeService } from "../ThemeService"
 import { handleError } from "../utils"
 import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
@@ -12,6 +13,7 @@ import * as view from "./TaskEditorView.view"
 export class TaskEditorView extends View {
     @isnonreactive readonly availableTechnologies: readonly domain.Technology[]
     @isnonreactive readonly description: monaco.editor.ITextModel
+    @isnonreactive private readonly _themeService: IThemeService
     @isnonreactive private static readonly _monitor = Monitor.create("task-editor-view", 0, 0, 0)
     @isnonreactive private readonly _id: number
     @isnonreactive private readonly _topic: domain.Topic
@@ -26,9 +28,10 @@ export class TaskEditorView extends View {
     override get title(): string { return "Task Editor" }
     get taskTitle(): string { return this._taskTitle }
     get selectedTechnologies(): readonly domain.Technology[] { return this._selectedTechnologies }
+    get editorTheme(): string { return this._themeService.theme }
 
     constructor(task: domain.Task, availableTechnologies: readonly domain.Technology[], storage: Storage, viewGroup: ViewGroup,
-        messageService: IMessageService) {
+        messageService: IMessageService, themeService: IThemeService) {
         super()
         this._messageService = messageService
         this._storage = storage
@@ -36,10 +39,11 @@ export class TaskEditorView extends View {
         this._id = task.id
         this._topic = task.topic
         this._taskTitle = task.title
-        this.description = nonreactive(() => monaco.editor.createModel(task.description, "markdown"))
+        this.description = Transaction.off(() => monaco.editor.createModel(task.description, "markdown"))
         this._selectedTechnologies = task.technologies
         this.availableTechnologies = availableTechnologies
         this._solutions = task.solutions
+        this._themeService = themeService
     }
 
     override dispose(): void {

@@ -35,9 +35,10 @@ self.MonacoEnvironment = {
 
 interface MonacoEditorProps {
     model: monaco.editor.ITextModel
+    theme: string
 }
 
-export function MonacoEditor({ model }: MonacoEditorProps): JSX.Element {
+export function MonacoEditor({ model, theme }: MonacoEditorProps): JSX.Element {
     const ref = useRef<HTMLDivElement>(null)
     const editor = useRef<monaco.editor.IEditor | null>(null)
 
@@ -45,18 +46,20 @@ export function MonacoEditor({ model }: MonacoEditorProps): JSX.Element {
         let observer: ResizeObserver | null = null
         if (ref.current) {
             const style = getComputedStyle(document.documentElement)
-            monaco.editor.defineTheme("lmsplusplus-dark", {
-                base: "vs-dark",
-                inherit: true,
-                rules: [],
-                colors: {
-                    "editor.background": style.getPropertyValue("--background-primary").trim(),
-                    "minimap.background": style.getPropertyValue("--background-secondary").trim(),
-                }
-            })
+            const themeName = "lmsplusplus-theme"
+            const inherit = true
+            const rules: monaco.editor.ITokenThemeRule[] = []
+            const colors = {
+                "editor.background": style.getPropertyValue("--background-primary").trim(),
+                "minimap.background": style.getPropertyValue("--background-secondary").trim(),
+            }
+            if (theme === "Dark")
+                monaco.editor.defineTheme(themeName, { base: "vs-dark", inherit, rules, colors })
+            else
+                monaco.editor.defineTheme(themeName, { base: "vs", inherit, rules, colors })
             editor.current = monaco.editor.create(ref.current, {
                 model,
-                theme: "lmsplusplus-dark",
+                theme: themeName,
                 cursorSmoothCaretAnimation: true,
                 padding: { top: 10 }
             })
@@ -68,7 +71,7 @@ export function MonacoEditor({ model }: MonacoEditorProps): JSX.Element {
             if (ref.current)
                 observer?.unobserve(ref.current)
         }
-    }, [])
+    }, [theme])
 
     useEffect(() => {
         if (editor.current)

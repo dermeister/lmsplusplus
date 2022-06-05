@@ -31,14 +31,7 @@ export function VcsOptionCategory({ category }: VcsOptionCategoryProps): JSX.Ele
                 {category.vcsProviders.map(provider => (
                     <li key={provider.id} className={styles.provider}>
                         <div className={styles.providerHeading}>
-                            <h2 className={styles.providerName}>
-                                <img src={provider.iconUrl}
-                                    alt={provider.name}
-                                    width={11}
-                                    height={11}
-                                    className={styles.providerIcon} />
-                                {provider.name}
-                            </h2>
+                            <h2 className={styles.providerName}>{provider.name}</h2>
                             <button className={styles.addAccount} onClick={() => category.addAccount(provider).catch(() => { })} />
                         </div>
                         {accountList(provider)}

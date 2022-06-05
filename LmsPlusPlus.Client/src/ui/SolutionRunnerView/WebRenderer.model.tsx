@@ -65,7 +65,7 @@ export class WebRenderer extends ObservableObject implements IRenderer, IDisposa
                         this._iframeTop = element.offsetTop
                         this._iframe!.style.top = `${this._iframeTop}px`
                     }
-                    this._iframe!.style.zIndex = "100"
+                    this._iframe!.style.zIndex = "98"
                 }
             })
         })

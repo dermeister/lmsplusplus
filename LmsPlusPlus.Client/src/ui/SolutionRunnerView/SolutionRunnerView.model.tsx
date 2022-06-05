@@ -6,6 +6,7 @@ import { AppError } from "../../AppError"
 import * as domain from "../../domain"
 import { IMessageService } from "../MessageService"
 import { ServiceViewsExplorer } from "../ServicesViewExplorer"
+import { IThemeService } from "../ThemeService"
 import { handleError } from "../utils"
 import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
@@ -25,6 +26,7 @@ export class SolutionRunnerView extends View implements IServiceWorkerService {
     @isnonreactive private readonly _solution: domain.Solution
     @isnonreactive private readonly _viewGroup: ViewGroup
     @isnonreactive private readonly _messageService: IMessageService
+    @isnonreactive private readonly _themeService: IThemeService
     private _serviceViewsExplorer: ServiceViewsExplorer | null = null
     private _connection: HubConnection | null = null
     private _serviceViews: ServiceView[] | null = null
@@ -38,11 +40,12 @@ export class SolutionRunnerView extends View implements IServiceWorkerService {
     get currentRenderer(): IRenderer | null { return this._serviceViewsExplorer?.selectedNode?.item ?? null }
     get unableToStartApplication(): boolean { return this._unableToStartApplication }
 
-    constructor(solution: domain.Solution, viewGroup: ViewGroup, errorsService: IMessageService) {
+    constructor(solution: domain.Solution, viewGroup: ViewGroup, errorsService: IMessageService, themeService: IThemeService) {
         super()
         this._solution = solution
         this._viewGroup = viewGroup
         this._messageService = errorsService
+        this._themeService = themeService
     }
 
     override dispose(): void {
@@ -96,7 +99,7 @@ export class SolutionRunnerView extends View implements IServiceWorkerService {
             await this._connection.start()
             const serviceConfigurations = await this._connection.invoke<ServiceConfiguration[]>("StartApplication", this._solution.id)
             this._serviceViews = serviceConfigurations.map(c => new ServiceView(c.name, c.stdin, c.virtualPorts, this._connection!, this,
-                this._messageService))
+                this._messageService, this._themeService))
             if (this._serviceViews.length === 0)
                 this._messageService.showError(new AppError("Cannot start solution.", "There are no services in solution."))
             else

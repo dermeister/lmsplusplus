@@ -56,7 +56,7 @@ export function TaskEditorSidePanelContent({ view }: TaskEditorViewProps): JSX.E
 export function TaskEditorMainPanelContent({ view }: TaskEditorViewProps): JSX.Element {
     return autorender(() => (
         <div className={styles.mainPanelContent}>
-            <MonacoEditor model={view.description} />
+            <MonacoEditor model={view.description} theme={view.editorTheme} />
         </div>
     ), [view])
 }
