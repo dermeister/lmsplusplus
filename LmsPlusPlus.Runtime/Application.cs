@@ -107,12 +107,22 @@ public sealed class Application : IAsyncDisposable
 
     static void ValidateCompose(Compose compose)
     {
+        List<string> errors = new();
         if (compose.Services.Values.Any(service => service.Build is null))
+            errors.Add(@"""build"" configuration key is not provided for some services.");
+        bool somePortsNotNumbers = compose.Services.Values.Any(s => s.Ports.Any(p =>
         {
-            string[] errors = { @"""build"" configuration key is not provided for some services." };
+            string[] parts = p.Split(':');
+            if (parts.Length != 2)
+                return true;
+            if (!short.TryParse(parts[0], out _) || !short.TryParse(parts[1], out _))
+                return true;
+            return false;
+        }));
+        if (somePortsNotNumbers)
+            errors.Add(@"Ports must be numbers.");
+        if (errors.Count > 0)
             throw new DockerComposeException(errors);
-        }
-        // TODO: Validate ports
     }
 
     static ReadOnlyCollection<VirtualPortMapping> CreateVirtualPortMappings(IEnumerable<string> portMappingsInDockerComposeFormat)
