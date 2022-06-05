@@ -31,7 +31,7 @@ public class AuthenticationControllerTests : IAsyncLifetime
     public async Task SignInBadRequest()
     {
         // Arrange
-        Request.SignIn signIn = new(Login: "Invalid", Password: "Invalid");
+        Request.SignIn signIn = new(login: "Invalid", password: "Invalid");
         HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "sign-in", HttpMethod.Post, jwt: null, signIn);
 
         // Act

@@ -4,7 +4,7 @@ namespace LmsPlusPlus.Api.Request;
 
 public record CreateTopic
 {
-    [MaxLength(1000)]
+    [MinLength(1), MaxLength(1000)]
     public string Name { get; }
     public long AuthorId { get; }
 
@@ -17,7 +17,7 @@ public record CreateTopic
 
 public record UpdateTopic
 {
-    [MaxLength(1000)]
+    [MinLength(1), MaxLength(1000)]
     public string Name { get; }
 
     public UpdateTopic(string name) => Name = name;

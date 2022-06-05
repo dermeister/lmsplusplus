@@ -4,7 +4,7 @@ namespace LmsPlusPlus.Api.Request;
 
 public record CreateTask
 {
-    [MaxLength(1000)]
+    [MinLength(1), MaxLength(1000)]
     public string Title { get; }
     public string Description { get; }
     public long TopicId { get; }
@@ -21,7 +21,7 @@ public record CreateTask
 
 public record UpdateTask
 {
-    [MaxLength(1000)]
+    [MinLength(1), MaxLength(1000)]
     public string Title { get; }
     public string Description { get; }
     public IEnumerable<short> TechnologyIds { get; }

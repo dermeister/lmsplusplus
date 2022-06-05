@@ -4,7 +4,7 @@ namespace LmsPlusPlus.Api.Request;
 
 public record CreateGroup
 {
-    [MaxLength(1000)]
+    [MinLength(1), MaxLength(1000)]
     public string Name { get; }
     public long TopicId { get; }
 
@@ -17,7 +17,7 @@ public record CreateGroup
 
 public record UpdateGroup
 {
-    [MaxLength(1000)]
+    [MinLength(1), MaxLength(1000)]
     public string Name { get; }
 
     public UpdateGroup(string name) => Name = name;

@@ -59,7 +59,7 @@ public class PreferencesControllerTests : IAsyncLifetime
     public async Task UpdatePreferencesUnauthorized()
     {
         // Arrange
-        Request.Preferences preferences = new(Theme: "Light");
+        Request.Preferences preferences = new("Light");
         HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "preferences", HttpMethod.Put, jwt: null, preferences);
 
         // Act
@@ -73,7 +73,7 @@ public class PreferencesControllerTests : IAsyncLifetime
     public async Task UpdatePreferencesBadRequest()
     {
         // Arrange
-        Request.Preferences preferences = new(Theme: null!);
+        Request.Preferences preferences = new(null!);
         string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
         HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "preferences", HttpMethod.Put, jwt, preferences);
 
@@ -90,7 +90,7 @@ public class PreferencesControllerTests : IAsyncLifetime
     public async Task UpdatePreferencesSuccess()
     {
         // Arrange
-        Request.Preferences preferences = new(Theme: "Light");
+        Request.Preferences preferences = new("Light");
         string jwt = _app.JwtGenerator.Generate(_data.Author.Id.ToString(), _data.Author.Role.ToString());
         HttpRequestMessage requestMessage = Utils.CreateHttpRequestMessage(url: "preferences", HttpMethod.Put, jwt, preferences);
 
