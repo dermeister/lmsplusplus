@@ -1,6 +1,7 @@
 using LmsPlusPlus.Api.Vcs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LmsPlusPlus.Api;
 
@@ -33,16 +34,21 @@ public class OauthController : ControllerBase
         IHostingClient hostingClient = HostingClientFactory.CreateClient(providerId);
         string token = await hostingClient.CreateAuthorizationAccessToken(code, provider.OauthClientId, provider.OauthClientSecret);
         string username = await hostingClient.GetUsername(token);
-        Infrastructure.VcsAccount account = new()
+        Infrastructure.VcsAccount? existingAccount = await _context.VcsAccounts.SingleOrDefaultAsync(a => a.UserId == long.Parse(state)
+            && a.HostingProviderId == providerId && a.Name == username);
+        if (existingAccount is null)
         {
-            Name = username,
-            AccessToken = token,
-            IsActive = false,
-            HostingProviderId = providerId,
-            UserId = long.Parse(state)
-        };
-        _context.Add(account);
-        await _context.SaveChangesAsync();
+            Infrastructure.VcsAccount account = new()
+            {
+                Name = username,
+                AccessToken = token,
+                IsActive = false,
+                HostingProviderId = providerId,
+                UserId = long.Parse(state)
+            };
+            _context.Add(account);
+            await _context.SaveChangesAsync();
+        }
         return Redirect("/authorization-redirect.html");
     }
 }
