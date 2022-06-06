@@ -1,5 +1,5 @@
 import React from "react"
-import { cached, isnonreactive, Ref, Rx, Transaction, transaction } from "reactronic"
+import { cached, isnonreactive, options, Ref, Rx, Transaction, transaction } from "reactronic"
 import { ObservableObject } from "../../ObservableObject"
 import * as view from "./SidePanel.view"
 
@@ -7,6 +7,10 @@ export class SidePanel extends ObservableObject {
     @isnonreactive private readonly _title: Ref<string>
     @isnonreactive private readonly _shouldShowLoader: Ref<boolean>
     private _isOpened = true
+
+    get title(): string { return this._title.value }
+    get shouldShowLoader(): boolean { return this._shouldShowLoader.value }
+    get isOpened(): boolean { return this._isOpened }
 
     constructor(title: Ref<string>, shouldShowLoader: Ref<boolean>) {
         super()
@@ -33,13 +37,8 @@ export class SidePanel extends ObservableObject {
     }
 
     @cached
+    @options({ triggeringArgs: true })
     render(content: JSX.Element): JSX.Element {
-        return (
-            <view.SidePanel isOpened={this._isOpened}
-                shouldShowLoader={this._shouldShowLoader.value}
-                title={this._title.value}>
-                {content}
-            </view.SidePanel>
-        )
+        return <view.SidePanel sidePanel={this}>{content}</view.SidePanel>
     }
 }
