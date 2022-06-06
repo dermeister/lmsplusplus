@@ -98,17 +98,19 @@ public class ApplicationContext : DbContext
             entity.Property(e => e.CanDeleteTask).HasColumnName("can_delete_task");
             entity.Property(e => e.CanUpdateTask).HasColumnName("can_update_task");
             entity.Property(e => e.CanUpdateUser).HasColumnName("can_update_user");
-            entity.Property(e => e.CanUpdateVcsConfiguration).HasColumnName("can_update_vcs_configuration");
+            entity.Property(e => e.HasVcsAccounts).HasColumnName("has_vcs_accounts");
+            entity.Property(e => e.CanViewAllSolutions).HasColumnName("can_view_all_solutions");
             entity.HasData(new Permissions
             {
                 Role = Role.Admin,
                 CanCreateTask = false,
                 CanUpdateTask = false,
                 CanDeleteTask = false,
-                CanUpdateVcsConfiguration = false,
+                HasVcsAccounts = false,
                 CanUpdateUser = true,
                 CanCreateSolution = false,
-                CanDeleteSolution = false
+                CanDeleteSolution = false,
+                CanViewAllSolutions = false
             },
             new Permissions
             {
@@ -116,10 +118,11 @@ public class ApplicationContext : DbContext
                 CanCreateTask = true,
                 CanUpdateTask = true,
                 CanDeleteTask = true,
-                CanUpdateVcsConfiguration = false,
+                HasVcsAccounts = false,
                 CanUpdateUser = false,
                 CanCreateSolution = false,
-                CanDeleteSolution = false
+                CanDeleteSolution = false,
+                CanViewAllSolutions = true
             },
             new Permissions
             {
@@ -127,10 +130,11 @@ public class ApplicationContext : DbContext
                 CanCreateTask = false,
                 CanUpdateTask = false,
                 CanDeleteTask = false,
-                CanUpdateVcsConfiguration = true,
+                HasVcsAccounts = true,
                 CanUpdateUser = false,
                 CanCreateSolution = true,
-                CanDeleteSolution = true
+                CanDeleteSolution = true,
+                CanViewAllSolutions = false
             });
         });
     }

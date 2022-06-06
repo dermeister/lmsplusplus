@@ -1,10 +1,10 @@
 export interface Permissions {
-    id: number
-    canCreateTask: boolean
-    canUpdateTask: boolean
-    canDeleteTask: boolean
-    canUpdateVcsConfiguration: boolean
-    canUpdateUser: boolean
-    canCreateSolution: boolean
-    canDeleteSolution: boolean
+    readonly canCreateTask: boolean
+    readonly canUpdateTask: boolean
+    readonly canDeleteTask: boolean
+    readonly hasVcsAccounts: boolean
+    readonly canUpdateUser: boolean
+    readonly canCreateSolution: boolean
+    readonly canDeleteSolution: boolean
+    readonly canViewAllSolutions: boolean
 }

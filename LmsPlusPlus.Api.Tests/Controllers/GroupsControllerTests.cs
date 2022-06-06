@@ -71,10 +71,8 @@ public class GroupsControllerTests : IAsyncLifetime
         Task<HttpResponseMessage> responseMessage1 = _app.Client.SendAsync(requestMessage1);
         Task<HttpResponseMessage> responseMessage2 = _app.Client.SendAsync(requestMessage2);
         await Task.WhenAll(responseMessage1, responseMessage2);
-        IEnumerable<Response.Group> groups1 =
-            await Utils.ReadHttpResponse<IEnumerable<Response.Group>>(responseMessage1.Result);
-        IEnumerable<Response.Group> groups2 =
-            await Utils.ReadHttpResponse<IEnumerable<Response.Group>>(responseMessage2.Result);
+        IEnumerable<Response.Group> groups1 = await Utils.ReadHttpResponse<IEnumerable<Response.Group>>(responseMessage1.Result);
+        IEnumerable<Response.Group> groups2 = await Utils.ReadHttpResponse<IEnumerable<Response.Group>>(responseMessage2.Result);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, responseMessage1.Result.StatusCode);

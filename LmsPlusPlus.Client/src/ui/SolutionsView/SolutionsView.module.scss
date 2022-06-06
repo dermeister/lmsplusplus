@@ -1,0 +1,25 @@
+@use "../library";
+
+.main-panel-content {
+    @include library.full-size;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 32px;
+}
+
+.side-panel-content {
+    @include library.full-size;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.close-button {
+    @include library.shadow("all");
+
+    margin: auto 16px 14px;
+    padding: 4px;
+}

@@ -54,7 +54,7 @@ export class Storage extends ObservableObject {
             this._topics = this._topics.map(t => {
                 if (t.id !== task.topic.id)
                     return t
-                const newTopic = new domain.Topic(task.topic.id, task.topic.name)
+                const newTopic = new domain.Topic(task.topic.id, task.topic.name, task.topic.groups)
                 const technologies = data.technologyIds.map(id => {
                     const technology = this._technologies.find(t => t.id === id)
                     if (!technology)
@@ -93,18 +93,17 @@ export class Storage extends ObservableObject {
             this._topics = this._topics.map(t => {
                 if (t.id !== task.topic.id)
                     return t
-                const newTopic = new domain.Topic(task.topic.id, task.topic.name)
-                const technologies = data.technologyIds.map(id => {
-                    const technology = this._technologies.find(t => t.id === id)
-                    if (!technology)
-                        throw new AppError("Cannot update task.", `Technology with id ${id} not found.`)
-                    return technology
-                })
-                const newTask = new domain.Task(data.id, task.topic, data.title, data.description, technologies)
+                const newTopic = new domain.Topic(task.topic.id, task.topic.name, task.topic.groups)
                 newTopic.tasks = task.topic.tasks.map(t => {
                     if (t.id !== task.id)
                         return t
-                    return newTask
+                    const technologies = data.technologyIds.map(id => {
+                        const technology = this._technologies.find(t => t.id === id)
+                        if (!technology)
+                            throw new AppError("Cannot update task.", `Technology with id ${id} not found.`)
+                        return technology
+                    })
+                    return new domain.Task(data.id, newTopic, data.title, data.description, technologies)
                 })
                 return newTopic
             })
@@ -132,7 +131,7 @@ export class Storage extends ObservableObject {
             this._topics = this._topics.map(t => {
                 if (t.id !== task.topic.id)
                     return t
-                const newTopic = new domain.Topic(t.id, t.name)
+                const newTopic = new domain.Topic(t.id, t.name, t.groups)
                 newTopic.tasks = t.tasks.filter(t => t.id !== task.id)
                 return newTopic
             })
@@ -187,10 +186,9 @@ export class Storage extends ObservableObject {
 
     @transaction
     async deleteAccount(account: domain.Account): Promise<void> {
-        if (!this._permissions.canUpdateVcsConfiguration)
+        if (!this._permissions.hasVcsAccounts)
             throw this.permissionError()
         try {
-
             await this._api.delete(`/api/vcs-accounts/${account.id}`)
         } catch (e) {
             if (e instanceof AxiosError && e.response?.status === 401) {
@@ -204,7 +202,7 @@ export class Storage extends ObservableObject {
 
     @transaction
     async setActiveAccount(account: domain.Account): Promise<void> {
-        if (!this._permissions.canUpdateVcsConfiguration)
+        if (!this._permissions.hasVcsAccounts)
             throw this.permissionError()
         try {
             const { data } = await this._api.put<response.VcsAccount, AxiosResponse<response.VcsAccount>, request.VcsAccount>(
@@ -240,13 +238,13 @@ export class Storage extends ObservableObject {
             this._topics = this._topics.map(topic => {
                 if (topic.id !== solution.task.topic.id)
                     return topic
-                const newTopic = new domain.Topic(topic.id, topic.name)
+                const newTopic = new domain.Topic(topic.id, topic.name, topic.groups)
                 newTopic.tasks = topic.tasks.map(task => {
                     if (task.id !== solution.task.id)
                         return task
                     const newTask = new domain.Task(solution.task.id, newTopic, solution.task.title, solution.task.description,
                         solution.task.technologies)
-                    const newSolution = new domain.Solution(data.id, newTask, null, data.cloneUrl, data.websiteUrl)
+                    const newSolution = new domain.Solution(data.id, newTask, null, data.cloneUrl, data.websiteUrl, this._user)
                     newTask.solutions = task.solutions.concat(newSolution)
                     return newTask
                 })
@@ -276,7 +274,7 @@ export class Storage extends ObservableObject {
             this._topics = this._topics.map(topic => {
                 if (topic.id !== solution.task.topic.id)
                     return topic
-                const newTopic = new domain.Topic(topic.id, topic.name)
+                const newTopic = new domain.Topic(topic.id, topic.name, topic.groups)
                 newTopic.tasks = topic.tasks.map(task => {
                     if (task.id !== solution.task.id)
                         return task
@@ -308,17 +306,24 @@ export class Storage extends ObservableObject {
             const preferences = this.fetchPreferences()
             const permissions = this.fetchPermissions()
             const technologies = this.fetchTechnologies()
-            const topics = this.fetchTopics()
-            await Promise.all([user, preferences, permissions, technologies, topics])
-            if ((await permissions).canUpdateVcsConfiguration) {
+            await Promise.all([user, preferences, permissions, technologies])
+            let groups: domain.Group[] = []
+            let solvers: domain.User[]
+            if ((await permissions).canViewAllSolutions) {
+                solvers = await this.fetchSolvers()
+                groups = await this.fetchGroups(solvers)
+            } else
+                solvers = [await user]
+            const topics = await this.fetchTopics(groups)
+            if ((await permissions).hasVcsAccounts) {
                 const providers = await this.fetchVcsHostingProviders()
                 this._providers = providers
                 const accounts = await this.fetchVcsAccounts(providers)
                 this._accounts = accounts
             }
-            const tasks = await this.fetchTasks(await topics, await technologies)
-            const solutions = await this.fetchSolutions(tasks)
-            for (const topic of await topics) {
+            const tasks = await this.fetchTasks(topics, await technologies)
+            const solutions = await this.fetchSolutions(tasks, solvers)
+            for (const topic of topics) {
                 topic.tasks = tasks.filter(t => t.topic.id === topic.id)
                 for (const task of topic.tasks)
                     task.solutions = solutions.filter(s => s.task.id === task.id)
@@ -327,7 +332,7 @@ export class Storage extends ObservableObject {
             this._preferences = await preferences
             this._permissions = await permissions
             this._technologies = await technologies
-            this._topics = await topics
+            this._topics = topics
         } catch (e) {
             if (e instanceof AxiosError && e.response?.status === 401) {
                 this._authService.signOut()
@@ -338,19 +343,19 @@ export class Storage extends ObservableObject {
     }
 
     private async fetchUser(): Promise<domain.User> {
-        const { data } = await this._api.get<{ firstName: string, lastName: string }>("/api/users")
-        return new domain.User(data.firstName, data.lastName)
+        const { data } = await this._api.get<response.User>("/api/users")
+        return new domain.User(data.id, data.firstName, data.lastName)
     }
 
     private async fetchPreferences(): Promise<domain.Preferences> {
-        const { data } = await this._api.get<{ theme: string }>("/api/preferences")
+        const { data } = await this._api.get<response.Preferences>("/api/preferences")
         return new domain.Preferences(data.theme)
     }
 
     private async fetchPermissions(): Promise<domain.Permissions> {
         const { data } = await this._api.get<response.Permissions>("/api/permissions")
-        return new domain.Permissions(data.canCreateTask, data.canUpdateTask, data.canDeleteTask, data.canUpdateVcsConfiguration,
-            data.canUpdateUser, data.canCreateSolution, data.canDeleteSolution)
+        return new domain.Permissions(data.canCreateTask, data.canUpdateTask, data.canDeleteTask, data.hasVcsAccounts,
+            data.canUpdateUser, data.canCreateSolution, data.canDeleteSolution, data.canViewAllSolutions)
     }
 
     private async fetchVcsHostingProviders(): Promise<domain.Provider[]> {
@@ -373,9 +378,12 @@ export class Storage extends ObservableObject {
         return data.map(t => new domain.Technology(t.id, t.name))
     }
 
-    private async fetchTopics(): Promise<domain.Topic[]> {
+    private async fetchTopics(groups: domain.Group[]): Promise<domain.Topic[]> {
         const { data } = await this._api.get<response.Topic[]>("/api/topics")
-        return data.map(t => new domain.Topic(t.id, t.name))
+        return data.map(t => {
+            const topicGroups = groups.filter(g => g.topicId === t.id)
+            return new domain.Topic(t.id, t.name, topicGroups)
+        })
     }
 
     private async fetchTasks(topics: domain.Topic[], allTechnologies: domain.Technology[]): Promise<domain.Task[]> {
@@ -395,13 +403,34 @@ export class Storage extends ObservableObject {
         })
     }
 
-    private async fetchSolutions(tasks: domain.Task[]): Promise<domain.Solution[]> {
+    private async fetchSolutions(tasks: domain.Task[], solvers: domain.User[]): Promise<domain.Solution[]> {
         const { data } = await this._api.get<response.Solution[]>("/api/solutions")
         return data.map(s => {
             const task = tasks.find(t => t.id === s.taskId)
             if (!task)
                 throw new AppError("Cannot fetch solutions.", `Task with id ${s.taskId} not found.`)
-            return new domain.Solution(s.id, task, null, s.cloneUrl, s.websiteUrl)
+            const solver = solvers.find(u => u.id === s.solverId)
+            if (!solver)
+                throw new AppError("Cannot fetch solutions.", `User with id ${s.solverId} not found.`)
+            return new domain.Solution(s.id, task, null, s.cloneUrl, s.websiteUrl, solver)
+        })
+    }
+
+    private async fetchSolvers(): Promise<domain.User[]> {
+        const { data } = await this._api.get<response.User[]>("/api/users/solvers")
+        return data.map(u => new domain.User(u.id, u.firstName, u.lastName))
+    }
+
+    private async fetchGroups(solvers: domain.User[]): Promise<domain.Group[]> {
+        const { data } = await this._api.get<response.Group[]>("/api/groups")
+        return data.map(g => {
+            const users = g.userIds.map(id => {
+                const user = solvers.find(s => s.id === id)
+                if (!user)
+                    throw new AppError("Cannot fetch groups.", `User with id ${id} not found.`)
+                return user
+            })
+            return new domain.Group(g.id, g.name, users, g.topicId)
         })
     }
 }

@@ -4,10 +4,12 @@ import { cached, isnonreactive, Monitor, options, Ref, Transaction, transaction 
 import { Storage } from "../../api"
 import * as domain from "../../domain"
 import { IContextMenuService } from "../ContextMenuService"
+import { ISolutionsService } from "../ISolutionsService"
 import { ITasksService } from "../ITasksService"
 import { IMessageService } from "../MessageService"
 import { SolutionEditorView } from "../SolutionEditorView"
 import { SolutionRunnerView } from "../SolutionRunnerView"
+import { SolutionsView } from "../SolutionsView"
 import { TaskEditorView } from "../TaskEditorView"
 import { TasksExplorer } from "../TasksExplorer"
 import { IThemeService } from "../ThemeService"
@@ -16,7 +18,7 @@ import { View } from "../View"
 import { ViewGroup } from "../ViewGroup"
 import * as view from "./TasksView.view"
 
-export class TasksView extends View implements ITasksService {
+export class TasksView extends View implements ITasksService, ISolutionsService {
     @isnonreactive readonly tasksExplorer: TasksExplorer
     @isnonreactive private static readonly _monitor = Monitor.create("tasks-view", 0, 0, 0)
     @isnonreactive private static readonly _markdown = new MarkdownIt()
@@ -24,6 +26,7 @@ export class TasksView extends View implements ITasksService {
     @isnonreactive private readonly _viewGroup: ViewGroup
     @isnonreactive private readonly _messageService: IMessageService
     @isnonreactive private readonly _themeService: IThemeService
+    @isnonreactive private readonly _contextMenuService: IContextMenuService
 
     override get shouldShowLoader(): boolean { return TasksView._monitor.isActive }
     override get title(): string { return "Tasks" }
@@ -38,7 +41,8 @@ export class TasksView extends View implements ITasksService {
         this._storage = storage
         this._viewGroup = viewGroup
         this._messageService = messageService
-        this.tasksExplorer = new TasksExplorer(new Ref(this._storage, "topics"), this, contextMenuService, new Ref(this._storage, "permissions"))
+        this._contextMenuService = contextMenuService
+        this.tasksExplorer = new TasksExplorer(new Ref(this._storage, "topics"), this, contextMenuService, new Ref(this._storage, "permissions"), this)
         this._themeService = themeService
     }
 
@@ -85,7 +89,7 @@ export class TasksView extends View implements ITasksService {
 
     @transaction
     createSolution(task: domain.Task): void {
-        const solution = new domain.Solution(domain.Solution.NO_ID, task, "", null, null)
+        const solution = new domain.Solution(domain.Solution.NO_ID, task, "", null, null, null)
         const solutionEditorView = new SolutionEditorView(solution, this._storage, this._viewGroup, this._messageService)
         this._viewGroup.openView(solutionEditorView)
     }
@@ -100,5 +104,11 @@ export class TasksView extends View implements ITasksService {
     runSolution(solution: domain.Solution): void {
         const solutionRunnerView = new SolutionRunnerView(solution, this._viewGroup, this._messageService, this._themeService)
         this._viewGroup.openView(solutionRunnerView)
+    }
+
+    @transaction
+    openSolutions(task: domain.Task): void {
+        const solutionsView = new SolutionsView(this._viewGroup, task.topic.groups, task.solutions, this, this._contextMenuService)
+        this._viewGroup.openView(solutionsView)
     }
 }

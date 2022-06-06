@@ -18,12 +18,11 @@ public class GroupsController : ControllerBase
         AuthorizationCredentials credentials = new(User);
         return credentials.UserRole switch
         {
-            Infrastructure.Role.Author => await (from u in _context.Users
-                                                 join t in _context.Topics on u.Id equals t.AuthorId
-                                                 join g in _context.Groups on t.Id equals g.TopicId
-                                                 where u.Id == credentials.UserId
+            Infrastructure.Role.Author => await (from t in _context.Topics
+                                                 join g in _context.Groups.Include(g => g.Users) on t.Id equals g.TopicId
+                                                 where t.AuthorId == credentials.UserId
                                                  select (Response.Group)g).ToArrayAsync(),
-            Infrastructure.Role.Solver => await (from u in _context.Users.Include(u => u.Groups)
+            Infrastructure.Role.Solver => await (from u in _context.Users.Include(u => u.Groups).ThenInclude(g => g.Users)
                                                  where u.Id == credentials.UserId
                                                  select from g in u.Groups select (Response.Group)g).SingleAsync(),
             _ => throw new ArgumentOutOfRangeException()
@@ -45,7 +44,8 @@ public class GroupsController : ControllerBase
         Infrastructure.Group databaseGroup = new()
         {
             Name = requestGroup.Name,
-            TopicId = requestGroup.TopicId
+            TopicId = requestGroup.TopicId,
+            Users = new List<Infrastructure.User>()
         };
         _context.Add(databaseGroup);
         await _context.SaveChangesAsync();
@@ -56,7 +56,7 @@ public class GroupsController : ControllerBase
     public async Task<ActionResult<Response.Group>> Update(long groupId, Request.UpdateGroup requestGroup)
     {
         AuthorizationCredentials credentials = new(User);
-        Infrastructure.Group? databaseGroup = await _context.Groups.Include(g => g.Topic).SingleOrDefaultAsync(g => g.Id == groupId);
+        Infrastructure.Group? databaseGroup = await _context.Groups.Include(g => g.Topic).Include(g => g.Users).SingleOrDefaultAsync(g => g.Id == groupId);
         if (databaseGroup is null)
             return Problem(detail: "Group does not exist.", statusCode: StatusCodes.Status400BadRequest, title: "Cannot update group.");
         if (databaseGroup.Topic.AuthorId != credentials.UserId)

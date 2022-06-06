@@ -20,12 +20,12 @@ export function renderContextMenu(node: model.TaskNode): JSX.Element[] {
 
     function onCreateSolution(): void {
         node.contextMenuService.close()
-        node.tasksService.createSolution(node.item)
+        node.solutionsService.createSolution(node.item)
     }
 
     async function onDeleteSolution(): Promise<void> {
         node.contextMenuService.close()
-        node.tasksService.deleteSolution(node.item.solutions[0])
+        node.solutionsService.deleteSolution(node.item.solutions[0])
     }
 
     function onOpenSolution(): void {
@@ -38,6 +38,11 @@ export function renderContextMenu(node: model.TaskNode): JSX.Element[] {
         navigator.clipboard.writeText(node.item.solutions[0].cloneUrl as string)
     }
 
+    function onOpenSolutions(): void {
+        node.contextMenuService.close()
+        node.solutionsService.openSolutions(node.item)
+    }
+
     let key = 1
     const contextMenuItems = []
     if (node.permissions.canUpdateTask)
@@ -48,29 +53,32 @@ export function renderContextMenu(node: model.TaskNode): JSX.Element[] {
         contextMenuItems.push(
             <ContextMenu.Button key={key++} variant="danger" onClick={onDeleteTask}>Delete Task</ContextMenu.Button>
         )
-    if (node.permissions.canCreateSolution && node.item.solutions.length === 0)
-        contextMenuItems.push(
-            <ContextMenu.Button key={key++} variant="primary" onClick={onCreateSolution}>New Solution</ContextMenu.Button>
-        )
-    if (node.item.solutions.length === 1) {
-        let submenuItems = (
-            <>
-                <ContextMenu.Button key={key++} variant="primary" onClick={onRunSolution}>Run Solution</ContextMenu.Button>
-                <ContextMenu.Button key={key++} variant="primary" onClick={onOpenSolution}>Open Solution</ContextMenu.Button>
-                <ContextMenu.Button key={key++} variant="primary" onClick={onCopySolutionCopyUrl}>Copy Solution Clone URL</ContextMenu.Button>
-            </>
-        )
-        if (node.permissions.canDeleteSolution)
-            submenuItems = (
+    if (node.item.solutions.length === 0) {
+        if (node.permissions.canCreateSolution)
+            contextMenuItems.push(
+                <ContextMenu.Button key={key++} variant="primary" onClick={onCreateSolution}>New Solution</ContextMenu.Button>
+            )
+    } else {
+        if (node.permissions.canViewAllSolutions) {
+            contextMenuItems.push(
+                <ContextMenu.Button key={key++} variant="primary" onClick={onOpenSolutions}>Open Solutions</ContextMenu.Button>
+            )
+        } else {
+            let submenuItems = (
                 <>
-                    {submenuItems}
-                    <ContextMenu.Button key={key++} variant="danger" onClick={onDeleteSolution}>Delete Solution</ContextMenu.Button>
+                    <ContextMenu.Button key={key++} variant="primary" onClick={onRunSolution}>Run Solution</ContextMenu.Button>
+                    <ContextMenu.Button key={key++} variant="primary" onClick={onOpenSolution}>Open Solution</ContextMenu.Button>
+                    <ContextMenu.Button key={key++} variant="primary" onClick={onCopySolutionCopyUrl}>Copy Solution Clone URL</ContextMenu.Button>
                 </>
             )
-        if (contextMenuItems.length === 0)
-            contextMenuItems.push(<React.Fragment key={key++}>{submenuItems}</React.Fragment>)
-        else
-            contextMenuItems.push((<ContextMenu.Submenu key={key++} title="Solution">{submenuItems}</ContextMenu.Submenu>))
+            if (node.permissions.canDeleteSolution)
+                submenuItems = (
+                    <>
+                        {submenuItems}
+                        <ContextMenu.Button key={key++} variant="danger" onClick={onDeleteSolution}>Delete Solution</ContextMenu.Button>
+                    </>
+                )
+        }
     }
     return contextMenuItems
 }

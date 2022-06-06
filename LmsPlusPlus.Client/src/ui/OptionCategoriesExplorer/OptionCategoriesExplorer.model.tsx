@@ -27,7 +27,7 @@ export class OptionCategoriesExplorer extends Explorer<OptionCategoryKind> {
     private static createChildren(permissions: domain.Permissions): readonly Node<OptionCategoryKind>[] {
         const preferences = new Node<OptionCategoryKind>("0", OptionCategoryKind.Preferences, "Preferences")
         const nodes = [preferences]
-        if (permissions.canUpdateVcsConfiguration) {
+        if (permissions.hasVcsAccounts) {
             const vcs = new Node<OptionCategoryKind>("1", OptionCategoryKind.Vcs, "VCS")
             nodes.push(vcs)
         }

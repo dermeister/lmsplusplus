@@ -1,16 +1,16 @@
+import { Group } from "./Group"
 import { Task } from "./Task"
 
 export class Topic {
     static readonly NO_ID = -1
     readonly id: number
     readonly name: string
-    private _tasks: Task[] = []
+    readonly groups: Group[] = []
+    tasks: Task[] = []
 
-    get tasks(): Task[] { return this._tasks }
-    set tasks(tasks: Task[]) { this._tasks = tasks }
-
-    constructor(id: number, name: string) {
+    constructor(id: number, name: string, groups: Group[]) {
         this.id = id
         this.name = name
+        this.groups = groups
     }
 }

@@ -1,6 +1,7 @@
 export interface Solution {
-    id: number
-    cloneUrl: string
-    websiteUrl: string | null
-    taskId: number
+    readonly id: number
+    readonly cloneUrl: string
+    readonly websiteUrl: string | null
+    readonly taskId: number
+    readonly solverId: number
 }

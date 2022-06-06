@@ -8,19 +8,19 @@ export class Node<T> extends ObservableObject {
     @isnonreactive readonly key: string
     @isnonreactive private readonly _contextMenuService: IContextMenuService | null
     private _title: string
-    private _children: Node<unknown>[] | null
+    private _children: readonly Node<unknown>[] | null
     private _isOpened = false
     private _item: T
 
     get title(): string { return this._title }
-    get children(): Node<unknown>[] | null { return this._children }
+    get children(): readonly Node<unknown>[] | null { return this._children }
     get isGroupNode(): boolean { return this._children !== null }
     get isOpened(): boolean { return this._isOpened }
     get item(): T { return this._item }
     protected get contextMenuService(): IContextMenuService | null { return this._contextMenuService }
 
     constructor(key: string, item: T, title: string, contextMenuService: IContextMenuService | null = null,
-        children: Node<unknown>[] | null = null) {
+        children: readonly Node<unknown>[] | null = null) {
         super()
         this.key = key
         this._item = item

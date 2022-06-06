@@ -7,9 +7,5 @@ export interface ITasksService {
 
     deleteTask(task: domain.Task): void
 
-    createSolution(task: domain.Task): void
-
-    deleteSolution(task: domain.Solution): void
-
     runSolution(solution: domain.Solution): void
 }

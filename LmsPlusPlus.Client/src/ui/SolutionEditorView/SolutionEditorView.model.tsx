@@ -19,6 +19,7 @@ export class SolutionEditorView extends View {
     @isnonreactive private readonly _storage: Storage
     @isnonreactive private readonly _cloneUrl: string | null
     @isnonreactive private readonly _websiteUrl: string | null
+    @isnonreactive private readonly _solver: domain.User | null
     private _repositoryName: string | null
     private _selectedTechnology: domain.Technology | null = null
 
@@ -37,6 +38,7 @@ export class SolutionEditorView extends View {
         this._cloneUrl = solution.cloneUrl
         this._websiteUrl = solution.websiteUrl
         this.availableTechnologies = this._task.technologies
+        this._solver = solution.solver
         this._viewGroup = viewGroup
     }
 
@@ -61,7 +63,7 @@ export class SolutionEditorView extends View {
     @transaction
     @options({ monitor: SolutionEditorView.s_monitor })
     async saveSolution(): Promise<void> {
-        const solution = new domain.Solution(this._id, this._task, this._repositoryName, this._cloneUrl, this._websiteUrl)
+        const solution = new domain.Solution(this._id, this._task, this._repositoryName, this._cloneUrl, this._websiteUrl, this._solver)
         if (!this._selectedTechnology)
             this._messageService.showError(new AppError("Cannot create solution.", "No technology selected."))
         else
