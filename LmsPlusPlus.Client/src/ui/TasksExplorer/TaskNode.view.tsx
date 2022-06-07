@@ -64,19 +64,18 @@ export function renderContextMenu(node: model.TaskNode): JSX.Element[] {
                 <ContextMenu.Button key={key++} variant="primary" onClick={onOpenSolutions}>Open Solutions</ContextMenu.Button>
             )
         } else {
-            let submenuItems = (
-                <>
-                    <ContextMenu.Button key={key++} variant="primary" onClick={onRunSolution}>Run Solution</ContextMenu.Button>
-                    <ContextMenu.Button key={key++} variant="primary" onClick={onOpenSolution}>Open Solution</ContextMenu.Button>
-                    <ContextMenu.Button key={key++} variant="primary" onClick={onCopySolutionCopyUrl}>Copy Solution Clone URL</ContextMenu.Button>
-                </>
+            contextMenuItems.push(
+                <ContextMenu.Button key={key++} variant="primary" onClick={onRunSolution}>Run Solution</ContextMenu.Button>
+            )
+            contextMenuItems.push(
+                <ContextMenu.Button key={key++} variant="primary" onClick={onOpenSolution}>Open Solution</ContextMenu.Button>
+            )
+            contextMenuItems.push(
+                <ContextMenu.Button key={key++} variant="primary" onClick={onCopySolutionCopyUrl}>Copy Solution Clone URL</ContextMenu.Button>
             )
             if (node.permissions.canDeleteSolution)
-                submenuItems = (
-                    <>
-                        {submenuItems}
-                        <ContextMenu.Button key={key++} variant="danger" onClick={onDeleteSolution}>Delete Solution</ContextMenu.Button>
-                    </>
+                contextMenuItems.push(
+                    <ContextMenu.Button key={key++} variant="danger" onClick={onDeleteSolution}>Delete Solution</ContextMenu.Button>
                 )
         }
     }
