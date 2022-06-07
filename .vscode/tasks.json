@@ -19,34 +19,6 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Run API",
-      "command": "dotnet",
-      "type": "process",
-      "args": [
-        "run",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary",
-        "--project",
-        "LmsPlusPlus.Api/LmsPlusPlus.Api.csproj"
-      ],
-      "problemMatcher": [],
-    },
-    {
-      "label": "Run client",
-      "type": "npm",
-      "script": "dev",
-      "path": "LmsPlusPlus.Client",
-      "problemMatcher": [],
-    },
-    {
-      "label": "Run application",
-      "dependsOn": [
-        "Run API",
-        "Run client"
-      ],
-      "problemMatcher": []
-    },
-    {
       "label": "Run TSC",
       "type": "npm",
       "path": "LmsPlusPlus.Client",
