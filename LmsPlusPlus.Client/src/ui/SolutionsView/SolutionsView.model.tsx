@@ -1,5 +1,5 @@
 import React from "react"
-import { cached, isnonreactive, transaction } from "reactronic"
+import { cached, isnonreactive, Transaction, transaction } from "reactronic"
 import * as domain from "../../domain"
 import { IContextMenuService } from "../ContextMenuService"
 import { ISolutionsService } from "../ISolutionsService"
@@ -19,6 +19,13 @@ export class SolutionsView extends View {
         super()
         this._viewGroup = viewGroup
         this.solutionsExplorer = new SolutionsExplorer(groups, solutions, solutionsService, contextMenuService)
+    }
+
+    override dispose(): void {
+        Transaction.run(null, () => {
+            this.solutionsExplorer.dispose()
+            super.dispose()
+        })
     }
 
     @cached
