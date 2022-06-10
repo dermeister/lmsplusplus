@@ -29,7 +29,7 @@ export class AuthService extends ObservableObject implements IAuthService {
         if (this._jwtToken)
             Transaction.off(() => this.signOut())
         try {
-            const result = await this._api.post<{ token: string }>("/api/sign-in", { login, password })
+            const result = await this._api.post<{ token: string }>("sign-in", { login, password })
             this._jwtToken = result.data.token
         } catch (e) {
             if (e instanceof AxiosError && e.response?.status === 400) {

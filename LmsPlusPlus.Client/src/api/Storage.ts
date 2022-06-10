@@ -45,7 +45,7 @@ export class Storage extends ObservableObject {
         if (!this._permissions.canCreateTask)
             throw this.permissionError()
         try {
-            const { data } = await this._api.post<response.Task, AxiosResponse<response.Task>, request.CreateTask>("/api/tasks", {
+            const { data } = await this._api.post<response.Task, AxiosResponse<response.Task>, request.CreateTask>("tasks", {
                 title: task.title,
                 description: task.description,
                 topicId: task.topic.id,
@@ -85,7 +85,7 @@ export class Storage extends ObservableObject {
         if (!this._permissions.canUpdateTask)
             throw this.permissionError()
         try {
-            const { data } = await this._api.put<response.Task, AxiosResponse<response.Task>, request.UpdateTask>(`/api/tasks/${task.id}`, {
+            const { data } = await this._api.put<response.Task, AxiosResponse<response.Task>, request.UpdateTask>(`tasks/${task.id}`, {
                 title: task.title,
                 description: task.description,
                 technologyIds: task.technologies.map(t => t.id)
@@ -127,7 +127,7 @@ export class Storage extends ObservableObject {
         if (!this._permissions.canDeleteTask)
             throw this.permissionError()
         try {
-            await this._api.delete(`/api/tasks/${task.id}`)
+            await this._api.delete(`tasks/${task.id}`)
             this._topics = this._topics.map(t => {
                 if (t.id !== task.topic.id)
                     return t
@@ -147,7 +147,7 @@ export class Storage extends ObservableObject {
     @transaction
     async updatePreferences(preferences: domain.Preferences): Promise<void> {
         try {
-            const { data } = await this._api.put<response.Preferences, AxiosResponse<response.Preferences>, request.Preferences>("/api/preferences", {
+            const { data } = await this._api.put<response.Preferences, AxiosResponse<response.Preferences>, request.Preferences>("preferences", {
                 theme: preferences.theme
             })
             this._preferences = new domain.Preferences(data.theme)
@@ -164,7 +164,7 @@ export class Storage extends ObservableObject {
     async addAccount(provider: domain.Provider): Promise<void> {
         const vcsAccountRegisteringModal = new VcsAccountRegisteringModal()
         try {
-            const { data: authorizationUrl } = await this._api.get<string>(`/api/oauth/authorization-url/${provider.id}`)
+            const { data: authorizationUrl } = await this._api.get<string>(`oauth/authorization-url/${provider.id}`)
             await vcsAccountRegisteringModal.registerAccount(authorizationUrl)
         } catch (e) {
             if (e instanceof AxiosError && e.response?.status === 401) {
@@ -189,7 +189,7 @@ export class Storage extends ObservableObject {
         if (!this._permissions.hasVcsAccounts)
             throw this.permissionError()
         try {
-            await this._api.delete(`/api/vcs-accounts/${account.id}`)
+            await this._api.delete(`vcs-accounts/${account.id}`)
         } catch (e) {
             if (e instanceof AxiosError && e.response?.status === 401) {
                 this._authService.signOut()
@@ -206,7 +206,7 @@ export class Storage extends ObservableObject {
             throw this.permissionError()
         try {
             const { data } = await this._api.put<response.VcsAccount, AxiosResponse<response.VcsAccount>, request.VcsAccount>(
-                `/api/vcs-accounts/${account.id}`, { isActive: true })
+                `vcs-accounts/${account.id}`, { isActive: true })
             if (data.isActive)
                 this._accounts = this._accounts.map(a => {
                     if (a.isActive)
@@ -230,7 +230,7 @@ export class Storage extends ObservableObject {
         if (!this._permissions.canCreateSolution)
             throw this.permissionError()
         try {
-            const { data } = await this._api.post<response.Solution, AxiosResponse<response.Solution>, request.Solution>("/api/solutions", {
+            const { data } = await this._api.post<response.Solution, AxiosResponse<response.Solution>, request.Solution>("solutions", {
                 repositoryName: solution.repositoryName as string,
                 taskId: solution.task.id,
                 technologyId: technology.id
@@ -270,7 +270,7 @@ export class Storage extends ObservableObject {
         if (!this._permissions.canDeleteSolution)
             throw this.permissionError()
         try {
-            await this._api.delete(`/api/solutions/${solution.id}`)
+            await this._api.delete(`solutions/${solution.id}`)
             this._topics = this._topics.map(topic => {
                 if (topic.id !== solution.task.topic.id)
                     return topic
@@ -343,28 +343,28 @@ export class Storage extends ObservableObject {
     }
 
     private async fetchUser(): Promise<domain.User> {
-        const { data } = await this._api.get<response.User>("/api/users")
+        const { data } = await this._api.get<response.User>("users")
         return new domain.User(data.id, data.firstName, data.lastName)
     }
 
     private async fetchPreferences(): Promise<domain.Preferences> {
-        const { data } = await this._api.get<response.Preferences>("/api/preferences")
+        const { data } = await this._api.get<response.Preferences>("preferences")
         return new domain.Preferences(data.theme)
     }
 
     private async fetchPermissions(): Promise<domain.Permissions> {
-        const { data } = await this._api.get<response.Permissions>("/api/permissions")
+        const { data } = await this._api.get<response.Permissions>("permissions")
         return new domain.Permissions(data.canCreateTask, data.canUpdateTask, data.canDeleteTask, data.hasVcsAccounts,
             data.canUpdateUser, data.canCreateSolution, data.canDeleteSolution, data.canViewAllSolutions)
     }
 
     private async fetchVcsHostingProviders(): Promise<domain.Provider[]> {
-        const { data } = await this._api.get<response.VcsHostingProvider[]>("/api/vcs-hosting-providers")
+        const { data } = await this._api.get<response.VcsHostingProvider[]>("vcs-hosting-providers")
         return data.map(p => new domain.Provider(p.id, p.name, githubIcon))
     }
 
     private async fetchVcsAccounts(providers: domain.Provider[]): Promise<domain.Account[]> {
-        const { data } = await this._api.get<response.VcsAccount[]>("/api/vcs-accounts")
+        const { data } = await this._api.get<response.VcsAccount[]>("vcs-accounts")
         return data.map(a => {
             const provider = providers.find(p => p.id === a.hostingProviderId)
             if (!provider)
@@ -374,12 +374,12 @@ export class Storage extends ObservableObject {
     }
 
     private async fetchTechnologies(): Promise<domain.Technology[]> {
-        const { data } = await this._api.get<response.Technology[]>("/api/technologies")
+        const { data } = await this._api.get<response.Technology[]>("technologies")
         return data.map(t => new domain.Technology(t.id, t.name))
     }
 
     private async fetchTopics(groups: domain.Group[]): Promise<domain.Topic[]> {
-        const { data } = await this._api.get<response.Topic[]>("/api/topics")
+        const { data } = await this._api.get<response.Topic[]>("topics")
         return data.map(t => {
             const topicGroups = groups.filter(g => g.topicId === t.id)
             return new domain.Topic(t.id, t.name, topicGroups)
@@ -387,7 +387,7 @@ export class Storage extends ObservableObject {
     }
 
     private async fetchTasks(topics: domain.Topic[], allTechnologies: domain.Technology[]): Promise<domain.Task[]> {
-        const { data } = await this._api.get<response.Task[]>("/api/tasks")
+        const { data } = await this._api.get<response.Task[]>("tasks")
         return data.map(t => {
             const topic = topics.find(topic => topic.id === t.topicId)
             if (!topic)
@@ -404,7 +404,7 @@ export class Storage extends ObservableObject {
     }
 
     private async fetchSolutions(tasks: domain.Task[], solvers: domain.User[]): Promise<domain.Solution[]> {
-        const { data } = await this._api.get<response.Solution[]>("/api/solutions")
+        const { data } = await this._api.get<response.Solution[]>("solutions")
         return data.map(s => {
             const task = tasks.find(t => t.id === s.taskId)
             if (!task)
@@ -417,12 +417,12 @@ export class Storage extends ObservableObject {
     }
 
     private async fetchSolvers(): Promise<domain.User[]> {
-        const { data } = await this._api.get<response.User[]>("/api/users/solvers")
+        const { data } = await this._api.get<response.User[]>("users/solvers")
         return data.map(u => new domain.User(u.id, u.firstName, u.lastName))
     }
 
     private async fetchGroups(solvers: domain.User[]): Promise<domain.Group[]> {
-        const { data } = await this._api.get<response.Group[]>("/api/groups")
+        const { data } = await this._api.get<response.Group[]>("groups")
         return data.map(g => {
             const users = g.userIds.map(id => {
                 const user = solvers.find(s => s.id === id)

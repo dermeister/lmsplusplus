@@ -56,6 +56,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -63,6 +64,7 @@ app.UseMiddleware<ServiceProxyMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.UseEndpoints(endpoints => { endpoints.MapHub<ApplicationHub>("/application"); });
+app.MapFallbackToFile("index.html");
 using (IServiceScope scope = app.Services.CreateScope())
 {
     IServiceProvider services = scope.ServiceProvider;

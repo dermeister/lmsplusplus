@@ -41,7 +41,7 @@ self.addEventListener("fetch", event => {
             let body: ArrayBuffer | null = null
             if (request.method !== "GET" && request.method !== "HEAD")
                 body = await request.arrayBuffer()
-            const newUrl = `/api/proxy${url.pathname}?${url.searchParams.toString()}`
+            const newUrl = `proxy${url.pathname}?${url.searchParams.toString()}`
             const newRequest = new Request(newUrl, {
                 headers,
                 body,

@@ -8,11 +8,11 @@ import "./ui/index.scss"
 
 const app = Transaction.run(null, () => new App())
 
-function Root(): JSX.Element {
+function Bootstrap(): JSX.Element {
     return autorender(() => app.render(), [app])
 }
 
-ReactDOM.render(<Root />, document.getElementById("root"))
+ReactDOM.render(<Bootstrap />, document.getElementById("root"))
 
 window.onbeforeunload = () => {
     app.dispose()

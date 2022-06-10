@@ -95,7 +95,7 @@ export class SolutionRunnerView extends View implements IServiceWorkerService {
     @options({ monitor: SolutionRunnerView._monitor })
     private async startSolution(): Promise<void> {
         try {
-            this._connection = new HubConnectionBuilder().withUrl("/api/application").build()
+            this._connection = new HubConnectionBuilder().withUrl("/application").build()
             await this._connection.start()
             const serviceConfigurations = await this._connection.invoke<ServiceConfiguration[]>("StartApplication", this._solution.id)
             this._serviceViews = serviceConfigurations.map(c => new ServiceView(c.name, c.stdin, c.virtualPorts, this._connection!, this,
