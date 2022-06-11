@@ -29,7 +29,8 @@ export default defineConfig({
             "/tasks": proxyOptions,
             "/groups": proxyOptions,
             "/application": proxyOptions,
-            "/proxy": proxyOptions
+            "/proxy": proxyOptions,
+            "/sign-in": proxyOptions
         }
     }
 })
